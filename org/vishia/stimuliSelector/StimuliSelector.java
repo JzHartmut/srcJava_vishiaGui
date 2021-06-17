@@ -29,6 +29,7 @@ import org.vishia.util.DataAccess;
 import org.vishia.util.DataAccess.Variable;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringFunctions_C;
 
 /*Test with jzcmd: call jzcmd with this java file with its full path:
 D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/test/StimuliSelector.java
@@ -220,7 +221,7 @@ public class StimuliSelector
     this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
     this.btnDeselectLines = new GralButton("addTestCase", "desel", this.actionDeselectLines);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
-    this.btnExampleSel = new GralButton("exmpl", "exmpl", this.actionExampleSel);
+    this.btnExampleSel = new GralButton("exmpl", "show", this.actionShowSel);
     this.btnHelp = new GralButton("help", "help", this.actionHelp);
     //
     JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
@@ -328,9 +329,9 @@ public class StimuliSelector
   
   
   
-  /**This is the common routine for all buttons which does anything with the selection.
+  /**This is the common routine for all buttons which should call a sub routine from the JZtxtcmd control script.
    * It is used also for gen Stimuli and the exec buttons. 
-   * @param subroutine
+   * @param subroutine name of the sub routine in the JZtxtcmd script for this button.
    */
   void execBtnAction(String subroutine)
   {
@@ -371,6 +372,11 @@ public class StimuliSelector
   }
   
   
+  
+  /**Routine called from the button [gen test cases].
+   * It searches and calls the JZtxtcmd sub btnGenTestCases(select)
+   * with a JZtxtcmd variable as argument with the select string.
+   */
   void genTestcases ( ) {
     //String[] identifier = new String[wdgTables.length];
     Map<String, DataAccess.Variable<Object>> args = new TreeMap<String, DataAccess.Variable<Object>>();
@@ -386,74 +392,244 @@ public class StimuliSelector
 
   
   
+  /**routine for Button [add sel]
+   * 
+   */
   void addTestcases ( ) {
-    StringBuilder select = new StringBuilder();
-    String sepSpace = "";
-    boolean bFoundMark = false;
-    for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
-      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
-      boolean bAdd = false;
-      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
-        int mark = line.getMark();
-        if( (mark & 1)!=0) {                  //line is marked (red)
-          if(!bFoundMark) {                   //first time found a line
-            this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
-            
-          }
-          addTestCase(select, line, sep, ixTable +1);
-          bAdd = true;
-          bFoundMark = true;
-          sep = ",";
-        }
-        Debugutil.stop();
+    int nCursor = this.wdgSelects.getCursorPos();
+    String textSelect = this.wdgSelects.getText();
+    int zTextSelect = textSelect.length();
+    StringBuilder sbselect = new StringBuilder(textSelect);
+    char cc = 0;
+    boolean bAddAllTable = false;
+    if(nCursor >= zTextSelect) { nCursor -=1; } //start on last character
+    while(nCursor >=0 && " \n\t\r".indexOf(cc = textSelect.charAt(nCursor))>=0) { nCursor -=1; }  //lands on -1 or last char before cursor 
+    nCursor +=1;
+    if(nCursor ==0 || ":&+".indexOf(cc)>=0) {
+      int nCursor1 = nCursor;
+      while(nCursor1 < zTextSelect && " \n\t\r".indexOf(cc = textSelect.charAt(nCursor1))>=0) { nCursor1 +=1; } 
+      if(nCursor1 > nCursor) {
+      //  sbselect.delete(nCursor, nCursor1);  //remove white spaces from : till current
       }
-      if(bAdd) { select.append(';'); }
-      sepSpace = " ";
+      bAddAllTable = (nCursor1 == sbselect.length() || ":&+".indexOf(cc)>=0);
     }
-    if(bFoundMark==false) { //nothing is marked, it means the user press this key without preparing mark.
-      //Then add the last selected line in the last selected table as default behavior to do anything what's obviously.
-      GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = this.wdgLastSelectedTable.getCurrentLine();
-      if(line == null) { 
-        this.wdgSelects.setText("first select a line in table, or press [exmpl]\nremove this content with mark and delete in this textbox");
-      }
-      else { addTestCaseFromTable(line); }
+    if(bAddAllTable) {
+      nCursor = addTestCaseAllTables(sbselect, nCursor);
     }
     else {
-      String selWdg = this.wdgSelects.getText();
-      int selWdgPos = selWdg.indexOf('|');
-      int selWdgPos2;
-      if(selWdgPos >=0) {
-        selWdgPos2 = selWdgPos +1;
-        while( selWdgPos2 < selWdg.length() && selWdg.charAt(selWdgPos2) == '|') { selWdgPos2 +=1; }
-      } else {
-        selWdgPos = this.wdgSelects.getCursorPos();
-        selWdgPos2 = selWdgPos;
-      }
-      selWdg = selWdg.substring(0, selWdgPos) + select + selWdg.substring(selWdgPos2);
-      this.wdgSelects.setText(selWdg);
-      this.wdgSelects.setCursorPos(selWdgPos + select.length()); 
+      nCursor = prcTablesInSelectionPart(sbselect, nCursor, -1, null, false);
     }
-  }  
+    this.wdgSelects.setText(sbselect);
+    this.wdgSelects.setCursorPos(nCursor);
+
+  }
 
   
-  int nTableTestcase = -1;
   
-  String sTextTestCases = "";
   
-  int nPosCursorTextCases = 0;
   
-  void addTestCase ( StringBuilder select, GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line, String sepXXX, int nTable ) 
-  //throws IOException 
-  {
-    if(this.nTableTestcase != nTable) {
-      if(this.nTableTestcase != -1) {           //a following table
-        select.append("; ");
+  /**Processes the selected lines of all tables but only in the found part of the selection expression.
+   * It searches which tables are contained in that part and processes only content from this tables.
+   * But for bMarkLinesInTable = false: If the table is given (nTable >0), 
+   * this table content is added in this part as a new table too.
+   * <br>
+   * This routine has 2 different functions:
+   * <ul><li> use marked lines or the current line for selection: bMarkLinesInTable==false.
+   * <li>Mark the lines which are contained in the part of selection expression: bMarkLinesInTable==true.
+   * <ul>
+   * Both algorithm are widely similar, hence done in this routine and distinct by bMarkLinesInTable.
+   *     
+   * @param sbselect contains the content of the select textbox
+   * @param nCursor position of the cursor there
+   * @param nTable if given (>=0) then only this table is handled (because of double clicked of its line).
+   *               if -1, then check any table of selection
+   * @param lineSel only used if nTable >=0, then this line.
+   * @param bMarkLinesInTable true then the found keys marks the lines in the table (other direction).
+   * @return not used
+   */
+  int prcTablesInSelectionPart ( StringBuilder sbselect, int nCursor
+      , int nTable, GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData lineSel
+      , boolean bMarkLinesInTable) {
+    //                                                     // search backward which table
+    int zText0 = sbselect.length();
+    int nTable1 = -1;
+    char cc = '\0';
+    int nCursor1 = nCursor-1;                              // back to the section part start from : + %
+    while(nCursor1 >=0 && ":+&".indexOf(cc = sbselect.charAt(nCursor1))<0) { nCursor1 -=1; }  
+    nCursor1 +=1;
+    //cursor @0 or @:
+    //now search table:
+    boolean bTableFound = false;                           // forward to one table entries start on =
+    while(!bTableFound && nCursor1 < zText0 && ":+&".indexOf(cc = sbselect.charAt(nCursor1++)) <0) {
+      if(cc == '=') {
+        int nCursor2 = nCursor1;  //after =
+        nCursor1 -=2;  //at char before = from after =
+        while(nCursor1 >0 && (cc = sbselect.charAt(nCursor1)) ==' ') { nCursor1 -=1; }
+        while(nCursor1 >=0 && (cc = sbselect.charAt(nCursor1)) >='0' && cc <= '9') { 
+          nCursor1 -=1;   //back to start of nr
+        }
+        nCursor1 +=1;  //to the number, or from -1 to 0
+        nTable1 = StringFunctions_C.parseIntRadix(sbselect, nCursor1, 2, 10, null);
+        nCursor1 = nCursor2;  //after = to search next table entry
+        //                                                 // A table was detected.
+        if(nTable <0 || nTable == nTable1) {
+          Map<String, String> selInTable = new TreeMap<String, String>();    //skip over
+          do {                                               // gather all existing entries for this segment
+            while(nCursor1 >0 && " ,".indexOf(cc = sbselect.charAt(nCursor1))>=0) { nCursor1 +=1; }
+            int nCursor0 = nCursor1;                           //read identifiert
+            while(nCursor1 >0 && Character.isJavaIdentifierPart(cc = sbselect.charAt(nCursor1))) { nCursor1 +=1; }
+            String selKey = sbselect.substring(nCursor0, nCursor1);
+            selInTable.put(selKey, selKey);                  // gather all already existing select keys for this table
+          } while(";&:+".indexOf(cc) <0);                    // till the end of this section part
+          
+          GralTable<Map<String, DataAccess.Variable<Object>>> table = this.wdgTables[nTable1-1];
+          if(table !=null) {
+            boolean bSomeMarked = false;
+            for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: table.iterLines()) {
+              String keyLine = getKeyfromLine(line);
+              int mark = line.getMark();
+              if(bMarkLinesInTable) {                      // set marked if key is contains in select expression part
+                if(selInTable.get(keyLine) != null) {
+                  if((mark & 1)==0) { 
+                    line.setMarked(1, null); bSomeMarked = true; 
+                  }
+                } else {
+                  if((mark & 1)!=0) { 
+                    line.setNonMarked(1, null); bSomeMarked = true;
+                  }
+                }
+              } else {                                     // get marked line as key
+                if( (mark & 1)!=0) {   //line is marked (red)
+                  bSomeMarked = true;
+                  nCursor1 = addLineToSegm(sbselect, nCursor1, line, selInTable);
+                }
+              }
+            }
+            if(bSomeMarked && bMarkLinesInTable) {
+              table.repaint();
+            }
+            else if(!bSomeMarked && !bMarkLinesInTable) {
+              GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = table.getCurrentLine();
+              nCursor1 = addLineToSegm(sbselect, nCursor1, line, selInTable);
+            }
+          }
+        }
       }
-      select.append(Integer.toString(nTable)).append("=");
-    } else {
-      select.append(", ");
     }
-    this.nTableTestcase = nTable;
+    return nCursor1;
+  }
+  
+  
+  /**Reads the key from the line of the table, interal.
+   * @param line
+   * @return
+   */
+  private String getKeyfromLine ( GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line) {
+    Map<String, DataAccess.Variable<Object>> lineData = line.getData();
+    DataAccess.Variable<Object> lineContent = lineData.get("name");
+    assert(lineContent.type() == 'S');      //contains a String
+    String sel = (String)lineContent.value();
+    int posSpace = sel.indexOf(' ');
+    if(posSpace <0) { posSpace = sel.length(); }
+    return sel;
+  }
+  
+  
+  
+  
+  /**Adds the key of the given line in this part of selection string
+   * but only if it is not contained. 
+   * @param sbselect contains the select expression, will be changed
+   * @param nCursor cursor position where exactly should be inserted.
+   * @param line
+   * @param alreadyContained Map of all found keys (contained in the part of the select expression)
+   * @return The new cursor position proper for a next entry.
+   */
+  int addLineToSegm ( StringBuilder sbselect, int nCursor
+      , GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line
+      , Map<String, String> alreadyContained
+      ) {
+    int nCursorNew = nCursor;
+    String key = getKeyfromLine(line);
+    if(alreadyContained.get(key) ==null) {
+      nCursorNew = insertTestCase(sbselect, nCursor, false, 0, line);
+      alreadyContained.put(key, key);
+    }
+    return nCursorNew;
+  }
+  
+  
+  
+  
+
+  /**Adds the selection from all tables as initial string, called if the selection (part) is empty. 
+   * This routine is called from {@link #addTestcases()} if there is detected that the part is empty.
+   * If some lines are marked, only this lines are used. 
+   * If no mark is given, the current lines of all tables are added.
+   * @param sbselect contains the select expression, will be changed
+   * @param nCursor cursor position where exactly should be inserted. It is 0 if the field is empty,
+   * or it can be after a ':' character.
+   */
+  int addTestCaseAllTables ( StringBuilder sbselect, int nCursor) {
+    int nCursor1 = nCursor;
+    boolean bFoundMarked = false;
+    for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
+      GralTable<Map<String, DataAccess.Variable<Object>>> table = this.wdgTables[ixTable];
+      if(table !=null) {
+        boolean bFirstInTable = true;
+        for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: table.iterLines()) {
+          String keyLine = getKeyfromLine(line);
+          int mark = line.getMark();
+          if((mark & 1)!=0) {                              // add marked line
+            bFoundMarked = true;
+            nCursor1 = insertTestCase(sbselect, nCursor1, bFirstInTable, ixTable+1, line);
+            bFirstInTable = false;
+          }
+        }
+        if(!bFirstInTable) { //only if somewhat inserted:
+          sbselect.insert(nCursor1, "; ");                 // close the entry of a table with ;
+          nCursor1 += 2;
+        }
+      }
+    }
+    if(!bFoundMarked) {                                    // add all current lines
+      for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
+        GralTable<Map<String, DataAccess.Variable<Object>>> table = this.wdgTables[ixTable];
+        if(table !=null) {
+          GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = table.getCurrentLine();
+          if(line !=null) {
+            nCursor1 = insertTestCase(sbselect, nCursor1, true, ixTable+1, line);
+            sbselect.insert(nCursor1, "; ");                   // close the entry of a table with ;
+            nCursor1 += 2;
+          }
+        }
+      }
+    }
+    return nCursor1;
+  }
+  
+  
+  
+  
+  /**Add the entry for one line of a table exactly on the cursor position.
+   * @param sbselect The StringBuffer contains the current content, will be changed
+   * @param nCursor position where to insert
+   * @param bNewTableEntry true then write "<&nTable>=" for a new table, false then write ", "
+   * @param nTable The table number counted from 1 for the first.
+   * @param line The line of table, get key from there
+   */
+  int insertTestCase ( StringBuilder sbselect, int nCursor, boolean bNewTableEntry
+      , int nTable, GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line ) 
+  //throws IOException 
+  { int nCursor1 = nCursor;
+    int sblen0 = sbselect.length();
+    if(bNewTableEntry) {
+      sbselect.insert(nCursor1, Integer.toString(nTable)+"=");
+    } else {
+      sbselect.insert(nCursor1, ", ");
+    }
+    int sblen = sbselect.length();
+    nCursor1 += sblen - sblen0;
     Map<String, DataAccess.Variable<Object>> lineData = line.getData();
     DataAccess.Variable<Object> lineContent = lineData.get("name");
     assert(lineContent.type() == 'S');      //contains a String
@@ -461,31 +637,36 @@ public class StimuliSelector
     int posSpace = sel.indexOf(' ');
     if(posSpace <0) { posSpace = sel.length(); }
     //select.append(sep)
-    select.append(sel.substring(0, posSpace));
+    sblen0 = sblen;
+    sbselect.insert(nCursor1, sel.substring(0, posSpace));
+    sblen = sbselect.length();
+    nCursor1 += sblen - sblen0;
+    return nCursor1;
   }
   
   
+  
+  
+  
+  /**Double click on one line
+   * @param line
+   */
   void addTestCaseFromTable ( GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line ) {
     Object o = line.getTable().getData();
     assert(o instanceof Integer);
     int nTable = ((Integer)o).intValue();
+    
     int nCursor = this.wdgSelects.getCursorPos();
-    String text0 = this.wdgSelects.getText();
-    if(nCursor != this.nPosCursorTextCases || !text0.equals(this.sTextTestCases)) {
-      this.nTableTestcase = -1; //anything is changed, it starts with new table. 
-    }
-    StringBuilder sCase = new StringBuilder(text0.substring(0, nCursor));
-    //
-    addTestCase(sCase, line, null, nTable);
-    //
-    int nCursorNew = sCase.length();
-    sCase.append(text0.substring(nCursor));
-    this.wdgSelects.setText(sCase);
-    this.wdgSelects.setCursorPos(nCursorNew);
-    this.nPosCursorTextCases = nCursorNew; this.sTextTestCases = sCase.toString();
-     
+    String textSelect = this.wdgSelects.getText();
+    StringBuilder sbselect = new StringBuilder(textSelect);
+    nCursor = prcTablesInSelectionPart(sbselect, nCursor, nTable, line, false);
+    this.wdgSelects.setText(sbselect);
+    this.wdgSelects.setCursorPos(nCursor);
+ 
   }
 
+  
+  
   
   void deselectLines ( ) {
     for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
@@ -504,69 +685,16 @@ public class StimuliSelector
   }  
   
   
-  void prepareExampleSel() {
-    StringBuilder select = new StringBuilder();
-    String sepSpace = "";
-    boolean bAddTable = false;
-    for(int ixTable = 0; ixTable <=1; ++ixTable) {
-      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
-      boolean bAdd = false;
-      int nrLine = 0;
-      int nrLines = this.wdgTables[ixTable].size();
-      int nrEndLine = nrLines >2? 2 :1;
-      this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
-      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
-        if(++nrLine > nrEndLine) break;
-        addTestCase(select, line, sep, ixTable +1);
-        sep = ","; bAdd = true; bAddTable = true;
-      }
-      select.append("; ");
-      //if(bAdd) { select.append(';'); }
-      sepSpace = " ";
-    }
-    //                                // add selection + second combination
-    this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
-    boolean bAddSel2 = false;
-    for(int ixTable = 0; ixTable <=1; ++ixTable) {
-      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
-      boolean bAdd = false;
-      int nrLine = 0;
-      int nrLines = this.wdgTables[ixTable].size();
-      int nrUsedLine = nrLines >=2? nrLines -2 :1;
-      
-      this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
-      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
-        if(++nrLine >nrUsedLine) {
-          if(bAddTable && !bAddSel2) {
-            select.append(" + ");    //additional combination
-          }
-          addTestCase(select, line, sep, ixTable +1);
-          sep = ","; bAdd = true; bAddTable = true; bAddSel2 = true;
-        }
-      }
-      select.append("; ");
-      //if(bAdd) { select.append(';'); }
-      sepSpace = " ";
-    }
-    if(bAddTable) {
-      select.append("\n & ");    //with this combination
-    }
-    bAddTable = false;
-    this.nTableTestcase = -1;         //decides about syntax in addTestCase(..)
-    for(int ixTable = 2; ixTable <6; ++ixTable) {
-      String sep = sepSpace + Integer.toString(ixTable+1) + "=";
-      boolean bAdd = false;
-      int nrLine = 0;
-      for(GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line: this.wdgTables[ixTable].iterLines()) {
-        if(++nrLine >2) break;
-        addTestCase(select, line, sep, ixTable +1);
-        sep = ","; bAdd = true;
-      }
-      sepSpace = " ";
-    }
-    this.wdgSelects.setText(select);
-    this.wdgSelects.setCursorPos(select.length()); 
+  
+  void showSelectExpressionPart ( ) {
+    int nCursor = this.wdgSelects.getCursorPos();
+    String textSelect = this.wdgSelects.getText();
+    StringBuilder sbselect = new StringBuilder(textSelect);
+    prcTablesInSelectionPart(sbselect, nCursor, -1, null, true);
   }
+  
+  
+  
 
 
   GralUserAction actionReadConfig = new GralUserAction("readConfig")
@@ -603,11 +731,13 @@ public class StimuliSelector
   
   
   
+  /**Action for the button [gen test cases] invokes {@link StimuliSelector#genTestcases()} 
+   * 
+   */
   GralUserAction actionGenTestcases = new GralUserAction("genTestcases")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         genTestcases();
-        StimuliSelector.this.nTableTestcase = -1;
       }
       return true;
     }
@@ -699,10 +829,10 @@ public class StimuliSelector
   
   
   /**Assembles an example for selection using the given tables. */
-  GralUserAction actionExampleSel = new GralUserAction("actionExampleSel")
+  GralUserAction actionShowSel = new GralUserAction("actionShowSel")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        prepareExampleSel();
+        showSelectExpressionPart();
       }
       return true;
     }
