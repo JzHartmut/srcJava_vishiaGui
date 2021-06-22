@@ -378,13 +378,13 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
     @Override
     public void focusLost(FocusEvent e)
     {
-      System.err.println("TextBox focus lost");
+      //System.err.println("TextBox focus lost");
     }
     
     @Override
     public void focusGained(FocusEvent e)
     {
-      System.err.println("TextBox focus gained");
+      //System.err.println("TextBox focus gained");
     }
   };
 

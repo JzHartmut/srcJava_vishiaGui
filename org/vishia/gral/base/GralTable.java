@@ -1952,7 +1952,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         if(!bRedrawPending){
           itsMng.gralFocusListener.focusGainedGral(GralTable.this);
           //super.focusGained();
-          System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
+          //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
           repaint(50,100);
         }
       }

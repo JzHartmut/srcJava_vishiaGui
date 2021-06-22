@@ -664,13 +664,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         String sText = widgSwt.getText();
         super.checkAndUpdateText(sText, celldata);
       }
-      //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
-      System.out.println("SwtTableCell - focus lost;");
-      //int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
-      //for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
-        
-        //cellSwt.setBackground(colorBackSelectNonFocusedSwt);
-      //}
+      //System.out.println("SwtTableCell - focus lost;");
     }
   }
   
@@ -921,11 +915,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     }
     
     @Override public void focusLost(FocusEvent e){ 
-      System.out.println("SwtTable - debug;table composite focus lost. ");
+      //System.out.println("SwtTable - debug;table composite focus lost. ");
     }
     
     @Override public void focusGained(FocusEvent ev)
-    { System.out.println("SwtTable - debug;table composite focus gained. ");
+    { //System.out.println("SwtTable - debug;table composite focus gained. ");
     }
     
   };
@@ -969,7 +963,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         GralTable.CellData data = (GralTable.CellData)ev.widget.getData();
         Control widgSwt = (Control)ev.widget;
         //widgSwt.setBackground(colorBackSelectNonFocusedSwt); 
-        System.out.println("SwtTableCell - focus lost;");
+        //System.out.println("SwtTableCell - focus lost;");
         int iCellLine = data.ixCellLine; //ixLineNew - ixLine1;
         for(int iCellCol = 0; iCellCol < zColumn(); ++iCellCol){
           Text cellSwt = cellsSwt[iCellLine][iCellCol];

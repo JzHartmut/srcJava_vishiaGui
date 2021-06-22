@@ -17,6 +17,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -62,14 +63,15 @@ java org.vishia.gral.test.SimSelector.main(null);
  * }
  * 
  * ##execute the following routine on selection button:
- * sub execSelection(Map line1, Map line2, Map line3, Map line4, Map line5, Map line6){
- *   <+out>execSelection <&line1.descr> <&line2.var> 
+ * sub btnGenSelection ( Map line1, Map line2, Map line3, Map line4, Map line5, Map line6){
+ *   <+out><&scriptdir>/<&scriptfile>: btnGenSelection (<: > <&line1.name>, <&line2.name>) ..... <.+n>;  
  *     ... here some statements to create any output to use anywhere other from the selection.
  *   <.+>
  * }
  * 
- * sub exec1(String button="Exec", Map line1, Map line2, Map line3, Map line4, Map line5, Map line6){
- *   cmd cmd.exe /C start sh.exe -c build/testAllBase.sh;  ##example starts a execution with a [Exec] button.
+ * sub btnGenTestcases ( String select) {
+ *   if(jztc.envar.soRx) {    ##hint: use definitely the script variable, not the local copy.
+ *   ....
  * }
  * </pre>
 
@@ -82,6 +84,7 @@ public class StimuliSelector
 {
   /**Version, history and license.
    * <ul>
+   * <li>2021-06-17 renew possibilities to assemble the selection expression 
    * <li>2021-06-12 offer {@link #soRxVar} and {@link #selectorVariables} accessible from the jzTc script via envar.
    * <li>2021-06-09 Hartmut better support for building test cases
    * <li>2020-07-20 hartmut new If the script contains subroutines "exec1" ... "exec4"
@@ -123,6 +126,7 @@ public class StimuliSelector
   
   GralMng gralMng;
   
+  /**The main window */
   GralWindow window;
   
   @SuppressWarnings("unchecked") 
@@ -151,20 +155,22 @@ public class StimuliSelector
   
   public final File fileConfig;
   
-  /**A slot able to use for receiving commands.
-   * But will be initialized in the script with the designated ip and port.
-   * It is common type Object to use in JZtxtcmd container.
+  /**This variable is accessible from JZtxtcmd execution. It can be uses as an instance to communicate 
+   * with the test system, especially via {@link org.vishia.communication.SocketCmd_InterProcessComm}
+   * using emC/soCmd/SocketCmd.exe on the other side as command line program. 
+   * <br>
+   * It is from the common type Object to use in JZtxtcmd container.
    * Reason for this variable: Should preserve on re read the JZtxtcmd script.
-   * If it is only a script variable, it is destroyed while using.
+   * If a simple script variable would be used, it will be destroyed while re-compilation.
    */
   private DataAccess.Variable<Object> soRxVar = new DataAccess.Variable<Object>('O', "soRx", null);
-  //GetRx_InterProcessComm soRx;
 
+  /**This variable is accessible from JZtxtcmd execution to access all elements in the graphic. */
   private DataAccess.Variable<Object> thisVar = new DataAccess.Variable<Object>('O', "stimuliSelector", this, true);
 
   
   
-  
+  /**container to offer to the JZtxtcmd script. */
   private final Map<String, DataAccess.Variable<Object>> selectorVariables;
   
   
@@ -189,6 +195,9 @@ public class StimuliSelector
   }
   
   
+  /**local ctor only from main
+   * @param fileConfig immediately the command line argument
+   */
   StimuliSelector(String fileConfig)
   {
     this.fileConfig = new File(fileConfig);
@@ -252,6 +261,11 @@ public class StimuliSelector
     this.selectorVariables = new TreeMap<String, DataAccess.Variable<Object>>();
     this.selectorVariables.put("soRx", this.soRxVar);
     this.selectorVariables.put(this.thisVar.name(), this.thisVar);
+    this.selectorVariables.put("colorGenTestcaseActive", new  DataAccess.Variable<Object>('O', "colorGenTestcaseActive", GralColor.getColor("lgn")));
+    this.selectorVariables.put("colorGenTestcaseError", new  DataAccess.Variable<Object>('O', "colorGenTestcaseActive", GralColor.getColor("lrd")));
+    this.selectorVariables.put("colorGenTestcaseWaitRx", new  DataAccess.Variable<Object>('O', "colorGenTestcaseActive", GralColor.getColor("lye")));
+    this.selectorVariables.put("colorGenTestcaseInactive", new  DataAccess.Variable<Object>('O', "colorGenTestcaseInactive", GralColor.getColor("wh")));
+    
     
     this.output = new GralTextBox("output");
   }
@@ -284,6 +298,9 @@ public class StimuliSelector
   
   
   
+  /**Read and translate the JZtxtcmd to config the GUI
+   * It is also invoked from the button [read config] on the opened GUI.
+   */
   void readConfig()
   {
     JZtxtcmdExecuter.ExecuteLevel level = null;
@@ -393,7 +410,13 @@ public class StimuliSelector
   
   
   /**routine for Button [add sel]
-   * 
+   * It analyzes the given content in the {@link #wdgSelects} text box and marked lines in the tables
+   * and produces the proper part of the selection expression.
+   * Calls {@link #addTestCaseAllTables(StringBuilder, int)} for an empty part in the expression
+   * or calls {@link #prcTablesInSelectionPart(StringBuilder, int, int, org.vishia.gral.base.GralTable.TableLineData, boolean)}
+   * if some info are contained already. 
+   * <br>
+   * A part in the select string is the text area from start or from : + & to end or to one of this operators.
    */
   void addTestcases ( ) {
     int nCursor = this.wdgSelects.getCursorPos();
@@ -445,7 +468,7 @@ public class StimuliSelector
    *               if -1, then check any table of selection
    * @param lineSel only used if nTable >=0, then this line.
    * @param bMarkLinesInTable true then the found keys marks the lines in the table (other direction).
-   * @return not used
+   * @return new cursor position
    */
   int prcTablesInSelectionPart ( StringBuilder sbselect, int nCursor
       , int nTable, GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData lineSel
@@ -520,9 +543,9 @@ public class StimuliSelector
   }
   
   
-  /**Reads the key from the line of the table, interal.
+  /**Reads the key from the line of the table, internal.
    * @param line
-   * @return
+   * @return The key in the line, often field "name"
    */
   private String getKeyfromLine ( GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line) {
     Map<String, DataAccess.Variable<Object>> lineData = line.getData();
@@ -668,6 +691,9 @@ public class StimuliSelector
   
   
   
+  /**Routine for the button [desel] remove the mark in all table lines. 
+   * 
+   */
   void deselectLines ( ) {
     for(int ixTable = 0; ixTable < this.wdgTables.length; ++ixTable) {
       boolean bSomeDone = false;
@@ -686,6 +712,10 @@ public class StimuliSelector
   
   
   
+  /**Routine for button [show] shows the lines which are contained in the current part (cursor)
+   * of the selection expression.
+   * 
+   */
   void showSelectExpressionPart ( ) {
     int nCursor = this.wdgSelects.getCursorPos();
     String textSelect = this.wdgSelects.getText();
@@ -697,6 +727,9 @@ public class StimuliSelector
   
 
 
+  /**Action for the button [read config] calls {@link #readConfig()}
+   * 
+   */
   GralUserAction actionReadConfig = new GralUserAction("readConfig")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -744,6 +777,10 @@ public class StimuliSelector
   };
   
   
+
+  /**Action for the button [add sel] invokes {@link StimuliSelector#addTestcases()} 
+   * 
+   */
   GralUserAction actionAddTestcases = new GralUserAction("addTestcases")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -758,6 +795,9 @@ public class StimuliSelector
   };
   
   
+  /**Action for the button [desel] invokes {@link StimuliSelector#deselectLines()()} 
+   * 
+   */
   GralUserAction actionDeselectLines = new GralUserAction("actionDeselectLines")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -772,6 +812,9 @@ public class StimuliSelector
   };
   
   
+  /**Action for the button [clean] removes the text in the {@link #output} text box. 
+   * 
+   */
   GralUserAction actionCleanOut = new GralUserAction("cleanOut")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -784,6 +827,9 @@ public class StimuliSelector
   
   
   
+  /**Action for a double click on a line invokes {@link StimuliSelector#addTestCaseFromTable(org.vishia.gral.base.GralTable.TableLineData)} 
+   * 
+   */
   GralUserAction actionTouchLine = new GralUserAction("touchLine")
   { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
       if( actionCode == KeyCode.mouse1Double){
@@ -815,6 +861,9 @@ public class StimuliSelector
   
   
   
+  /**Action is invoked if the text box was touched or changed, yet not used.
+   * 
+   */
   GralUserAction actionTouchTestcaseString = new GralUserAction("touchTestcaseString")
   { @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params) { 
       //System.out.println(Integer.toHexString(actionCode));
@@ -828,7 +877,9 @@ public class StimuliSelector
   
   
   
-  /**Assembles an example for selection using the given tables. */
+  /**Action for the button [Show] calls {@link #showSelectExpressionPart()} 
+   * 
+   */
   GralUserAction actionShowSel = new GralUserAction("actionShowSel")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -839,6 +890,11 @@ public class StimuliSelector
   };
   
   
+  
+  
+  /**Action for the button [help] yet improveable.
+   * 
+   */
   GralUserAction actionHelp = new GralUserAction("help")
   { @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
@@ -857,6 +913,9 @@ public class StimuliSelector
   
   
   
+  /**Initializes/creates the main window
+   * @param size
+   */
   @SuppressWarnings("deprecation")
   private void openWindow1(char size){
     GralFactory gralFactory = new SwtFactory();
@@ -869,6 +928,10 @@ public class StimuliSelector
   }
   
   
+  /**The {@link GralGraphicTimeOrder#awaitExecution(int, int)} implemented here is invoked after creation.
+   * It builds the content of the main window called in the Graphic thread of the {@link GralMng}
+   * This routine determines the position of all widgets using {@link GralMng#setPosition(float, float, float, float, int, char)}
+   */
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     /**
      * 
