@@ -15,7 +15,6 @@ echo
 echo =============================================================
 echo ====== javac ================================================
 echo compile java and generate jar with binary-compatible content. 
-##echo JAVAC_HOME = $JAVAC_HOME
 echo BUILD = $BUILD  - root for all outputs
 echo DEPLOY = $DEPLOY  - output file names
 echo VERSION = $VERSION  - output file names
@@ -32,9 +31,12 @@ echo TMPJAVAC =  $TMPJAVAC  - temporary files while compilation
 echo JARFILE = $JARFILE  - generated jar
 echo MD5FILE = $MD5FILE  - generated MD5 text file
 
-if test "$JAVAC" = ""; then
-  export JAVAC="$($(dirname $0)/JAVAC_CMD.sh)"
+if test "$JAVAC_HOME" = ""; then
+  export JAVAC_HOME="$($(dirname $0)/JAVAC_HOME.sh)"
 fi  
+echo JAVAC_HOME = $JAVAC_HOME
+##regards an empty JAVAC_HOME, then javac should be able as command in the path:
+if test "$JAVAC_HOME" = ""; then export JAVAC="javac"; else export JAVAC="$JAVAC_HOME/bin/javac"; fi
 echo JAVAC = $JAVAC
 # clean the build dir because maybe old faulty content:
 if test -d $TMPJAVAC; then rm -f -r -d $TMPJAVAC; fi
@@ -46,7 +48,7 @@ echo ===============================================================
 
 ##Automatic build a zip file if SRC_ALL and maybe additionally SRC_ALL2 is given.
 ##SRC_ALL refers to the java package path root directory,
-##but the source.zip should contain the parent folder which is srcJava_xyz/org/...            
+##but the source.zip should contain the parent folder which is srcJava_xyz/org/... 
 export SRCZIP=""
 if ! test "$SRC_ALL" = ""; then
   echo source-set all files = $SRC_ALL
@@ -62,7 +64,7 @@ if ! test "$SRC_ALL2" = ""; then
 fi  
 echo compile javac
 pwd
-echo $JAVAC -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
+echo javac -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
 ###$JAVAC_HOME/bin/
 $JAVAC -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
 
