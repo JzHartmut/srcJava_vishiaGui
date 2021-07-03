@@ -8,13 +8,14 @@ echo script $0
 #Set the version newly here to the current date if the sources are changed in jar and checksum.
 #If the relevant sources are not change in functionality, may be changed in comment, 
 #  it is not necessary the change this VERSION because the generated content is the same.
-export VERSION="2021-06-28"
-export VERSION_VISHIABASE="2021-06-28"
+export VERSION="2021-07-01"
+export VERSION_VISHIABASE="XX2021-07-01"
+
 # SWT for Windows-64 it is a copy of the used jar, see bom
 # comment or uncomment for alternative swt.jar
-export JAR_SWT=org.eclipse.swt.win32.win32.x86_64.jar   ##common name, not version specific
-#export JAR_SWT=org.eclipse.swt.win32.win32.x86_64_3.110.0.v20190305-0602.jar  ##full name
-#export JAR_SWT=org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar   ##32 bit SWT
+#export JAR_SWT=""  ##left empty if unversioned should be used
+export JAR_SWT="org.eclipse.swt.win32.win32.x86_64_3.110.0.v20190305-0602.jar"
+#export JAR_SWT="org.eclipse.swt.win32.win32.x86_3.5.1.v3555a.jar"   ##32 bit SWT
 #export JAR_SWT=LINUX-TODO
 
 
@@ -22,10 +23,10 @@ export JAR_SWT=org.eclipse.swt.win32.win32.x86_64.jar   ##common name, not versi
 export SRCZIPFILE="vishiaGui-$VERSION-source.zip"
 
 # Select the location and the proper vishiaBase
-if test -f ../../../../../../deploy/vishiaBase-VERSION_VISHIABASE.jar
+if test -f ../../../../../../deploy/vishiaBase-$VERSION_VISHIABASE.jar
 then export JAR_vishiaBase="../../../../../../deploy/vishiaBase-VERSION_VISHIABASE.jar"
-elif test -f ../../deploy/vishiaBase-VERSION_VISHIABASE.jar
-then export JAR_vishiaBase="../../deploy/vishiaBase-VERSION_VISHIABASE.jar"
+elif test -f ../../deploy/vishiaBase-$VERSION_VISHIABASE.jar
+then export JAR_vishiaBase="../../deploy/vishiaBase-$VERSION_VISHIABASE.jar"
 elif test -f ../../jars/vishiaBase.jar
 then export JAR_vishiaBase="../../jars/vishiaBase.jar"
 elif test -f ../../../../../../libstd/vishiaBase.jar
@@ -38,12 +39,28 @@ fi
 echo JAR_vishisBase=$JAR_vishiaBase
 
 # Select the location and the proper SWT
-if test -f ../../jars/$JAR_SWT
-then export JARPATH_SWT="../../jars/$JAR_SWT"
-elif test -f ../../../../../../libstd/$JAR_SWT
-then export JARPATH_SWT="../../../../../../libstd/$JAR_SWT"
-elif test -f ../../../../../../libs/$JAR_SWT
-then export JARPATH_SWT="../../../../../../libs/$JAR_SWT"
+if test -f ../../../../../../deploy/$JAR_SWT
+then export JAR_vishiaBase="../../../../../../deploy/$JAR_SWT"
+elif test -f ../../deploy/$JAR_SWT
+then export JAR_vishiaBase="../../deploy/$JAR_SWT"
+elif test -f ../../jars/org.eclipse.swt.win32_x86_64.jar
+then export JARPATH_SWT="../../jars/org.eclipse.swt.win32_x86_64.jar"
+elif test -f ../../jars/org.eclipse.swt.win32_x86.jar
+then export JARPATH_SWT="../../jars/org.eclipse.swt.win32_x86.jar"
+elif test -f ../../jars/org.eclipse.swt.gtk.linux.x86_64.jar
+then export JARPATH_SWT="../../jars/org.eclipse.swt.gtk.linux.x86_64.jar"
+elif test -f ../../../../../../libstd/org.eclipse.swt.win32_x86_64.jar
+then export JARPATH_SWT="../../../../../../libstd/org.eclipse.swt.win32_x86_64.jar"
+elif test -f ../../../../../../libstd/org.eclipse.swt.win32_x86.jar
+then export JARPATH_SWT="../../../../../../libstd/org.eclipse.swt.win32_x86.jar"
+elif test -f ../../../../../../libstd/org.eclipse.swt.gtk.linux.x86_64.jar
+then export JARPATH_SWT="../../../../../../libstd/org.eclipse.swt.gtk.linux.x86_64.jar"
+elif test -f ../../../../../../libs/org.eclipse.swt.win32_x86_64.jar
+then export JARPATH_SWT="../../../../../../libs/org.eclipse.swt.win32_x86_64.jar"
+elif test -f ../../../../../../libs/org.eclipse.swt.win32_x86.jar
+then export JARPATH_SWT="../../../../../../libs/org.eclipse.swt.win32_x86.jar"
+elif test -f ../../../../../../libs/org.eclipse.swt.gtk.linux.x86_64.jar
+then export JARPATH_SWT="../../../../../../libs/org.eclipse.swt.gtk.linux.x86_64.jar"
   echo swt.jar not found, abort
 fi
 echo JARPATH_SWT=$JARPATH_SWT
@@ -86,7 +103,7 @@ export DEPLOY="$BUILD/deploy/vishiaGui"
 
 
 #now run the common script:
-chmod 777 makejar.sh
+chmod 777 ./-makejar-coreScript.sh
 ./-makejar-coreScript.sh
 
 
