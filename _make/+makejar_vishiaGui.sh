@@ -1,14 +1,28 @@
-echo script +makejar_vishiaGui.sh
-echo script $0
+echo =========================================================================
+echo execute  $0
+echo " ... generates the vishiaBase.jar from srcJava_vishiaBase core sources"
 
 #Do not change the version on repeated build, and check the checksum and content of jar.
-#If it is equal, it is a reproduces build. The $VERSION is important 
+#If it is equal, it is a reproduces build. The $VERSIONSTAMP is important 
 #  because it determines the timestamp and hence the checksum in the jar file. 
 
-#Set the version newly here to the current date if the sources are changed in jar and checksum.
-#If the relevant sources are not change in functionality, may be changed in comment, 
-#  it is not necessary the change this VERSION because the generated content is the same.
-export VERSION="2021-07-01"
+## The VERSIONSTAMP can come form calling script, elsewhere it is set with the current date.
+## This determines the names of the results, but not the content and not the MD5 check sum.
+if test "$VERSIONSTAMP" = ""; then export VERSIONSTAMP=$(date -I); fi   ## writes current date
+## Determines the timestamp of the files in the jar. The timestamp determines also
+## the MD5 check code. 
+## Do not change the version on repeated build, and check the checksum and content of jar.
+## If it is equal, it is a reproduces build. The $VERSIONSTAMP is important 
+##  because it determines the timestamp and hence the checksum in the jar file. 
+## Using another timestamp on equal result files forces another MD5.
+## Hence let this unchanged in comparison to a pre-version 
+## if it is assumed that the sources are unchanged.
+## Only then a comparison of MD5 is possible. 
+## The comparison byte by byte inside the jar (zip) file is always possible.
+## Use this timestamp for file in jars, influences the MD5 check:
+export TIMEinJAR="2021-07-01+00:00"
+
+## Determine a dedicated vishiaBase-yyyy-mm-dd.jar or deactivate it to use the current vishiaBase.jar:
 export VERSION_VISHIABASE="XX2021-07-01"
 
 # SWT for Windows-64 it is a copy of the used jar, see bom
@@ -19,8 +33,8 @@ export JAR_SWT="org.eclipse.swt.win32.win32.x86_64_3.110.0.v20190305-0602.jar"
 #export JAR_SWT=LINUX-TODO
 
 
-# It should have anytime the stamp of the newest file, independing of the VERSION
-export SRCZIPFILE="vishiaGui-$VERSION-source.zip"
+# It should have anytime the stamp of the newest file, independing of the VERSIONSTAMP
+export SRCZIPFILE="vishiaGui-$VERSIONSTAMP-source.zip"
 
 # Select the location and the proper vishiaBase
 if test -f ../../../../../../deploy/vishiaBase-$VERSION_VISHIABASE.jar
@@ -90,16 +104,15 @@ export RESOURCEFILES="..:**/*.zbnf ..:**/*.xml"
 # located from this workingdir as currdir for shell execution:
 export MANIFEST=vishiaGui.manifest
 
-#$BUILD is the main build output directory. 
-#possible to give $BUILD from outside. On argumentless call determine in tmp.
-if test "$BUILD" = ""; then export BUILD="/tmp/BuildJava_vishiaGui"; fi
+#$BUILD_TMP is the main build output directory. 
+#possible to give $BUILD_TMP from outside. On argumentless call determine in tmp.
+if test "$BUILD_TMP" = ""; then export BUILD_TMP="/tmp/BuildJava_vishiaGui"; fi
 
 #to store temporary class files:
-export TMPJAVAC=$BUILD/javac/
+export TMPJAVAC=$BUILD_TMP/javac/
 
-#DEPLOY is the directory where the results are written.
-if ! test -d $BUILD/deploy; then mkdir --parent $BUILD/deploy; fi
-export DEPLOY="$BUILD/deploy/vishiaGui"
+if ! test -d $BUILD_TMP/deploy; then mkdir --parent $BUILD_TMP/deploy; fi
+export DSTNAME="vishiaGui"
 
 
 #now run the common script:
@@ -108,28 +121,38 @@ chmod 777 ./-makejar-coreScript.sh
 
 
 # Deploy the result
-if test -f $DEPLOY-$VERSION.jar; then   ##compilation successfull
-  ##
-  ## copy to the deploy directory. 
-  if test -d ../../../../../../deploy; then
-    cp $DEPLOY-$VERSION* ../../../../../../deploy
-  elif test -d ../../deploy; then
-    cp $DEPLOY-$VERSION* ../../deploy
-  fi  
+if test ! -f $BUILD_TMP/deploy/$DSTNAME-$VERSIONSTAMP.jar; then   ##compilation not successfull
+  echo "?????? compiling ERROR, abort ????????????????????????" 
+  exit 255
+else                                                       ##compilation not successfull
   ##
   ## copy the useable version to a existing libstd directory:
   if test -d ../../../../../../libstd; then ##beside cmpnJava... should be existing
-    export DEPLOYPATH="../../../../../../libStd" 
-    ##TODO maybe correct the bomVishiaJava.txt via script.jzTc possible
+    export CURRENT_JARS_PATH="../../../../../../libStd" 
   else
-    export DEPLOYPATH="../../jars" 
-    if ! test -d $DEPLOYPATH; then mkdir $DEPLOYPATH; fi
+    export CURRENT_JARS_PATH="../../jars" 
+    if ! test -d $CURRENT_JARS_PATH; then mkdir $CURRENT_JARS_PATH; fi
   fi  
-  if test -v DEPLOYPATH; then
-    cp $DEPLOY-$VERSION.jar $DEPLOYPATH/vishiaGui.jar    
-    ls -l $DEPLOYPATH
-    echo correct the bom file: JZtxtcmd corrBom.jzTc $DEPLOYPATH $BUILD/deploy vishiaBase $VERSION
-    java -cp $DEPLOYPATH/vishiaBase.jar org.vishia.jztxtcmd.JZtxtcmd corrBom.jzTc $DEPLOYPATH $BUILD/deploy vishiaGui $VERSION
+  if test -v CURRENT_JARS_PATH; then
+    echo test and correct the bom file: JZtxtcmd corrBom.jzTc $CURRENT_JARS_PATH $BUILD_TMP/deploy vishiaBase $VERSIONSTAMP
+    java -cp $CURRENT_JARS_PATH/vishiaBase.jar org.vishia.jztxtcmd.JZtxtcmd corrBom.jzTc $CURRENT_JARS_PATH $BUILD_TMP/deploy vishiaGui $VERSIONSTAMP
+    echo ========================================================================== $?
+    if test ! -f $CURRENT_JARS_PATH/vishiaGui*_old.jar; then
+      echo "BOM not changed, unchanged MD5"
+    else
+      cp $BUILD_TMP/deploy/$DSTNAME-$VERSIONSTAMP.jar $CURRENT_JARS_PATH/vishiaGui.jar    
+      echo create BOM file $CURRENT_JARS_PATH/bomVishiaJava.new.txt
+      ls -l $CURRENT_JARS_PATH
+      ##
+      ## copy to the deploy directory.
+      if test -d ../../../../../../deploy; then
+        cp $BUILD_TMP/deploy/$DSTNAME-$VERSIONSTAMP* ../../../../../../deploy
+      fi
+      if test -d ../../deploy; then
+        cp $BUILD_TMP/deploy/$DSTNAME-$VERSIONSTAMP* ../../deploy
+      fi  
+    fi  
+    echo ======= success ==========================================================
   fi  
 fi  
 
