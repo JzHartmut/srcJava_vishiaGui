@@ -228,10 +228,10 @@ public class StimuliSelector
     this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
     this.btnGenTestcases = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
     this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
-    this.btnDeselectLines = new GralButton("addTestCase", "desel", this.actionDeselectLines);
+    this.btnDeselectLines = new GralButton("cleanSelTable ", "clean", this.actionDeselectLines);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
     this.btnExampleSel = new GralButton("exmpl", "show", this.actionShowSel);
-    this.btnHelp = new GralButton("help", "help", this.actionHelp);
+    this.btnHelp = new GralButton("help", "help", null);   //this.actionHelp);
     //
     JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
     if(sub1 !=null) {
@@ -961,10 +961,10 @@ public class StimuliSelector
       StimuliSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
       StimuliSelector.this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
       StimuliSelector.this.btnAddTestcase.createImplWidget_Gthread();
-      StimuliSelector.this.btnDeselectLines.createImplWidget_Gthread();
+      StimuliSelector.this.btnHelp.createImplWidget_Gthread();
       StimuliSelector.this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
       StimuliSelector.this.btnExampleSel.createImplWidget_Gthread();
-      StimuliSelector.this.btnHelp.createImplWidget_Gthread();
+      StimuliSelector.this.btnDeselectLines.createImplWidget_Gthread();
       //int last = 1; //tables.length
       for(int iTable = 0; iTable < StimuliSelector.this.wdgTables.length; ++iTable) {
         int xtable = iTable %3;
@@ -984,6 +984,12 @@ public class StimuliSelector
       StimuliSelector.this.isTableInitialized = true;
       //
       //GralTextField input = new GralTextField();
+      StimuliSelector.this.gralMng.createHtmlInfoBoxes(null);
+      String sHelpdir = StimuliSelector.this.fileConfig.getAbsoluteFile().getParent() + "/";
+      StimuliSelector.this.gralMng.setHelpBase(sHelpdir);
+      StimuliSelector.this.gralMng.setHelpUrl("+StimuliSelector_help.html");
+      StimuliSelector.this.btnHelp.specifyActionChange("help", StimuliSelector.this.gralMng.actionHelp, null);
+      
     }
     
     

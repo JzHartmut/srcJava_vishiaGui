@@ -20,7 +20,7 @@ if test "$VERSIONSTAMP" = ""; then export VERSIONSTAMP=$(date -I); fi   ## write
 ## Only then a comparison of MD5 is possible. 
 ## The comparison byte by byte inside the jar (zip) file is always possible.
 ## Use this timestamp for file in jars, influences the MD5 check:
-export TIMEinJAR="2021-07-01+00:00"
+export TIMEinJAR="2021-07-09+00:00"
 
 ## Determine a dedicated vishiaBase-yyyy-mm-dd.jar or deactivate it to use the current vishiaBase.jar:
 export VERSION_VISHIABASE="XX2021-07-01"
