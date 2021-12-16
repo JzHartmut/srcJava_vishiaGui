@@ -87,7 +87,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2021-02-05";
+  public static final String version = "2021-11-25";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -965,7 +965,9 @@ public class Fcmd extends GuiCfg
     
     @Override protected boolean checkArguments(){
       boolean bOk = true;
-      if(cargs.dirCfg == null) { bOk = false; writeError("cmdline argument cfg:PATHCFG is missing"); }
+      if(cargs.dirCfg == null) { 
+        bOk = false; writeError("cmdline argument cfg:PATHCFG is missing"); 
+      }
       if(bOk){
         if(!cargs.dirCfg.exists()){ bOk = false; writeError("cmdline argument cfg is faulty:" + cargs.dirCfg.getAbsolutePath());}
       }

@@ -105,8 +105,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     cursorStore1 = new Image(panelSwt.getDisplay(), 1, 2000);
     cursorStore2 = new Image(panelSwt.getDisplay(), 1, 2000);
     
-    gridColor = new Color(curveSwt.getDisplay(), 192, 255, 255);
-    gridColorStrong = new Color(curveSwt.getDisplay(), 128, 255, 255);
+    gridColor = new Color(curveSwt.getDisplay(), 192, 192, 192);
+    gridColorStrong = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorCursor = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorBack = new Color(curveSwt.getDisplay(), 0xff, 0xff, 0xff);
     widgg.initMenuContext();
@@ -310,12 +310,22 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     g.setForeground(gridColor);
     g.setLineWidth(1);
     g.setLineStyle(SWT.LINE_DOT);
+    for(int ii=1; ii <=49; ++ii){  //draw the horizontal grid
+      int y = (int)(size.y /50.0f * ii);
+      g.drawLine(size.x - xViewPart, y, size.x, y);
+      
+    }
+    g.setForeground(gridColorStrong);
+    g.setLineWidth(1);
+    g.setLineStyle(SWT.LINE_DOT);
     for(int ii=1; ii <=9; ++ii){  //draw the horizontal grid
       int y = (int)(size.y /10.0f * ii);
       g.drawLine(size.x - xViewPart, y, size.x, y);
       
     }
     //
+    g.setForeground(gridColor);
+    g.setLineWidth(1);
     int ixPixelTimeDiv =-1;
     int xPixelTimeDiv1;                     //draw the vertical fine grid, the time divisions
     while((xPixelTimeDiv1 = widgg.timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {

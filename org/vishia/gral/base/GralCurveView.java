@@ -437,6 +437,11 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      */
     private volatile int ctTimeSet;
     
+    /**The millisec per 1 timeshort step. If it remains 1.0 the timeshort is a integer millisecond value.
+     * If the timeshort is a step counter this should be the sampling time for one step of timeshort. 
+     */
+    float msPerTimeshort = 1.0f;
+    
     /**The last timeshort from the timeVariable. To detect newly simulation if it starts with a lesser value. */ 
     int timeshortLast;
 
@@ -651,6 +656,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
 
   /**A short timestamp for the values in {@link GralCurveView.Track#values}.
    * It maybe a millisecond timestamp. Then about 2000000 seconds are able to display.
+   * It maybe a counter of step times, then per cfg the length of Tstep should be known. 
+   * See {@link TimeOrganisation#msPerTimeshort} 
+   * 
    * This array and the {@link Track#actValue} array are filled wrapping.
    * <br><br> 
    * A negative difference between 2 successive time stamps designates the time break point between newer values
@@ -892,6 +900,14 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     timeorg.timeSpread = time; 
   }
   
+  
+  
+  public float getdTimeCursors() {
+    GraphicImplAccess impl = (GraphicImplAccess) this._wdgImpl;
+    int dpCursor = impl.xpCursor2 - impl.xpCursor1;
+    if(dpCursor <0) { dpCursor = -dpCursor; }
+    return dpCursor / timeorg.pixel7time;
+  }
   
   
   /**Returns the path of the time variable if given or null.
@@ -1241,7 +1257,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     String sLine;
     BufferedReader ifile = new BufferedReader(new FileReader(file));
     //first head line
-    setTimePoint(System.currentTimeMillis(), 0, 0.156f);
+    //setTimePoint(System.currentTimeMillis(), 0, 0.156f);
+    setTimePoint(0, 0, 0.050f);
     //line with channels
     sLine = ifile.readLine();
     //List<Track> listTracksNew = new ArrayList<Track>();  ////
@@ -1274,7 +1291,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     float[] fvalues = new float[listTracks.size() + 10];
     int timeshort = 0;
     while( (sLine = ifile.readLine())!=null){
-      timeshort +=1;
+      timeshort +=1;  //increment per default if no column for timeshort
       String[] values = sLine.split(";");
       int ixCol = -1;
       boolean bFirstCol = true;
@@ -1284,7 +1301,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         if(first_timesh && bFirstCol) {
           try{ timeshort = Integer.valueOf(sValue); }
           catch(NumberFormatException exc) {
-            timeshort +=1;  //use incremented
+            timeshort +=0;  //use incremented
           }
         } else {
           float value;

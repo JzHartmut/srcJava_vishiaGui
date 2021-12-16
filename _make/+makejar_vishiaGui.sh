@@ -98,7 +98,7 @@ export SRCPATH="$SRC_ALL$sepPath$SRC_ALL2"
 export SRCPATH="$SRC_ALL"
 
 # Resourcefiles for files in the jar
-export RESOURCEFILES="..:**/*.zbnf ..:**/*.xml"
+export RESOURCEFILES="..:**/*.zbnf ..:**/*.xml ..:**/*.png ..:**/*.txt"
 
 
 # located from this workingdir as currdir for shell execution:

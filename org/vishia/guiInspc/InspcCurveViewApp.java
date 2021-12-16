@@ -40,7 +40,7 @@ public class InspcCurveViewApp
   private void execute(String sDir){
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, "Curve View", 'C', 100, 50, 800, 600);
+    GralWindow wind = gralFactory.createWindow(log, "Curve View", 'B', 100, 50, 800, 600);
     FileCluster fileCluster = FileRemote.clusterOfApplication;
     FileRemote dirCfg = fileCluster.getDir(sDir);
     FileRemote dirSave = fileCluster.getDir(sDir);

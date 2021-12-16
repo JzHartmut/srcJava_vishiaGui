@@ -182,7 +182,7 @@ public final class InspcCurveView
    */
   GralTextField scalingWidg;
   
-  GralTextField widgValCursorLeft, widgValCursorRight; ///
+  GralTextField widgValCursorLeft, widgValCursorRight, widgValdTime; ///
   
   GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnReadCfg, widgBtnSaveCfg;
   
@@ -324,9 +324,11 @@ public final class InspcCurveView
     gralMng.addButton("btnScale", actionColorSelectorOpen, "!", null,  "color");  
     gralMng.setPosition(/*35*/ -6, GralPos.size +2, -10, GralPos.size +6, 0, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
-    gralMng.setPosition(-22, GralPos.size +3, posright, GralPos.size +11, 0, 'd', 0);
+    gralMng.setPosition(-22, GralPos.size +3, posright, GralPos.size +9, 0, 'r', 2);
     widgValCursorLeft = gralMng.addTextField(null, true, "cursor left", "t");
     widgValCursorRight = gralMng.addTextField(null, true, "cursor right", "t");
+    gralMng.setPosition(-19, GralPos.size +3, posright, GralPos.size +8, 0, 'r', 0);
+    widgValdTime = gralMng.addTextField(null, true, "dtime", "t");
     gralMng.setPosition(-15, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
     widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionOpenFileDialog, sBtnReadCfg, null, sBtnReadCfg);
     widgBtnSaveCfg = gralMng.addButton("btnSaveCfg", actionOpenFileDialog, sBtnSaveCfg, null, sBtnSaveCfg);
@@ -956,7 +958,7 @@ public final class InspcCurveView
           }
           //set the line from the last selection to normal
           if(trackScale !=null && trackScale !=null){
-            trackScale.setLineProperties(trackScale.getLineColor(), 1, 0);
+            trackScale.setLineProperties(trackScale.getLineColor(), 3, 0);
             if(trackScale.getVisible() !=0){
               trackScale.setVisible(1);
             }
@@ -964,7 +966,7 @@ public final class InspcCurveView
           //set the track bold and show the scaling of the track 
           InspcCurveView.this.trackScale = track;
           if(trackScale !=null && trackScale.getVisible() !=0){
-            trackScale.setLineProperties(trackScale.getLineColor(), 3, 0);
+            trackScale.setLineProperties(trackScale.getLineColor(), 5, 0);
             trackScale.setVisible(2);
             widgScale.setText("" + track.getScale7div());
             widgScale0.setText("" + track.getOffset());
@@ -1321,6 +1323,8 @@ public final class InspcCurveView
         float valueCursorRight = trackScale.getValueCursorRight();
         widgValCursorLeft.setText("" + valueCursorLeft);
         widgValCursorRight.setText("" + valueCursorRight);
+        float td = widgCurve.getdTimeCursors();
+        widgValdTime.setText("" + td);
       }
       return true;
     }
