@@ -94,7 +94,7 @@
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2021-10-04 14:29:50  x     GralButton.java                          ::         20.517 -0065124249 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
-2021-12-05 21:58:33  x     GralCurveView.java                       ::         86.513  0482336199 
+2021-12-18 18:33:51  x     GralCurveView.java                       ::         87.085 -0802513547 
 2021-10-04 14:29:58  x     GralGraphicThread.java                   ::         21.999 -1132551389 
 2021-10-04 14:29:55  x     GralGraphicTimeOrder.java                ::          4.626  0308339593 
 2021-10-04 14:29:51  x     GralGridProperties.java                  ::         12.850 -0251460719 
@@ -235,7 +235,7 @@
 2021-10-04 14:29:51  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2018-10-28 10:18:44  x     GralCommandSelector.java                 ::          8.507 -1870745650 
 2018-10-27 18:48:45  x     GralFileSelectWindow.java                ::          8.251  0842102366 
-2018-10-28 11:36:35  x     GralFileSelector.java                    ::         67.142 -0442504845 
+2021-12-18 18:30:49  x     GralFileSelector.java                    ::         67.583 -0589477622 
 2021-10-04 14:29:58  x     GralHorizontalSelector.java              ::         10.452  0023991061 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2017-01-10 10:55:06  x     GralInfoBox.java                         ::         14.864  0747955144 
@@ -248,7 +248,7 @@
 
 ============================== org/vishia/guiInspc/ ================================================
 2021-10-04 14:29:57  x     ButtonInspcCmd.java                      ::           .520  1765509099 
-2021-12-05 22:19:49  x     InspcCurveView.java                      ::         58.045  1700181347 
+2021-12-18 18:38:16  x     InspcCurveView.java                      ::         58.396  1505779415 
 2021-12-05 22:22:22  x     InspcCurveViewApp.java                   ::          2.054 -0846072850 
 2021-10-04 14:29:52  x     InspcFieldTable.java                     ::         25.438 -1434371394 
 2021-10-04 14:29:51  x     InspcGui.java                            ::         22.632  0249632838 

@@ -70,6 +70,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2021-12-18 Hartmut: new feature: {@link #fillIn(FileRemote, boolean)}, if the file is a file not directory
+   *   then this file is highlighted. Firstly used on InspcCurveViewApp to get cfg and data from the same directory,
+   *   re-read the same file is before by saving the gotten file before. 
    * <li>2018-10-28 Hartmut: The Creation and Position is old style yet. Should invoked in the graphic thread. 
    * TODO: create and position in other (main) thread, createImplWidget_Gthread for Swt incarnation.
    * <li>2018-10-28 Hartmut: The {@link #favorList} is unused yet, create only if position is given.
@@ -912,7 +915,8 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   /**Fills the content with given directory.
    * If the same directory was refreshed in a short time before, it is not refreshed here.
    * That is while fast navigation in a tree. 
-   * @param fileIn The directory which's files are shown.
+   * @param fileIn The directory which's files are shown or a file in this directory.
+   *   If it is a file this line is marked.
    * @param bDonotRefrehs false then invoke an extra thread to walk through the file system, 
    *   see @{@link FileRemote#refreshPropertiesAndChildren(FileRemoteCallback)} and {@link #callbackChildren1}.
    *   If true then it is presumed that the FileRemote children are refreshed in the last time already.
@@ -999,6 +1003,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
         //Remove lines which remains the colorBackPending after refreshing.
         dir.refreshPropertiesAndChildren(callbackChildren1, false);
       }
+    }
+    if(file !=null) {
+      selectFile(file.getName());
     }
   }
   

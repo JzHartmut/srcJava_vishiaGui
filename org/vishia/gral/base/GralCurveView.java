@@ -50,6 +50,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Version, history and license.
    * <ul>
+   * <li>2018-09-20 Hartmut new feature on {@link #readCurveCsvHeadline(File)}, a variable which is not yet in cfg is disabled.
+   *   Elsewhere not prepared stuff is shown in the graphic. It can be enabled and scaled by the user afterwards.
+   *   The importance is, the variable will be inserted as signal (track) automatically
    * <li>2018-09-20 Hartmut improved for using in InspcCurveViewApp.
    *   <ul>
    *   <li>initTrack(...) renamed to {@link #addTrack(String, String, GralColor, int, int, float, float)}
@@ -1264,23 +1267,22 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     //List<Track> listTracksNew = new ArrayList<Track>();  ////
     //listTrackSet.clear();
     int ixInList = -1;
-    String[] signals = sLine.split(";");
+    String[] signals = sLine.split(";");                   // analyze first line, signal names
     int[] dataIx = new int[signals.length +10];
     String[] colors = {"bk","rd","gn","bl","or","rd1","rd2","gn1","gn2","bk","rd","gn","bl","or","rd1","rd2","gn1"};
     int ix = -1;
     int ixColor = 0;
     boolean first_timesh = false;
-    for(String signal1: signals){
+    for(String signal1: signals){                          // signal names from first line
       String signal = signal1.trim();
       if(signal.equals("timesh") && ix == -1) {
         first_timesh = true;
       } else {
         Track track = searchTrack(signal);
-        if(track !=null) {
-          //listTracksNew.add(track);
-        } else {
+        if(track ==null) {                                 // signal found which is yet unknown
           GralColor color = GralColor.getColor(colors[ixColor]);
           track = addTrack(signal, signal, color, 1, 50, 1.0f, 0.0f); //, listTracksNew);
+          track.setVisible(0);                             // a gray track, display in select list, but not in graph
           if(ixColor < colors.length-1) {ixColor +=1;}
         }
         dataIx[++ix] = track.ixList; //getDataIx();

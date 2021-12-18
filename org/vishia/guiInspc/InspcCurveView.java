@@ -48,6 +48,10 @@ public final class InspcCurveView
 
   /**Version, history and license. 
    * <ul>
+   * <li>2018-01-08 Hartmut only formally, now {@link #fileCurveData} instead dirCurveSave, 
+   *   {@link #actionOpenFileDialog_i(GralWidget_ifc)} called in the {@link #actionOpenFileDialog}.
+   *   {@link #actionReadValues(int, GralWidget_ifc, Object...)} stores the file, not the directory in {@link #fileCurveData}
+   *   to show the same file later again (as also completed in {@link GralFileSelector}.
    * <li>2018-01-08 Hartmut refactoring 
    *   <ul>
    *   <li>private class TrackValues removed, it hasn't any specific content, replaced by {@link GralCurveViewTrack_ifc}
@@ -194,7 +198,7 @@ public final class InspcCurveView
   /**The currently loaded file for curve settings. */
   FileRemote fileCurveCfg;
   
-  FileRemote dirCurveSave;
+  FileRemote fileCurveData;
   
   //long timeLastSave;
   
@@ -228,13 +232,13 @@ public final class InspcCurveView
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.gralMng = gralMng;
-    fileCurveCfg = defaultDirCfg;
-    dirCurveSave = defaultDirSave;
-    widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
-    widgFileSelector.specifyActionOnFileSelected(actionSelectFile);
-    widgFileSelector.setActionOnEnterFile(actionEnterFile);
+    this.fileCurveCfg = defaultDirCfg;
+    this.fileCurveData = defaultDirSave;
+    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
+    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
+    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
-    widgFilename = new GralTextField("-filename", GralTextField.Type.editable);
+    this.widgFilename = new GralTextField("-filename", GralTextField.Type.editable);
      
   }
   
@@ -520,11 +524,11 @@ public final class InspcCurveView
        // widgCurve.
       }
       String sNameFile = sDate + "_" + sName;
-      //fileCurveSave.mkdirs();
-      FileRemote fileCurveSave = dirCurveSave.child(sNameFile + ".csv");
-      FileSystem.mkDirPath(fileCurveSave);
-      System.out.println("InspcCurveView - save curve data to; " + fileCurveSave.getAbsolutePath());
-      writerCurveCsv.setFile(fileCurveSave);
+      //fileCurveData.mkdirs();
+      FileRemote fileCurveData = this.fileCurveData.child(sNameFile + ".csv");
+      FileSystem.mkDirPath(fileCurveData);
+      System.out.println("InspcCurveView - save curve data to; " + fileCurveData.getAbsolutePath());
+      writerCurveCsv.setFile(fileCurveData);
       widgCurve.writeCurve(writerCurveCsv, mode);
       
       String sClassExportDat = curveExporterClasses.get("dat");
@@ -532,12 +536,12 @@ public final class InspcCurveView
         Class<?> clazzCurveWriter2 = Class.forName(sClassExportDat);
         
         WriteCurve_ifc writerCurve2 = (WriteCurve_ifc)clazzCurveWriter2.newInstance();
-        File fileDat = new File(dirCurveSave, sNameFile + ".dat");
+        File fileDat = new File(this.fileCurveData, sNameFile + ".dat");
         
         writerCurve2.setFile(fileDat);
         widgCurve.writeCurve(writerCurve2, mode);
       }
-      System.out.println("InspcCurveView - data saved; " + fileCurveSave.getAbsolutePath());
+      System.out.println("InspcCurveView - data saved; " + fileCurveData.getAbsolutePath());
 
       //timeLastSave = System.currentTimeMillis();
     } catch(Exception exc){
@@ -1035,54 +1039,62 @@ public final class InspcCurveView
   
   
   
+  
+  void actionOpenFileDialog_i ( GralWidget_ifc widgd ) {
+    try{
+      String sCmd = widgd.getCmd();
+      if(sCmd.equals(sWhatTodoWithFile)) {
+        //file dialog is open, second press
+        actionEnterFile.exec(KeyCode.menuEntered, null);
+        //setVisible already done.
+      } else if(sWhatTodoWithFile !=null) {
+        //other button, it is esc
+        sWhatTodoWithFile = null;
+        widgFilename.setVisible(false);
+        widgFileSelector.setVisible(false);
+        widgCurve.setVisible(true);
+        widgBtnReadCfg.setBackColor(colorBtnFileInactive,0);
+        widgBtnSaveCfg.setBackColor(colorBtnFileInactive,0);
+        widgBtnReadValues.setBackColor(colorBtnFileInactive,0);
+        widgBtnSaveValues.setBackColor(colorBtnFileInactive,0);
+      } else { 
+        //button pressed first time because .WhatTodoWithFile == null
+        sWhatTodoWithFile = widgd.getCmd(); //The button cmd.
+        widgd.setBackColor(colorBtnFileActive, 0);
+        final FileRemote fileCurr;
+        if(sCmd.equals(sBtnReadCfg)){
+          fileCurr = fileCurveCfg;
+        } else if(widgd.getCmd().equals(sBtnSaveCfg)){
+          //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), true, actionSaveCfg);
+          fileCurr = fileCurveCfg;
+        } else if(widgd.getCmd().equals(sBtnReadValues)){
+          //windFileCfg.openDialog(dirCurveSave, "read values", false, actionReadValues);
+          fileCurr = this.fileCurveData;
+        } else if(widgd.getCmd().equals(sBtnSaveValues)){
+          //windFileCfg.openDialog(dirCurveSave, "write values", true, actionSaveValues);
+          fileCurr = this.fileCurveData;
+        } else {
+          fileCurr = null; //unexpected
+        }
+        //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), false, actionReadCfg);
+        widgCurve.setVisible(false);
+        widgFilename.setVisible(true);
+        widgFileSelector.setVisible(true);
+        widgFileSelector.fillIn(fileCurr, false);
+        widgFileSelector.setFocus();
+      }
+    } catch(Exception exc){
+      widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+    }
+    
+  }
+  
+  
+  
   GralUserAction actionOpenFileDialog = new GralUserAction("OpenFileDialog"){
     @SuppressWarnings("synthetic-access") @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(actionCode == KeyCode.mouse1Up){
-        try{
-          String sCmd = widgd.getCmd();
-          if(sCmd.equals(sWhatTodoWithFile)) {
-            //file dialog is open, second press
-            actionEnterFile.exec(KeyCode.menuEntered, null);
-            //setVisible already done.
-          } else if(sWhatTodoWithFile !=null) {
-            //other button, it is esc
-            sWhatTodoWithFile = null;
-            widgFilename.setVisible(false);
-            widgFileSelector.setVisible(false);
-            widgCurve.setVisible(true);
-            widgBtnReadCfg.setBackColor(colorBtnFileInactive,0);
-            widgBtnSaveCfg.setBackColor(colorBtnFileInactive,0);
-            widgBtnReadValues.setBackColor(colorBtnFileInactive,0);
-            widgBtnSaveValues.setBackColor(colorBtnFileInactive,0);
-          } else { 
-            //button pressed first time because .WhatTodoWithFile == null
-            sWhatTodoWithFile = widgd.getCmd(); //The button cmd.
-            widgd.setBackColor(colorBtnFileActive, 0);
-            final FileRemote dir;
-            if(sCmd.equals(sBtnReadCfg)){
-              dir = fileCurveCfg;
-            } else if(widgd.getCmd().equals(sBtnSaveCfg)){
-              //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), true, actionSaveCfg);
-              dir = fileCurveCfg;
-            } else if(widgd.getCmd().equals(sBtnReadValues)){
-              //windFileCfg.openDialog(dirCurveSave, "read values", false, actionReadValues);
-              dir = dirCurveSave;
-            } else if(widgd.getCmd().equals(sBtnSaveValues)){
-              //windFileCfg.openDialog(dirCurveSave, "write values", true, actionSaveValues);
-              dir = dirCurveSave;
-            } else {
-              dir = null; //unexpected
-            }
-            //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), false, actionReadCfg);
-            widgCurve.setVisible(false);
-            widgFilename.setVisible(true);
-            widgFileSelector.setVisible(true);
-            widgFileSelector.fillIn(dir, false);
-            widgFileSelector.setFocus();
-          }
-        } catch(Exception exc){
-          widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-        }
+        InspcCurveView.this.actionOpenFileDialog_i(widgd);
       }
       return true;
   } };
@@ -1225,7 +1237,7 @@ public final class InspcCurveView
       try{
         assert(params[0] instanceof File);
         FileRemote file = (FileRemote)params[0];
-        dirCurveSave = file.getParentFile();
+        this.fileCurveData = file; //.getParentFile();
         
         readCurve(file);
         fillTableTracks();
@@ -1245,10 +1257,7 @@ public final class InspcCurveView
   void actionSaveValues(int actionCode, GralWidget_ifc widgd, Object... params)
   { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
       try{
-        dirCurveSave = (FileRemote)params[0];
-        if(dirCurveSave.exists() && !dirCurveSave.isDirectory()){
-          dirCurveSave = dirCurveSave.getParentFile();
-        }
+        this.fileCurveData = (FileRemote)params[0];
         saveCurve(GralCurveView_ifc.ModeWrite.currentView);
         ///
         
