@@ -48,6 +48,7 @@ public final class InspcCurveView
 
   /**Version, history and license. 
    * <ul>
+   * <li>2021-12-19 Hartmut new: Now has a help button 
    * <li>2021-12-19 Hartmut chg: in {@link #actionSelectVariableInTable}:
    *   repaint after 500 ms without forced repaint instead 100 ms, then variables in the table can be selected fastly.
    * <li>2021-12-19 Hartmut new right mouse menu in variable list "bold all selected" as new feature:
@@ -196,6 +197,8 @@ public final class InspcCurveView
   
   GralTextField widgValCursorLeft, widgValCursorRight, widgValdTime; ///
   
+  GralButton widgBtnHelp;
+  
   GralButton widgBtnUp, widgBtnDn, widgBtnScale, widgBtnReadCfg, widgBtnSaveCfg;
   
   GralButton widgBtnReadValues, widgBtnSaveValues, wdgButtonAutosave, widgBtnColor; 
@@ -207,6 +210,8 @@ public final class InspcCurveView
   FileRemote fileCurveCfg;
   
   FileRemote fileCurveData;
+  
+  final String sHelpDir;
   
   //long timeLastSave;
   
@@ -234,7 +239,9 @@ public final class InspcCurveView
    * @param defaultDir
    * @param curveExporterClasses Class which is used to export curves.
    */
-  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng, FileRemote defaultDirCfg, FileRemote defaultDirSave, Map<String, String> curveExporterClasses){
+  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng
+      , FileRemote defaultDirCfg, FileRemote defaultDirSave, String sHelpDir
+      , Map<String, String> curveExporterClasses){
     //this.comm = comm;
     this.sName = sName;
     this.curveExporterClasses = curveExporterClasses;
@@ -242,6 +249,7 @@ public final class InspcCurveView
     this.gralMng = gralMng;
     this.fileCurveCfg = defaultDirCfg;
     this.fileCurveData = defaultDirSave;
+    this.sHelpDir = sHelpDir;
     this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
     this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
     this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
@@ -275,6 +283,7 @@ public final class InspcCurveView
   void buildGraphicInCurveWindow(GralCurveView.CommonCurve common)
   {
     int posright = -20;
+    
     gralMng.setPosition(0, -4, 0, posright, 0, 'd');
     widgFileSelector.createImplWidget_Gthread();
     widgFileSelector.setVisible(false);
@@ -289,10 +298,14 @@ public final class InspcCurveView
     widgCurve = gralMng.addCurveViewY(sName, 15000, common);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
     widgCurve.setActionTrackSelected(actionTrackSelectedFromGralCurveViewCtrlMousePressed);
-    gralMng.setPosition(0, GralPos.size +2, posright, 0, 0, 'd', 0);
+    gralMng.setPosition(3, GralPos.size -3, posright, -6, 0, 'r', 0);
     gralMng.addText("curve variable");
+    if(this.sHelpDir !=null) {
+      gralMng.setPosition(3, GralPos.size -3, -6, 0, 0, 'r', 0);
+      widgBtnHelp = gralMng.addButton("btnHelp", this.gralMng.actionHelp, "help", null, "help");
+    }
     widgTableVariables = new GralTable<GralCurveViewTrack_ifc>("variables", new int[]{-posright});
-    gralMng.setPosition(2, GralPos.size +20, posright, 0, 0, 'd', 0);
+    gralMng.setPosition(3, GralPos.size +20, posright, 0, 0, 'd', 0);
     widgTableVariables.setColumnEditable(0, true);
     widgTableVariables.setToPanel(gralMng);
     widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
@@ -352,6 +365,11 @@ public final class InspcCurveView
     gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
   
+    if(this.sHelpDir !=null) {
+      this.gralMng.createHtmlInfoBoxes(null);
+      this.gralMng.setHelpBase(this.sHelpDir);
+      this.gralMng.setHelpUrl("+CurveView_help.html");
+    }
     
   }
   

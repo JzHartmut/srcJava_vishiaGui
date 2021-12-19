@@ -206,9 +206,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       } else {
         defaultDirSave = null;
       }
-      curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
-      curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
-      curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, cargs.curveExporterClasses);
+      curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
     }
     fieldsA = new InspcFieldTable(variableMng);
     fieldsB = new InspcFieldTable(variableMng);

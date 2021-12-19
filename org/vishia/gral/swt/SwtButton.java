@@ -21,6 +21,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 public class SwtButton extends GralButton.GraphicImplAccess
@@ -209,6 +210,9 @@ public class SwtButton extends GralButton.GraphicImplAccess
     gc.fillRectangle(1,1,dim.width-1, dim.height-1);
     int ypText;
     if(sButtonText !=null){
+//      if(sButtonText.equals("help")) {   //support to debug a specific button, set breakpoint here
+//        Debugutil.stop();
+//      }
       FontMetrics fontMetrics = gc.getFontMetrics();
       int charWidth = fontMetrics.getAverageCharWidth();
       int halfWidthButtonText = charWidth * sButtonText.length() /2;

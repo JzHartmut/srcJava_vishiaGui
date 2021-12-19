@@ -733,11 +733,24 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   public void setHelpBase(String path){ 
-    sHelpBase = path; 
+    char cEnd = path.charAt(path.length()-1);
+    if("/\\".indexOf(cEnd) >=0) {
+      sHelpBase = path;
+    } else {
+      sHelpBase = path + "/";
+    }
   }
   
   
   
+  /**Sets the URL for the current help situation. 
+   * Note: before calling the following may/should be set: <pre>
+   * this.gralMng.createHtmlInfoBoxes(null);
+   *  this.gralMng.setHelpBase(this.sHelpDir);
+   * </pre>
+   * Only then the url is effective.
+   * @param url
+   */
   public void setHelpUrl(String url){ 
     String sUrl;
     if(url.startsWith("+")){
