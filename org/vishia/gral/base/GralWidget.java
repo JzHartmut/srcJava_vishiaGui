@@ -175,6 +175,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2016-09-30 Hartmut improved: {@link #repaint(int, int)} now the second argument can be really 0 to prevent a not required repaint from the first repaint call
+   *   if some more replaints are registered per delay.
    * <li>2016-09-30 Hartmut bugfix: {@link #setFocus()} has set the default focus of the primaryWindow if the focus of a window was set.
    * <li>2016-09-30 Hartmut New idea, concept: {@link ImplAccess#wdgimpl}: That refers an implementation of a WidgetHelper class of the implementation layer
    *   which knows the widget. Via this aggregation some action with the implementation widget can be do which are defined
@@ -1798,7 +1800,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         _wdgImpl.repaintGthread();
       } else {
         long time = System.currentTimeMillis();
-        repaintRequ.activateAt(time + delay, time + latest);
+        repaintRequ.activateAt(time + delay, latest ==0 ? 0 : time + latest);
       }
     }
   }

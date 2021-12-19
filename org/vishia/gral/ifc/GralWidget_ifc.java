@@ -368,8 +368,9 @@ public interface GralWidget_ifc extends Removeable
    * But the latest time on first call will be used.
    * @param delay in milliseconds. If 0 or less 0, then it is executed immediately if the calling
    *   thread is the graphic thread.
-   * @param latest The latest draw time in milliseconds. If it is less 0, then it is unused.
-   *   If it is 0 or less delay if a delay is given, then the delay isn't wound up on re-call.
+   * @param latest The latest draw time in milliseconds. If it is <= 0, then it is unused.
+   *   Note that a new call of repaint removes an existing repaint order to the new given time.
+   *   With the latest argument for this time the repaint is always executing independent of new calls.
    *   
    */
   public void repaint(int delay, int latest);

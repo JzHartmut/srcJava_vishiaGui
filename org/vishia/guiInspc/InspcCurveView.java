@@ -48,7 +48,15 @@ public final class InspcCurveView
 
   /**Version, history and license. 
    * <ul>
-   * <li>2018-01-08 Hartmut only formally, now {@link #fileCurveData} instead dirCurveSave, 
+   * <li>2021-12-19 Hartmut chg: in {@link #actionSelectVariableInTable}:
+   *   repaint after 500 ms without forced repaint instead 100 ms, then variables in the table can be selected fastly.
+   * <li>2021-12-19 Hartmut new right mouse menu in variable list "bold all selected" as new feature:
+   *   {@link #actionBoldSelected}
+   *   You can mark some lines in this table, then this curves are repaint with 3 thickness. 
+   *   This is proper for example to get a print result.
+   * <li>2021-12-18 Hartmut new in {@link #actionSelectVariableInTable}: 
+   *   It shows the values on cursor for this variable immediately. Very helpfull extension.
+   * <li>2021-12-16 Hartmut only formally, now {@link #fileCurveData} instead dirCurveSave, 
    *   {@link #actionOpenFileDialog_i(GralWidget_ifc)} called in the {@link #actionOpenFileDialog}.
    *   {@link #actionReadValues(int, GralWidget_ifc, Object...)} stores the file, not the directory in {@link #fileCurveData}
    *   to show the same file later again (as also completed in {@link GralFileSelector}.
@@ -290,15 +298,16 @@ public final class InspcCurveView
     widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
     widgTableVariables.setActionChange(actionKeyHandlingTable);
     //widgTableVariables.set
-    widgTableVariables.addContextMenuEntryGthread(0, null, "switch on-off <F2>", actionOnOffTrack);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", actionInsertVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", actionReplaceVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "swap variable", actionSwapVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "delete variable", actionDeleteVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "shift variable", actionShiftVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "set color", actionColorSelectorOpen);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "group scale", actionShareScale);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "ungroup scale", actionUnshareScale);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "switch on-off <F2>", this.actionOnOffTrack);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", this.actionInsertVariable);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", this.actionReplaceVariable);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "swap variable", this.actionSwapVariable);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "delete variable", this.actionDeleteVariable);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "shift variable", this.actionShiftVariable);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "set color", this.actionColorSelectorOpen);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "group scale", this.actionShareScale);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "ungroup scale", this.actionUnshareScale);
+    widgTableVariables.addContextMenuEntryGthread(0, null, "bold all selected", this.actionBoldSelected);
     gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
     widgScale.setActionFocused(actionFocusScaling);         //store which field, set color
@@ -615,6 +624,21 @@ public final class InspcCurveView
   };
 
   
+  GralUserAction actionBoldSelected = new GralUserAction("actionBoldSelected"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
+    { 
+      List<GralTableLine_ifc<GralCurveViewTrack_ifc>> markedLines = widgTableVariables.getMarkedLines(0x0001);
+      for( GralTableLine_ifc<GralCurveViewTrack_ifc> line : markedLines) {
+        GralCurveViewTrack_ifc track = line.getUserData();          // the data of the line is type of Table-Generic
+        GralCurveView.Track track2 = (GralCurveView.Track)line.getData();  //the same ---
+        track.setLineProperties(null, 3, 0);
+      }
+      widgCurve.repaint();
+      return true;
+    }
+  };
+
+
   GralUserAction actionOnOffTrack = new GralUserAction("actionOnOffTrack"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(trackScale.getVisible() ==0) {
@@ -960,9 +984,8 @@ public final class InspcCurveView
             }
             widgTableVariables.repaint(500,500);
           }
-          //set the line from the last selection to normal
-          if(trackScale !=null && trackScale !=null){
-            trackScale.setLineProperties(trackScale.getLineColor(), 3, 0);
+          if(trackScale !=null && trackScale !=null){      // set the line from the last selection to normal
+            trackScale.setLineProperties(trackScale.getLineColor(), 1, 0);
             if(trackScale.getVisible() !=0){
               trackScale.setVisible(1);
             }
@@ -970,14 +993,15 @@ public final class InspcCurveView
           //set the track bold and show the scaling of the track 
           InspcCurveView.this.trackScale = track;
           if(trackScale !=null && trackScale.getVisible() !=0){
-            trackScale.setLineProperties(trackScale.getLineColor(), 5, 0);
+            trackScale.setLineProperties(trackScale.getLineColor(), 3, 0);
             trackScale.setVisible(2);
             widgScale.setText("" + track.getScale7div());
             widgScale0.setText("" + track.getOffset());
             widgline0.setText("" + track.getLinePercent());
           }
+          actionShowCursorValues(track);                   // show the values of this variable on cursor position
           System.out.println("InspcCurveView.action - SelectVariableInTable");
-          widgCurve.repaint(100, 200);
+          widgCurve.repaint(500, 0);                       // repaint after ...1 second to have time to select in the table.
         }
       }
       return true;
@@ -1003,7 +1027,7 @@ public final class InspcCurveView
           //last variable
           //trackScale.widgVarPath.setBackColor(GralColor.getColor("wh"),0);
           if(trackScale !=null){
-            trackScale.setLineProperties(trackScale.getLineColor(), 1, 0);
+            trackScale.setLineProperties(trackScale.getLineColor(), 1, 0);  //the old track
           }
         }
         trackScale = (GralCurveViewTrack_ifc)widgd.getContentInfo();
@@ -1011,7 +1035,7 @@ public final class InspcCurveView
           trackScale = widgCurve.addTrack(sName, null, trackScale.getLineColor(), 0, 50, 5000.0f, 0.0f);
         }
         //colorLineTrackSelected = trackScale.getLineColor();
-        trackScale.setLineProperties(trackScale.getLineColor(), 3, 0);
+        trackScale.setLineProperties(trackScale.getLineColor(), 3, 0);     //the new track
         //trackScale.widgVarPath.setBackColor(GralColor.getColor("lam"),0);
         try{
           String s1 = widgScale.getText();
@@ -1325,15 +1349,24 @@ public final class InspcCurveView
   } };
 
   
+  
+  /**Show the values of the given track in the {@link #widgValCursorLeft} and -Right
+   * @param track from this track
+   */
+  void actionShowCursorValues ( GralCurveViewTrack_ifc track) {
+    float valueCursorLeft = track.getValueCursorLeft();
+    float valueCursorRight = track.getValueCursorRight();
+    widgValCursorLeft.setText("" + valueCursorLeft);
+    widgValCursorRight.setText("" + valueCursorRight);
+    float td = widgCurve.getdTimeCursors();
+    widgValdTime.setText("" + td);
+  }
+  
+  
   public GralUserAction actionShowCursorValues = new GralUserAction("actionShowCursorValues"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
-      if(trackScale !=null && trackScale !=null){
-        float valueCursorLeft = trackScale.getValueCursorLeft();
-        float valueCursorRight = trackScale.getValueCursorRight();
-        widgValCursorLeft.setText("" + valueCursorLeft);
-        widgValCursorRight.setText("" + valueCursorRight);
-        float td = widgCurve.getdTimeCursors();
-        widgValdTime.setText("" + td);
+      if(InspcCurveView.this.trackScale !=null){
+        actionShowCursorValues(InspcCurveView.this.trackScale);
       }
       return true;
     }
