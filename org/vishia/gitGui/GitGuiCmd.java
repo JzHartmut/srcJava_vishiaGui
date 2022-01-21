@@ -63,7 +63,7 @@ public class GitGuiCmd extends MainCmd {
   
   /**This array describes the commands with its help and stores the result to Args. More is not necessary. */
   MainCmd.Argument[] argList1 =
-    { new Argument("-gitsh", ":C:/Program Files/git/sh.exe - Path to the sh.exe to execute git" , new MainCmd.SetArgument() 
+    { new Argument("-gitsh", ":\"'C:/Program Files/git/sh.exe' -x -c\" - Path to the sh.exe to execute git" , new MainCmd.SetArgument() 
         { @Override public boolean setArgument(String val) 
           { GitGuiCmd.this.args.guiPaths.gitsh_exe = val; return (new File(val)).exists(); } })
       , new Argument("-diff", ":C:/Programs/difftool/diff.exe - exe for diff tool"

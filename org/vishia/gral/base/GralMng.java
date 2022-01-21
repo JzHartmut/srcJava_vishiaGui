@@ -46,6 +46,7 @@ import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Debugutil;
+import org.vishia.util.FileFunctions;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.ReplaceAlias_ifc;
@@ -749,20 +750,21 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    *  this.gralMng.setHelpBase(this.sHelpDir);
    * </pre>
    * Only then the url is effective.
-   * @param url
+   * @param urlSuffix it is usual a suffix to given helpBase. 
+   *   Only if it is absolute than take it without helpbase.
    */
-  public void setHelpUrl(String url){ 
+  public void setHelpUrl(String urlSuffix){ 
     String sUrl;
-    if(url.startsWith("+")){
-      sUrl = sHelpBase + url.substring(1);
-    } else if(FileSystem.isAbsolutePath(url)) { 
-      sUrl = url;  //absolute path
-    } else if (sHelpBase !=null) { //it is a directory which does not end with "/"
-      sUrl = sHelpBase + "/" + url;  //url is a "file.html+label"
+    if(urlSuffix.startsWith(":")){
+      sUrl = this.sHelpBase + urlSuffix.substring(1);
+    } else if(FileFunctions.isAbsolutePath(urlSuffix)) { 
+      sUrl = urlSuffix;  //absolute path
+    } else if (this.sHelpBase !=null) { //a directory should end with "/", possible also /path/to/file.html
+      sUrl = this.sHelpBase + urlSuffix;      //url may be "file.html#label" or "#label"
     } else {
-      sUrl = url;  //should be absolute
+      sUrl = urlSuffix;  //taken as is absolute or relative
     }
-    if(infoHelp !=null) infoHelp.setUrl(sUrl); 
+    if(this.infoHelp !=null) this.infoHelp.setUrl(sUrl); 
   }
   
 
@@ -1789,6 +1791,8 @@ public GralButton addCheckButton(
       widgg.repaint();  //maybe changed outfit on focus gained.
       String htmlHelp = widgg.getHtmlHelp();
       if(htmlHelp !=null && applAdapter !=null){
+//        if(htmlHelp.startsWith("+GitGui.html")) { 
+//          Debugutil.stop(); }
         applAdapter.setHelpUrl(htmlHelp);
       }
       if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }

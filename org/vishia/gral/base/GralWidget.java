@@ -10,6 +10,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
+import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -1250,6 +1251,19 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
+  /**For context sensitive help, it assigns a part of a URL to the widget which has the focus gained.
+   * If this widget is in focus, it calls {@link GralMngApplAdapter_ifc#setHelpUrl(String)}
+   * exactly with the given stored value to set the help url of the application.
+   * @param url A ":file.html#label" or ":localdir/file.html#label" or also "suffix.html#label"
+   *   (also without "#label" to add this part to the central help path
+   *   given by {@link org.vishia.gral.area9.GralArea9_ifc#setHelpBase(String)}
+   *   which describes the html help url in an local context. 
+   *   The origin of the url is given with a global context of the help window.
+   *   If url is an absolute path then it is used as is.
+   *   If it does not start with a ":" then is should be used as relative path
+   *   related to the application's current directory. 
+   *   
+   */
   public void setHtmlHelp(String url){ htmlHelp = url; }
   
   public String getHtmlHelp(){ return htmlHelp; }

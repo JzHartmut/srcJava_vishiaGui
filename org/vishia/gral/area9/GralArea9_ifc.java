@@ -234,6 +234,7 @@ public interface GralArea9_ifc extends GralMngApplAdapter_ifc
 
   /**Set a path which is used as help url base path.
    * @param path An absolute given path on a local file system, or html page in internet.
+   * This path is used for {@link GralMngApplAdapter_ifc#setHelpUrl(String)}
    */
   void setHelpBase(String path);
   

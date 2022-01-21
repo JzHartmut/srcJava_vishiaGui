@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +23,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
+import org.vishia.util.FileFunctions;
 import org.vishia.util.FileList;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -49,11 +49,21 @@ public class GitGui
 
 
   /**Version, history and license
-   * <ul>2020-02-12 Hartmut Now main works (in Test), able to invoke as standalone Java applic. 
+   * <ul>
+   * <li>2022-01-21 Hartmut now the whole sh.exe call is determinable by the -gitsh option 
+   *   which should be ""'C:\\Program Files\\git\\bin\\sh.exe' -x -c"" 
+   * <li>2022-01-21 Hartmut echo of command line in info window
+   * <li>2022-01-21 Hartmut some, not all refactoring for warnings "Unqualified access"
+   * <li>2022-01-21 Hartmut for {@link #actionExecCmd}: If starts with !! then show only "done" on success, else show whole output
+   * <li>2022-01-21 Hartmut {@link #prepArgs(String)}) is new, gets the sh.exe call with -x -c completely from the -getsh option.
+   *    used on all {@link #gitCmd}.addCmd(...)
+   * <li>2022-01-21 Hartmut reorganization of the button positions.
+   * <li>2022-01-21 Hartmut {@link #cmdThread}: possible to set a debug breakpoint if contains commands.
+   * <li>2020-02-12 Hartmut Now main works (in Test), able to invoke as standalone Java applic. 
    * <li>2020-01-15 Hartmut {@link #startLog(String)} shows the working dir too. 
    * <li>2020-01-15 Hartmut {@link #wdgTableVersion} with fix width, {@link #wdgTableFiles} variable width on resizing of the window. Better for view. 
    * <li>2019-12-25 Hartmut {@link #actionFetch}, {@link #actionPull}. {@link #actionPull} not ready yet. 
-   * <li>2019-12-10 Hartmut in {@link #actionExecCmd}, {@link #actionAdd} etc.: shows the cmd output via {@link #execShowCmdOutput} 
+   * <li>2019-12-10 Hartmut in {@link #actionExecCmd}, {@link #actionAdd} etc.: shows the cmd output via {@link #execShowCmdOutputDone} 
    * <li>2019-12-10 Hartmut in {@link #exec_CommitDone}: shows commit error 
    * <li>2019-11-25 Hartmut {@link #moveFileListToSelection()} improved creates one directory level on git working dir.  
    * <li>2019-09-00 Hartmut new {@link #actionOutputZip} 
@@ -104,7 +114,7 @@ public class GitGui
    * 
    * 
    */
-  public final String sVersion = "2018-10-28";  
+  public final String sVersion = "2022-01-21";  
 
 
   static class RevisionEntry
@@ -137,9 +147,9 @@ public class GitGui
   GralUserAction actionOpenCommitText = new GralUserAction("actionTableOpenCommitText")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       String[] args ={"cmd.exe", "/C", "edit", ".gitCommit"};
-      wdgCmd.setText("cmd.exe /C edit .gitCommit");
-      gitCmd.addCmd(args, null, listOut, null, workingDir, null);
-      wdgCommit.setText("do commit");
+      GitGui.this.wdgCmd.setText("cmd.exe /C edit .gitCommit");
+      GitGui.this.gitCmd.addCmd(args, null, GitGui.this.listOut, null, GitGui.this.workingDir, null);
+      GitGui.this.wdgCommit.setText("do commit");
       return true;
   } };
 
@@ -152,12 +162,12 @@ public class GitGui
   { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
     { if(errorcode ==0) {
-        FileSystem.writeFile("\n", sWorkingDir + "/.gitcommit");
-        wdgCommit.setText("commit done");
+        FileFunctions.writeFile("\n", GitGui.this.sWorkingDir + "/.gitcommit");
+        GitGui.this.wdgCommit.setText("commit done");
       } else {
-        wdgCommit.setText("commit error");
-        wdgInfo.setText(gitOut);
-        gitOut.clear();
+        GitGui.this.wdgCommit.setText("commit error");
+        GitGui.this.wdgInfo.setText(GitGui.this.gitOut);
+        GitGui.this.gitOut.clear();
       }
     }
   }; 
@@ -169,22 +179,22 @@ public class GitGui
    */
   GralUserAction actionCommit = new GralUserAction("actionCommit")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      File gitCommit = new File(sWorkingDir, ".gitCommit");
+      File gitCommit = new File(GitGui.this.sWorkingDir, ".gitCommit");
       if(gitCommit.length() > 3) {
-        try{ FileList.list(sWorkingDir, "*", GitGui.this.sFileList);
+        try{ FileList.list(GitGui.this.sWorkingDir, "*", GitGui.this.sFileList);
         } catch(Exception exc){
-          wdgInfo.setText("_filelist.lst problem: " + exc.getMessage());
+          GitGui.this.wdgInfo.setText("_filelist.lst problem: " + exc.getMessage());
         }
         String sGitCmd = "git";
-        if(! sGitDir.startsWith(sWorkingDir)) {
-          sGitCmd += " '--git-dir=" + sGitDir + "'";
+        if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
+          sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";
         }
         sGitCmd += " commit -a -F .gitcommit";
-        wdgCmd.setText(sGitCmd);
-        String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
-        gitCmd.addCmd(args, null, listOut, null, workingDir, exec_CommitDone);
+        GitGui.this.wdgCmd.setText(sGitCmd);
+        String[] args = prepArgs(sGitCmd);
+        GitGui.this.gitCmd.addCmd(args, null, GitGui.this.listOut, null, GitGui.this.workingDir, GitGui.this.exec_CommitDone);
       } else {
-        wdgCommit.setText("do commit text?");
+        GitGui.this.wdgCommit.setText("do commit text?");
       }
       return true;
   } };
@@ -401,11 +411,13 @@ public class GitGui
   GralUserAction actionExecCmd = new GralUserAction("actionExecCmd")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
-        String cmd = wdgCmd.getText();
-        if(cmd.startsWith("!! ")) {
-          cmd = cmd.substring(3);
+        String cmd = GitGui.this.wdgCmd.getText();
+        CmdExecuter.ExecuteAfterFinish execAfter = GitGui.this.execShowCmdOutput;
+        if(cmd.startsWith("!!")) {     // A typical git cmd in execution phase
+          cmd = cmd.substring(2);
+          execAfter = GitGui.this.execShowCmdOutputDone;
         }
-        execCmd(cmd, execShowCmdOutput);
+        execCmd(cmd, execAfter);
       } //if;
       return false;
   } };
@@ -514,7 +526,7 @@ public class GitGui
         String cmd = GitGui.this.wdgCmd.getText().trim();
         if(cmd.startsWith("!! ")) {
           cmd = cmd.substring(3);
-          execCmd(cmd, execShowCmdOutput);
+          execCmd(cmd, execShowCmdOutputDone);
         } else {
           addFileFromSelection(); return true;
         }
@@ -533,7 +545,7 @@ public class GitGui
         String cmd = GitGui.this.wdgCmd.getText().trim();
         if(cmd.startsWith("!! ")) {
           cmd = cmd.substring(3);
-          execCmd(cmd, execShowCmdOutput);
+          execCmd(cmd, execShowCmdOutputDone);
         } else {
           moveFileListToSelection(); return true;
         }
@@ -544,7 +556,7 @@ public class GitGui
 
 
 
-  CmdExecuter.ExecuteAfterFinish execShowCmdOutput = new CmdExecuter.ExecuteAfterFinish()
+  CmdExecuter.ExecuteAfterFinish execShowCmdOutputDone = new CmdExecuter.ExecuteAfterFinish()
   { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
     { if(errorcode ==0) {
@@ -554,6 +566,17 @@ public class GitGui
         try { wdgInfo.append(gitOut);
         } catch (IOException e) { }
       }
+  } };
+
+  
+  
+  
+  CmdExecuter.ExecuteAfterFinish execShowCmdOutput = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { wdgInfo.setText("cmd ouptut:\n");
+      try { wdgInfo.append(gitOut);
+      } catch (IOException e) { }
   } };
 
   
@@ -585,7 +608,7 @@ public class GitGui
         String sDate = dateFmtyyMMdd.format(revision.dateCommit);
         String sGitCmd = "git '--git-dir=" + sGitDir + "' archive  -o " + sZipName + "-" + sDate + ".zip " + revision.revisionHash; ///
         wdgCmd.setText(sGitCmd);
-        String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+        String[] args = prepArgs(sGitCmd);
         gitCmd.addCmd(args, null, listOut, null, workingDir, null);
 
 //        if(sLine !=null && sLine.length() >=2) {
@@ -623,29 +646,29 @@ public class GitGui
   
   final GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
 
-  final GralButton wdgBtnDiffCurrWork = new GralButton("@-29..-27, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
+  final GralButton wdgBtnDiffCurrWork = new GralButton("@-30+2, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
 
-  final GralButton wdgBtnDiffCurrFile = new GralButton("@-26..-24, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
+  final GralButton wdgBtnDiffCurrFile = new GralButton("@-27+2, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
 
-  final GralButton wdgBtnBlame = new GralButton("@-23..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
+  final GralButton wdgBtnPull = new GralButton("@-21+2, -20..-15 = pull", "pull", this.actionPull);
 
-  final GralButton wdgBtnDaylyBranch = new GralButton("@-18+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
+  final GralButton wdgBtnPush = new GralButton("@-21+2, -7..-1 = push", "push", this.actionPush);
 
-  final GralButton wdgBtnDaylyMain = new GralButton("@-18+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
+  final GralButton wdgBtnBlame = new GralButton("@-18..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
 
-  final GralButton wdgBtnAdd = new GralButton("@-15+2, -9..-1 = add", "add", this.actionAdd);
+  final GralButton wdgBtnDaylyBranch = new GralButton("@-15+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
 
-  final GralButton wdgBtnMove = new GralButton("@-15+2, -18..-10 = move", "move", this.actionMove);
+  final GralButton wdgBtnDaylyMain = new GralButton("@-15+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
 
-  final GralButton wdgRefresh = new GralButton("@-12+2, -18..-8 = refresh", "refresh", this.actionRefresh);
+  final GralButton wdgBtnAdd = new GralButton("@-12+2, -9..-1 = add", "add", this.actionAdd);
 
-  final GralButton wdgBtnPull = new GralButton("@-9+2, -20..-15 = pull", "pull", this.actionPull);
+  final GralButton wdgBtnMove = new GralButton("@-12+2, -18..-10 = move", "move", this.actionMove);
 
-  final GralButton wdgCommitText = new GralButton("@-9+2, -14..-2 = commitText", "commit-text", this.actionOpenCommitText);
+  final GralButton wdgCommitText = new GralButton("@-9+2, -20..-8 = commitText", "commit-text", this.actionOpenCommitText);
 
   final GralButton wdgCommit = new GralButton("@-6+2, -20..-8 = commit", "do commit", this.actionCommit);
 
-  final GralButton wdgBtnPush = new GralButton("@-6+2, -7..-1 = push", "push", this.actionPush);
+  final GralButton wdgRefresh = new GralButton("@-3+2, -12..-2 = refresh", "refresh", this.actionRefresh);
 
   /**If set to true, the {@link #cmdThread} should be aborted.
    * 
@@ -738,12 +761,14 @@ public class GitGui
     this.exepath = cmdArgs.guiPaths;
     if(!this.exepath.dirTemp1.exists()) { this.exepath.dirTemp1.mkdirs(); }
     if(!this.exepath.dirTemp2.exists()) { this.exepath.dirTemp2.mkdirs(); }
-    wdgTableVersion.specifyActionOnLineSelected(actionTableLineVersion);
-    wdgTableFiles.specifyActionChange("actionTableFile", actionTableFile, null);
-    wdgInfo.setUser(wdgInfoSetSelection);
-    window.specifyActionOnCloseWindow(actionOnCloseWindow);
-    window.create(sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, initGraphic);
-    cmdThread.start();
+    this.wdgTableVersion.specifyActionOnLineSelected(this.actionTableLineVersion);
+    wdgTableFiles.specifyActionChange("actionTableFile", this.actionTableFile, null);
+    this.wdgInfo.setUser(this.wdgInfoSetSelection);
+    this.window.specifyActionOnCloseWindow(this.actionOnCloseWindow);
+    this.window.create(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, this.initGraphic);
+    this.wdgCmd.setHtmlHelp(":GitGui.html#exec");
+    this.gitCmd.setEchoCmdOut(this.wdgInfo); //System.out);
+    this.cmdThread.start();
   }
 
   
@@ -1028,6 +1053,15 @@ public class GitGui
   }
 
 
+  
+  
+  String[] prepArgs(String cmd) {
+    String[] ret = CmdExecuter.splitArgs(exepath.gitsh_exe, 0, 1);
+    ret[ret.length-1] = cmd;    //the whole git cmd or other cmd is one arg for the sh.exe invocation.
+    return ret;
+  }
+  
+  
 
 
   
@@ -1066,7 +1100,7 @@ public class GitGui
       sGitCmd +=  " --follow --name-status -- '" + sLocalFile + "'";  //--name-status only if one file, elsewhere too much info
     }
     wdgCmd.setText(sGitCmd);
-    String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+    String[] args = prepArgs(sGitCmd); //{exepath.gitsh_exe, "-x", "-c", sGitCmd};
     gitCmd.clearCmdQueue();
     gitCmd.abortCmd();
     gitOut.buffer().setLength(0);
@@ -1213,7 +1247,7 @@ public class GitGui
       sGitCmd += " '--git-dir=" + sGitDir + "'";
     }
     if(currentEntry ==null) {
-      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd + " status"};
+      String[] args = prepArgs(sGitCmd + " status");
       gitCmd.addCmd(args, null, listOut, null, workingDir, exec_ShowStatus);
       wdgInfo.setText("(working area)");
       try{
@@ -1232,7 +1266,7 @@ public class GitGui
       sGitCmd += " diff --name-status " + currentEntry.parentHash + ".." + currentEntry.revisionHash;
     }
     wdgCmd.setText(sGitCmd);
-    String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+    String[] args = prepArgs(sGitCmd);
     //
     gitCmd.addCmd(args, null, listOut, null, workingDir, exec_fillFileTable4Revision);
     synchronized(cmdThread) { cmdThread.notify(); }
@@ -1243,11 +1277,11 @@ public class GitGui
   void restoreFile(String sFile) {
     String sGitCmd2 = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + this.sFileList; ///
     wdgCmd.setText(sGitCmd2);
-    String[] args2 ={exepath.gitsh_exe, "-x", "-c", sGitCmd2};
+    String[] args2 = prepArgs(sGitCmd2);
     gitCmd.addCmd(args2, null, listOut, null, workingDir, null);
 
     String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpEntry.revisionHash + " -- " + sFile;
-    String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+    String[] args = prepArgs(sGitCmd);
     gitCmd.addCmd(args, null, listOut, null, workingDir, 
       new CmdExecuter.ExecuteAfterFinish()
         { @Override
@@ -1270,6 +1304,10 @@ public class GitGui
 
   
   
+  /**
+   * @param cmd if "git.. " or "+ ... " then call in sh.exe
+   * @param showCmd The routine which evaluates the result.
+   */
   void execCmd(String cmd, CmdExecuter.ExecuteAfterFinish showCmd) {
     File cmdDir = workingDir;
     int posDir = cmd.indexOf('>');
@@ -1277,14 +1315,16 @@ public class GitGui
       cmdDir = new File(cmd.substring(0, posDir));
       cmd = cmd.substring(posDir+1);
     }
+    boolean bSh = false;
+    if(cmd.startsWith("+")) {
+      bSh = true;
+      int nStart = StringFunctions.indexNoWhitespace(cmd, 1, -1);
+      cmd = cmd.substring(nStart);
+    }
     String[] args = cmd.split(" ");
-    if(args[0].equals("git")) {
+    if(bSh || args[0].equals("git")) {
       String[] args2 = args;
-      args = new String[4];
-      args[0] = exepath.gitsh_exe;
-      args[1] = "-x";
-      args[2] = "-c";
-      args[3] = cmd;
+      args = prepArgs(cmd);
     }
     gitOut.clear();
     gitCmd.addCmd(args, null, listOut, null, cmdDir, showCmd);
@@ -1360,7 +1400,7 @@ public class GitGui
       sFile1 = dirTemp1 + "/" + sCurrFile; //sFile;
       try{ FileSystem.mkDirPath(sFile1);} catch(IOException exc) { throw new RuntimeException(exc); }
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sCurrFile; //sFile;
-      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+      String[] args = prepArgs(sGitCmd);
       gitCmd.addCmd(args, null, listOut, null, new File(dirTemp1), null);  //checkout in the dirTemp1, it is the working dir.
     }
     if(cmpRev == null) {
@@ -1373,7 +1413,7 @@ public class GitGui
       try{ FileSystem.mkDirPath(sFile2);} catch(IOException exc) { throw new RuntimeException(exc); }
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sCmpFile;
       wdgCmd.setText(this.exepath.dirTemp2 + ">" + sGitCmd);
-      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+      String[] args = prepArgs(sGitCmd);
       gitCmd.addCmd(args, null, listOut, null, new File(dirTemp2), null);
     }
     sFile1 = sFile1.replace('/', '\\');
@@ -1399,7 +1439,7 @@ public class GitGui
       sFile1 = sWorkingDir + "/" + sFile;
     } else  { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + currRev.revisionHash + " -- " + sFile;
-      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+      String[] args = prepArgs(sGitCmd);
       gitCmd.addCmd(args, null, listOut, null, this.exepath.dirTemp1, null);
     }
     if(cmpRev == null) {
@@ -1408,7 +1448,7 @@ public class GitGui
     else { 
       String sGitCmd = "git '--git-dir=" + sGitDir + "' checkout " + cmpRev.revisionHash + " -- " + sFile;
       wdgCmd.setText(this.exepath.dirTemp2 + ">" + sGitCmd);
-      String[] args ={exepath.gitsh_exe, "-x", "-c", sGitCmd};
+      String[] args = prepArgs(sGitCmd);
       gitCmd.addCmd(args, null, listOut, null, this.exepath.dirTemp2, null);
     }
     sFile1 = sFile1.replace('/', '\\');
@@ -1471,10 +1511,21 @@ public class GitGui
 
 
 
+  /**This thread executes the git commands concurrently to the GUI.
+   * If the commands will be executed inside the GUI event operations,
+   * it may need to much time. 
+   * <br>
+   * For the answer, usual the commands calls a {@link CmdExecuter.ExecuteAfterFinish}
+   * operation, which changed the GUI. This execution is in this thread too, of course,
+   * and inform the graphic as usual in the GRAL concept. 
+   * 
+   */
   Thread cmdThread = new Thread("gitGui-Cmd") {
     @Override public void run() {
       do {
-        gitCmd.executeCmdQueue(true);
+        if(gitCmd.hasEntries()) {
+          gitCmd.executeCmdQueue(true);
+        }
         try {
           synchronized(this){ wait(1000); }
         } catch (InterruptedException e) { }

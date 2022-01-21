@@ -126,9 +126,9 @@ if test ! -f $BUILD_TMP/deploy/$DSTNAME-$VERSIONSTAMP.jar; then   ##compilation 
   exit 255
 else                                                       ##compilation not successfull
   ##
-  ## copy the useable version to a existing libstd directory:
-  if test -d ../../../../../../libstd; then ##beside cmpnJava... should be existing
-    export CURRENT_JARS_PATH="../../../../../../libStd" 
+  ## copy the useable version to a existing tools directory:
+  if test -d ../../../../../../tools; then ##beside cmpnJava... should be existing
+    export CURRENT_JARS_PATH="../../../../../../tools" 
   else
     export CURRENT_JARS_PATH="../../jars" 
     if ! test -d $CURRENT_JARS_PATH; then mkdir $CURRENT_JARS_PATH; fi

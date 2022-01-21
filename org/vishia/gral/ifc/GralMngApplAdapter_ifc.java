@@ -37,14 +37,17 @@ public interface GralMngApplAdapter_ifc
    */
   public static final int version = 20120303;
 
-  /**For context sensitive help, it assigns an URL to the widget which has the focus gained.
-   * @param url A "file#html.label" or "localdir/file.html#label" which describes the html help url
-   *   in an local context. The origin of the url is given with a global context of the help window.
-   *   See {@link org.vishia.gral.area9.GralArea9Window#setHelpBase(String)}
+  /**For context sensitive help, it assigns a part of a URL to the widget which has the focus gained.
+   * This URL is used on calling the help function (usual F1 key or help button).
+   * @param url A ":file.html#label" or ":localdir/file.html#label" 
+   *   or "/abs/path/to/help.html#label" or "relatpath/help.html#lablel":<br>
+   *   with a colon as first char the specific base directory of the help is used.  
+   *   This origin of the url is given with a global context of the help window.
+   *   See {@link org.vishia.gral.area9_ifc.GralArea9#setHelpBase(String)}
+   *   If url is an absolute path then it is used as is.
+   *   If it does not start with a ":" then is should be used as relative path
+   *   related to the application's current directory. 
    *   
-   *   deprecated: It is often an absolute path. may be a relative path??
-   *   deprecated: If it starts with "+", a base path is used as prefix.
-   *  
    */
   void setHelpUrl(String url);
 }
