@@ -1790,9 +1790,9 @@ public GralButton addCheckButton(
       GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
       widgg.repaint();  //maybe changed outfit on focus gained.
       String htmlHelp = widgg.getHtmlHelp();
+      if(htmlHelp !=null && htmlHelp.startsWith(":FcmdNew.html")) { 
+        Debugutil.stop(); }
       if(htmlHelp !=null && applAdapter !=null){
-//        if(htmlHelp.startsWith("+GitGui.html")) { 
-//          Debugutil.stop(); }
         applAdapter.setHelpUrl(htmlHelp);
       }
       if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }

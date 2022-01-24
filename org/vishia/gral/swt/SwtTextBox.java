@@ -93,23 +93,23 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   protected SwtTextBox(GralTextBox widgg, SwtMng mng)
   { widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
     Composite panelSwt = mng.getCurrentPanel();
-    GralPanelContent gralPanel = mng.mng.getCurrentPanel();
+    //GralPanelContent gralPanel = mng.mng.getCurrentPanel();
     
     assert(panelSwt !=null);
-    textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
-    textFieldSwt.setData(this);
-    super.wdgimpl = this.wdgh = new SwtWidgetHelper(textFieldSwt, mng);
-    textFieldSwt.addFocusListener(focusLstn);
-    textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
-    textFieldSwt.setEditable(widgg.isEditable());
-    textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(0xFFFFFF));
-    textFieldSwt.addMouseListener(SwtGralMouseListener.mouseActionStd);
+    this.textFieldSwt = new Text(panelSwt, SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL); //;style);
+    this.textFieldSwt.setData(this);
+    super.wdgimpl = this.wdgh = new SwtWidgetHelper(this.textFieldSwt, mng);
+    this.textFieldSwt.addFocusListener(mng.focusListener);
+    this.textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
+    this.textFieldSwt.setEditable(widgg.isEditable());
+    this.textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(0xFFFFFF));
+    this.textFieldSwt.addMouseListener(SwtGralMouseListener.mouseActionStd);
     KeyListener swtKeyListener = new TextBoxKeyListener(mng.mng._impl.gralKeyListener);
-    textFieldSwt.addKeyListener(swtKeyListener);
+    this.textFieldSwt.addKeyListener(swtKeyListener);
     TextBoxModifyListener modifyListener = new TextBoxModifyListener();
-    textFieldSwt.addModifyListener(modifyListener);
+    this.textFieldSwt.addModifyListener(modifyListener);
     
-    mng.setPosAndSize_(widgg.pos(), textFieldSwt);
+    mng.setPosAndSize_(widgg.pos(), this.textFieldSwt);
     if(prompt() != null && promptStylePosition().equals("t")){
       final int yPixelField;
       final Font promptFont;
@@ -124,7 +124,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
       default: promptFont = mng.propertiesGuiSwt.smallPromptFont;
                yPixelField = mng.mng.propertiesGui.yPixelUnit() * 2 -3;
       }//switch
-      Rectangle boundsField = textFieldSwt.getBounds();
+      Rectangle boundsField = this.textFieldSwt.getBounds();
       Rectangle boundsPrompt = new Rectangle(boundsField.x, boundsField.y-3  //occupy part of field above, only above the normal letters
         , boundsField.width, boundsField.height );
       
@@ -143,7 +143,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
       if(promptSize.x > boundsPrompt.width){
         boundsPrompt.width = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
       }
-      textFieldSwt.setBounds(boundsField);
+      this.textFieldSwt.setBounds(boundsField);
       wgPrompt.setBounds(boundsPrompt);
     } 
     mng.mng.registerWidget(widgg);
@@ -159,34 +159,34 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
   
   //@Override public Widget getWidgetImplementation(){ return textFieldSwt; } 
-  //@Override public boolean setFocus(){ return textFieldSwt.setFocus(); }
+  //@Override public boolean setFocus(){ return this.textFieldSwt.setFocus(); }
 
   @Override public GralRectangle getPixelPositionSize(){ return wdgh.getPixelPositionSize(); }
 
 
-  @Override protected int getCurrentCaretPos() { return textFieldSwt.getCaretPosition(); }
+  @Override protected int getCurrentCaretPos() { return this.textFieldSwt.getCaretPosition(); }
   
 
   
   @Override public Object getWidgetImplementation()
-  { return textFieldSwt;
+  { return this.textFieldSwt;
   }
 
   /*
 
   @Override public String getText()
   {
-    String oldText = textFieldSwt.getText();
+    String oldText = this.textFieldSwt.getText();
     return oldText;
   }
    
   @Override public GralColor setBackgroundColor(GralColor color)
-  { return SwtWidgetHelper.setBackgroundColor(color, textFieldSwt);
+  { return SwtWidgetHelper.setBackgroundColor(color, this.textFieldSwt);
   }
   
 
   @Override public GralColor setForegroundColor(GralColor color)
-  { return SwtWidgetHelper.setForegroundColor(color, textFieldSwt);
+  { return SwtWidgetHelper.setForegroundColor(color, this.textFieldSwt);
   }
   
   
@@ -195,20 +195,20 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
 
   
   @Override public void setTextInGThread(CharSequence text){ 
-    textFieldSwt.setText(text.toString()); 
+    this.textFieldSwt.setText(text.toString()); 
   }
   
 
   
   @Override public void appendTextInGThread(CharSequence text){ 
-    textFieldSwt.append(text.toString()); 
+    this.textFieldSwt.append(text.toString()); 
   }
   
   */
   
   
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { textFieldSwt.setBounds(x,y,dx,dy);
+  { this.textFieldSwt.setBounds(x,y,dx,dy);
   }
   
 
@@ -217,13 +217,13 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   @Override public void repaintGthread(){
     int catastrophicalCount = 0;
     int chg;
-    if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
+    if(this.textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();
       while( (chg = getChanged()) !=0){ //widgg.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) 
           throw new RuntimeException("atomic failed");
         if((chg & chgText) !=0 && dyda.displayedText !=null){ 
-          textFieldSwt.setText(dyda.displayedText);
+          this.textFieldSwt.setText(dyda.displayedText);
           final int selectionStart, selectionEnd;
           final int zText = dyda.displayedText.length();
           if(caretPos() <0){
@@ -237,49 +237,49 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
             selectionEnd = selectionStart =-1;  //dont call
           }
           if(selectionStart >=0){
-            textFieldSwt.setSelection(selectionStart, selectionEnd);
+            this.textFieldSwt.setSelection(selectionStart, selectionEnd);
           }
         }
         if((chg & chgAddText) !=0) {
-          textFieldSwt.append(getAndClearNewText());
+          this.textFieldSwt.append(getAndClearNewText());
         }
         if((chg & chgColorText)!=0){
           SwtProperties props = wdgh.mng.propertiesGuiSwt;
           if(dyda.textColor !=null){
-            textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
+            this.textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
           }
           if(dyda.backColor !=null){
-            textFieldSwt.setBackground(props.colorSwt(dyda.backColor));
+            this.textFieldSwt.setBackground(props.colorSwt(dyda.backColor));
           }
           if(dyda.textFont !=null){
-            textFieldSwt.setFont(props.fontSwt(dyda.textFont));
+            this.textFieldSwt.setFont(props.fontSwt(dyda.textFont));
           }
         }
         if((chg & chgEditable)!=0){ 
-          textFieldSwt.setEditable(true); 
+          this.textFieldSwt.setEditable(true); 
         }
         if((chg & chgNonEditable)!=0){ 
-          textFieldSwt.setEditable(false); 
+          this.textFieldSwt.setEditable(false); 
         }
         
         if((chg & chgViewTrail)!=0) {
-          ScrollBar scroll = textFieldSwt.getVerticalBar();
+          ScrollBar scroll = this.textFieldSwt.getVerticalBar();
           int maxScroll = scroll.getMaximum();
           scroll.setSelection(maxScroll);
-          textFieldSwt.update();
+          this.textFieldSwt.update();
         }
         if((chg & chgCursor) !=0){ 
-          textFieldSwt.setSelection(caretPos());
+          this.textFieldSwt.setSelection(caretPos());
         }
         if((chg & chgVisible) !=0) {
-          textFieldSwt.getShell().setVisible(true);
+          this.textFieldSwt.getShell().setVisible(true);
         }
         if((chg & chgInvisible) !=0) {
-          textFieldSwt.getShell().setVisible(false);
+          this.textFieldSwt.getShell().setVisible(false);
         }
-        if((chg & chgColorText) !=0){ textFieldSwt.setForeground(wdgh.mng.getColorImpl(dyda().textColor)); }
-        if((chg & chgColorBack) !=0){ textFieldSwt.setBackground(wdgh.mng.getColorImpl(dyda().backColor)); }
-        textFieldSwt.redraw();
+        if((chg & chgColorText) !=0){ this.textFieldSwt.setForeground(wdgh.mng.getColorImpl(dyda().textColor)); }
+        if((chg & chgColorBack) !=0){ this.textFieldSwt.setBackground(wdgh.mng.getColorImpl(dyda().backColor)); }
+        this.textFieldSwt.redraw();
         acknChanged(chg);
       }
     }
@@ -290,7 +290,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
 
   @Override public boolean setFocusGThread()
-  { return SwtWidgetHelper.setFocusOfTabSwt(textFieldSwt);
+  { return SwtWidgetHelper.setFocusOfTabSwt(this.textFieldSwt);
   }
 
 
@@ -299,9 +299,9 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
   @Override public void removeWidgetImplementation()
   {
-    if(textFieldSwt !=null) {
-      textFieldSwt.dispose();
-      textFieldSwt = null;
+    if(this.textFieldSwt !=null) {
+      this.textFieldSwt.dispose();
+      this.textFieldSwt = null;
     }
     if(promptSwt !=null){
       promptSwt.dispose();
@@ -325,12 +325,12 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
       }
       boolean bUserOk;
       GralTextFieldUser_ifc user = user();
-      //SwtTextBox.super.caretPos(textFieldSwt.getCaretPosition());
+      //SwtTextBox.super.caretPos(this.textFieldSwt.getCaretPosition());
       if(user !=null){
-        Point selection = textFieldSwt.getSelection();
+        Point selection = SwtTextBox.this.textFieldSwt.getSelection();
         bUserOk = user.userKey(key
-            , textFieldSwt.getText()
-            , textFieldSwt.getCaretPosition()
+            , SwtTextBox.this.textFieldSwt.getText()
+            , SwtTextBox.this.textFieldSwt.getCaretPosition()
             , selection.x, selection.y);
       } else { bUserOk = false; }
       //
@@ -338,7 +338,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
         if(KeyCode.isWritingOrTextNavigationKey(key)) return true;
         switch(key){
           case KeyCode.ctrl + 'a': { 
-            textFieldSwt.selectAll();
+            SwtTextBox.this.textFieldSwt.selectAll();
           } break;
           default: bDone = false;
         }
@@ -355,24 +355,24 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   
   protected class TextBoxModifyListener implements ModifyListener{
     @Override public void modifyText(ModifyEvent ev) {
-      String text = textFieldSwt.getText();
+      String text = SwtTextBox.this.textFieldSwt.getText();
       SwtTextBox.super.dyda().displayedText = text;
       //System.out.println("actionText");
-      //SwtTextFieldWrapper.super.caretPos = textFieldSwt.getCaretPosition();
+      //SwtTextFieldWrapper.super.caretPos = this.textFieldSwt.getCaretPosition();
       GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyChgContent);
       if(action !=null){
         Object[] args = action.args();
-        if(args == null){ action.action().exec(KeyCode.valueChanged, widgg, text); }
-        else { action.action().exec(KeyCode.valueChanged, widgg, args, text); }
+        if(args == null){ action.action().exec(KeyCode.valueChanged, SwtTextBox.this.widgg, text); }
+        else { action.action().exec(KeyCode.valueChanged, SwtTextBox.this.widgg, args, text); }
       }
       //if(dyda.displayedText !=null){
-        //textFieldSwt.setText(dyda.displayedText);
+        //this.textFieldSwt.setText(dyda.displayedText);
       //}
     }
     
   }
   
-  protected FocusListener focusLstn = new FocusListener()
+  protected FocusListener XXXfocusLstn = new FocusListener()
   {
     
     @Override
@@ -389,4 +389,7 @@ public class SwtTextBox extends GralTextBox.GraphicImplAccess
   };
 
   
+
+  
+
 }

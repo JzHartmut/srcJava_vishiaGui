@@ -20,7 +20,7 @@ if test "$VERSIONSTAMP" = ""; then export VERSIONSTAMP=$(date -I); fi   ## write
 ## Only then a comparison of MD5 is possible. 
 ## The comparison byte by byte inside the jar (zip) file is always possible.
 ## Use this timestamp for file in jars, influences the MD5 check:
-export TIMEinJAR="2021-12-19+00:00"
+export TIMEinJAR="2022-01-24+00:00"
 
 ## Determine a dedicated vishiaBase-yyyy-mm-dd.jar or deactivate it to use the current vishiaBase.jar:
 export VERSION_VISHIABASE="XX2021-07-01"
@@ -43,8 +43,8 @@ elif test -f ../../deploy/vishiaBase-$VERSION_VISHIABASE.jar
 then export JAR_vishiaBase="../../deploy/vishiaBase-$VERSION_VISHIABASE.jar"
 elif test -f ../../jars/vishiaBase.jar
 then export JAR_vishiaBase="../../jars/vishiaBase.jar"
-elif test -f ../../../../../../libstd/vishiaBase.jar
-then export JAR_vishiaBase="../../../../../../libstd/vishiaBase.jar"
+elif test -f ../../../../../../tools/vishiaBase.jar
+then export JAR_vishiaBase="../../../../../../tools/vishiaBase.jar"
 elif test -f ../../../../../../libs/vishiaBase.jar
 then export JAR_vishiaBase="../../../../../../libs/vishiaBase.jar"
 else
@@ -63,12 +63,12 @@ elif test -f ../../jars/org.eclipse.swt.win32_x86.jar
 then export JARPATH_SWT="../../jars/org.eclipse.swt.win32_x86.jar"
 elif test -f ../../jars/org.eclipse.swt.gtk.linux.x86_64.jar
 then export JARPATH_SWT="../../jars/org.eclipse.swt.gtk.linux.x86_64.jar"
-elif test -f ../../../../../../libstd/org.eclipse.swt.win32_x86_64.jar
-then export JARPATH_SWT="../../../../../../libstd/org.eclipse.swt.win32_x86_64.jar"
-elif test -f ../../../../../../libstd/org.eclipse.swt.win32_x86.jar
-then export JARPATH_SWT="../../../../../../libstd/org.eclipse.swt.win32_x86.jar"
-elif test -f ../../../../../../libstd/org.eclipse.swt.gtk.linux.x86_64.jar
-then export JARPATH_SWT="../../../../../../libstd/org.eclipse.swt.gtk.linux.x86_64.jar"
+elif test -f ../../../../../../tools/org.eclipse.swt.win32_x86_64.jar
+then export JARPATH_SWT="../../../../../../tools/org.eclipse.swt.win32_x86_64.jar"
+elif test -f ../../../../../../tools/org.eclipse.swt.win32_x86.jar
+then export JARPATH_SWT="../../../../../../tools/org.eclipse.swt.win32_x86.jar"
+elif test -f ../../../../../../tools/org.eclipse.swt.gtk.linux.x86_64.jar
+then export JARPATH_SWT="../../../../../../tools/org.eclipse.swt.gtk.linux.x86_64.jar"
 elif test -f ../../../../../../libs/org.eclipse.swt.win32_x86_64.jar
 then export JARPATH_SWT="../../../../../../libs/org.eclipse.swt.win32_x86_64.jar"
 elif test -f ../../../../../../libs/org.eclipse.swt.win32_x86.jar

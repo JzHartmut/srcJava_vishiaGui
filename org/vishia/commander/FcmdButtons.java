@@ -57,7 +57,7 @@ public class FcmdButtons
   
   GralButton buttonDel;
   
-  boolean bButtonVisible = true;
+  boolean bButtonVisible = false;
 
   FcmdButtons(Fcmd main){
     this.main = main;
@@ -171,7 +171,7 @@ public class FcmdButtons
   private void addButton(int idx, Iterator<Map.Entry<String, ButtonAction>> iterButtonAction){
     ButtonAction button = getNext(idx, iterButtonAction);
     GralButton gralButton = main._gralMng.addButton(button.button, button.action, button.text);
-    gralButton.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.Button." + button.text + ".");
+    gralButton.setHtmlHelp(":Fcmd.html#Topic.FcmdHelp.Button." + button.text + ".");
     //keyAction[idx] = button.action;
   }
   
@@ -286,7 +286,7 @@ public class FcmdButtons
     for(idx = 40; idx < 50; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main.gui.setMinMaxSizeArea("A3C3", 15, 15, 0, 0);
+    main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
   }
 
 

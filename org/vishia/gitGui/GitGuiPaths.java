@@ -1,6 +1,7 @@
 package org.vishia.gitGui;
 
 import java.io.File;
+import java.util.List;
 
 /**This class contains the paths to some executable in the hard disk.
  * @author Hartmut Schorrig
@@ -16,5 +17,10 @@ public class GitGuiPaths {
   
   File dirTemp1 = new File("t:/git_tmp1");
   File dirTemp2 = new File("t:/git_tmp2");
+  
+  /**Can contain "name=value" or "name=value+" for additional environments.
+   * 
+   */
+  public List<String> env;
 
 }

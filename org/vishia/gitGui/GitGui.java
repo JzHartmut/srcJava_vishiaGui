@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdFilepath;
@@ -757,7 +758,7 @@ public class GitGui
     this.sLocalFile = files[2];  //null if not given
     this.sFileList = files[3] + ".filelist";
     
-    initializeCmd();
+    initializeCmd(cmdArgs);
     this.exepath = cmdArgs.guiPaths;
     if(!this.exepath.dirTemp1.exists()) { this.exepath.dirTemp1.mkdirs(); }
     if(!this.exepath.dirTemp2.exists()) { this.exepath.dirTemp2.mkdirs(); }
@@ -767,7 +768,6 @@ public class GitGui
     this.window.specifyActionOnCloseWindow(this.actionOnCloseWindow);
     this.window.create(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, this.initGraphic);
     this.wdgCmd.setHtmlHelp(":GitGui.html#exec");
-    this.gitCmd.setEchoCmdOut(this.wdgInfo); //System.out);
     this.cmdThread.start();
   }
 
@@ -852,22 +852,31 @@ public class GitGui
   {
   }
 
-  void initializeCmd() {
-    gitCmd.setCharsetForOutput("UTF-8");  //git outputs in UTF-8
-    Map<String, String> env = gitCmd.environment();
-    env.put("HOMEPATH", "\\vishia\\HOME");
-    env.put("HOMEDRIVE", "D:");
-    String sPath = env.get("PATH");
-    if(sPath ==null) { sPath = env.get("Path"); }
-    if(sPath ==null) { sPath = env.get("path"); }
-    sPath = "D:\\Program Files\\git\\bin;" + sPath;
-    env.put("PATH", sPath);
+  void initializeCmd ( GitGuiCmd.CmdArgs cmdArgs ) {
+    this.gitCmd.setCharsetForOutput("UTF-8");  //git outputs in UTF-8
+    this.gitCmd.setEchoCmdOut(this.wdgInfo); //System.out);
+    if(cmdArgs.guiPaths.env !=null) {
+      for(String env: cmdArgs.guiPaths.env) {
+        int posEq = env.indexOf('=');
+        String val = env.substring(posEq+1);
+        if(env.charAt(posEq-1) =='+') {
+          String name = env.substring(0, posEq-1);
+          this.gitCmd.prefixEnvIgnoreCase(name, val);
+          System.out.println("set " + name + "+=" + val);
+        } else {
+          String name = env.substring(0, posEq);
+          this.gitCmd.setEnvIgnoreCase(name, val);
+          System.out.println("set " + name + "=" + val);
+        }
+    } }
+    try {
+      this.gitCmd.outAllEnvironment(System.out);   
+    } catch(IOException exc) { System.err.println(exc.getMessage()); }
   }
 
 
   public void doSomethinginMainthreadTillCloseWindow()
-  { int ix = 0;
-    while(! window.isGraphicDisposed()){
+  { while(! this.window.isGraphicDisposed()){
       try{ Thread.sleep(1000);} 
       catch (InterruptedException e) { }
     }
@@ -1523,13 +1532,16 @@ public class GitGui
   Thread cmdThread = new Thread("gitGui-Cmd") {
     @Override public void run() {
       do {
-        if(gitCmd.hasEntries()) {
-          gitCmd.executeCmdQueue(true);
-        }
         try {
+          if(gitCmd.hasEntries()) {
+            gitCmd.executeCmdQueue(true);
+          }
           synchronized(this){ wait(1000); }
-        } catch (InterruptedException e) { }
+        } catch (Exception e) { 
+          System.err.println(e.getMessage()+"\n"  );
+        }
       } while (!bCmdThreadClose);
+      System.err.println("close cmd thread\n");
     }
   };
 

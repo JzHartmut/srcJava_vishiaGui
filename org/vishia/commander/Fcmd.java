@@ -87,7 +87,7 @@ public class Fcmd extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2022-01-21";
+  public static final String version = "2022-01-24";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -158,7 +158,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        favorPathSelector.panelLeft.cardFavorThemes.wdgdTable.setFocus();
+        Fcmd.this.favorPathSelector.panelLeft.cardFavorThemes.wdgdTable.setFocus();
         return true;
       } else return false;
     }
@@ -171,7 +171,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        favorPathSelector.panelMid.cardFavorThemes.wdgdTable.setFocus();
+        Fcmd.this.favorPathSelector.panelMid.cardFavorThemes.wdgdTable.setFocus();
         return true;
       } else return false;
     }
@@ -184,7 +184,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelRight.cardFavorThemes.wdgdTable.setFocus();
+        Fcmd.this.favorPathSelector.panelRight.cardFavorThemes.wdgdTable.setFocus();
         return true;
       } else return false;
     }
@@ -197,7 +197,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelLeft.setFocus();
+        Fcmd.this.favorPathSelector.panelLeft.setFocus();
         return true;
       } else return false;
     }
@@ -210,7 +210,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelMid.setFocus();
+        Fcmd.this.favorPathSelector.panelMid.setFocus();
         return true;
       } else return false;
     }
@@ -223,7 +223,7 @@ public class Fcmd extends GuiCfg
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        favorPathSelector.panelRight.setFocus();
+        Fcmd.this.favorPathSelector.panelRight.setFocus();
         return true;
       } else return false;
     }
@@ -249,7 +249,7 @@ public class Fcmd extends GuiCfg
   GralUserAction actionFocusPanelToLeft = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
       FcmdLeftMidRightPanel actPanel = lastFilePanels.get(0);
-      if(actPanel.cc == 'm'){ favorPathSelector.panelLeft.setFocus(); }
+      if(actPanel.cc == 'm'){ Fcmd.this.favorPathSelector.panelLeft.setFocus(); }
       else if(actPanel.cc == 'r'){ favorPathSelector.panelMid.setFocus(); }
       return true; 
     }
@@ -259,8 +259,8 @@ public class Fcmd extends GuiCfg
   GralUserAction actionFocusPanelToRight = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
       FcmdLeftMidRightPanel actPanel = lastFilePanels.get(0);
-      if(actPanel.cc == 'm'){ favorPathSelector.panelRight.setFocus(); }
-      else if(actPanel.cc == 'l'){ favorPathSelector.panelMid.setFocus(); }
+      if(actPanel.cc == 'm'){ Fcmd.this.favorPathSelector.panelRight.setFocus(); }
+      else if(actPanel.cc == 'l'){ Fcmd.this.favorPathSelector.panelMid.setFocus(); }
       return true; 
     }
   };
@@ -612,23 +612,23 @@ public class Fcmd extends GuiCfg
     // gui.set
 
     // Creates tab-Panels for the file lists and command lists.
-    _gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelLeft.tabbedPanelFileCards = _gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea("A1A1", favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
+    this._gralMng.selectPanel("primaryWindow");
+    this.favorPathSelector.panelLeft.tabbedPanelFileCards = this._gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    this.gui.addFrameArea("A1A1", this.favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
 
-    favorPathSelector.panelLeft.buildInitialTabs();
-    _gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelMid.tabbedPanelFileCards = _gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea("B1B1", favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
-    favorPathSelector.panelMid.buildInitialTabs();
+    this.favorPathSelector.panelLeft.buildInitialTabs();
+    this._gralMng.selectPanel("primaryWindow");
+    this.favorPathSelector.panelMid.tabbedPanelFileCards = this._gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    gui.addFrameArea("B1B1", this.favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
+    this.favorPathSelector.panelMid.buildInitialTabs();
 
-    _gralMng.selectPanel("primaryWindow");
-    favorPathSelector.panelRight.tabbedPanelFileCards = _gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea("C1C1", favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
-    favorPathSelector.panelRight.buildInitialTabs();
+    this._gralMng.selectPanel("primaryWindow");
+    this.favorPathSelector.panelRight.tabbedPanelFileCards = this._gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    gui.addFrameArea("C1C1", this.favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
+    this.favorPathSelector.panelRight.buildInitialTabs();
 
-    _gralMng.selectPanel("primaryWindow");
-    panelButtons = _gralMng.createGridPanel("Buttons", _gralMng.getColor("gr"), 1, 1, 10, 10);
+    this._gralMng.selectPanel("primaryWindow");
+    panelButtons = this._gralMng.createGridPanel("Buttons", this._gralMng.getColor("gr"), 1, 1, 10, 10);
     gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
 
     filesCp.buildGraphic();
@@ -644,28 +644,29 @@ public class Fcmd extends GuiCfg
     mkCmd.buildWindowConfirmMk();
     executer.buildWindowConfirmExec();
     deleteCmd.buildWindowConfirmDelete(); //F8
-    favorPathSelector.buildWindowAddFavorite();
+    this.favorPathSelector.buildWindowAddFavorite();
 
     fButtons.initPanelButtons();
     GralMenu menu = this.gui.getMenuBar();
     menu.addMenuItem("menuHelp", this.idents.menuHelpBar, this.gui.getActionHelp());
     menu.addMenuItem("menuClose", this.idents.menuCloseBar, this.gui.getActionClose());
     
-    menu.addMenuItem("MenuSetWorkingDir", "&Command/Set&WorkingDir", executer.actionSetCmdWorkingDir); // /
-    menu.addMenuItem("MenuCommandAbort", "&Command/&Abort", executer.actionCmdAbort); // /
+    menu.addMenuItem("MenuSetWorkingDir", "&Command/Set&WorkingDir", this.executer.actionSetCmdWorkingDir); // /
+    menu.addMenuItem("MenuCommandAbort", "&Command/&Abort", this.executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
-    menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", executer.actionSetCmdCfg); // /
+    menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", this.executer.actionSetCmdCfg); // /
     
-    menu.addMenuItem("menuAbout", idents.menuBarAbout, gui.getActionAbout());
-    menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", actionTest); 
-    guiW.outputBox.setActionChange(executer.actionCmdFromOutputBox);
-    String sHelpUrlDir = cargs.dirHtmlHelp.getAbsolutePath();
-    gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
-    lastFilePanels.clear();
-    lastFilePanels.add(favorPathSelector.panelMid);
-    lastFilePanels.add(favorPathSelector.panelRight);
-    lastFilePanels.add(favorPathSelector.panelLeft);
-    favorPathSelector.panelMid.cardFavorThemes.setFocus();
+    menu.addMenuItem("menuAbout", this.idents.menuBarAbout, this.gui.getActionAbout());
+    menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", this.actionTest); 
+    String sHelpUrlDir = this.cargs.dirHtmlHelp.getAbsolutePath();
+    this.gui.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
+    this.guiW.outputBox.specifyActionChange(null, this.executer.actionCmdFromOutputBox, null);
+    this.guiW.outputBox.setHtmlHelp(":FcmdNew.html#cmdOutput");
+    this.lastFilePanels.clear();                                     // The order of used file panels
+    this.lastFilePanels.add(this.favorPathSelector.panelMid);        // default: mid, right, left
+    this.lastFilePanels.add(this.favorPathSelector.panelRight);
+    this.lastFilePanels.add(this.favorPathSelector.panelLeft);
+    this.favorPathSelector.panelMid.cardFavorThemes.setFocus();
   }
 
   @Override
@@ -700,7 +701,7 @@ public class Fcmd extends GuiCfg
         sError = JZtxtcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, console, executer.cmdExecuter);
       }
       if (sError == null) {
-        sError = favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
+        sError = this.favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
       }
       if (sError != null) {
         mainCmd.writeError("Error reading " + fileCfg.getAbsolutePath() + ": "
@@ -742,9 +743,9 @@ public class Fcmd extends GuiCfg
     //executer.cmdQueue.execCmds(writeStatusCmd);
     executer.cmdExecuter.executeCmdQueue(false);
     long time = System.currentTimeMillis();
-    favorPathSelector.panelLeft.checkRefresh(time);
-    favorPathSelector.panelMid.checkRefresh(time);
-    favorPathSelector.panelRight.checkRefresh(time);
+    this.favorPathSelector.panelLeft.checkRefresh(time);
+    this.favorPathSelector.panelMid.checkRefresh(time);
+    this.favorPathSelector.panelRight.checkRefresh(time);
   }
   
   
