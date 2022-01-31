@@ -59,5 +59,11 @@ public class SwtSlider extends GralSlider._GraphicImplAccess_
     return null;
   }
 
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
   
 }

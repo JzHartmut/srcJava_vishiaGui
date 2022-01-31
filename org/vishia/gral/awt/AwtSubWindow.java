@@ -379,6 +379,12 @@ public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       
     }
   };
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
   
   
 }

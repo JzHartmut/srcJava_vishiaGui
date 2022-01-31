@@ -149,13 +149,24 @@ public GralRectangle getPixelPositionSize()
 }
 
 @Override
-protected int getCurrentCaretPos()
-{
+public void updateValuesForAction() {
   // TODO Auto-generated method stub
-  return 0;
+  
 }
 
-
+//@Override
+//protected int getCurrentCaretPos()
+//{
+//  // TODO Auto-generated method stub
+//  return 0;
+//}
+//
+//@Override protected int getCurrentCaretLinePos() 
+//{
+//  // TODO Auto-generated method stub
+//  return 0;
+//}
+//
   
   
   

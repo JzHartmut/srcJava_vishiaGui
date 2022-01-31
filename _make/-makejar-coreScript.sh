@@ -65,7 +65,9 @@ if ! test "$SRC_ALL2" = ""; then
   export SRCZIP="$SRCZIP $SRC_ALL2/..:**/*"                         
 fi  
 echo compile javac
-pwd
+echo pwd=$(pwd)
+##echo ls /tmp
+##ls /tmp
 echo javac -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 
 ###$JAVAC_HOME/bin/
 $JAVAC -encoding UTF-8 -d $TMPJAVAC/binjar -cp $CLASSPATH -sourcepath $SRCPATH $FILE1SRC 

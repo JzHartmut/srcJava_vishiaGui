@@ -1850,7 +1850,13 @@ public GralButton addCheckButton(
     protected GralUserAction userMainKeyAction(){ return mng.userMainKeyAction; }
     
     
+    /**This operation creates the proper implementation widgets due to the underlying Graphic system.
+     * It is implemented by the specific GralMngXyz, see {@link org.vishia.gral.swt.SwtMng}.
+     * @param widgg The given instantiated Gral Widget but without implementation instace yet.
+     */
     public abstract void createImplWidget_Gthread(GralWidget widgg);
+    
+    
     /**Creates the context menu for the given widget for right-mouse pressing.
      * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
      * context menu is stored in the {@link GralWidget#contextMenu} association. 

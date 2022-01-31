@@ -247,6 +247,14 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
     
   };
 
+
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
   
   
 

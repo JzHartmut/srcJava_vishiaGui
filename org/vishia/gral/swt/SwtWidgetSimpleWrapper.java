@@ -92,6 +92,13 @@ public class SwtWidgetSimpleWrapper implements GralWidgImpl_ifc
   }
 
 
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
+
   
   
 

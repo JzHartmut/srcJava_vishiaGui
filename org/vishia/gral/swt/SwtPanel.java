@@ -163,6 +163,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     return panelComposite;
   }
 
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
 
   
   

@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralKeyListener;
 import org.vishia.gral.base.GralKeySpecial_ifc;
 import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -55,9 +56,11 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
     
     final Object source = keyEv.getSource();
     final Control swtControl;
+    final GralWidgImpl_ifc wdgImpl; 
     if(source instanceof Control){
       swtControl = ((Control)source);
       Object oData = swtControl.getData();
+      wdgImpl = oData instanceof GralWidgImpl_ifc ? (GralWidgImpl_ifc) oData : null;
       if(oData instanceof GralTextField.GraphicImplAccess){
         GralTextField.GraphicImplAccess widgi = (GralTextField.GraphicImplAccess) oData;
         widgetDescr = widgi.widgg;
@@ -67,11 +70,12 @@ public class SwtKeyListener implements GralKeySpecial_ifc, KeyListener// extends
     } else { 
       widgetDescr = null; 
       swtControl = null;
+      wdgImpl = null;
     }
     if((keyEv.keyCode & 0xffff) !=0){
       final int keyCode = SwtGralKey.convertFromSwt(keyEv.keyCode, keyEv.stateMask, keyEv.character);
       if(! specialKeysOfWidgetType(keyCode, widgetDescr, swtControl)){
-        keyAction.keyPressed(keyCode, widgetDescr, swtControl);
+        this.keyAction.keyPressed(keyCode, widgetDescr, wdgImpl);  //should take the SWT impl, not the control itself.
       }
     }
     if(swtControl !=null){

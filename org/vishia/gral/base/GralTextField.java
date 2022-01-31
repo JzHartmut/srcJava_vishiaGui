@@ -3,6 +3,7 @@ package org.vishia.gral.base;
 
 import java.util.Map;
 
+import org.vishia.gral.awt.AwtTextField;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralRectangle;
@@ -10,6 +11,7 @@ import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.swt.SwtTextFieldWrapper;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Removeable;
@@ -23,6 +25,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2022-01-29 Hartmut chg: Now only one implementation {@link GraphicImplAccess} 
+   *   by {@link SwtTextFieldWrapper} (and {@link AwtTextField}) 
+   *   for a {@link GralTextBox} and this class. Most is the same, few things are tuned.
+   *   The {@link #newText} is moved from the {@link GralTextBox} to here
+   *   because should be handled from the implementation {@link GraphicImplAccess#getAndClearNewText()}.
+   * <li>2022-01-29 Hartmut new: possibility to get line and column of the cursor if it is a text box:
+   *   new {@link #cursorLine}, {@link #cursorCol}, {@link GraphicImplAccess#caretPos(int, int, int)} etc. 
    * <li>2015-05-04 Hartmut new: {@link #setBorderWidth(int)} to show the text field with a border. 
    * <li>2015-05-04 Hartmut chg: {@link #setLongValue(long)} is more complexly, a calculation can result in a float value. Fixed. 
    * <li>2015-05-02 Hartmut chg: Calculation of the {@link GraphicImplAccess#posPrompt} and ...posField is processed 
@@ -76,12 +85,12 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2015-09-12";
+  public static final String version = "2022-01-29";
   
 
   public enum Type{ password, editable};
   
-  protected int caretPos;
+  private int caretPos, cursorLine, cursorCol;
   
   /**The width of an extra border arround the text field to mark it.
    * 0: initially, no border. Note: The color of the border is the {@link GralWidget.DynamicData#lineColor}
@@ -106,6 +115,14 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   protected final GralGraphicThread windowMng;
   
   final boolean bPassword;
+  
+  /**Buffer for new text which is set or appended in another thread than the graphic thread.
+   * This buffer is empty if the graphic thread has processed the {@link GralGraphicTimeOrder}
+   * after calling {@link #append(CharSequence)} or {@link #setText(CharSequence)}.
+   * It is filled only temporary. It is used only by a GralTextBox
+   */
+  protected StringBuffer newText;
+
   
   /**Constructs a text field with given properties
    * @param posName Position and Name of the field. Maybe null if it is not need in management by name
@@ -571,7 +588,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
 
   @Override
-  public int getCursorPos(){ return caretPos; }
+  public int getCursorPos(){ return this.caretPos; }
+
+  @Override
+  public int getCursorLine(){ return this.cursorLine; }
+
+  @Override
+  public int getCursorCol(){ return this.cursorCol; }
 
 
   @Override
@@ -676,7 +699,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   implements GralWidgImpl_ifc
   {
 
-    public static final int chgPrompt = 0x100, chgCursor = 0x200;
+    public static final int chgPrompt = 0x100, chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800
+      , chgViewTrail = 0x1000, chgAddText = 0x2000;
     
     /**The {@link GralWidget#pos()} is the summary position for prompt and field.
      * This is the part for field and prompt.
@@ -741,9 +765,34 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
  
     protected int borderwidth(){ return GralTextField.this.borderwidth; }
     
-    protected int caretPos(){ return GralTextField.this.caretPos; }
+    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
+  
+    /**Returns the cursor position in the whole text
+     * @return
+     * @deprecated used {@link #getCursorPos()}
+     */
+    @Deprecated protected int caretPos(){ return GralTextField.this.caretPos; }
     
-    protected void caretPos(int newPos){ GralTextField.this.caretPos = newPos; }
+    /**Returns the cursor position in the whole text
+     * @return
+     */
+    protected int cursorPos(){ return GralTextField.this.caretPos; }
+    
+    /**Returns the cursor position in the line from 0
+     * @return
+     */
+    protected int getCursorCol(){ return GralTextField.this.caretPos; }
+    
+    /**Returns the line of the cursor position from 0
+     * @return
+     */
+    protected int getCurserLine(){ return GralTextField.this.caretPos; }
+    
+    protected void caretPos(int pos, int line, int col) { 
+      GralTextField.this.caretPos = pos; 
+      GralTextField.this.cursorLine = line; 
+      GralTextField.this.cursorCol = col; 
+    }
     
     protected GralTextFieldUser_ifc user(){ return GralTextField.this.user; }
     

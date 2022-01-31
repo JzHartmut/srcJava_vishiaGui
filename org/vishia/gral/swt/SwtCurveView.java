@@ -681,6 +681,13 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   {
     // TODO Auto-generated method stub
     return false;
+  }
+
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
   }  
   
 }

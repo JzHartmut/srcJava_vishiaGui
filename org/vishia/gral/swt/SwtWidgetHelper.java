@@ -22,7 +22,10 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.util.Debugutil;
 
-/**The static methods of this class are called in some situations, where same functionality is need in some classes.
+/**This class is a wrapper around any widget which is a {@link org.eclipse.swt.widgets.Control}.
+ * <br>
+ * The basically important operation with more content is {@link #getPixelPositionSize(Control)}.
+ * The static methods of this class are called in some situations, where same functionality is need in some classes.
  * @author Hartmut Schorrig
  *
  */

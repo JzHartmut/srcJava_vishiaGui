@@ -328,6 +328,13 @@ public class SwtButton extends GralButton.GraphicImplAccess
       }
       return bDone; 
     }
+  }
+
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
   };
 
   

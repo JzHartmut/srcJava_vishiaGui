@@ -120,6 +120,12 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
       SwtPlotArea.this.paintRoutine( ev);
     }
   };
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
   
 
 }

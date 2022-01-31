@@ -227,4 +227,10 @@ private class SwtLedImpl extends Canvas
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
 }

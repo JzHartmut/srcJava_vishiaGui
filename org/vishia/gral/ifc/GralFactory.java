@@ -112,6 +112,17 @@ public abstract class GralFactory
   
   
   
+  /**First call to initialize the graphic.
+   * use<pre>
+   * GralWindow primaryWindow = new GralWindow(posWindow1, "primaryWindow", sTitle1, windProps);
+   * GralFactory.createGraphic(primaryWindow, sizeShow, log, "SWT");
+   * </pre> 
+   * @param windowg
+   * @param sizeShow
+   * @param log
+   * @param implementor null for "SWT", "SWT" or "AWT",
+   * @return
+   */
   public static GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
     GralMng mng = GralMng.get();
     mng.setFirstlyThePrimaryWindow(windowg); //checks whether called firstly.

@@ -6,6 +6,7 @@ import java.text.ParseException;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
@@ -30,7 +31,6 @@ java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
 */
 
 /**This is the class to build a graphic window in any application which is configurable.
- * It uses an existing instance of the {@link GralMng}
  * <br><br>
  * Note: See {@link org.vishia.gral.area9.GuiCfg}, that is an application with 9 areas for configuration. 
  * 
@@ -42,6 +42,8 @@ public class GralCfgWindow
   
   /**The version, history and license.
    * <ul>
+   * <li>2018-09-17 {@link #GralCfgWindow(String, String, char, CharSequence, File, MainCmdLogging_ifc)}
+   *   with sPosName, also possible give the position, uses this capability from {@link GralWindow#GralWindow(String, String, String, int)} 
    * <li>2018-09-17 GralCfgWindow: with argument for size and AWT/SWT
    * <li>2015-04-26 Hartmut created: For usage in Jzcmd-scripts.
    * </ul>
@@ -71,7 +73,7 @@ public class GralCfgWindow
    * 
    * 
    */
-  public final static int version = 0x20150426;
+  public final static String version = "2022-01-29";
 
   
   final private MainCmdLogging_ifc log;
@@ -85,7 +87,8 @@ public class GralCfgWindow
   final public GralWindow window;
   
   /**Creates a new Window or opens the existing one with given name.
-   * @param sName Name of the window inside the gral manager to address the window.
+   * @param sPosName Position and Name of the window inside the gral manager to address the window.
+   *   Form: "@LINE+SIZE, COLUMN+SIZE=NAME". If pos is not given, not starts with "@", then a default Pos  "10+50, 10+100" is used.   
    * @param sTitle text in the title bar
    * @param size 'A'...'E' as pixel/grid unit for SWT graphic. 'a'...'e' same for AWT-Graphic
    * @param sCfg textual given configuration for the window.
@@ -93,22 +96,24 @@ public class GralCfgWindow
    * @param log interface for logging output of parser and creation.
    * @throws ParseException on errors in the sCfg
    */
-  private GralCfgWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
+  private GralCfgWindow(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
     this.log = log !=null ? log : log;
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
     this.imgDir = imgDir;
     String swtOrawt;
-    if(size < 'a') { swtOrawt = "SWT"; }
-    else { size -= 'a'-'A'; swtOrawt = "AWT"; }
+    char size1;
+    if(size < 'a') { size1 = size; swtOrawt = "SWT"; }
+    else { size1 = (char)(size - 'a'-'A'); swtOrawt = "AWT"; }
     GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
-    cfgZbnf.configureWithZbnf(sCfg, guiCfgData); //
+    cfgZbnf.configureWithZbnf(sCfg, this.guiCfgData); //
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     GralMng mng = GralMng.get();
     mng.selectPrimaryWindow();
-    this.window = new GralWindow("10+50, 10+100", sName, sTitle, props);
-    configInGthread.getCtDone(0);
-    this.window.create(swtOrawt, size, log, configInGthread);
-    configInGthread.awaitExecution(1, 0);
+    String defaultPos = sPosName.startsWith("@") ? null : "10+50, 10+100"; 
+    this.window = new GralWindow(defaultPos, sPosName, sTitle, props);
+    this.configInGthread.getCtDone(0);
+    this.window.create(swtOrawt, size1, log, this.configInGthread);
+    this.configInGthread.awaitExecution(1, 0);
   }
   
   /**Creates a window with a given configuration.
@@ -129,7 +134,13 @@ public class GralCfgWindow
   }
   
   
-  
+  /**Accesses a given widget which is given per name. 
+   * @param name from the config file
+   * @return null if name is faulty.
+   */
+  public GralWidget getWidget(String name) {
+    return this.window.getWidget(name);
+  }
   
 
   

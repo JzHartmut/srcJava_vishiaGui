@@ -153,4 +153,11 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   
   @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); swtWidgHelper.setVisibleGThread(bVisible); }
 
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

@@ -683,6 +683,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   //}
 
   /**Creates a widget.
+   * It is the compatibility-version for separated pos and name. 
+   * But the idea is: Use always one String for "@pos=name".
+   * If the pos is null then the name may contains this "@pos=name" string.
+   * Hence an adaption on user level is possible:<pre>
+   * if(name.startsWith("@") {
+   *   ... = new SpecificGralWidget(null, name,...);  // parameters are separateted pos, name)
+   *  else {
+   *   --- = new SpecificGralWidget(givenPos, name);
+   * }</pre>    
    * @param posString If null then the widget is not positioned. !=null then a position string.
    *   The position is taken relative to the {@link GralMng#pos}, the {@link GralMng#pos} is changed
    *   see {@link GralPos#setPosition(CharSequence, GralPos)}
@@ -690,7 +699,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   The name should be unified to indent a widget by its name. 
    * @param whatIs
    * @throws ParseException 
-   * @deprecated since 2016-09: The idea is: Use always one String for "@pos=name".
+   * @deprecated since 2016-09: May use always {@link GralWidget#GralWidget(String, char)} if levels above are proper
    */
   @Deprecated public GralWidget(String pos, String name, char whatIs){ 
     this(pos !=null ? ( (pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, whatIs);

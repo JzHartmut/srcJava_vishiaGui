@@ -1,5 +1,7 @@
 package org.vishia.gral.swt;
 
+import java.util.Arrays;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.events.DragDetectEvent;
@@ -17,6 +19,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Text;
 import org.vishia.byteData.VariableAccessWithIdx;
 import org.vishia.gral.base.GralButton.GraphicImplAccess;
@@ -32,13 +35,18 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringFunctions;
 
 public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 {
 
   /**Version, history and license.
    * <ul>
+   * <li>2015-05-04 Hartmut new: {@link #textFieldFocusLost()} calls {@link org.vishia.gral.base.GralWidgImpl_ifc#updateValuesForAction()}.
+   *   implemented here in {@link #updateValuesForAction()} which sets the cursor line and column. 
+   * <li>2015-05-04 Hartmut new: Contains all also for the TextBox, replaces SwtTextBox.
    * <li>2015-05-04 Hartmut new: {@link #setBorderWidth(int)} to show the text field with a border. That is not a property
    *   of an SWT Text, therefore a new {@link #paintListener} was added to draw the border.
    * <li>2013-12-22 Hartmut chg: Now {@link GralTextField} uses the new concept of instantiation: It is not
@@ -81,7 +89,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * 
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2015-09-12";
+  public static final String version = "2022-01-29";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
@@ -89,6 +97,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   private final SwtWidgetHelper swtWidgHelper;
   
   protected Text textFieldSwt;
+  
+  protected final boolean bbox;
   
   /**A possible prompt for the text field or null. */
   //Label promptSwt;
@@ -98,15 +108,25 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   private DropTarget drop;
   
   
-  private SwtTextFieldWrapper(GralTextField widgg, SwtMng mng)
+
+  /**This is a helper array for a text box to calculate the column from the position. 
+   * Unfortunately the {@link Text#getCaretPosition()} returns only the absolute position,
+   * not the column. Whereas {@link Text#getCaretLineNumber()} returns the line. 
+   * 
+   */
+  short[] startPosLine;
+  
+  
+  
+  private SwtTextFieldWrapper(GralTextField widgg, SwtMng mng, boolean bbox)
   {
     widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
-
+    this.bbox = bbox;
     Composite panelSwt = mng.getCurrentPanel();
     //in ctor: setPanelMng(mng);
     //Text widgetSwt;
     //
-    int textProperties = SWT.SINGLE;
+    int textProperties = bbox ? SWT.MULTI|SWT.H_SCROLL|SWT.V_SCROLL : SWT.SINGLE;
     if(isPasswordField()){ 
       textProperties |= SWT.PASSWORD; 
     }
@@ -138,17 +158,18 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.addKeyListener(swtKeyListener);
     textFieldSwt.setMenu(null);  //default: no contextMenu, use GralMenu?
     
-    Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
-    for(Listener lst: oldMouseListener){
-      textFieldSwt.removeListener(SWT.MouseDown, lst);
-    }
-    textFieldSwt.addMouseListener(mng.mouseClickForInfo);
-    textFieldSwt.addFocusListener(mng.focusListener);
+//    Listener[] oldMouseListener = textFieldSwt.getListeners(SWT.MouseDown);
+//    for(Listener lst: oldMouseListener){
+//      textFieldSwt.removeListener(SWT.MouseDown, lst);
+//    }
+//    textFieldSwt.addMouseListener(mng.mouseClickForInfo);
+    this.textFieldSwt.addMouseListener(SwtGralMouseListener.mouseActionStd);  //from SwtTextBox
+    //textFieldSwt.addFocusListener(mng.focusListener);
+    TextFieldFocusListener focusListener = new TextFieldFocusListener(mng);
+    textFieldSwt.addFocusListener(focusListener);
     if(widgg.isEditable()){
       TextFieldModifyListener modifyListener = new TextFieldModifyListener();
       textFieldSwt.addModifyListener(modifyListener);
-      TextFieldFocusListener focusListener = new TextFieldFocusListener(mng);
-      textFieldSwt.addFocusListener(focusListener);
     } else {
       
     }
@@ -200,7 +221,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * @param mng
    */
   static void createTextField(GralTextField widgg, GralMng mng){
-    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng.impl);
+    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng.impl, false);
+  }
+  
+  static void createTextBox(GralTextField widgg, GralMng mng){
+    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng.impl, true);
   }
   
   
@@ -263,6 +288,9 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
             textFieldSwt.setSelection(selectionStart, selectionEnd);
           }
         }
+        if((chg & chgAddText) !=0) {
+          this.textFieldSwt.append(getAndClearNewText());
+        }
         if((chg & chgColorText)!=0){
           SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
           if(dyda.textColor !=null){
@@ -278,6 +306,15 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         if((chg & chgEditable) !=0){ 
           textFieldSwt.setEditable(widgg.isEditable());
         }
+        if((chg & chgNonEditable)!=0){ 
+          this.textFieldSwt.setEditable(false); 
+        }
+        if((chg & chgViewTrail)!=0) {
+          ScrollBar scroll = this.textFieldSwt.getVerticalBar();
+          int maxScroll = scroll.getMaximum();
+          scroll.setSelection(maxScroll);
+          this.textFieldSwt.update();
+        }
         if((chg & chgCursor) !=0){ 
           textFieldSwt.setSelection(caretPos());
         }
@@ -292,9 +329,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
           textFieldSwt.setVisible(false);
         }
         if((chg & chgColorText) !=0){ 
-          textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
+          textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); 
+        }
         if((chg & chgColorBack) !=0){ 
-          textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
+          textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); 
+        }
         textFieldSwt.redraw();
         //textFieldSwt.
         acknChanged(chg);
@@ -340,31 +379,38 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   protected void textFieldFocusGained(){
     //- done in GralMng.GralMngFocusListener! super.focusGained();  //set HtmlHelp etc.
-    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onFocusGained); 
-    if(action !=null){
-      Object[] args = action.args();
-      if(args == null){ action.action().exec(KeyCode.focusGained, widgg, dyda().displayedText); }
-      else { action.action().exec(KeyCode.focusGained, widgg, args, dyda().displayedText); }
-    }
-    if(dyda().displayedText !=null){
-      textFieldSwt.setText(dyda().displayedText);
+    if(super.widgg.isEditable()) {
+      GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onFocusGained); 
+      if(action !=null){
+        Object[] args = action.args();
+        if(args == null){ action.action().exec(KeyCode.focusGained, widgg, dyda().displayedText); }
+        else { action.action().exec(KeyCode.focusGained, widgg, args, dyda().displayedText); }
+      }
+      if(dyda().displayedText !=null){
+        textFieldSwt.setText(dyda().displayedText);
+      }
     }
   }
   
   
+  /**On focus lost all values are updated, because it is possible to evaluate from any other widget. 
+   * Calls a user action if it is registered as {@link ActionChangeWhen#onChangeAndFocusLost}.
+   */
   protected void textFieldFocusLost(){
-    String text2 = textFieldSwt.getText();
-    //There was a problem. Because of TextFieldModifyListener the field is already set. Newly read of getText() gets the old text. Bug of windows?
-    //dyda().displayedText = text2;  //transfer the current text
-    caretPos(textFieldSwt.getCaretPosition());
-    //TODO only invoke on changed content.
-    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onChangeAndFocusLost); 
-    if(action !=null){
-      Object[] args = action.args();
-      if(args == null){ action.action().exec(KeyCode.focusLost, widgg, text2); }
-      else { action.action().exec(KeyCode.focusLost, widgg, args, text2); }
+    updateValuesForAction();
+    //
+    if(super.widgg.isEditable()) {
+      GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onChangeAndFocusLost); 
+      if(action !=null){
+        Object[] args = action.args();
+        GralWidget.DynamicData dyda = SwtTextFieldWrapper.super.dyda();
+        if(args == null){ action.action().exec(KeyCode.focusLost, this.widgg, dyda.displayedText); }
+        else { action.action().exec(KeyCode.focusLost, this.widgg, args, dyda.displayedText); }
+      }
     }
   }
+  
+  
   
   protected void paintWidget(Text swt, PaintEvent e){
     GC gc = e.gc;
@@ -479,6 +525,62 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   };
   
   void stop(){}
+
+
+
+  @Override
+  public void updateValuesForAction() {
+    String text2 = this.textFieldSwt.getText();
+    GralWidget.DynamicData dyda = SwtTextFieldWrapper.super.dyda();
+    if(! text2.equals(dyda.displayedText)) {
+      dyda.displayedText = text2;
+      setTouched(true);
+    }
+    //There was a problem. Because of TextFieldModifyListener the field is already set. Newly read of getText() gets the old text. Bug of windows?
+    //dyda().displayedText = text2;  //transfer the current text
+    int pos = this.textFieldSwt.getCaretPosition();
+    final int col;
+    int line =0;
+    if(bbox) {
+      line = this.textFieldSwt.getCaretLineNumber();
+      if(line >0) {
+        short zlines = this.startPosLine == null ? 0 : this.startPosLine[0];
+        if(  this.startPosLine == null 
+          || line >= zlines          //store oldLength!
+          || this.startPosLine[line] ==0
+          ) {                                    // necessity of new Array:
+          int pos1 = zlines ==0 ? 0: this.startPosLine[zlines];      //from 0 or from last line end.
+          String text = this.textFieldSwt.getText();
+          int ztext = text.length();
+          while(pos1 < ztext) {
+            if(zlines ==0 || (zlines+1) >= this.startPosLine.length) {
+              int sizenew = this.startPosLine == null ? 0x20: 2* this.startPosLine.length;
+              short[] startPosLine1;             // create a greater array
+              if(this.startPosLine !=null) {     // copy content to array with greater size
+                startPosLine1 = Arrays.copyOf(this.startPosLine, sizenew);
+              } else {                           // create firstly, empty
+                startPosLine1 = new short[sizenew ];
+              }
+              this.startPosLine = startPosLine1;     // replace / create with new size.
+            }
+            int posEnd1 = text.indexOf('\n', pos1);
+            int posEnd2 = text.indexOf('\r', pos1);
+            if(posEnd1 <0) { posEnd1 = posEnd2; }
+            if(posEnd1 <0) { posEnd1 = ztext -1; }         // end is after not ended line...
+            pos1 = posEnd1 +1;
+            this.startPosLine[++zlines] = (short)pos1;
+          }
+          this.startPosLine[0] = zlines;         // first element is number of existing lines.
+        }
+        col = pos - this.startPosLine[line];          // column in line.
+      } else {
+        col = pos;
+      }
+    } else {
+      col = pos;
+    }
+    super.caretPos(pos, line, col);
+  }
 
 
 

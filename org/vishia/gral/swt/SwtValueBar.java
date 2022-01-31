@@ -205,4 +205,12 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
   }
 
 
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
+
 }

@@ -189,7 +189,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   
   
   private void processKey(int key){
-    int caretPos = caretPos();
+    int caretPos = cursorPos();
     int caretPos1 = caretPos;
     if(KeyCode.isWritingKey(key) && widgg.isEditable()){
       switch(key){
@@ -218,7 +218,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
       }
     }
     if(caretPos != caretPos1) {
-      caretPos(caretPos);  //set new pos.
+      caretPos(caretPos, 0,0);  //set new pos.
       widgetAwt.repaint();
     }
   }
@@ -303,6 +303,13 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
     }
     
   };
+
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
   
   
   

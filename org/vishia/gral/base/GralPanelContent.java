@@ -121,7 +121,11 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   { this(posString, namePanel, '$');
   }
 
-  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
+  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. 
+   * @param posString can be null if namePanel contains "@pos=name"
+   * @param namePanel can also be combined "@pos=name"
+   * @param whatIsit See {@link GralWidget#whatIs}
+   */
   public GralPanelContent(String posString, String namePanel, char whatIsit)
   //public PanelContent(CanvasStorePanel panelComposite)
   { super(posString, namePanel, whatIsit);

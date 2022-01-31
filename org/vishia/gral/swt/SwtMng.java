@@ -344,7 +344,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     if(widgg instanceof GralHtmlBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
       SwtHtmlBox.createHtmlBox((GralHtmlBox)widgg, this);  //This may be the best variant.
     } else if(widgg instanceof GralTextBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
-      SwtTextBox.createTextBox((GralTextBox)widgg, this);  //This may be the best variant.
+      SwtTextFieldWrapper.createTextBox((GralTextBox)widgg, mng);  //This may be the best variant.
     } else if(widgg instanceof GralTextField){
       SwtTextFieldWrapper.createTextField((GralTextField)widgg, mng);  //This may be the best variant.
     } else if(widgg instanceof GralHorizontalSelector<?>){

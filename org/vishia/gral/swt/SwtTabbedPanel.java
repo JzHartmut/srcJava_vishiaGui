@@ -294,5 +294,14 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
     return null;
   }
 
+
+
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
 	
 }

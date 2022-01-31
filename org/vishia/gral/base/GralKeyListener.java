@@ -56,6 +56,11 @@ public class GralKeyListener implements GralKeySpecial_ifc
 {
   /**Version, history and license
    * <ul>
+   * <li>2022-01-29 Hartmut enhance: {@link #keyPressed(int, GralWidget_ifc, GralWidgImpl_ifc)} 
+   *   calls {@link GralWidgImpl_ifc#updateValuesForAction()} before call an action.
+   *  This updates the current line and column from the cursor in a text field, as also the text.
+   *  Or maybe also other information of other widgets (not yet done, possible).
+   *  It means the key action has current informations.
    * <li>2011-12-03 Hartmut created. Any widget may have the same key listener. It is the baseclass of it
    *   and empty yet. 
    * </ul>
@@ -85,7 +90,7 @@ public class GralKeyListener implements GralKeySpecial_ifc
    * 
    * 
    */
-  public final static int version = 20120609;
+  public final static String version = "2022-01-31";
  
   
   protected final GralMng mng;
@@ -97,11 +102,21 @@ public class GralKeyListener implements GralKeySpecial_ifc
   
   
   
-  public boolean keyPressed(int keyCode, GralWidget_ifc widgi, Object widgImpl){
+  /**
+   * @param keyCode
+   * @param widgi
+   * @param widgImpl It comes from the Control, there the added data. 
+   *   Should be instance of {@link GralWidgImpl_ifc}
+   * @return
+   */
+  public boolean keyPressed(int keyCode, GralWidget_ifc widgi, GralWidgImpl_ifc widgImpl){
     boolean actionDone;
     GralWidget_ifc.ActionChange action = widgi.getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyChgContent); 
     if(action !=null){
       Object[] args = action.args();
+      if(widgImpl !=null) {
+        widgImpl.updateValuesForAction();
+      }
     }
     final GralMng mng = widgi.gralMng();
     try{

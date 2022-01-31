@@ -2,19 +2,26 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 
-import org.eclipse.swt.graphics.Point;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFont;
-import org.vishia.gral.ifc.GralMng_ifc;
+//import java.util.Map;
+//import java.util.TreeMap;
+//
+//import org.eclipse.swt.graphics.Point;
+//import org.vishia.gral.ifc.GralColor;
+//import org.vishia.gral.ifc.GralFont;
+//import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
-import org.vishia.gral.ifc.GralTextFieldUser_ifc;
-import org.vishia.util.KeyCode;
+//import org.vishia.gral.ifc.GralTextFieldUser_ifc;
+//import org.vishia.util.KeyCode;
 
 public class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc
 {
   
   /**Version and history
    * <ul>
+   * <li>2022-01-31 Hartmut chg: Some stuff is commented now, because it is all in GralTextField,
+   *   because SwtTextFieldWrapper contains all necessities. Not an extra implementation class. 
+   * <li>2014-08-16 Hartmut chg: Now Implementation uses the same class, as GralTextField, inheritance was done before.
+   *   It is very more simple. Same only additional features for GralTextBox and GralTextField
    * <li>2014-08-16 Hartmut chg: GrapTextBox not abstract, using GraphicImplAccess like new concept of all GralWidgets. 
    * <li>2012-01-06 Hartmut chg: The {@link #append(CharSequence)} etc. methods are implemented
    *   in this super class instead in the graphic layer implementation classes. Therefore
@@ -48,17 +55,16 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    * 
    */
   @SuppressWarnings("hiding")
-  public final static String sVersion = "2014-08-16";
+  public final static String sVersion = "2022-01-28";
   
-  /**Buffer for new text which is set or appended in another thread than the graphic thread.
-   * This buffer is empty if the graphic thread has processed the {@link GralGraphicTimeOrder}
-   * after calling {@link #append(CharSequence)} or {@link #setText(CharSequence)}.
-   * It is filled only temporary.
-   */
-  private StringBuffer newText = new StringBuffer();
+  
+  
+//  Map<Integer, Integer> posLines;
+  
   
   public GralTextBox(String name, Type... property)
   { super(name, property);
+    super.newText = new StringBuffer();
   }
 
   /**Sets the text to the widget, invoked only in the graphic thread.
@@ -117,15 +123,15 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 
 
   
-  @Override public void setTextStyle(GralColor color, GralFont font)
-  {
-    dyda.textFont = font;
-    dyda.textColor = color;
-    dyda.setChanged(GralWidget.ImplAccess.chgColorText);
-    if(_wdgImpl !=null){
-      repaint();
-    }
-  }
+//  @Override public void setTextStyle(GralColor color, GralFont font)
+//  {
+//    dyda.textFont = font;
+//    dyda.textColor = color;
+//    dyda.setChanged(GralWidget.ImplAccess.chgColorText);
+//    if(_wdgImpl !=null){
+//      repaint();
+//    }
+//  }
   
 
   
@@ -141,9 +147,15 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   @Override public int getNrofLines(){ return 0; }  //TODO
 
   
-  @Override public int getCursorPos() { return super.caretPos = ((GraphicImplAccess)_wdgImpl).getCurrentCaretPos(); }
-  
-  
+//  @Override public int getCursorPos() { return super.caretPos = ((GraphicImplAccess)_wdgImpl).getCurrentCaretPos(); }
+//  
+//  public LineColumn getCursorLineColumn() {
+//    super.caretPos = ((GralTextBox.GraphicImplAccess)_wdgImpl).getCurrentCaretPos();
+//    int lineNr = ((GralTextBox.GraphicImplAccess)_wdgImpl).getCurrentCaretLinePos();
+//    //if(this.posLines == null) { posLines = new TreeMap<Integer, Integer>(); }
+//    LineColumn ret = new LineColumn(lineNr, super.caretPos);
+//    return ret;
+//  }
 
   @Override public void viewTrail()
   {
@@ -155,29 +167,40 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   }
 
   
-  
-  public abstract class GraphicImplAccess extends GralTextField.GraphicImplAccess  //GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
-  {
-    public static final int chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800
-        , chgViewTrail = 0x1000, chgAddText = 0x2000;
+  public static class XXXLineColumn { 
+    final int line, col;  
 
-    
-    protected GraphicImplAccess(GralWidget widgg)
-    {
-      super(widgg);
+    public XXXLineColumn(int line, int column) {
+      this.line = line;
+      this.col = column;
     }
-    
-    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
-    
-    protected int caretPos(){ return GralTextBox.this.caretPos; }
-    
-    protected void caretPos(int newPos){ GralTextBox.this.caretPos = newPos; }
-    
-    protected GralTextFieldUser_ifc user(){ return GralTextBox.this.user; }
-
-    protected abstract int getCurrentCaretPos();
-    
   }
+  
+  
+  
+//  public abstract class GraphicImplAccess extends GralTextField.GraphicImplAccess  //GralWidget.ImplAccess
+//  implements GralWidgImpl_ifc
+//  {
+//    public static final int chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800
+//        , chgViewTrail = 0x1000, chgAddText = 0x2000;
+//
+//    
+//    protected GraphicImplAccess(GralWidget widgg)
+//    {
+//      super(widgg);
+//    }
+//    
+//    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
+//    
+//    protected int caretPos(){ return GralTextBox.this.caretPos; }
+//    
+//    protected void caretPos(int newPos){ GralTextBox.this.caretPos = newPos; }
+//    
+//    protected GralTextFieldUser_ifc user(){ return GralTextBox.this.user; }
+//
+//    protected abstract int getCurrentCaretPos();
+//    protected abstract int getCurrentCaretLinePos();
+//    
+//  }
 
 }

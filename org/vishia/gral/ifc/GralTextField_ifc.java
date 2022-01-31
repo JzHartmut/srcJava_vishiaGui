@@ -66,6 +66,10 @@ public interface GralTextField_ifc extends GralWidget_ifc
   
   int getCursorPos();
   
+  int getCursorLine();
+  
+  int getCursorCol();
+  
   int setCursorPos(int pos);
   
   /**Sets the style of all new set and added texts. The content contained in the text field or box are not changed.

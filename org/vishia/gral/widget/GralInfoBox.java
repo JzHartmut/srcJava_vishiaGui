@@ -261,6 +261,10 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   @Override public int getCursorPos(){ return textBox.getCursorPos(); }
 
+  @Override public int getCursorLine(){ return textBox.getCursorLine(); }
+
+  @Override public int getCursorCol(){ return textBox.getCursorCol(); }
+
   @Override public long setContentIdent(long date){ return textBox.setContentIdent(date); }
   
   @Override public long getContentIdent(){ return textBox.getContentIdent(); }

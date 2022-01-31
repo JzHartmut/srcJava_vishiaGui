@@ -12,6 +12,10 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
+/**
+ * @author hartmut
+ *
+ */
 public class AwtButton extends GralButton.GraphicImplAccess
 {
   /**Version, history and license.
@@ -212,6 +216,14 @@ public class AwtButton extends GralButton.GraphicImplAccess
    * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); helper.setVisibleGThread(bVisible); }
+
+
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
   
   
 
