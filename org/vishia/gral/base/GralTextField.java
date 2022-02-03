@@ -619,6 +619,16 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     }
   }
   
+  public void setTextStyle(String color, char font, int size)
+  {
+    dyda.textFont = GralFont.getFont(font, size);
+    dyda.textColor = GralColor.getColor(color);
+    dyda.setChanged(GralWidget.ImplAccess.chgColorText);
+    if(_wdgImpl !=null){
+      repaint();
+    }
+  }
+  
 
   
   /**Sets a new border width and returns the old one.

@@ -109,7 +109,7 @@ public class GralButton extends GralWidget
   public GralButton(String sPosName, String sText, GralUserAction action)
   { super(sPosName, 'B');
     setText(sText);
-    specifyActionChange(null, action, null);
+    if(action !=null) { specifyActionChange(null, action, null); }
   }
     
   @Deprecated public GralButton(String position, String sName, String sText, GralUserAction action)

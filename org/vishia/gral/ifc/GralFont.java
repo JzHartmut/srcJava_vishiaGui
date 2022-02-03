@@ -70,6 +70,8 @@ public final class GralFont
   public char style;
 
   
+  
+  
   private static Map<String, GralFont> fonts = new TreeMap<String, GralFont>();
   
   public GralFont(String fontName, int size, char style)
@@ -86,7 +88,7 @@ public final class GralFont
    * @param style
    * @return
    */
-  protected static GralFont getFont(String fontName, int size, char style){
+  public static GralFont getFont(String fontName, int size, char style){
     String key = fontName + "." + style + size;
     GralFont ret = fonts.get(key);
     if(ret == null){
@@ -96,5 +98,25 @@ public final class GralFont
     return ret;
   }
   
+  
+  
+  /**Get a standard font in a simple way. It is yet not related on the GUI size (TODO).
+   * @param cFontName "m" monospaced "c" monospaced small "n" normal text (Arial), "b" bold "i" italic   
+   * @param size absolute size, TODO should be related to GUI size.
+   * @return a font, create instance or get the existing one.
+   */
+  public static GralFont getFont(char cFontName, int size){
+    String sFontName;
+    char style;
+    switch(cFontName) {
+    case 'm': style = ' '; sFontName = GralFont.fontMonospacedSansSerif; break;
+    case 'c': style = ' '; sFontName = GralFont.fontMonospacedSmall; break;
+    case 'n': style = ' '; sFontName = GralFont.fontSansSerif; break;
+    case 'b': style = 'b'; sFontName = GralFont.fontSansSerif; break;
+    case 'i': style = 'i'; sFontName = GralFont.fontSansSerif; break;
+    default : style = ' '; sFontName = GralFont.fontSansSerif;
+    }
+    return getFont(sFontName, size, style);
+  }
   
 }

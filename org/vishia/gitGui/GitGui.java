@@ -18,6 +18,7 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -145,6 +146,14 @@ public class GitGui
   /**Action for open the commit text. 
    * 
    */
+  GralUserAction actionShowExec = new GralUserAction("actionShowExec")
+  { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
+      Appendable echoOut = GitGui.this.wdgShowCmd.isOn() ? GitGui.this.wdgInfo : null;
+      GitGui.this.gitCmd.setEchoCmdOut(echoOut); //System.out);
+      return true;
+  } };
+
+
   GralUserAction actionOpenCommitText = new GralUserAction("actionTableOpenCommitText")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
       String[] args ={"cmd.exe", "/C", "edit", ".gitCommit"};
@@ -669,6 +678,9 @@ public class GitGui
 
   final GralButton wdgCommit = new GralButton("@-6+2, -20..-8 = commit", "do commit", this.actionCommit);
 
+  final GralButton wdgShowCmd = new GralButton("@-3+2, -20..-14 = showCmd", "showCmd", this.actionShowExec);
+  
+
   final GralButton wdgRefresh = new GralButton("@-3+2, -12..-2 = refresh", "refresh", this.actionRefresh);
 
   /**If set to true, the {@link #cmdThread} should be aborted.
@@ -763,10 +775,11 @@ public class GitGui
     if(!this.exepath.dirTemp1.exists()) { this.exepath.dirTemp1.mkdirs(); }
     if(!this.exepath.dirTemp2.exists()) { this.exepath.dirTemp2.mkdirs(); }
     this.wdgTableVersion.specifyActionOnLineSelected(this.actionTableLineVersion);
-    wdgTableFiles.specifyActionChange("actionTableFile", this.actionTableFile, null);
+    this.wdgTableFiles.specifyActionChange("actionTableFile", this.actionTableFile, null);
     this.wdgInfo.setUser(this.wdgInfoSetSelection);
     this.window.specifyActionOnCloseWindow(this.actionOnCloseWindow);
     this.window.create(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, this.initGraphic);
+    this.wdgShowCmd.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
     this.wdgCmd.setHtmlHelp(":GitGui.html#exec");
     this.cmdThread.start();
   }
@@ -854,7 +867,6 @@ public class GitGui
 
   void initializeCmd ( GitGuiCmd.CmdArgs cmdArgs ) {
     this.gitCmd.setCharsetForOutput("UTF-8");  //git outputs in UTF-8
-    this.gitCmd.setEchoCmdOut(this.wdgInfo); //System.out);
     if(cmdArgs.guiPaths.env !=null) {
       for(String env: cmdArgs.guiPaths.env) {
         int posEq = env.indexOf('=');

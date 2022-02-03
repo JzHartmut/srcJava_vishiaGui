@@ -322,6 +322,9 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
           promptSwt.setText(this.prompt());
           promptSwt.redraw();
         }
+        if((chg & chgFocus) !=0){ 
+          this.textFieldSwt.setFocus();
+        }
         if((chg & chgVisible) !=0){ 
           textFieldSwt.setVisible(true);
         }
