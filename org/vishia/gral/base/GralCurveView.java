@@ -251,13 +251,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     /**The index of the track in the List of tracks. 
      * It is the correspondent index in the float parameter for {@link GralCurveView#setSample(float[], int)}
      */
-    public final int ixList;
+    private final int ixList;
     
     private final GralCurveView outer;
     
-    public String sDataPath;
+    private String sDataPath;
     
-    public VariableAccess_ifc variable;
+    /**This value is set in {@link GralCurveView#refreshFromVariable(VariableContainer_ifc)}
+     * after {@link #setDataPath(String)} is given. 
+     */
+    private VariableAccess_ifc variable;
     
     private Object oContent;
     
@@ -860,7 +863,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     track.values = new float[this.maxNrofXValues];
     track.scale = new TrackScale();
     track.sDataPath =sDataPath;
-    track.variable = null;
+    track.variable = null;                                 // will be found and set in {@link GralCurveView#refreshFromVariable(VariableContainer_ifc)
     track.scale.y0Line = nullLine;
     track.scale.yOffset = offset;
     track.scale.yScale = scale;

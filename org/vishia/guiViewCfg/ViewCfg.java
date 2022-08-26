@@ -10,7 +10,7 @@ import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.base.GralWidget;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.util.Assert;
+import org.vishia.util.CheckVs;
 
 /**Class contains main, it is able to use for a GUI without any programming in Java.*/
 public class ViewCfg extends GuiCfg 
@@ -18,11 +18,12 @@ public class ViewCfg extends GuiCfg
   
   /**Version and history
    * <ul>
+   * <li>2022-08-26 Hartmut little bit refactored because of newly usage, prevent warnings.
    * <li>2012-20-22 Hartmut chg now works yet.
    * <li>2010-06-00 Hartmut created
    * </ul>
    */
-  public static final int version = 0x20120222;
+  public static final int versionViewCfg = 0x20120222;
   
   private final OamShowValues oamShowValues;
 	  
@@ -31,6 +32,7 @@ public class ViewCfg extends GuiCfg
    */
   //private final OamOutFileReader oamOutValues;
   
+  @SuppressWarnings("unused")
   private final boolean showValuesOk;
   
   private final OamRcvValue oamRcvUdpValue;
@@ -141,13 +143,13 @@ public class ViewCfg extends GuiCfg
     { boolean bOk = true;  //set to false if the argc is not passed
       try {
         if(arg.startsWith("-parambin=")) 
-	      { cargs.sParamBin = getArgument(10);   //an example for default output
+	      { this.cargs.sParamBin = getArgument(10);   //an example for default output
 	      }
 	      else if(arg.startsWith("-ctrlbin=")) 
-	      { cargs.sFileCtrlValues = getArgument(9);   //an example for default output
+	      { this.cargs.sFileCtrlValues = getArgument(9);   //an example for default output
 	      }
 	      else if(arg.startsWith("-oambin=")) 
-	      { cargs.sFileOamValues = getArgument(8);   //an example for default output
+	      { this.cargs.sFileOamValues = getArgument(8);   //an example for default output
 	      }
 	      else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){
@@ -177,16 +179,16 @@ public class ViewCfg extends GuiCfg
   { super(cargs, cmdgui, null, null, null);
     this.callingArguments = cargs;
     
-    oamShowValues = new OamShowValues(cmdgui, guiAccess);
-    showValuesOk = oamShowValues.readVariableCfg();
+    this.oamShowValues = new OamShowValues(cmdgui, this.guiAccess);
+    this.showValuesOk = this.oamShowValues.readVariableCfg();
     
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
-    oamRcvUdpValue = new OamRcvValue(oamShowValues, cmdgui);
+    this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, cmdgui);
     
     //msgReceiver = new MsgReceiver(console, dlgAccess, cargs.sTimeZone);
     
-	  oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
+	  this.oamShowValues.setFieldsToShow(this.panelBuildIfc.getShowFields());
 
     //msgReceiver.test(); //use it after initGuiDialog!
     
@@ -197,7 +199,7 @@ public class ViewCfg extends GuiCfg
   {
     super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
     //msgReceiver.start();
-    oamRcvUdpValue.start();
+    this.oamRcvUdpValue.start();
 
   }
   
@@ -207,10 +209,10 @@ public class ViewCfg extends GuiCfg
     try{
     	//oamOutValues.checkData();
       //msgReceiver.testAndReceive();
-      oamRcvUdpValue.sendRequest();
+      this.oamRcvUdpValue.sendRequest();
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
-      System.out.println(Assert.exceptionInfo("ViewCfg - unexpected Exception; ", exc, 0, 7));
+      System.out.println(CheckVs.exceptionInfo("ViewCfg - unexpected Exception; ", exc, 0, 7));
       exc.printStackTrace();
     }
 
@@ -221,6 +223,58 @@ public class ViewCfg extends GuiCfg
   
   /**The command-line-invocation (primary command-line-call. 
    * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
+   * <pre>
+-gui=guiCfg/gui.cfg
+-size=B
+-timeZone=GMT
+--report:T:\tmp\GUI.log
+--rlevel:334
+   * </pre>
+   * possible in a file called with argument <code>--@guiCfg/gui.args</code>
+   * The gui.cfg contains widgets to show, especially a curveView, for example: <pre>
+size(500,120);
+//@ 2,1:Text(GUI SES-Parameter);
+@msg, 16-16,0+90:Table(uMin) : size(14+6+2+70 x 16), name="msgOfDay";
+
+//===================opeation-curves: ===============================
+@operation, 30-30,0+50: Curveview(userCurves, 30000):
+  line(xway, color=006000, nullLine=50, offset = 0.0, scale=5000.0, var=xway),
+  line(wway, color=600000, nullLine=50, scale=5000.0, var=wway),
+  line(target, color=00ff00, nullLine=50, scale=5000.0, var=target),
+  line(dway, color=red, nullLine=50, offset = 0.0, scale=1000.0, var=dway),
+  line(output, color=blue, nullLine=50, scale=5000.0, var=output)
+;
+//explanations on diagram:
+@6.5-1.3++, 50+3: Text("2.0 m", dgn);//dgn is dark green
+@12.5, 50+3: Text("1.5");
+@18.5, 50+3: Text("1.0", dgn);
+@24.5, 50+3: Text("0.5", dgn);
+   * </pre>
+   * The Application expects a UDP datagram with data on port 60082 on localhost, to test (TODO use parameter).
+   * see {@link OamRcvValue#ownAddr}
+   * The diagram should have a payload with:
+   * <ul>
+   * <li>0x00: Head of inspector datagram, not evaluated, but space is used
+   * <li>0x10...0x17 Head of a Inspector datagram item, length should be set only (bytes @0x18..19)
+   * <li>0x18 a long timestamp milliseconds after 1970
+   * <li> ... some more telegram data 
+   * </ul>
+   * The position of the data in the UDP should be defined with a file on <code>GUI/oamVar.cfg</code>
+   * with the following content (example proper to CurveView):
+<pre>
+==OamVariables==
+time_milliseconds1970: J @0;
+xway: S @8;  
+wway: S @12;
+target: S @14;
+dway: S @16;
+output: S @18;
+stateSetValueGen: S @20;
+ctController: B @22;
+ctSetValue: B @23;
+</pre>
+The positions are related to the start of the Inspector item @ 0x18, first with the timestamp. 
+   * Use the directory inside the cmpnJava_vishiaGui: src/appl/ViewCfg/GUI
    */
   public static void main(String[] args)
   { boolean bOk = true;
@@ -250,6 +304,5 @@ public class ViewCfg extends GuiCfg
     cmdgui.exit();
   }
 
-  void stop(){} //debug helper
 
 }

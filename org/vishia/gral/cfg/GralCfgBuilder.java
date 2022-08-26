@@ -183,6 +183,8 @@ public class GralCfgBuilder
    * @param cfge The configuration element data read from config file or set from the GUI-editor.
    * @return null if OK, an error String for a user info message on warning or error.
    *         It is possible that a named user action is not found etc. 
+   * <br>
+   * This is both used from {@link org.vishia.guiInspc.InspcGui} as also from {@link org.vishia.guiViewCfg.ViewCfg}.         
    */
   public String buildWidget(GralCfgElement cfge)
   throws ParseException

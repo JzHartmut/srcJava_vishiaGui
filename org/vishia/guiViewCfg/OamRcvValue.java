@@ -103,10 +103,10 @@ public class OamRcvValue implements Runnable
 	
 	private void evalTelg(byte[] recvData, int nrofBytes) throws ParseException
 	{ 
-		datagramRcv.assign(recvData, nrofBytes);
-		datagramRcv.setBigEndian(true);
-		int nrofBytesInfoHead = infoEntity.getLengthHead();
-		int catastrophicalCount = 1000;
+		this.datagramRcv.assign(recvData, nrofBytes);          // The head of the datagram should be appropriate the head of an inspector datagram.
+		this.datagramRcv.setBigEndian(true);                   // it is the general approach.
+		int nrofBytesInfoHead = this.infoEntity.getLengthHead(); // the symbolic data starts as one item, from position 0x18
+		int catastrophicalCount = 1001;
 		while(datagramRcv.sufficingBytesForNextChild(infoEntity.getLengthHead()) && --catastrophicalCount >=0){
 			datagramRcv.addChild(infoEntity);
 			int nrofBytesInfo = infoEntity.getLenInfo();
