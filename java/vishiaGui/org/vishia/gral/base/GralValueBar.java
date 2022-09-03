@@ -51,10 +51,11 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
 	
-	public GralValueBar(String name)
-	{ super(name, 'U');
+	public GralValueBar(GralPos currPos, String name)
+	{ super(currPos, name, 'U');
 	}
 
+  public GralValueBar(String name) { this(null, name); }
 
 	@Override
 	public void setMinMax(float minValue, float maxValue)

@@ -22,6 +22,7 @@ import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 
 public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
@@ -67,7 +68,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	SwtTabbedPanel(GralTabbedPanel panelg, SwtMng mng, GralPanelActivated_ifc user, int property)
 	{ super(panelg);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
-		Object oParent = widgg.pos().panel._wdgImpl.getWidgetImplementation(); //this.pos().panel.getPanelImpl();
+		Object oParent = widgg.pos().panel.getImpl().getWidgetImplementation(); //this.pos().panel.getPanelImpl();
     if(oParent == null || !(oParent instanceof Composite) ){ 
       throw new IllegalArgumentException("Software error. You must select a panel before."); 
     }
@@ -87,7 +88,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   
 	@Override public GralPanelContent addGridPanel(GralPanelContent panelg, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
 	{ ///
-	  widgg.gralMng().setTabbedPanel(widgg);  //setMngToTabbedPanel();
+	  //widgg.gralMng().setTabbedPanel(widgg);  //setMngToTabbedPanel();
 	  Rectangle sizeTabFolder = widgetSwt.getBounds();
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
@@ -114,7 +115,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   
 	@Override public GralPanelContent addCanvasPanel(GralPanelContent panelg, String sLabel)
 	{ 
-	   widgg.gralMng().setTabbedPanel(widgg);  //setMngToTabbedPanel();
+	   //widgg.gralMng().setTabbedPanel(widgg);  //setMngToTabbedPanel();
 	   TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 	   tabItemOperation.setText(sLabel);
 	   Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
@@ -133,13 +134,13 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	@Override public GralPanelContent selectTab(String name)
 	{ //assert(false);
 	  
-	  GralPanelContent panel = mng.mng.getPanel(name);
+	  GralPanel_ifc panel = mng.mng.getPanel(name);
 	  Object oSwtPanel = panel.getImpl();  //getWidgetImplementation();
 	  SwtPanel swtPanel = (SwtPanel)oSwtPanel;
 	  if(swtPanel.itsTabSwt !=null){
 	  	  widgetSwt.setSelection(swtPanel.itsTabSwt);
   	  }
-	  return panel;
+	  return (GralPanelContent)panel;
 	}
 	
 	
@@ -293,7 +294,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
     // TODO Auto-generated method stub
     return null;
   }
-
+ 
 
 
 

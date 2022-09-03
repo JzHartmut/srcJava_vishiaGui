@@ -90,7 +90,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   { 
     ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
-    { for(GralWidget widgd: widgetsToResize){
+    { for(GralWidget widgd: getWidgetsToResize()){
         if(widgd instanceof GralWindow) {
           System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
         } else {
@@ -137,7 +137,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    */
   @Deprecated public GralWindow(String posString, String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
-    super( posString, nameWindow, 'w');  //relative Window position.
+    super((GralPos)null, posString, nameWindow, 'w');
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -149,14 +149,16 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
   
   /**Constructs a window.
+   * @param currPos will be cloned to the widget, either ready to use or base pos with posString.
+   *   The position of a window describes the size and the first position on the screen.
    * @param posString the position relative to a given position of the parent window. "!" on top level window. 
    * @param nameWindow
    * @param sTitle
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
    */
-  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
+  public GralWindow(GralPos currPos, String posString, String nameWindow, String sTitle, int windProps)
   {
-    super( posString, nameWindow, 'w');  //relative Window position.
+    super(currPos, posString, nameWindow, 'w');
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -165,6 +167,12 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   }
 
+  
+  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
+  { this(null, posString, nameWindow, sTitle, windProps);
+  }
+  
+  
   @Override public void specifyActionOnCloseWindow(GralUserAction action)
   { actionOnCloseWindow = action;
   }
@@ -176,6 +184,9 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * The it invokes {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}. 
    * The application should not know whether it is the primary or any secondary window.
    * That helps for applications which are started from a Gral graphic application itself without an own operation system process. 
+   * <br>
+   * The new implementation graphic starts on {@link GralGraphicThread#run()}
+   * <br>
    * @param awtOrSwt see {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}
    * @param size 'A'..'G', 'A' is a small size, 'G' is the largest.
    * @param log maybe null. If not given a {@link LogMessageStream} with System.out will be created. For internal logging.

@@ -20,10 +20,10 @@ import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -171,7 +171,7 @@ public interface GralMngBuild_ifc
    *              If it the instance is fault, a ClassCastException is thrown.
    *         
    */
-  public void registerPanel(GralPanelContent panel);
+  public void registerPanel(GralPanel_ifc panel);
   
   
   /**Adds a panel for tabs as child of the current panel.
@@ -185,10 +185,10 @@ public interface GralMngBuild_ifc
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
    */
-  void selectPanel(String sName);
+  GralPanel_ifc selectPanel(String sName);
 
   /**Selects the given panel as current panel to build some content. */
-  void selectPanel(GralPanelContent panel);
+  void selectPanel(GralPanel_ifc panel);
   
   /**Selects the primary window as current panel to build some content. */
   void selectPrimaryWindow();
@@ -643,7 +643,7 @@ public interface GralMngBuild_ifc
   /**Adds a panel that is not bound yet.
    * @param panel
    */
-  //void addPanel(GralPanelContent panel);
+  //void addPanel(GralPanel_ifc panel);
   
   /**Adds the given Focus action to the named widget.
    * @param sName The name of the widget. It should be registered calling any add... method.
@@ -767,7 +767,7 @@ public interface GralMngBuild_ifc
    * @param compositeBox
    * @return true if removed.
    */
-  boolean remove(GralPanelContent compositeBox);
+  boolean remove(GralPanel_ifc compositeBox);
   
   boolean remove(GralWidget widget);
   

@@ -137,7 +137,7 @@ public class GralCfgWriter
     if(cfge.positionString !=null) {
       ww.append(cfge.positionString);
     } else {
-      GralCfgPosition pp = cfge.positionInput;
+      GralCfgPosition pp = cfge.XXXpositionInput;
       if(pp.yPos >=0 || pp.xPos >=0 || pp.ySizeDown !=0 || pp.xWidth !=0){
         if(pp.panel !=null){ 
           if(!pp.panel.equals(sLastPanel)) {

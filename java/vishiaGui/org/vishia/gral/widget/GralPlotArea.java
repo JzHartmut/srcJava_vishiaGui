@@ -45,8 +45,12 @@ public class GralPlotArea extends GralWidget
 
   protected final GralCanvasStorage canvasStore = new GralCanvasStorage();
   
-  public GralPlotArea(String posname) {
-    super(posname, 'P' );
+  /**Constructs
+   * @param currPos may be null, then use the singleton pos in GralMng, else basic and current position
+   * @param posname
+   */
+  public GralPlotArea(GralPos currPos, String posname) {
+    super(currPos, posname, 'P' );
   }
   
  

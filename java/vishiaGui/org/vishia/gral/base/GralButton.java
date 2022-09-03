@@ -96,9 +96,14 @@ public class GralButton extends GralWidget
   /**True if the button has three states: on, off, disabled. */
   protected boolean bThreeStateSwitch;
   
-  public GralButton(String sName)
+  public GralButton(String sPosName)
   {
-    super(sName, 'B');  //GralWidget
+    super((GralPos)null, sPosName, 'B');  //GralWidget
+  }
+  
+  public GralButton(GralPos pos, String sName)
+  {
+    super(pos, sName, 'B');  //GralWidget
   }
   
   /**Creates a button
@@ -106,11 +111,15 @@ public class GralButton extends GralWidget
    * @param sText The button text
    * @param action The action on release mouse
    */
-  public GralButton(String sPosName, String sText, GralUserAction action)
-  { super(sPosName, 'B');
+  public GralButton(GralPos currPos, String sPosName, String sText, GralUserAction action)
+  { super(currPos, sPosName, 'B');
     setText(sText);
     if(action !=null) { specifyActionChange(null, action, null); }
   }
+  
+  public GralButton(String sPosName, String sText, GralUserAction action)
+  { this((GralPos)null, sPosName, sText, action);    }
+  
     
   @Deprecated public GralButton(String position, String sName, String sText, GralUserAction action)
   {

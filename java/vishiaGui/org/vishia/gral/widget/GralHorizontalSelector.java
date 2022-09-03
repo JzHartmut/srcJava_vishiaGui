@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
@@ -87,8 +88,8 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    * @param name
    * @param mng
    */
-  public GralHorizontalSelector(String name, GralUserAction actionOnSelect){
-    super(name, 'n');
+  public GralHorizontalSelector(GralPos currPos, String name, GralUserAction actionOnSelect){
+    super(currPos, name, 'n');
     colorText = GralColor.getColor("bk");
     colorSelect = GralColor.getColor("rd");
     colorBack = GralColor.getColor("wh");
@@ -97,6 +98,9 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     setActionChange(actionOnSelect);
   }
   
+  public GralHorizontalSelector(String name, GralUserAction actionOnSelect){
+    this(null, name, actionOnSelect);
+  }
   
   /**Adds a item to show.
    * @param text

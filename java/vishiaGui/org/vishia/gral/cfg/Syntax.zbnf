@@ -17,20 +17,15 @@ Conditional::=
 endif[;]
 .
 
+##Syntax of position internally in Java:
+
+
+
+
+
 
 Element::=
- [<?position> @ [<$?panel> ,] 
-                [<?yPosRelative> &+]
-                [<#?yPos>[\.<#?yPosFrac>]] 
-                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|] 
-                [ <?yIncr> ++] 
-                [ ,
-                  [<?xPosRelative> &+] 
-                  [<#?xPos>[\.<#?xPosFrac>]] 
-                  [ [+] <#-?xWidth>[\.<#?xSizeFrac>]| +* <?xOwnSize> |]
-                  [ <?xIncr> ++]
-                ] :
- ] 
+[@[<$?panel> ,]<*:?positionString>:]
  [ Led <Led> 
  | <Button> 
  | SwitchButton ( <param?SwitchButton> ) ; 

@@ -49,7 +49,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
    */
   public SwtCanvasStorePanel(GralPanelContent panelg, Composite parent, int style, Color backGround, GralMng gralMng)
   { super(panelg, null);
-    gralPanel().canvas = new GralCanvasStorage();
+    //gralPanel().panel.canvas = new GralCanvasStorage();
     swtCanvas = new SwtCanvas(this,parent, style);
     super.panelComposite = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
@@ -66,7 +66,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   protected SwtCanvasStorePanel(GralPanelContent panelg)
   {
     super(panelg, null);
-    gralPanel().canvas = new GralCanvasStorage();
+//    gralPanel().canvas = new GralCanvasStorage();
   }
   
 
@@ -93,10 +93,10 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     public void drawBackground(GC g, int x, int y, int dx, int dy) {
     	//NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     	
-      if(storeMng.gralPanel().canvas == null){
+      if(storeMng.gralPanel().canvas() == null){
         stop();
       } else 
-    	for(GralCanvasStorage.PaintOrder order: storeMng.gralPanel().canvas.paintOrders){
+    	for(GralCanvasStorage.PaintOrder order: storeMng.gralPanel().canvas().paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
       			g.setForeground(((SwtMng)storeMng.gralPanel().gralMng().impl).getColorImpl(order.color));

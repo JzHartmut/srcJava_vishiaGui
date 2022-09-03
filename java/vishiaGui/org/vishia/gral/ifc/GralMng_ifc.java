@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.msgDispatch.LogMessage;
@@ -21,9 +22,11 @@ import org.vishia.msgDispatch.LogMessage;
  * is a implementor of this interface.
  *   
  * @author Hartmut Schorrig
- *
+ * @deprecated because the GralMng is a singleton in the application and can immediately accessed by {@link GralMng#get()}.
+ *   It is not necessary to have a aggregation to it.
+ *   The older idea was, have several GralMng for different implementations. Hence the interface. 
  */
-public interface GralMng_ifc 
+@Deprecated public interface GralMng_ifc 
 {
 
   /**The version history of this interface:

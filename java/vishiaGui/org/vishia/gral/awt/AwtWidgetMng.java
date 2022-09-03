@@ -43,6 +43,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -80,13 +81,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   
-  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getWidgetImplementation(); }
+  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getImpl().getWidgetImplementation(); }
 
   
   public Container getWidgetsPanel(GralWidget widg){ 
     GralPos pos = widg.pos();
     if(pos == null) { pos = pos(); } //from GralMng
-    return ((Container)pos.panel.getWidgetImplementation()); 
+    return ((Container)pos.panel.getImpl().getWidgetImplementation()); 
   }
 
 
@@ -359,7 +360,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   {
       //Composite box = new Composite(graphicFrame, 0);
       Container box = new Container();
-      Container parent = (Container)pos().panel.getWidgetImplementation();
+      Container parent = (Container)pos().panel.getImpl().getWidgetImplementation();
       
       parent.add(box);
       setPosAndSize_(mng.getPosOldPositioning(), box);
@@ -421,10 +422,10 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   {
     final GralRectangle windowFrame;
     if(posWindow.panel !=null) {
-      Object awtWidg = posWindow.panel.getWidgetImplementation();
+      Object awtWidg = posWindow.panel.getImpl().getWidgetImplementation();
       Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
       Point loc;
-      windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+      windowFrame = getPixelUseableAreaOfWindow(posWindow.panel.getPanelWidget());
     } else {
       windowFrame = new GralRectangle(0,0,800,600);
     }
@@ -483,7 +484,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
 
   @Override
-  public boolean remove(GralPanelContent compositeBox)
+  public boolean remove(GralPanel_ifc compositeBox)
   {
     // TODO Auto-generated method stub
     return false;
@@ -515,8 +516,8 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     int test = 6;
     if(owidg !=null){
       Component swtWidget = (Component)owidg;
-      GralPanelContent panel = widgd.pos().panel;
-      GralRectangle size = panel._wdgImpl.getPixelPositionSize(); //PixelSize();
+      GralPanel_ifc panel = widgd.pos().panel;
+      GralRectangle size = panel.getImpl().getPixelPositionSize(); //PixelSize();
       GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
       swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
@@ -610,7 +611,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
-    Component parentComp = (Component)pos.panel.getWidgetImplementation();
+    Component parentComp = (Component)pos.panel.getImpl().getWidgetImplementation();
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;

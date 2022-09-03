@@ -218,6 +218,8 @@ public interface GralWidget_ifc extends Removeable
    */
   GralMng gralMng();
   
+  void setVisibleStateWidget(boolean visible);
+  
   /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
    * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
    */
@@ -350,6 +352,9 @@ public interface GralWidget_ifc extends Removeable
    * @param url String given url, maybe a local file too with #internalLabel.
    */
   void setHtmlHelp(String url);
+  
+  
+  GralWidget.ImplAccess getImpl();
   
   //public abstract GralWidget getGralWidget();
 

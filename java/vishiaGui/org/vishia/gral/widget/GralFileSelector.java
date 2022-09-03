@@ -29,6 +29,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -634,9 +635,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
    * @param columns
    * @param size
    */
-  public GralFileSelector(String name, int rows, int[] columns, int[] columnsFavorlist)
+  public GralFileSelector(GralPos currPos, String name, int rows, int[] columns, int[] columnsFavorlist)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
-    super(null, name, 'f');
+    super(currPos, name, 'f');
     favorList = columnsFavorlist !=null ? new GralTable<String>(name, columnsFavorlist) : null;
     selectList = new FileSelectList(this, name, rows, columns, 'A');
     colorBack = GralColor.getColor("wh");
@@ -644,6 +645,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     //this.mainCmd = mainCmd;
   }
   
+  
+  public GralFileSelector ( String name, int rows, int[] columns, int[] columnsFavorlist)
+  { this((GralPos)null, name, rows, columns, columnsFavorlist); }
   
   /**Maybe called after construction, should be called before {@link #setToPanel(GralMngBuild_ifc)}
    * @param name
@@ -676,7 +680,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   { GralMng panelMng = GralMng.get();
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
-    GralPanelContent panel = posAll.panel;
+    GralPanel_ifc panel = posAll.panel;
     String sPanel = panel.getName();
     //Text field for path above list
     panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');

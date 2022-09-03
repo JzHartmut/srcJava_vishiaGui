@@ -168,7 +168,7 @@ public class GuiDropFiles {
     this.gralMng.registerUserAction(null, this.action_abortCmd);
     this.gralMng.registerUserAction(null, this.action_clearOutput);
     this.gralMng.registerUserAction(null, this.action_readJZtc);
-    this.window = GralCfgWindow.createWindow("HelloWorldWindow", " hello world ", 'C', sCfg, null, null);
+    this.window = GralCfgWindow.createWindow("Guidropfiles", "Gui drop files and execute via JzTxtCmd", 'C', sCfg, null, null);
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);

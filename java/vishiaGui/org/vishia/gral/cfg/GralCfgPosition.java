@@ -116,6 +116,17 @@ public final class GralCfgPosition implements Cloneable
     return ok;
   }
   
+  
+  public String toString = null;  //filled on first invocation, can be set to null to refill
 
+  @Override public String toString() {
+    if(false && this.toString !=null) { return this.toString; }
+    else {
+      StringBuilder sb = new StringBuilder();
+      if(this.panel !=null) { sb.append(this.panel.toString()).append(":"); }
+      sb.append(this.yPos).append('.').append(this.yPosFrac).append(',').append(this.xPos).append('.').append(this.xPosFrac);
+      return this.toString = sb.toString();
+    }
+  }
   
 }

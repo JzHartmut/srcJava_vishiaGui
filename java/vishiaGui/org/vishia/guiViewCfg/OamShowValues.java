@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
+import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
@@ -28,6 +29,7 @@ public class OamShowValues
   
   /**Version and history
    * <ul>
+   * <li>2022-09-03 {@link #curveView} as extra reference for only one curve view if only one is used for fast access. 
    * <li>2022-08-26 Hartmut Refactored, firstly used after 10 years and detect some difficulties.
    *   The {@link ByteDataSymbolicAccess} and {@link ByteDataSymbolicAccessReadConfig} are also refactored.
    *   Prevent warnings (formally)
@@ -40,7 +42,7 @@ public class OamShowValues
    */
   public static final int version = 0x20220826;
   
-  final Report log;
+  final MainCmdLogging_ifc log;
 
   /**Index (fast access) of all variable which are sent from the automation device (contained in the cfg-file). */
   protected final ByteDataSymbolicAccess accessOamVariable;
@@ -56,6 +58,8 @@ public class OamShowValues
   protected final GralMng_ifc guiAccess;
   
   Set<Map.Entry<String, GralWidget>> fieldsToShow;
+  
+  GralCurveView curveView;
   
   /**The access to received data for the timestamp as milliseconds after a base year.
    * It is not null if that variable is contained in the received data description
@@ -80,7 +84,7 @@ public class OamShowValues
   //private final float[] valueUserCurves = new float[6];  
 
   public OamShowValues(
-    Report log
+    MainCmdLogging_ifc log
   , GralMng_ifc guiAccess
   )
   {
@@ -110,6 +114,13 @@ public class OamShowValues
   {
     this.fieldsToShow = fields;
   }
+  
+  
+  
+  public void setCurveView(GralCurveView curveView) {
+    this.curveView = curveView;
+  }
+  
   
   /**This routine presents the new received values at the GUI
    * or saves values in traces.
@@ -216,6 +227,11 @@ public class OamShowValues
   { if(this.dataValid){
       this.timeNow = System.currentTimeMillis();
       ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = this.guiAccess.getVisiblePanels();
+      if(this.curveView !=null) {
+        this.curveView.bActive = true;
+        this.curveView.refreshFromVariable(this.accessOamVariable);
+      }
+      
       //GralWidget widgdRemove = null;
       try{
         for(GralVisibleWidgets_ifc panel: listPanels){

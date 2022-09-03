@@ -13,6 +13,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -176,6 +177,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-08 new {@link GralWidget#GralWidget(GralPos, String, char)} for the new concept, some more adaptions. 
    * <li>2016-09-30 Hartmut improved: {@link #repaint(int, int)} now the second argument can be really 0 to prevent a not required repaint from the first repaint call
    *   if some more replaints are registered per delay.
    * <li>2016-09-30 Hartmut bugfix: {@link #setFocus()} has set the default focus of the primaryWindow if the focus of a window was set.
@@ -343,7 +345,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * stored in the panel manager. This reference is used to set values to other widgets. */
   protected GralMng itsMng;
   
-  /**The position of the widget. It may be null if the widget should not be resized. */
+  /**The position of the widget. 
+   * The GralPos contains also the reference to the parent composite panel {@link GralPanel_ifc} which contains the widget. */
   private GralPos _wdgPos;
 
 
@@ -359,7 +362,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public ImplAccess _wdgImpl;
 
 
-  protected GralMngBuild_ifc buildMng;
+  protected GralMngBuild_ifc XXXbuildMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -448,7 +451,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   }
   
-  /**Reference to the common configuration data for widgets. */
+  /**Reference to the common configuration data for widgets.
+   * See the inner class {@link ConfigData}. It is a sub structure. 
+   * It has no cohesion with the {@link #itsCfgElement}.  */
   public ConfigData cfg = new ConfigData();
   
   /**Name of the widget in the panel. */
@@ -579,8 +584,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Standard delay to repaint if {@link #repaint()} is called without arguments. 
-   * It delays a few time because an additional process can be occure in a short time, and only one repaint should be invoked.
-   * The repaintDelayMax limits a shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
+   * It delays a few time because an additional process can be occur in a short time after, and only one repaint should be invoked.
+   * The repaintDelayMax limits are shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
    * 
    */
   protected int repaintDelay = 30, repaintDelayMax = 100;
@@ -596,11 +601,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public final static class DynamicData {
     
-    /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. 
-     * TODO should be protected. */
+    /**32 bit what is changed, see {@link GralWidget.ImplAccess#chgColorText} etc. 
+     * with this information the repaint in the implementing level can see what is to do. */
     private AtomicInteger whatIsChanged = new AtomicInteger(); 
     
     /**Sets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
+     * It uses the atomic access capability (see {@link #whatIsChanged}) to ensure thread safety.
      * @param mask one bit or some bits. ImplAccess.chgXYZ
      */
     public void setChanged(int mask){
@@ -702,51 +708,80 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @deprecated since 2016-09: May use always {@link GralWidget#GralWidget(String, char)} if levels above are proper
    */
   @Deprecated public GralWidget(String pos, String name, char whatIs){ 
-    this(pos !=null ? ( (pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, whatIs);
+    this((GralPos)null, pos !=null ? ( (pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, whatIs);
+  }
+
+  
+  /**Constructs the widget with a maybe separately given position string. 
+   * It should only be used if this is the signature of the derived widget.  
+   * @param currPos
+   * @param posName can be null if only name is given, can contain "<positionString>"
+   *   or also "@<positionString> = name"
+   * @param name if posName == null, should be given as name, can be null if name is defined by posName writing "... = name"
+   * @param whatIs See {@link #whatIs}, type of widget.
+   */
+  public GralWidget(GralPos currPos, String posName, String name, char whatIs){ 
+    this(currPos                                           // can also be the position immediately to use if pos == null
+        , posName ==null ? name                            // pos not given, use only name. Name can start with @ and contains then a posString.
+          : ( (posName.startsWith("@") ? "" : "@")         // supplement @ if not given in pos 
+              + posName + 
+              ( name == null ? "" : "=" + name) )          // combine @pos = name 
+        , whatIs);
   }
 
   
   
   /**Creates a widget.
-   * @param sName has the form "@pos = name" then this is a combination from position string and name.
+   * @param currPos The position, absolute. This is either the given ready to use position
+   *   or the basic of a relative position given in the posName argument. 
+   *   The given position in the posName argument is written back to this given instance,
+   *   also on given absolute positions. Especially for relative positions to the previous widgets this is sensible.
+   *   For internal use the position info are cloned to a internal separated position instance aggregated by the widget.
+   *   It means the given currPos argument can be changed afterwards, especially to calculate new positions from the current one. 
+   *   if this argument is null, the central singleton position in the GralMng is used. 
+   *   Then the thread safety is not given. 
+   * @param sPosName can have the form "@pos = name" then this is a combination from position string and name.
    *   The name should be unified to indent a widget by its name.
    *   Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
    * @param whatIs See {@link #whatIs}
    */
-  public GralWidget(String sPosName, char whatIs){ 
+  public GralWidget(GralPos currPos, String sPosName, char whatIs){ 
     int posName;
-    String posString1;
+    this.itsMng = GralMng.get();
+    final GralPos currPos1;
+    if(currPos == null) { currPos1 = GralMng.get().pos().pos; }
+    else {currPos1 = currPos;}
     if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
-      posString1 = sPosName.substring(0, posName).trim();
+      String posString1 = sPosName.substring(0, posName).trim();
       this.name = sPosName.substring(posName+1).trim();
-    } else {
-      this.name = sPosName;
-      posString1 = null;
-    }
-    //this.widget = null;
-    this.whatIs = whatIs;
-    //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
-    bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
-    this.itsCfgElement = null;
-    itsMng = GralMng.get();
-    assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
-    if(posString1 !=null) {
       try{
-        if(whatIs == 'w') {
-          //a window: don't change the GralMng.pos, create a new one.
-          GralPos pos = new GralPos();
-          pos.panel = itsMng.getPrimaryWindow();
-          this._wdgPos = pos.setNextPos(posString1);
-        } else {
+//        if(whatIs == 'w') {
+//          //a window: don't change the GralMng.pos, create a new one.
+//          currPos1.panel = this.itsMng.getPrimaryWindow();
+//          currPos1.calcNextPos(posString1);  // Note: setNextPos() returns a cloned position.
+//        } else {
           //a normal widget on a panel
-          this._wdgPos = itsMng.pos().pos.setNextPos(posString1);
-        }
-        registerWidget();
+          currPos1.calcNextPos(posString1);  // Note: setNextPos() returns a cloned position.
+//        }
       } catch(ParseException exc) {
         throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString1);
       }
-    } //else: don't set the pos, it is done later 
+    } else {
+      this.name = sPosName;
+    }
+    this._wdgPos = currPos1.clone();
+    //this.widget = null;
+    this.whatIs = whatIs;
+    //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
+    this.bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
+    this.itsCfgElement = null;
+    assert(this.itsMng !=null);  //should be created firstly in the application, since 2015-01-18
+    registerWidget();
+
   }
+  
+  
+  
   
   
   void registerWidget() {
@@ -758,11 +793,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       this._wdgPos.panel = itsMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
+    this.itsMng.registerWidget(this);
   }
   
   
   @Deprecated public GralWidget(String sName, char whatIs, GralMng mng)
-  { this(sName, whatIs);
+  { this((GralPos)null, sName, whatIs);
     itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(mng !=null){
@@ -1722,22 +1758,23 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     } else {
       //action in the graphic thread.
       if(!bHasFocus) {
-        GralWidget child = this;
+        GralWidget_ifc child = this;
         if(! (child instanceof GralWindow)) {
-          GralPanelContent parent = _wdgPos.panel;
+          GralPanel_ifc parent = _wdgPos.panel;
           int catastrophicalCount = 100;
           //set the visible state and the focus of the parents.
           while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
-              && !parent.bHasFocus
-              && parent._wdgImpl !=null
+              && !parent.isInFocus()
+              && parent.getImpl() !=null
               && --catastrophicalCount >=0){
-            parent._wdgImpl.setFocusGThread();
+            parent.getImpl().setFocusGThread();
             parent.setVisibleStateWidget(true);
             if(parent instanceof GralTabbedPanel) {
               //TabbedPanel: The tab where the widget is member of have to be set as active one.
               GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
-              assert(child instanceof GralPanelContent);
-              panelTabbed.selectTab(child.name);
+              if(child instanceof GralPanelContent) {
+                panelTabbed.selectTab(child.getName());
+              }
               //String name = panel1.getName();
               //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
             }
@@ -1756,7 +1793,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       GralWidget child;
       GralPanelContent panel;
       while(parent instanceof GralPanelContent
-        && (child = (panel = (GralPanelContent)parent).primaryWidget) !=null
+        && (child = (panel = (GralPanelContent)parent)._panel.primaryWidget) !=null
         && child._wdgImpl !=null
         && !child.bHasFocus
         ) {
@@ -1765,12 +1802,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         child.bVisibleState = true;
         child._wdgImpl.repaintGthread();
         List<GralWidget> listWidg = panel.getWidgetList();
-        
-        if(!(panel instanceof GralTabbedPanel)) { //don't show all childs of all tabs!
-          for(GralWidget widgChild : listWidg) {
-            widgChild._wdgImpl.setVisibleGThread(true);
-            widgChild.bVisibleState = true;
-          }
+        for(GralWidget widgChild : listWidg) {
+          widgChild._wdgImpl.setVisibleGThread(true);
+          widgChild.bVisibleState = true;
         }
         parent = child;  //loop if more as one GralPanelContent
       }
@@ -1792,7 +1826,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Gets the panel where the widget is member of. 
    * @return The panel.
    */
-  public GralPanelContent getItsPanel(){ return _wdgPos.panel; }
+  public GralPanel_ifc getItsPanel(){ return _wdgPos.panel; }
   
   
   /* (non-Javadoc)
@@ -1852,7 +1886,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   { StringBuilder u = new StringBuilder(240);
     u.append(whatIs).append(":").append(name).append(": ").append(sDataPath);
     if(_wdgPos !=null && _wdgPos.panel !=null){
-      u.append(" @").append(_wdgPos.panel.name);
+      u.append(" @").append(_wdgPos.panel.getName());
     } else {
       u.append(" @?");
     }
@@ -2048,7 +2082,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   final public void setVisibleStateWidget(boolean visible){
     bVisibleState = visible;
-    String name = _wdgPos.panel == null ? "main window" : _wdgPos.panel.name;
+    String name = _wdgPos.panel == null ? "main window" : _wdgPos.panel.getName();
     System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + name + ":" + toString());
     lastTimeSetVisible = System.currentTimeMillis();
   }

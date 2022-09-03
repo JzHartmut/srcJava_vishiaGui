@@ -55,10 +55,9 @@ public class GralLed extends GralWidget
   /**
    * @param name
    * @param mng
-   * @deprecated use {@link #GralLed(String)}
    */
-  protected GralLed(String name, GralMng mng)
-  { super(name, 'D', mng);
+  public GralLed(GralPos currPos, String sPosName)
+  { super(currPos, sPosName, 'D');
     colorBorderSelectable = new GralColor[3];
     colorBorderSelectable[0] = GralColor.getColor("ye");
     colorBorderSelectable[1] = GralColor.getColor("gn");
@@ -70,10 +69,14 @@ public class GralLed extends GralWidget
     setValue(0);  //initializes dyda.colors
   }
 
+  public GralLed(GralPos currPos, String sPosName, GralMng mng) {
+    this(currPos, sPosName);
+  }
   
   public GralLed(String name)
-  { this(name, null);
+  { this(null, name);
   }
+  
   
   
   /**Sets the LED's color. The border can be another than the inner color.

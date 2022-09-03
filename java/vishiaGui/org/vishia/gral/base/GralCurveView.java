@@ -756,9 +756,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
 
-  public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common)
+  public GralCurveView(GralPos currPos, String sName, int maxNrofXvaluesP, CommonCurve common)
   {
-    super(null, sName, 'c');
+    super(currPos, sName, 'c');
     this.common = common == null ? new CommonCurve() : common;
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
@@ -783,7 +783,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     //mng.registerWidget(this);
   }
 
-  
+  public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common) {
+    this((GralPos)null, sName, maxNrofXvaluesP, common);
+  }  
   
   public void cleanBuffer()
   {

@@ -1,12 +1,15 @@
 package org.vishia.gral.swt;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TabItem;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralPanel_ifc;
 
 /**This is a org.eclipse.swt.widgets.Composite. 
  * It can contain some GUI-Elements like Button, Text, Label, Table etc from org.eclipse.swt.widgets.
@@ -61,17 +64,34 @@ public class SwtGridPanel extends SwtCanvasStorePanel
   
 	public SwtGridPanel(GralPanelContent panelg, Composite xxxparent, int style, Color backGround, int xG, int yG, int xS, int yS, GralMng gralMng)
 	{ super(panelg);
-	  Composite parent = (Composite)panelg.pos().panel._wdgImpl.getWidgetImplementation();  
-  
-	  swtCanvas = new SwtCanvasGridPanel(this, parent, style);
-    super.panelComposite = swtCanvas;
-    swtCanvas.addControlListener(resizeItemListener);
-    swtCanvas.setData(this);
-    swtCanvas.setLayout(null);
-    currColor = swtCanvas.getForeground();
-    swtCanvas.addPaintListener(swtCanvas.paintListener);
-    swtCanvas.setBackground(backGround);
+	  GralPanel_ifc parentPanel = panelg.pos().panel;
+	  Composite parent = (Composite)panelg.pos().panel.getImpl().getWidgetImplementation();  
+	  if(((GralPanelContent)parentPanel).isTabbed()) {
+      GralWidget.ImplAccess swtPanelifc = parentPanel.getImpl();
+      final SwtPanel swtPanel;
+      if(swtPanelifc instanceof SwtSubWindow) {
+        swtPanel = ((SwtSubWindow)swtPanelifc).swtPanel;
+      } else {
+        swtPanel = null; //TODO
+      }
+      parent = swtPanel.tabFolder;
+      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
+      TabItem tab = new TabItem(swtPanel.tabFolder, SWT.None);
+      tab.setText(panelg.getName());
+      tab.setControl(this.swtCanvas);
+    }
+	  else {
+     this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
+	  }
+  	super.panelComposite = this.swtCanvas;
+    this.swtCanvas.addControlListener(this.resizeItemListener);
+    this.swtCanvas.setData(this);
+    this.swtCanvas.setLayout(null);
+    this.currColor = this.swtCanvas.getForeground();
+    this.swtCanvas.addPaintListener(this.swtCanvas.paintListener);
+    if(backGround !=null) { this.swtCanvas.setBackground(backGround); }
 	  setGridWidth(xG, yG, xS, yS);
+	    
 	}
 	
 	public void setGridWidth(int xG, int yG, int xS, int yS)

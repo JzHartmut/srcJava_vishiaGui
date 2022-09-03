@@ -62,11 +62,16 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 //  Map<Integer, Integer> posLines;
   
   
-  public GralTextBox(String name, Type... property)
-  { super(name, property);
+  public GralTextBox(GralPos posCurr, String name, Type... property)
+  { super(posCurr, name, property);
     super.newText = new StringBuffer();
   }
 
+  public GralTextBox(String name, Type... property) {
+    this(null, name, property);
+  }
+
+  
   /**Sets the text to the widget, invoked only in the graphic thread.
    * This method have to be implemented in the Graphic implementation layer.
    * @param text The text which should be shown in the widget.

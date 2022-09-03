@@ -416,8 +416,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String posName, int zLineMax, int[] columnWidths) {
-    super(posName, 'L');
+  public GralTable(GralPos currPos, String posName, int zLineMax, int[] columnWidths) {
+    super(currPos, posName, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.bColumnEditable = new boolean[this.zColumn];  //all false.
@@ -435,7 +435,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
 
   
-  
+  public GralTable(String posName, int zLineMax, int[] columnWidths) {
+    this(null, posName, zLineMax, columnWidths);
+  }  
   
   /**Constructs a table with position
    * @param pos String given position in GralPos units.
@@ -2395,7 +2397,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     { return false;  //TODO line visible. 
     }
 
-    
+    @Override public void setVisibleStateWidget(boolean bVisible) { GralTable.this.setVisibleStateWidget(bVisible); }
     
     @Override public void setFocus() { GralTable.this.setFocus(); }
 
@@ -2666,6 +2668,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public UserData getData()
     { return data;
     }
+
+
+
+
+    @Override public ImplAccess getImpl () { return GralTable.this.getImpl(); }
   }
   
   /**Data for each Text widget of the graphical implementation layer.

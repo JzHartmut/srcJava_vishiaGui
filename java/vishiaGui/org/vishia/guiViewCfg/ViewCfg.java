@@ -1,19 +1,31 @@
 package org.vishia.guiViewCfg;
 
 import java.io.File;
-
+import java.text.ParseException;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
+import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.cfg.GralCfgWindow;
+import org.vishia.gral.cfg.GralCfgZbnf;
+import org.vishia.gral.ifc.GralFactory;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.mainCmd.MainCmdLoggingStream;
+import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.CheckVs;
+import org.vishia.util.FileFunctions;
 
 /**Class contains main, it is able to use for a GUI without any programming in Java.*/
-public class ViewCfg extends GuiCfg 
+public class ViewCfg //extends GuiCfg 
 {
   
   /**Version and history
@@ -41,6 +53,14 @@ public class ViewCfg extends GuiCfg
    * and writes into the dayly list and into files.
    */
   //private final MsgReceiver msgReceiver;
+  
+  GralMng guiAccess;
+  
+  GralWindow window;
+  
+  GralTextBox outTextbox;
+  
+  MainCmdLogging_ifc logTextbox;
   
   
   /**The command-line-arguments may be stored in an extra class, which can arranged in any other class too. 
@@ -86,17 +106,6 @@ public class ViewCfg extends GuiCfg
   
   
   
-  private final GralUserAction actionKeyboard = new GralUserAction()
-  { @Override
-  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
-    {
-  		if(sCmd != null){  
-  			//String sCmd1 = "TouchInputPc.exe";
-  			mainCmd.executeCmdLine(widgetInfos.sCmd, 0, null, null);
-        return true;
-  		} else return false;
-    }
-  };
   
   
   
@@ -175,36 +184,67 @@ public class ViewCfg extends GuiCfg
    * @param cargs The given calling arguments.
    * @param gui The GUI-organization.
    */
-  ViewCfg(CallingArguments cargs, GralArea9MainCmd cmdgui) 
-  { super(cargs, cmdgui, null, null, null);
+  ViewCfg(CallingArguments cargs) 
+  { 
     this.callingArguments = cargs;
+
+    if(cargs.fileGuiCfg !=null) {
+      try { 
+        
+        GralMng gralMng = GralMng.get();
+        this.guiAccess = gralMng;
+  //    gralMng.registerUserAction(null, this.action_dropFilePath);
+  //    gralMng.registerUserAction(null, this.action_exec);
+  //    gralMng.registerUserAction(null, this.action_abortCmd);
+  //    gralMng.registerUserAction(null, this.action_clearOutput);
+  //    gralMng.registerUserAction(null, this.action_readJZtc);
+//        this.window = GralCfgWindow.createWindow("ViewCfg", " View cfg ", 'C', sCfg, null, null);
+        GralTextBox msgOut = (GralTextBox)gralMng.getWidget("msgOut");
+        this.outTextbox = msgOut;
+        this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
+      } 
+      catch(Exception exc) {
+        System.err.println("Exception: " + exc.getMessage());
+      }
+    } else {
+      System.err.println("argument -gui:path/to/gui.cfg is mandatory. ");
+    }
+
     
-    this.oamShowValues = new OamShowValues(cmdgui, this.guiAccess);
+    
+    
+    //super(cargs, cmdgui, null, null, null);
+    
+    this.oamShowValues = new OamShowValues(this.logTextbox, this.guiAccess);
     this.showValuesOk = this.oamShowValues.readVariableCfg();
     
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
-    this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, cmdgui);
+    this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox);
     
     //msgReceiver = new MsgReceiver(console, dlgAccess, cargs.sTimeZone);
     
-	  this.oamShowValues.setFieldsToShow(this.panelBuildIfc.getShowFields());
+	  this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields());
 
     //msgReceiver.test(); //use it after initGuiDialog!
     
   }
   
   
-  @Override protected void initMain()
+  //@Override 
+  protected void initMain()
   {
-    super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
+    //super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
     //msgReceiver.start();
     this.oamRcvUdpValue.start();
 
   }
   
+  
+  
 
-  @Override protected void stepMain()
+  //@Override 
+  protected void stepMain()
   {
     try{
     	//oamOutValues.checkData();
@@ -218,7 +258,15 @@ public class ViewCfg extends GuiCfg
 
   }
   
-  
+  public void doSomethinginMainthreadTillClosePrimaryWindow()
+  { while(GralMng.get().gralDevice.isRunning()){
+      try{ Thread.sleep(20);} 
+      catch (InterruptedException e) { }
+      stepMain();
+    }
+    
+  }
+
   
   
   /**The command-line-invocation (primary command-line-call. 
@@ -276,33 +324,59 @@ ctSetValue: B @23;
 The positions are related to the start of the Inspector item @ 0x18, first with the timestamp. 
    * Use the directory inside the cmpnJava_vishiaGui: src/appl/ViewCfg/GUI
    */
-  public static void main(String[] args)
-  { boolean bOk = true;
-    CallingArguments cargs = new CallingArguments();
+  public static int smain ( String[] cmdArgs) { 
+    int error = 0;
+    //old: CallingArguments cargs = new CallingArguments();
+    CallingArguments cargs = new CallingArguments();           // Standard arguments for graphic application, here sufficient
+    try {
+      cargs.parseArgs(cmdArgs);
+    } catch (Exception exc) {
+      System.err.println("cmdline arg exception: " + exc.getMessage());
+      error = 255;
+    }
+
     //Initializes the GUI till a output window to show informations:
-    CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
+    //old: CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
+    
+    
     //Initializes the graphic window and parse the parameter of args (command line parameter).
     //Parameter errors will be output in the graphic window in its given output area.
-    bOk = cmdgui.parseArgumentsAndInitGraphic("ViewCfg", "3A3C");
-    
-    if(bOk){
-      //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
-    	//try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
-    	//}catch(ClassNotFoundException exc){
-    	//	System.out.println("class not found: " + "org.vishia.communication.InterProcessComm_Socket");
-    	//}
-      //Loads the named class, and its base class InterProcessCommFactory. 
-      //In that kind the calling of factory methods are regarded to socket.
-    	new InterProcessCommFactorySocket();
+    //old: bOk = cmdgui.parseArgumentsAndInitGraphic("ViewCfg", "3A3C");
+    new InterProcessCommFactorySocket();
+    ViewCfg main = new ViewCfg(cargs);
+    if(error ==0){
     	
-      ViewCfg main = new ViewCfg(cargs, cmdgui);
-  
-      main.execute();
+      String sCfg = FileFunctions.readFile(cargs.fileGuiCfg);
+      try {
+        main.window = GralCfgZbnf.configWithZbnf(sCfg);         // does all, reads the config file, parses, creates Graphic Elements
+      } catch (ParseException e) {
+        error=9;
+        System.err.println("Graphic confic error: " + e.getMessage());
+      }                  
+    }
+    if(error ==0) {
+      GralWidget curveView = GralMng.get().getWidget("userCurves");
+      if(curveView !=null && curveView instanceof GralCurveView) {
+        main.oamShowValues.setCurveView((GralCurveView)curveView);
+      }
+      LogMessage log = new LogMessageStream(System.out);  //a logging system.
+      main.window.create("SWT", 'C', log, null);  //creates the primary window, starts the whole graphic engine.
+      //wait, a parallel thread to the grahic.
+      //GralFactory.createGraphic(main.window, 'C', null, "SWT");
+      
+      main.oamRcvUdpValue.start();
+      //main.execute();
+      main.doSomethinginMainthreadTillClosePrimaryWindow();
       
       main.oamRcvUdpValue.stopThread();
     }    
-    cmdgui.exit();
+    GralMng.closeGral();
+    return 0;
   }
 
+  public static void main(String[] cmdArgs){
+    int errlev = smain(cmdArgs);
+    System.exit(errlev);
+  } 
 
 }

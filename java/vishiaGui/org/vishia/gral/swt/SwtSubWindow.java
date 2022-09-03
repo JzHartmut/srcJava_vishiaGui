@@ -106,6 +106,9 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
    * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
    */
   SwtWidgetHelper swtWidgWrapper;
+  
+  
+  final SwtPanel swtPanel;
 
   protected Shell window;
   
@@ -194,6 +197,10 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     if(!bHasResizeAction && resizeAction() != null){
       window.addControlListener(resizeListener);  //This listener calls the resizeAction
     }
+    this.swtPanel = new SwtPanel(wdgGral);
+    this.swtPanel.checkCreateTabFolder(this.window, mng);
+    
+    
     /* test
     Label testLabel = new Label(window, 0);
     testLabel.setText("T");

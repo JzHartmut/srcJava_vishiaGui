@@ -10,6 +10,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.widget.GralPlotArea;
 
 /**Implementation of GralPlotArea to SET
@@ -57,8 +58,8 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   {
     gralPlotArea.super(gralPlotArea);
     this.mng = mng;
-    GralPanelContent panel = gralPlotArea.pos().panel;
-    Object swtPanel = panel._wdgImpl.getWidgetImplementation();
+    GralPanel_ifc panel = gralPlotArea.pos().panel;
+    Object swtPanel = panel.getImpl().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
     swtCanvas = new Canvas(panelSwt, 0);
     swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));

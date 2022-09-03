@@ -6,6 +6,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralInfoBox;
@@ -207,7 +208,7 @@ public class GralShowMethods
         if(nameWindow !=null) {
           if(nameWindow.endsWith("wind")) { nameWindow = nameWindow.substring(0, nameWindow.length()-4); }
           GralMng mng = GralMng.get();
-          GralPanelContent panelWind = mng.getPanel(nameWindow);
+          GralPanel_ifc panelWind = mng.getPanel(nameWindow);
           if(panelWind !=null) { panelWind.setFocus(); }
           else { System.err.println("action_openWindow: window not found: " + nameWindow); }
         }

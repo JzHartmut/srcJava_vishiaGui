@@ -74,7 +74,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
     default: mode = 0;
     }
     labelAwt = new Label(dyda().displayedText, mode);
-    Container panelAwt = (Container)widgg.pos().panel.getWidgetImplementation();
+    Container panelAwt = (Container)widgg.pos().panel.getImpl().getWidgetImplementation();
     panelAwt.add(labelAwt);
     widgHelper = new AwtWidgetHelper(labelAwt, mng);
     labelAwt.setAlignment(mode);

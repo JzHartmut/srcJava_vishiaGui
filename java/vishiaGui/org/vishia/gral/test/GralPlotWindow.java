@@ -2,6 +2,7 @@ package org.vishia.gral.test;
 
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.widget.GralPlotArea;
 import org.vishia.msgDispatch.LogMessage;
@@ -62,7 +63,7 @@ public class GralPlotWindow
   
   GralPlotWindow(String sTitle)
   { window = new GralWindow("10+120, 10+200", "window", sTitle, GralWindow.windResizeable);
-    canvas = new GralPlotArea("@0..0,0..0=canvas");
+    canvas = new GralPlotArea((GralPos)null, "@0..0,0..0=canvas");
     LogMessage log = new LogMessageStream(System.out);
     window.create("SWT", 'B', log, initGraphic);
     

@@ -73,10 +73,12 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**The position is set in textual form too. It is because [<?Element>...] was written */
   String positionString;
   
+  String panel;
+  
   /**ZBNF: Position coordinates will be filled from [<?position>.... 
    * The instance contains only that position data, which are found in the textual config file. 
    * It is important to rewrite only that data, which are contained in the originally one. */
-  final GralCfgPosition positionInput = new GralCfgPosition();
+  final GralCfgPosition XXXpositionInput = new GralCfgPosition();
   
   /**This obj contains all position data. Missed position data in the {@link #positionInput}
    * are completed by knowledge of the position of the previous elements. 
@@ -96,7 +98,9 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   public GralCfgElement clone(){ 
     GralCfgElement newObj = new GralCfgElement();  //this.itsCfgData);
     newObj.widgetType = widgetType.clone(); ///use a new cloned instance (use data).
-    newObj.positionInput.set(this.positionInput);
+    //newObj.positionInput.set(this.positionInput);
+    newObj.positionString = positionString;
+    newObj.panel = panel;
     /*NOTE: don't use super.clone() because it copies the references to final elements. We need cloned new elements
     GralCfgElement newObj = null;
     try{ newObj = (GralCfgElement)super.clone(); 
@@ -120,13 +124,13 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    * @return
    * @throws ParseException 
    */
-  void setPos(GralMngBuild_ifc guiMng) 
+  GralPos XXXsetPos(GralMngBuild_ifc guiMng) 
   throws ParseException 
   { GralMng mng = GralMng.get();
     if(positionString !=null) {
-      mng.setPos(positionString);
+      return mng.setPos(positionString);
     } else {
-      GralCfgPosition p = positionInput;
+      GralCfgPosition p = XXXpositionInput;
       if(p.yPos >=0 || p.xPos >=0 || p.ySizeDown !=0 || p.xWidth !=0) {
           
         int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
@@ -141,6 +145,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
         stop();
         //no position given. The new position will be set relative to the old one on widget.setToPanel.
       }
+      return mng.getPositionInPanel();
       //  setPosOld(guiMng);  //use inputPos
     }
   }  
@@ -148,20 +153,27 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   
   
-  public String getPanel(){ return positionInput.panel; }
+  public String getPanel(){ return panel; }
 
-  void setPanel(String panel){ position.panel = positionInput.panel = panel; }
+  void setPanel(String panel){ this.panel = panel; }
   
-  public int get_xPos(){ return positionInput.xPos; }
+  public int XXXget_xPos(){ return XXXpositionInput.xPos; }
   
-  public int get_yPos(){ return positionInput.yPos; }
+  public int XXXget_yPos(){ return XXXpositionInput.yPos; }
   
   
   /**ZBNF: <?position> */
-  public GralCfgPosition new_position(){ return positionInput; }  
+  public GralCfgPosition XXXnew_position(){ return XXXpositionInput; }  
   
   /**ZBNF: <*:?position> */
-  public void set_positionString(String val) { this.positionString = val; }
+  public void set_positionString(String val) { 
+    this.positionString = val; 
+  }
+ 
+  /**ZBNF: <*:?position> */
+  public void set_panel(String val) { 
+    this.panel = val; 
+  }
  
   /**ZBNF: [<?position>   ] it is unnecessary*/
   public void set_position(String val) {  }
@@ -298,6 +310,11 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**ZBNF: Curveview::= */
   public void set_Curveview(GuiCfgCurveview data){  }
 
+  
+  
+  @Override public String toString() {
+    return (this.positionString + ":" + this.widgetType);
+  }
   
   private void stop(){}
   

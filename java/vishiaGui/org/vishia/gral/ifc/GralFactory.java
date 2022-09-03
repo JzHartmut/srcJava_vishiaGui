@@ -98,10 +98,6 @@ public abstract class GralFactory
   /**This method should intitialize the implementation layer manager, primary window and the graphic thread.
    * @param windowg
    * @param sizeShow
-   * @param left
-   * @param top
-   * @param xSize
-   * @param ySize
    * @param log
    * @return
    */
@@ -117,6 +113,14 @@ public abstract class GralFactory
    * GralWindow primaryWindow = new GralWindow(posWindow1, "primaryWindow", sTitle1, windProps);
    * GralFactory.createGraphic(primaryWindow, sizeShow, log, "SWT");
    * </pre> 
+   * With the argument "implementor" it searches a proper {@link GralFactory} class:
+   * {@link org.vishia.gral.swt.SwtFactory} or {@link org.vishia.gral.awt.AwtFactory} and calls 
+   * {@link GralFactory#createGraphic(GralWindow, char, LogMessage)}
+   * This creates a {@link GralGraphicThread} which is returned and can be used to add further orders.
+   * <br>
+   * The argument "windowg" given {@link GralWindow} is used to create the whole graphic implementation
+   * as all widgets are referenced from the {@link GralWindow}.
+   * This is done for SWT in {@link org.vishia.gral.swt.SwtGraphicThread#initGraphic()}.  In the graphic thread the {@link GralGraphicThread#run()} is executed which initializes the graphic, the main Window and all underlying widgets.
    * @param windowg
    * @param sizeShow
    * @param log

@@ -3,13 +3,18 @@ package org.vishia.gral.swt;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.List;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
@@ -18,6 +23,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.util.Debugutil;
 
 public class SwtPanel extends GralPanelContent.ImplAccess
 {
@@ -40,6 +46,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
    */
   public Composite panelComposite;
   
+  
+  /**If this panel is a TabbedPanel, this is the adequate tabFolder instance.
+   * 
+   */
+  TabFolder tabFolder;
+  
   /**The associated tab in a TabFolder if this panel is the main panel of the TabItem, or null 
    * if it isn't a main panel of a tab in a tabbed panel.
    * <br><br>    
@@ -52,7 +64,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
 
   //protected Composite panelSwt;
   
-  private SwtPanel(GralPanelContent panelg)
+  SwtPanel(GralPanelContent panelg)
   { super(panelg);
     panelComposite = null;
   }
@@ -78,6 +90,17 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   }*/
   
 
+  
+  void checkCreateTabFolder(Composite composite, SwtMng swt) {
+    if(super.isTabbed()) {
+      this.tabFolder = new TabFolder(composite, SWT.TOP);
+      GralRectangle rectangle = swt.calcWidgetPosAndSizeSwt(widgg.pos(), composite, 500, 300);
+      this.tabFolder.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy);
+      this.tabFolder.addSelectionListener(this.tabItemSelectListener);
+      this.tabFolder.addControlListener(this.resizeListener);
+
+    }
+  }
 
   
   @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelComposite); }
@@ -138,7 +161,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     { 
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
-      for(GralWidget widg1: ((GralPanelContent)widgg).widgetsToResize){
+      for(GralWidget widg1: ((GralPanelContent)widgg).getWidgetsToResize()){
         widg1.gralMng().resizeWidget(widg1, 0, 0);
       }
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
@@ -170,7 +193,72 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   }
 
 
+  public SelectionListener tabItemSelectListener = new SelectionListener(){
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent event)
+    {
+      widgetSelected(event);
+    }
+    
+
+    /**It is the selected method of the TabFolder.
+     * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+     */
+    @Override public void widgetSelected(SelectionEvent event)
+    {
+      try{
+        TabItem tab = (TabItem)event.item;    //The tab
+        Control container = tab.getControl(); //Its container
+        if(container != null){
+        //TabFolder tabFolder = tab.getParent();
+          Object data = container.getData();
+          if(data != null){
+            @SuppressWarnings("unchecked")
+            SwtPanel swtPanel = (SwtPanel)data;
+            GralPanelContent gralPanel = (GralPanelContent)(swtPanel.widgg);
+            List<GralWidget> widgetInfos = gralPanel.getWidgetList(); 
+            //widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
+            if(gralPanel.getFocusedWidget() !=null){
+              widgg.getFocusedWidget().setVisibleState(false);  //the last focused tab.
+            }
+            widgg.setPrimaryWidget( gralPanel );
+            //done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
+            gralPanel.setFocus();
+            //System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
+            //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
+            if(SwtPanel.this._panel.notifyingUserInstanceWhileSelectingTab !=null){
+              SwtPanel.this._panel.notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+            }
+          }
+        }
+      }
+      catch(Exception exc){
+        String sMsg = exc.getMessage();
+        if(sMsg == null){ sMsg = "nullPointer"; }
+        System.err.println(sMsg);
+        exc.printStackTrace(System.err);
+      }
+    }
+  };
+
   
   
+  ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+      Debugutil.stop();
+    }
+
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      Debugutil.stop();
+      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
+  
+
+
   
 }

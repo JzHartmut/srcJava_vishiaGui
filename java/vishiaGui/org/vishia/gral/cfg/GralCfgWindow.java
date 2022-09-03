@@ -91,7 +91,8 @@ public class GralCfgWindow
    *   Form: "@LINE+SIZE, COLUMN+SIZE=NAME". If pos is not given, not starts with "@", then a default Pos  "10+50, 10+100" is used.   
    * @param sTitle text in the title bar
    * @param size 'A'...'E' as pixel/grid unit for SWT graphic. 'a'...'e' same for AWT-Graphic
-   * @param sCfg textual given configuration for the window.
+   * @param sCfg textual given configuration for the window. 
+   *   The syntax is contained in org.vishia.gral.cfg.Syntax.zbnf inside the jar file.
    * @param imgDir start directory path where images are located if given with relative path.
    * @param log interface for logging output of parser and creation.
    * @throws ParseException on errors in the sCfg

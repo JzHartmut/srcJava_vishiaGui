@@ -8,18 +8,29 @@ import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Debugutil;
 
 
-/**This class describes a panel with its content for managing. */
-public class GralPanelContent extends GralWidget implements GralWidget_ifc
+/**This class describes a panel which contains either some other widgets (also sub GralPanelContent) 
+ * or as second variant tabs (new since 2022-08). 
+ * <br>
+ * The implementing widget in Swt is a Composite. To support line views als a canvas is referenced here.
+ * It means the GralPanelContent can contain lines, figures beside widgets.
+ * <br>
+ * For positioning grid lines can be drawn in the implementing graphic. 
+ */
+public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralWidget_ifc
 {
 
   /**Version history:
    * 
    * <ul>
+   * <li>2022-08: {@link Data#bTabbed} as designation, this is a tabbed panel.
+   *   The old class GralTabbedPanel is no more necessary. 
+   * <li>2022-08: New class {@link Data} to encapsulate all elements of this. It is better to view in debug to distinguish form GralWidget fields.
    * <li>2018-08-17 Hartmut new: {@link #getWidget(String)}, {@link #getTextFrom(String)}  
    * <li>2016-07-16 Hartmut chg: On {@link #setToPanel(GralMngBuild_ifc)} all widgets of this panel are initialized too. More simple for user application. 
    * <li>2015-05-02 Hartmut new: {@link #setTextIn(String, CharSequence)}, change of registering a widget. Now any panel knows its widgets
@@ -64,61 +75,84 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   
   //public final GralMng gralMng;
   
+  public static class Data {   //Hint: the class is public to see it in implementation graphic, but the reference is protected.
   
-  /**The widget which should be focused if the panel is focused. 
-   * It is possible to set any actual widget to store the focus situation,
-   * It is possible too to have only one widget to focus. if the panel gets the focus. */
-  protected GralWidget primaryWidget;
+    /**The widget which should be focused if the panel is focused. 
+     * It is possible to set any actual widget to store the focus situation,
+     * It is possible too to have only one widget to focus. if the panel gets the focus. */
+    protected GralWidget primaryWidget;
+    
+    /**List of all widgets which are contained in this panel or Window, to refresh the graphic.
+     * This list is used in the communication thread to update the content of all widgets in the panel.
+     */
+    //private List<GralWidget> _wdgList = new ArrayList<GralWidget>();
   
-  /**List of all widgets which are contained in this panel or Window, to refresh the graphic.
-   * This list is used in the communication thread to update the content of all widgets in the panel.
-   */
-  //private List<GralWidget> _wdgList = new ArrayList<GralWidget>();
-
-  /**List of all widgets which are contained in this panel.
-   * This list is used in the communication thread to update the content of all widgets in the panel.
-   */
-  protected List<GralWidget> widgetList = new ArrayList<GralWidget>();
-
-  public List<GralWidget> widgetsToResize = new LinkedList<GralWidget>();
-
-  private final Map<String, GralWidget> idxWidgets = new TreeMap<String, GralWidget>();
-
-  /**True then the content of the panel is zoomed with the actual size of panel. 
-   * It means that all widgets are zoomed in position and size,  but there content isn't changed. */
-  protected boolean bZoomed;
+    /**List of all widgets which are contained in this panel.
+     * This list is used in the communication thread to update the content of all widgets in the panel.
+     */
+    protected List<GralWidget> widgetList = new LinkedList<GralWidget>();
   
-  /**True then the grid of the panel is zoomed with the actual size of panel. 
-   * It means that all fonts are changed too.
-   * */
-  protected boolean bGridZoomed;
+    public List<GralWidget> widgetsToResize = new LinkedList<GralWidget>();
   
+    private final Map<String, GralWidget> idxWidgets = new TreeMap<String, GralWidget>();
   
-  /**If this instance is not null, the content of that should be paint in the paint routine
-   * of the implementation graphic. */
-  public GralCanvasStorage canvas;
+    
+    /*final*/ public GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;
 
+    
+    /**True then the content of the panel is zoomed with the actual size of panel. 
+     * It means that all widgets are zoomed in position and size,  but there content isn't changed. */
+    protected boolean bZoomed;
+    
+    /**True then the grid of the panel is zoomed with the actual size of panel. 
+     * It means that all fonts are changed too.
+     * */
+    protected boolean bGridZoomed;
+    
+    /**True then all widgets of this panel are tab from a tabbed pane. 
+     * Usual the widgets are also then panes, or maybe also a table or such one (comprehensive widgets).
+     * With this designation the older GralTabbedPanel is no more necessary, it makes the system simpler.
+     * The implementation should regard this designation and build specific tab folder and items in the implementing widgets.
+     */
+    boolean bTabbed;
+    
+    /**If this values are set, a grid should be shown. 
+     * yGrid, xGrid are the spaces for the fine grid, yGrid2, xGrid2 describes which nth grid line should be more determined.
+     * Typical values 1 and 10 or 2 and 5
+     */
+    int yGrid, xGrid, yGrid2, xGrid2;
+    
+    /**If this instance is not null, the content of that should be paint in the paint routine
+     * of the implementation graphic. */
+    public GralCanvasStorage canvas;
+  };
+  Data _panel = new Data();
   
   @Deprecated public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
-	//public PanelContent(CanvasStorePanel panelComposite)
-	{ super(namePanel, '$');
-	  this.name = namePanel;
-		//this.panelComposite = panelComposite;
+  //public PanelContent(CanvasStorePanel panelComposite)
+  { super((GralPos)null, namePanel, '$');
+    this.name = namePanel;
+    //this.panelComposite = panelComposite;
     //GralMng mng = GralMng.get();
     mng.registerPanel(this);
     if( pos()!=null) {
       mng.setPosPanel(this);
     }
     int property = 0; //TODO parameter
-    bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
-    bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
-	}
-	
+    this._panel.bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
+    this._panel.bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
+  }
+  
 
 
   /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
   public GralPanelContent(String posString, String namePanel)
-  { this(posString, namePanel, '$');
+  { this(null, posString, namePanel, '$');
+  }
+
+  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
+  public GralPanelContent(GralPos currPos, String posString, String namePanel)
+  { this(currPos, posString, namePanel, '$');
   }
 
   /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. 
@@ -126,9 +160,9 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @param namePanel can also be combined "@pos=name"
    * @param whatIsit See {@link GralWidget#whatIs}
    */
-  public GralPanelContent(String posString, String namePanel, char whatIsit)
+  public GralPanelContent(GralPos currPos, String posString, String namePanel, char whatIsit)
   //public PanelContent(CanvasStorePanel panelComposite)
-  { super(posString, namePanel, whatIsit);
+  { super(currPos, posString, namePanel, whatIsit);
     this.name = namePanel;
     GralMng mng = GralMng.get();
     mng.registerPanel(this);
@@ -136,10 +170,18 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
       mng.setPosPanel(this);
     }
     int property = 0; //TODO parameter
-    bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
-    bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
+    this._panel.bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
+    this._panel.bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
   }
-	/*
+
+  
+  public GralPanelContent(String posString, String namePanel, char whatIsit) {
+    this(null, posString, namePanel, whatIsit);
+  }
+
+  
+  
+  /*
   private GralPanelContent(String namePanel, GralPrimaryWindow_ifc mainWindow)
   { super(namePanel, '$', null);
     this.namePanel = namePanel; this.gralMng = null; //mainWindow.;
@@ -152,10 +194,41 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   }
   */
   
-	
-	
-  public void setPrimaryWidget(GralWidget widg){ primaryWidget = widg; }
   
+  
+  public void setPrimaryWidget(GralWidget widg){ this._panel.primaryWidget = widg; }
+  
+  
+  /**Should be set before call of {@link #addWidget(GralWidget, boolean)}.
+   * Then the widgets are presented as tabs in this panel.
+   * The widgets then are usual {@link GralPanelContent} by itself or a more complex {@link GralWidget}, for example a {@link GralTable}.
+   * This feature can only be set initially, not removed. 
+   */
+  public void setToTabbedPanel() {
+    if(!this._panel.bTabbed && this._panel.widgetList.size()>0) {
+      throw new IllegalArgumentException(" setToTabbedPanel() can only invoked if the panel is empty.");
+    } else {
+      this._panel.bTabbed = true;
+    }
+  }
+  
+  
+  
+  
+  /**If yGrid and xGrid are >0, show a grid. 
+   * For tabbed panels show the grid for all tabs.
+   * If yGrid==0 or xGrid ==0 does not show a grid.
+   * @param yGrid
+   * @param xGrid
+   * @param yGrid2
+   * @param xGrid2
+   */
+  public void setGrid(int yGrid, int xGrid, int yGrid2, int xGrid2) {
+    this._panel.yGrid = yGrid; 
+    this._panel.xGrid = xGrid; 
+    this._panel.yGrid2 = yGrid2; 
+    this._panel.xGrid2 = xGrid2; 
+  }
   
   /*package private*/
   /**Adds a widget to its panel. This method will be called in {@link GralWidget#initPosAndRegisterWidget(GralPos)} 
@@ -164,7 +237,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @param widg
    * @param toResize
    */
-  void addWidget(GralWidget widg, boolean toResize){
+  @Override public void addWidget(GralWidget widg, boolean toResize){
     String nameWidg = widg.name;
     if(widg instanceof GralWindow)
       Debugutil.stop();
@@ -177,36 +250,38 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
         nameGlobal = nameWidg;
       }
       itsMng.registerWidget(nameGlobal, widg);
-      idxWidgets.put(nameWidg, widg);
+      this._panel.idxWidgets.put(nameWidg, widg);
     }
-    if(widgetList.remove(widg)){
+    if(this._panel.widgetList.remove(widg)){
       System.err.println("Widget added twice; " + nameWidg);
     }
-    widgetList.add(widg);
+    this._panel.widgetList.add(widg);
     if(toResize) {
       if(widg instanceof GralWindow) {
         System.err.println("GralPanelContent.addWidget - A window itself should not be added to widgetsToResize, " + widg.name);
       } else {
-        widgetsToResize.add(widg);
+        this._panel.widgetsToResize.add(widg);
       }
     }
-    if(primaryWidget ==null && !(widg instanceof GralPanelContent)) {  //register only a non-panel widget as primary - for the panel or window.
-      primaryWidget = widg; 
+    if(this._panel.primaryWidget ==null && !(widg instanceof GralPanelContent)) {  //register only a non-panel widget as primary - for the panel or window.
+      this._panel.primaryWidget = widg; 
     }
   }
-	
-	
-	
+  
+  
+  
+  
+  
   /**Overridden implementation of {@link GralWidget#createImplWidget_Gthread()} for instantiation of all widgets of this panel.
    */
   @Override public void createImplWidget_Gthread() throws IllegalStateException {
     super.createImplWidget_Gthread(); //from GralWidget.
-    for(GralWidget widg: widgetList) {
+    for(GralWidget widg: this._panel.widgetList) {
       widg.createImplWidget_Gthread();
     }
-  }	
-	
-	/**Removes this widget from the lists in this panel. This method is not intent to invoke
+  }  
+  
+  /**Removes this widget from the lists in this panel. This method is not intent to invoke
    * by an application. It is only used in {@link GralWidget#remove()}. Use the last one method
    * to remove a widget includint is disposition and remove from the panel.
    * @param widg The widget.
@@ -222,11 +297,11 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
         nameGlobal = nameWidg;
       }
       itsMng.removeWidget(nameGlobal);
-      idxWidgets.remove(nameWidg);
+      this._panel.idxWidgets.remove(nameWidg);
     }
     
-    widgetList.remove(widg);
-    widgetsToResize.remove(widg);
+    this._panel.widgetList.remove(widg);
+    this._panel.widgetsToResize.remove(widg);
     
   }
 
@@ -237,33 +312,44 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    */
   @Override public boolean remove(){
     int catastrophicCt = 100000; //safety of all while loops! No more than 100000 widgets.
-    while(--catastrophicCt >=0 && widgetList.size() >0){
+    while(--catastrophicCt >=0 && this._panel.widgetList.size() >0){
       //remove all widgets from the panel via Widget.remove, it removes it from this list too.
-      widgetList.get(0).remove(); 
+      this._panel.widgetList.get(0).remove(); 
     }
     assert(catastrophicCt >0);
-    widgetList.clear();      //the lists may be cleared already 
-    widgetsToResize.clear(); //because widg.remove() removes the widget from the panel.
+    this._panel.widgetList.clear();      //the lists may be cleared already 
+    this._panel.widgetsToResize.clear(); //because widg.remove() removes the widget from the panel.
     super.remove();
     return true;
   }
 
   
   
+  @Override public GralCanvasStorage canvas() { return this._panel.canvas; }
+
+  public boolean isTabbed() { return this._panel.bTabbed; }
+
   
-  
-  
+  @Override public GralWidget getPanelWidget () {
+    return this;
+  }
+
+
+  public GralWidget getFocusedWidget() { return this._panel.primaryWidget; }
+
   /**
    * @deprecated use {@link #getWidgetList()}
    */
-  @Deprecated public List<GralWidget> widgetList(){ return widgetList; }
+  @Deprecated public List<GralWidget> widgetList(){ return this._panel.widgetList; }
   
-  public List<GralWidget> getWidgetList(){ return widgetList; }
+  public List<GralWidget> getWidgetList(){ return this._panel.widgetList; }
+  
+  public List<GralWidget> getWidgetsToResize(){ return this._panel.widgetsToResize; }
   
   /**Gets a named widget on this panel. Returns null if faulty name. 
    * @since 2018-09
    */
-  public GralWidget getWidget(String name){ return idxWidgets.get(name); }
+  public GralWidget getWidget(String name){ return this._panel.idxWidgets.get(name); }
   
   
   
@@ -275,7 +361,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @since 2015-05-02
    */
   public void setTextIn(String nameWidget, CharSequence text) {
-    GralWidget widg = idxWidgets.get(nameWidget);
+    GralWidget widg = this._panel.idxWidgets.get(nameWidget);
     if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
     widg.setText(text);
   }
@@ -289,7 +375,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
    * @since 2015-05-02
    */
   public String getTextFrom(String nameWidget) {
-    GralWidget widg = idxWidgets.get(nameWidget);
+    GralWidget widg = this._panel.idxWidgets.get(nameWidget);
     if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
     return widg.getText();
   }
@@ -308,9 +394,9 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   //@Override 
   public boolean XXXsetFocusGThread()
   {
-    if(primaryWidget !=null) {
+    if(this._panel.primaryWidget !=null) {
       //invokes the setFocus routine to mark focus in table etc.
-      primaryWidget.setFocus();  //invokes setFocusGThread because it is the graphic thread.
+      this._panel.primaryWidget.setFocus();  //invokes setFocusGThread because it is the graphic thread.
       return true;  //TODO check focus
       //return primaryWidget.setFocusGThread();
     }
@@ -323,7 +409,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   @Deprecated public Object getWidgetImplementation()
   { return _wdgImpl.getWidgetImplementation(); //panelComposite;
   }
-	
+  
   
   /**Returns the container instance of the panel of the implementing graphic.
    * @return The container.
@@ -351,7 +437,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
       this.panelg = panelg;
     }
     @Override public void setVisibleState(boolean visible){
-      for(GralWidget widget: panelg.widgetList){
+      for(GralWidget widget: this.panelg._panel.widgetList){
         widget.setVisibleState(visible);
       }
     }
@@ -371,7 +457,7 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
       //only invoke for all sub widgets when the visible state of the parent is changed. Otherwise do nothing - nothing is changed, no effort.
       //for tabbed panels etc. it is specially processed
       super.setVisibleStateWidget(visible);  //for the own panel
-      for(GralWidget widget: widgetList){
+      for(GralWidget widget: this._panel.widgetList){
         if(widget != this && !(widget instanceof GralWindow)) {
           widget.setVisibleState(visible);
         }
@@ -383,18 +469,27 @@ public class GralPanelContent extends GralWidget implements GralWidget_ifc
   public abstract static class ImplAccess extends GralWidget.ImplAccess
   {
 
+    public final GralPanelContent widgg;
+    
+    protected final GralPanelContent.Data _panel;
+    
     /**Same reference as {@link GralWidget.ImplAccess#widgg} but type of this class. */
     //GralPanelContent gralPanel;
     
     protected ImplAccess(GralPanelContent widgg)
     {
       super(widgg);
+      this.widgg = widgg;
+      this._panel = widgg._panel;
       //for all following actions: this is the current panel.
       GralMng mng = GralMng.get();
       mng.setPosPanel((GralPanelContent)widgg);   
     }
     
     public GralPanelContent gralPanel(){ return (GralPanelContent) widgg; } //It is the correct type.
+    
+    
+    protected boolean isTabbed() { return this.widgg._panel.bTabbed; }
     
     /**Returns the absolute position of this panel on screen and its size.
      * If it is a main window, the useable area of the window without title and menu bar is returned.

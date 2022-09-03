@@ -105,7 +105,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
 	
 	//abstract public GralPanelContent getGuiComponent();
 	
-	public GralPanelContent getFocusedTab(){ return (GralPanelContent)primaryWidget; }
+	public GralPanelContent getFocusedTab(){ return (GralPanelContent)this._panel.primaryWidget; }
 	
 	   /**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
      * so the access to the panel can be done with its name.
@@ -218,9 +218,9 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
       this.widgg = widgg;
     }
     
-    protected GralPanelContent getFocusedTab(){ return (GralPanelContent) widgg.primaryWidget; }
+    protected GralPanelContent getFocusedTab(){ return (GralPanelContent) widgg._panel.primaryWidget; }
     
-    protected void setFocusedTab(GralPanelContent tab){ widgg.primaryWidget = tab; }
+    protected void setFocusedTab(GralPanelContent tab){ widgg._panel.primaryWidget = tab; }
     
     /**Adds a grid-panel in the TabPanel. The panel will be registered in the GuiPanelMng,
      * so the access to the panel can be done with its name.

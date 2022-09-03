@@ -3,8 +3,10 @@ package org.vishia.gral.base;
 import java.text.ParseException;
 
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartScan;
 
@@ -154,6 +156,8 @@ public class GralPos implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-08 refactored. Now also for textual configured Widgets the {@link #setPosition(CharSequence, GralPos)} is used.
+   *   It means, should support all features. It is refactored and yet in test. Some bugfixes including, and more features.
    * <li>2013-05-24 Hartmut bugfix fine position can be greater 20 if positions are add and sizes are add too. 
    * <li>2011-10-01 Hartmut corr: Calculation of next position or refer + value if the size was negative and sameSize is selected.
    *                Then the new input value should calculate from the bottom or left value because the size is negative furthermore.
@@ -227,6 +231,8 @@ public class GralPos implements Cloneable
    */
   public final static int nextBlock = 0xdffd;
   
+  /**Marker for invalid, to check*/
+  public final static int invalidPos = 0xdfff;
   
   /**This value at xEnd or yEnd means, that the native size of a widget should be used.
    * It is especially to draw images with its native size.
@@ -332,18 +338,26 @@ public class GralPos implements Cloneable
   /**The values for x and y positions. Note: should be private! Don't use in application furthermore. */
   public final Coordinate x = new Coordinate(), y = new Coordinate();
   
-  /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
-   * It is copied inside the GralMng for any widget.  
+  /**Creates an position with all values 0.
    * The position can be changed after them with {@link #setPosition(float, float)} etc.
    */
-  protected GralPos(){}
+  public GralPos(){}
   
+  
+  /**Set a initial GralPos for a given PanelContent (also a Window).
+   * Afterwards any absolute position should be set. Without set, this GralPos describes the whole panel size.
+   * Because also the end values (right, bottom) are 0, it is the whole left to right and top to bottom position.
+   * @param panel The given panel
+   */
+  public GralPos(GralPanelContent panel) {
+    this.panel = panel;
+  }
   
   /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
    * It is copied inside the GralMng for any widget. The position can be changed after them with {@link #setPosition(float, float)} etc. 
    * @param src the src position to copy all values.
    */
-  protected GralPos(GralPos src){ set(src); }
+  public GralPos(GralPos src){ set(src); }
   
   /**The border to the next element. */
   //public int xyBorder, xyBorderFrac;
@@ -357,7 +371,7 @@ public class GralPos implements Cloneable
   /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
   //public int xSepLine, ySepLine;
   
-  public GralPanelContent panel;
+  public GralPanel_ifc panel;
   
   /**Sets all values of this with the values of pos (copy values)
    * @param pos The src pos
@@ -390,6 +404,20 @@ public class GralPos implements Cloneable
 
   
   /**Sets the position with the given string representation.
+ <pre>
+ position::= [@] [<$?panel> ,] 
+                [<?yPosRelative> &+]
+                [<#?yPos>[\.<#?yPosFrac>]] 
+                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|] 
+                [ <?yIncr> ++] 
+                [ ,
+                  [<?xPosRelative> &+] 
+                  [<#?xPos>[\.<#?xPosFrac>]] 
+                  [ [+] <#-?xWidth>[\.<#?xSizeFrac>]| +* <?xOwnSize> |]
+                  [ <?xIncr> ++]
+                ] :
+ ] 
+</pre>
    * @param sPos The syntax of the string see description of this class, starting with "@panel, ..." etc.
    *   for example "@windowA, 3..5, 16+20" for absolute line 3 and 4 (exclusive 5) and from absolute column 16, size-x=20. 
    *   The position can be given without panel designation or relative, then the posParent argument is necessary.
@@ -400,14 +428,18 @@ public class GralPos implements Cloneable
     GralPos posParent1;
     //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;
     Coordinate line = new Coordinate(), col = new Coordinate();
-    int  origin =0, border =0, borderFrac =0;
+    int  origin =1;                                        // default left top
+    int border =0, borderFrac =0;
+    if(posParent !=null) {
+      origin = 0;  // do not change, get from parent.
+    }
     char direction = 'r';
     if(sPos ==null) {
       //position text not given, use refer and same size
-      line.p1 = refer;
+      line.p1 = next;
       line.p2 = samesize;
       //all other values of line and col remain 0. It is default.
-      col.p1 = refer;
+      col.p1 = next;
       col.p2 = samesize;
       posParent1 = posParent; 
     } else {
@@ -419,7 +451,7 @@ public class GralPos implements Cloneable
         if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
           String sPanel = spPos.getLastScannedString().toString();
           GralMng mng = GralMng.get();  //singleton.
-          GralPanelContent panel = mng.getPanel(sPanel);
+          GralPanel_ifc panel = mng.getPanel(sPanel);
           if(panel == null) {
             spPos.close();
             throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
@@ -428,16 +460,19 @@ public class GralPos implements Cloneable
             posParent1 = posParent;
           } else {
             //only if it is another panel, remove the given parent.
-            posParent1 = new GralPos();
+            posParent1 = null; //new GralPos();                    // should exist formally
+            this.panel = panel;
           }
         } else {
           posParent1 = posParent;  //the parent is valid. Because no other panel. Use the current panel.
         }
+        //======>>>>>>
         scanPosition(spPos, line);
         if(spPos.scan(",").scanOk()) {
+          //======>>>>>>
           scanPosition(spPos, col);
         } else {
-          col.p1 = refer;
+          col.p1 = line.p1 == next ? next : refer;         // line.next is set if nothing is scanned on line.
           col.p2 = samesize;
         }
       } finally {
@@ -451,7 +486,7 @@ public class GralPos implements Cloneable
   
   /**Scans one coordinate.
    * <pre>
-   * [[<refer>+|-]<#?p1>[.<#p2Frac>] [..|<?size>]] <#?p2>[.<#p2Frac>]
+   * [[<?refer>+|<?percent>%]<#?p1>[.<#p2Frac>] [..|<?size>]] <#?p2>[.<#p2Frac>]
    * </pre>
    * If only the right number is given, p1 is {@link #refer}
    * @param spPos
@@ -461,57 +496,55 @@ public class GralPos implements Cloneable
   private void scanPosition(StringPartScan spPos, Coordinate co) throws ParseException {
     char sign = spPos.seekNoWhitespace().getCurrentChar();
     int size1; //maybe size for end element, converted to refer for start element.
-    co.p1 = next; //default, next line or next column depending on parent.
-    co.p1Frac = 0;
-    co.p2 = samesize;
-    co.p2Frac = 0;
+    co.p1 = invalidPos;                                          // default, next line or next column depending on parent.
+    co.p1Frac = invalidPos;
+    co.p2 = invalidPos;                                      // default, same size for heigth or width
+    co.p2Frac = invalidPos;
+    int rel_p1 = 0;
+    final int[] rel_select = { refer, ratio};
     //
-    if("+-".indexOf(sign) >=0){
-      size1 = size;
-      spPos.seek(1);  //skip + or -
-    } else if(sign == '%'){
-      size1 = ratio;
-      spPos.seek(1);  //skip + or -
-    } else {
-      size1 = 0;
+    int typeFirstChar = "+%".indexOf(sign);
+    if(typeFirstChar >=0) {
+      rel_p1 = rel_select[typeFirstChar];                  // additional value to p1
+      spPos.seekPos(1);  //skip over first char
     }
-    if(spPos.scanInteger().scanOk()) {
-      int pos1 = (int)spPos.getLastScannedIntegerNumber();
-      if(sign == '-'){ pos1 = -pos1; }
-      co.p2 = size1 + pos1;  
+    if(spPos.scanInteger().scanOk()) {                     // value maybe negative scanned  10 or -10
+      co.p1 = rel_p1 + (int)spPos.getLastScannedIntegerNumber();  //higher bits determines rel_p1, lower bits are scanned number
       if(spPos.scan(".").scanInteger().scanOk()) {
-        co.p2Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+        co.p1Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+      } else {
+        co.p1Frac = 0;
       }
+    } else {
+      co.p1 = next;                                        // nothing given, then the next position should be used
+      co.p1Frac = 0;                                       // respectively the same in the unchanged direction
     }
     int size2;
-    if(spPos.scan("..").scanOk()) {  //position for end is given
-      size2 = 0;  
+    int rel_p2;   //relative to p1
+    if(spPos.scan("..").scanOk()) {                        // absolute position for end is given
+      rel_p2 = 0;
     } else {
-      size2 = size;
-      spPos.scan("+").scanStart();  //skip over '+', it is the separator, 
+      rel_p2 = size;                                       // not .. then size as 2th number
+      spPos.scan("+").scanStart();                         //skip over '+', it is the separator, 
     }
-    if(spPos.scanInteger().scanOk()) { //can start with '-' but not with '+'
-      //between 2. number is given, first is p1
-      if(size1 == size){
-        co.p1 = co.p2 - size; //stored as size for end element, but it is negative for first element.  
-      } else {
-        co.p1 = co.p2;   //ratio or absolute
-      }
-      co.p1Frac = co.p2Frac;
-      //
-      co.p2Frac = 0;  //default
-      co.p2 = size2 + (int)spPos.getLastScannedIntegerNumber();  //positive or negative. Negative means from left or bottom.
+    if(spPos.scanInteger().scanOk()) {                     //can start with '-' but not with '+'
+      co.p2 = rel_p2 + (int)spPos.getLastScannedIntegerNumber();    // maybe negative, means from right
       if(spPos.scan(".").scanInteger().scanOk()) {
         co.p2Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+      } else {
+        co.p2Frac = 0;                                     // frac default 0 if p2 is determined.
       }
+    } else {
+      co.p2 = samesize;                                    // not an integer following, nothing given, then samesize as default
+      co.p2Frac = 0;
     }
-    
+    assert(co.p1 != invalidPos && co.p2 != invalidPos && co.p1Frac >=0 && co.p1Frac <=9 && co.p2Frac >=0 && co.p2Frac <=9 );
   }
   
   
   
-  /**Sets the position to the given panel as container.
-   * @param panel The panel which is used as container. Its current {@link GralPanelContent#pos()} is used for relative positions
+  /**Sets the position absolutely or also relative to the given position with given values.
+   * @param panel The panel which is used as container. If null then left the existing panel unchanged.
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
    *   it is the bottom line for the position. 
    *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
@@ -525,10 +558,11 @@ public class GralPos implements Cloneable
    * @param origin
    * @param direction
    */
-  public void setPosition(GralPanelContent panel, float line, float lineEndOrSize, float column, float columnEndOrSize
+  public void setPosition(GralPanel_ifc panel, float line, float lineEndOrSize, float column, float columnEndOrSize
       , int origin, char direction, float border)
   {
-    this.panel = panel;
+    if(panel !=null) { this.panel = panel; }               // change the panel only if given
+    assert(this.panel !=null);                             // should always have a panel information. 
     int[] pos = new int[10];
     frac(line, pos, 0);
     frac(lineEndOrSize, pos, 2);
@@ -601,7 +635,8 @@ public class GralPos implements Cloneable
     if((i & mValueNegative) !=0){
       f = (int)((v-i)*10 + 0.5f);
       if( f == 10){ f = 0; }
-    } else {
+    } 
+    else {
       f = (int)((v - i)*10 + 0.5f);
     }
     if(f < 0){
@@ -635,7 +670,21 @@ public class GralPos implements Cloneable
    * @param length: The number of columns. If <0, then the param column is the right column, 
    *                and column-length is the left column. If 0 then the last value of length is not changed.
    * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down
-   * @param parent 
+   * @param parent if given, the parent is the base for calculation. If null, this itself is the base.
+   *
+   * @param line yPos 
+   * @param yPosFrac fractional part of yPos, 0, 1..9
+   * @param ye
+   * @param yef
+   * @param column
+   * @param xPosFrac
+   * @param xe
+   * @param xef
+   * @param origin 0 then get from parent or left as is, 1 2 3 on top-left, -mid, -right 4 5 6 mid, 7-8-9 bottom left to right 
+   * @param direction
+   * @param border
+   * @param borderFrac
+   * @param parent
    */
   public void setFinePosition(int line, int yPosFrac, int ye, int yef
       , int column, int xPosFrac, int xe, int xef, int origin, char direction
@@ -655,16 +704,20 @@ public class GralPos implements Cloneable
     if(ye == useNatSize)
       stop();
     //
-    if(parent == null){ parent = this; }
-    if(origin >0 && origin <=9){
+    final GralPos parentUse = parent == null ? this : parent;
+    //
+    if(origin >0 && origin <=9) {                          // newly given
       int yOrigin = (origin-1) /3;
       int xOrigin = origin - yOrigin -1; //0..2
       this.x.origin = "lmr".charAt(xOrigin);
       this.y.origin = "tmb".charAt(yOrigin);
+    } else {                                               // origin == 0: take from parent or from this.
+      this.x.origin = parentUse.x.origin;                  // from this means, left it as is.
+      this.y.origin = parentUse.y.origin;
     }
     
-    y.set(line, yPosFrac, ye, yef, parent.y);
-    x.set(column, xPosFrac, xe, xef, parent.x);
+    this.y.set(line, yPosFrac, ye, yef, "ud", parentUse.y);      // core of positioning for line and column
+    this.x.set(column, xPosFrac, xe, xef, "lr", parentUse.x);
     
     if("rl".indexOf(direction)>=0 ){
       this.x.dirNext = direction;
@@ -679,13 +732,13 @@ public class GralPos implements Cloneable
       this.y.pbf = borderFrac;
       this.x.pb = this.x.pbf = 0;
     } else {
-      this.x.dirNext = parent.x.dirNext;
-      this.y.dirNext = parent.y.dirNext;
-      this.x.pb = parent.x.pb; this.x.pbf = parent.x.pbf;
-      this.y.pb = parent.y.pb; this.y.pbf = parent.y.pbf;
+      this.x.dirNext = parentUse.x.dirNext;
+      this.y.dirNext = parentUse.y.dirNext;
+      this.x.pb = parentUse.x.pb; this.x.pbf = parentUse.x.pbf;
+      this.y.pb = parentUse.y.pb; this.y.pbf = parentUse.y.pbf;
     }
-    assert(x.p1Frac >=0 && x.p1Frac < 10 && y.p1Frac >=0 && y.p1Frac < 10 );
-    assert(x.p2Frac >=0 && x.p2Frac < 10 && y.p2Frac >=0 && y.p2Frac < 10 );
+    assert(this.x.p1Frac >=0 && this.x.p1Frac < 10 && this.y.p1Frac >=0 && this.y.p1Frac < 10 );
+    assert(this.x.p2Frac >=0 && this.x.p2Frac < 10 && this.y.p2Frac >=0 && this.y.p2Frac < 10 );
   }
   
   
@@ -789,7 +842,15 @@ public class GralPos implements Cloneable
   
   
   
-  public GralPos setNextPos(String posString) throws ParseException {
+  /**Sets the given position with the given posString.
+   * @param posString "@panel,line, col:" syntax see description on class level.
+   * @return new calculated position equal to this.
+   *   The clone is done because the result is intend to use as position for the current Gral Widget
+   *   during building the Gui. This instance is furthermore used as currently calculated,
+   *   the widget aggregates a
+   * @throws ParseException
+   */
+  public GralPos calcNextPos(String posString) throws ParseException {
     if(posString.equals("!")) {  //new window, initialize the position without panel because it is top.
       panel = null;
       setFinePosition(0,0,0,0,0,0,0,0,0,'d', 0,0, null);
@@ -797,7 +858,7 @@ public class GralPos implements Cloneable
       setPosition(posString, this);
       //TODO change pos:
     }
-    return clone();  //return the pos as clone, to use as posWidg  
+    return this; 
   }
   
   
@@ -870,7 +931,7 @@ public class GralPos implements Cloneable
   { StringBuilder b = new StringBuilder(16);
     b.append('@');
     if(panel != null) {
-      b.append(panel.name).append(", ");
+      b.append(panel.getName()).append(", ");
     }
     appendPos(b, y.p1, y.p1Frac);
     b.append("..");
@@ -887,7 +948,7 @@ public class GralPos implements Cloneable
    */
   @Override public String toString()
   { return "panel=" + (panel == null ? "?" : panel.toString()) + ", "
-    +"line=" + y.p1 + "." + y.p1Frac + ".." + y.p2 + "." + y.p2Frac + " col=" + x.p1 + "." + x.p1Frac + ".." + x.p2 + "." + x.p2Frac + " " + x.dirNext + y.dirNext + y.origin + x.origin;
+    +"line=" + y.toString() + " col=" + x.toString() + " " + x.dirNext + y.dirNext + y.origin + x.origin;
   }
 
   
@@ -934,6 +995,9 @@ public class GralPos implements Cloneable
     /**Attributes of this coordinate. */
     public int attr;
     
+    /**Origin point of the pos in the widget.
+     * Use l m, r, t, m, b for x and y (left, mid, right, top, bottom)
+     */
     char origin;
     
     /**direction of the next element. Use r, d, l, u. */
@@ -951,158 +1015,216 @@ public class GralPos implements Cloneable
     public int endSepLine;
 
     /**Sets the new position for this coordinate.
-     * @param z1
-     * @param z1Frac
-     * @param z2
-     * @param z2Frac
+     * Special functions:
+     * <table>
+     * <th><td>z1       </td><td>z2         </td><td>...</td></th>
+     * <tr><td>0        </td><td>sameSize 0x6... </td><td>absolute start coord, same size  </td></tr>
+     * <tr><td>0        </td><td>                </td><td>absolute start coord, same size  </td></tr>
+     * <tr><td>0        </td><td>sameSize   </td><td>absolute start coord, same size  </td></tr>
+     * <tr><td>refer    </td><td>0          </td><td>relative start coord, abs. end coord </td></tr>
+     * <tr><td>refer    </td><td>0          </td><td>relative start coord, abs. end coord </td></tr>
+     * <tr><td>refer    </td><td>0          </td><td>relative start coord, abs. end coord </td></tr>
+     * </table>
+     * @param z
+     * @param zFrac
+     * @param ze
+     * @param zeFrac
      * @param parent The refer position. Note that parent may be == this because the new position based on the current.
      */
-    public Coordinate set(final int z1, final int z1Frac, final int z2, final int z2Frac, final Coordinate parent)
-    {
-      /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
-      final int q1, q1Frac, q2, q2Frac;
+    public Coordinate set(final int z, final int zFrac, final int ze, final int zeFrac, String nextPosChars, final Coordinate parent)
+    { /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
+      int q1 = invalidPos, q1f =0, q2 = invalidPos, q2f =0;
 
       //check input parameter ze of size and negative size
       
       //The type of input parameter.
-      final boolean zNeg =  (z1 & mValueNegative) !=0;
-      final int zType = (z1 & mSpecialType) == kSpecialType ? z1 : (z1 + kTypAdd_) & mType_;
-      final boolean zeNeg =  (z2 & mValueNegative) !=0;
-      final int zeType = (z2 & mSpecialType) == kSpecialType ? z2 : (z2 + kTypAdd_) & mType_;
-      final int testCase;
-      final int testType = (zType<<16) + zeType;
+      final boolean zNeg =  (z & mValueNegative) !=0;     // zNeg true for 7000..7fff, 9000...9fff etc.
+      //zType is either 0x2000, 0x4000, 0x6000, 0x8000, 0xa000, 0xc000 for one of the type designations
+      final int zType = (z & mSpecialType) == kSpecialType ? z // 0xdfxx for the specialType. 
+                      : (z + kTypAdd_) & mType_;          // Adding kTypeAdd_ brings forex 7000..8fff to 8000..9fff, mType_ results is 0x8000
+      final boolean zeNeg =  (ze & mValueNegative) !=0;    // same for end coord.
+      final int zeType = (ze & mSpecialType) == kSpecialType ? ze : (ze + kTypAdd_) & mType_;
+      final int testCase;                                  // testcase for debug
+      final int testType = (zType<<16) + zeType;           // combination of both coord start ...end
       if(parent !=this){
         pb = parent.pb; pbf = parent.pbf;
       }
-      switch(testType){
-        //
-        case 0: {
-          testCase = 1;
-          q1 = z1; q1Frac = z1Frac;                         //q = z
-          q2 = z2; q2Frac = z2Frac;                     //qe = ze
-        } break;
-        //
-        case 0 + refer: {
-          testCase = 2;                           //q = z
-          q1 = z1; q1Frac = z1Frac;                         //qe = pe + refer
-          q2 = parent.p2 + (z2 - refer); q2Frac = parent.p2Frac + z2Frac;
-        } break;
-        //
-        case 0 + size: {
-          testCase = 3;
-          if(zeNeg){ 
-            q2 = z1; q2Frac = z1Frac;                    //qe = z
-            q1 = q2 + (z2 - size); q1Frac = q2Frac + z2Frac;   //q = qe + size
-          } else {
-            q1 = z1; q1Frac = z1Frac;                       //q = z
-            q2 = q1 + (z2 - size); q2Frac = q1Frac +z2Frac;  //qe = q + size
-          }
-        } break;
-        //
-        case 0 + samesize: {
-          testCase = 4;
-          if( (attr & mBitSizeNeg) !=0){     //was the last size negative? the qe is base
-            q2 = z1; q2Frac = z1Frac;                     //qe = z
-            q1 = q2 - (parent.p2 - parent.p1) + (z2 - samesize);  //q = qe - lastsize + sizediff 
-            q1Frac = q2Frac + (parent.p2Frac - parent.p1Frac) + z2Frac;
-          } else {
-            q1 = z1; q1Frac = z1Frac;                       //q = z 
-            q2 = q1 + (parent.p2 - parent.p1) + (z2 - samesize);  //qe = q + lastsize + sizediff 
-            q2Frac = q1Frac + (parent.p2Frac - parent.p1Frac) + z2Frac;
-          }
-        } break;
-        //
-        case 0 + useNatSize: {
-          testCase = 11;
-          q1 = z1; q1Frac = z1Frac;
-          q2 = z2;  q2Frac = 0; //store useNatSize
-        } break;
-        //
-        case (refer<<16) + 0: {
-          testCase = 5;
-          q1 = parent.p1 + (z1 - refer); q1Frac = parent.p1Frac + z1Frac;      //q = p + refer 
-          q2 = z2; q2Frac = z2Frac;                     //qe = ze
-        } break;
-        //
-        case (refer<<16) + refer: {
-          testCase = 1;
-          q1 = parent.p1 + (z1 - refer); q1Frac = parent.p1Frac + z1Frac;        //q = parent.p + refer
-          q2 = parent.p2 + (z2 - refer); q2Frac = parent.p2Frac + z2Frac;  //qe = parent.pe + refer
-        } break;
-        //
-        case (refer<<16) + size: {
-          testCase = 6;
-          if(zeNeg){ 
-            q2 = parent.p2 + (z1 - refer); q2Frac = parent.p2Frac + z1Frac; //qe = parent.pe + refer, z is the bottom/right pos 
-            q1 = q2 + (z2 - size); q1Frac = q2Frac + z2Frac;     //q = qe - size
-          } else {
-            q1 = parent.p1 + z1 - refer; q1Frac = parent.p1Frac + z1Frac;        //q = parent.p + refer
-            q2 = q1 + (z2 - size); q2Frac = q1Frac + z2Frac;   //qe = q + size
-          }
-        } break;
-        //
-        case (refer<<16) + samesize: {
-          testCase = 7;
-          if( (attr & mBitSizeNeg) !=0){       
-            q1 = z1 - (parent.p2 - parent.p1) + z2 - samesize; q1Frac = z1Frac - (parent.p2Frac - parent.p1Frac);
-            q2 = parent.p2 + z1 - refer; q2Frac = z2Frac; 
-          } else {
-            q1 = parent.p1 + (z1 - refer); q1Frac = parent.p1Frac + z1Frac;      //q = parent.p + refer
-            q2 = q1 + (parent.p2 - parent.p1) + (z2 - samesize);    //qe = q + lastsize + sizediff 
-            q2Frac = q1Frac + (parent.p2Frac - parent.p1Frac) + z2Frac;
-          }
-        } break;
-        //
-        case (next<<16) + refer: {
-          testCase = 8;
-          q1 = parent.p2 + parent.pb; q1Frac = parent.p2Frac + parent.pbf;              //q = parent.pe + parent.pb  the next right/down
-          q2 = q1 + (parent.p2 - parent.p1) + (z2 - refer); q2Frac = q1Frac + (parent.p2Frac - parent.p1Frac) + z2Frac;     //qe = q + (parent.pe - parent.p) + refer  
-        } break;
-        //
-        case (next<<16) + size: {
-          testCase = 10;
-          //switch(dirNext){
-          switch(parent.dirNext){
-              case 'r': case 'd': {
-              if( (attr & mBitSizeNeg) !=0){ 
-                q2 = parent.p2 + parent.pb; q2Frac = parent.p2Frac + parent.pbf; 
-                q1 = q2 - (parent.p2 - parent.p1) + (z2 - size); q1Frac = q2Frac - (parent.p2Frac - parent.p1Frac) + z2Frac;
-              } else {                               //same as next, refer
-                q1 = parent.p2 + parent.pb; q1Frac = parent.p2Frac + parent.pbf;         //q = parent.pe + parent.pb the next right/down
-                q2 = q1 + z2 - size; q2Frac = q1Frac + z2Frac; 
-              }
-            } break;
-            //
-            default: {
-              q1 = parent.p1; q1Frac = parent.p1Frac; q2 = parent.p2; q2Frac = parent.p2Frac;  //don't change this coordinate. It may be the other one.              
-            }
-          }
-        } break;
-        //
-        case (next<<16) + samesize: {  //z1 is next, ze is samesize, means typical next
-          testCase = 9;
-          switch(parent.dirNext){
-            case 'r': case 'd': {
-              if( (attr & mBitSizeNeg) !=0){ 
-                q2 = parent.p2 + (parent.p2 - parent.p1) + parent.pb; q2Frac = parent.p2Frac + (parent.p2Frac - parent.p1Frac) + parent.pbf; 
-                q1 = q2 - (parent.p2 - parent.p1) + (z2 - samesize); q1Frac = q2Frac - (parent.p2Frac - parent.p1Frac) + z2Frac;
-              } else {                               //same as next, refer
-                q1 = parent.p2 + parent.pb; q1Frac = parent.p2Frac + parent.pbf;         //q = parent.pe + parent.pb the next right/down
-                q2 = q1 + (parent.p2 - parent.p1) + z2 - samesize; q2Frac = q1Frac + (parent.p2Frac - parent.p1Frac) + z2Frac; 
-              }
-            } break;
-            //
-            default: {
-              q1 = parent.p1; q1Frac = parent.p1Frac; q2 = parent.p2; q2Frac = parent.p2Frac;  //don't change this coordinate. It may be the other one.              
-            }
-          }
-        } break;
-        default: 
-          assert(false);
-          testCase = 12;
-          q1 = z1; q1Frac = z1Frac; 
-          q2 = z2; q2Frac = z2Frac;
+      boolean bSetEnd = false;                             // true then z determines qe
+      switch(zType) {
+      case 0: q1 = z; q1f = zFrac; break;                  // no specific designation: absloute pos
+      case refer:  //same                                  // relative to the parent position
+        q1 = parent.p1 - (parent.p2 - parent.p1) + (z - refer); 
+        q1f = parent.p1Frac + zFrac;      //q = p + refer 
+        break;
+      case next: {
+        int direction = nextPosChars.indexOf(parent.dirNext);
+        switch(direction) {
+        case 0:                                            // left or up
+          q1 = parent.p1 - parent.pb; q1f = parent.p1Frac + parent.pbf;
+          break;
+        case 1:                                            // right or down
+          q1 = parent.p2 + parent.pb; q1f = parent.p2Frac + parent.pbf;  //add the border to second (right, bottom) to get the next first pos
+          break;
+        default:                                           // left same position for this coord (the other may be changed)
+          q1 = parent.p1; q1f = parent.p1Frac;             // don't change this coordinate. It may be the other one.              
+        }//switch direction     
+      } break;
+      default:
+          throw new IllegalArgumentException("GralPos coord set, start value case missing: 0x" + Integer.toHexString(zType));  
+      } //switch for z coord
+      //
+      switch(zeType) {
+      case 0: q2 = ze; q2f = zeFrac; break;             // no specific designation: absloute pos
+      case size:
+        int ze2 = (ze - size) + q1;                         // relative end position to start pos
+        if(zeNeg) { 
+          q2 = q1; q2f = q1f; q1 = ze2; q1f = zeFrac; // "10-2": negative size: q2 is the end point, q1 caculate with size
+        } else { 
+          q2 = ze2; q2f = zeFrac;                       // "10+2" positive size, end is caculate with size
+        }
+        break;
+      case same:                                           //"" not textual
+        q2 = parent.p2 + (z - refer); 
+        q2f = parent.p2Frac + zFrac;      //q = p + refer 
+        break;
+      case samesize:
+        q2 = q1 + (parent.p2 - parent.p1);                 // use size of parent to calculate q2 from q1
+        q2f = q1f + (parent.p2Frac - parent.p1Frac);       // same frac, note: the coord ready to use are absolutely.
+        break;
+      default:                                              
+        throw new IllegalArgumentException("GralPos coord set, end value case missing: 0x" + Integer.toHexString(zeType));  
       }
+      assert(q1 != invalidPos && q2 != invalidPos);      
+      
+//      switch(testType){
+//        //
+//        case 0: {                                          // both are absolute coord
+//          testCase = 1;
+//          q = z; qFrac = zFrac;                        
+//          qe = ze; qeFrac = zeFrac;                        
+//        } break;
+//        //
+//        case 0 + refer: {                                  //start absolute, end relative to parent end
+//          testCase = 2;                                      
+//          q = z; qFrac = zFrac;                            // it is a special case, not textual possible
+//          qe = parent.p2 + (ze - refer); qeFrac = parent.p2Frac + zeFrac;
+//        } break;
+//        //
+//        case 0 + size: {                                   //set start, size to end, typical case
+//          testCase = 3;
+//          if(zeNeg){ 
+//            qe = z; qeFrac = zFrac;                        // if negative size, start is bottom or right point
+//            q = qe + (ze - size); qFrac = qeFrac + zeFrac; //              and q calculate by size
+//          } else {
+//            q = z; qFrac = zFrac;                          // positive size, start is left or top
+//            qe = q + (ze - size); qeFrac = qFrac +zeFrac;  // end is calculate by size
+//          }
+//        } break;
+//        //
+//        case 0 + samesize: {
+//          testCase = 4;
+//          if( (attr & mBitSizeNeg) !=0){     //was the last size negative? the qe is base
+//            qe = z; qeFrac = zFrac;                     //qe = z
+//            q = qe - (parent.p2 - parent.p1) + (ze - samesize);  //q = qe - lastsize + sizediff 
+//            qFrac = qeFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
+//          } else {
+//            q = z; qFrac = zFrac;                       //q = z 
+//            qe = q + (parent.p2 - parent.p1) + (ze - samesize);  //qe = q + lastsize + sizediff 
+//            qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
+//          }
+//        } break;
+//        //
+//        case 0 + useNatSize: {
+//          testCase = 11;
+//          q = z; qFrac = zFrac;
+//          qe = ze;  qeFrac = 0; //store useNatSize
+//        } break;
+//        //
+//        case (refer<<16) + 0: {                            // start is relative to parent, end is given.
+//          testCase = 5;
+//          q = parent.p1 + (z - refer); qFrac = parent.p1Frac + zFrac;      //q = p + refer 
+//          qe = ze; qeFrac = zeFrac;                     //qe = ze
+//        } break;
+//        //
+//        case (refer<<16) + refer: {                        // start and end are relative to parent.
+//          testCase = 1;
+//          q = parent.p1 + (z - refer); qFrac = parent.p1Frac + zFrac;        //q = parent.p + refer
+//          qe = parent.p2 + (ze - refer); qeFrac = parent.p2Frac + zeFrac;  //qe = parent.pe + refer
+//        } break;
+//        //
+//        case (refer<<16) + size: {                         // start relative to parent, end is start + size
+//          testCase = 6;
+//          if(zeNeg){ 
+//            qe = parent.p2 + (z - refer); qeFrac = parent.p2Frac + zFrac; //qe = parent.pe + refer, z is the bottom/right pos 
+//            q = qe + (ze - size); qFrac = qeFrac + zeFrac;     //q = qe - size
+//          } else {
+//            q = parent.p1 + z - refer; qFrac = parent.p1Frac + zFrac;        //q = parent.p + refer
+//            qe = q + (ze - size); qeFrac = qFrac + zeFrac;   //qe = q + size
+//          }
+//        } break;
+//        //
+//        case (refer<<16) + samesize: {
+//          testCase = 7;
+//          if( (attr & mBitSizeNeg) !=0){       
+//            q = z - (parent.p2 - parent.p1) + ze - samesize; qFrac = zFrac - (parent.p2Frac - parent.p1Frac);
+//            qe = parent.p2 + z - refer; qeFrac = zeFrac; 
+//          } else {
+//            q = parent.p1 + (z - refer); qFrac = parent.p1Frac + zFrac;      //q = parent.p + refer
+//            qe = q + (parent.p2 - parent.p1) + (ze - samesize);    //qe = q + lastsize + sizediff 
+//            qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
+//          }
+//        } break;
+//        //
+//        case (next<<16) + refer: {
+//          testCase = 8;
+//          q = parent.p2 + parent.pb; qFrac = parent.p2Frac + parent.pbf;              //q = parent.pe + parent.pb  the next right/down
+//          qe = q + (parent.p2 - parent.p1) + (ze - refer); qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;     //qe = q + (parent.pe - parent.p) + refer  
+//        } break;
+//        //
+//        case (next<<16) + size: {
+//          testCase = 10;
+//          //switch(dirNext){
+//          switch(parent.dirNext){
+//              case 'r': case 'd': {
+//              if( (attr & mBitSizeNeg) !=0){ 
+//                qe = parent.p2 + parent.pb; qeFrac = parent.p2Frac + parent.pbf; 
+//                q = qe - (parent.p2 - parent.p1) + (ze - size); qFrac = qeFrac - (parent.p2Frac - parent.p1Frac) + zeFrac;
+//              } else {                               //same as next, refer
+//                q = parent.p2 + parent.pb; qFrac = parent.p2Frac + parent.pbf;         //q = parent.pe + parent.pb the next right/down
+//                qe = q + ze - size; qeFrac = qFrac + zeFrac; 
+//              }
+//            } break;
+//            //
+//            default: {
+//              q = parent.p1; qFrac = parent.p1Frac; qe = parent.p2; qeFrac = parent.p2Frac;  //don't change this coordinate. It may be the other one.              
+//            }
+//          }
+//        } break;
+//        //
+//        case (next<<16) + samesize: {  //z1 is next, ze is samesize, means typical next
+//          testCase = 9;
+//          switch(parent.dirNext){
+//            case 'r': case 'd': {
+//              if( (attr & mBitSizeNeg) !=0){ 
+//                qe = parent.p2 + (parent.p2 - parent.p1) + parent.pb; qeFrac = parent.p2Frac + (parent.p2Frac - parent.p1Frac) + parent.pbf; 
+//                q = qe - (parent.p2 - parent.p1) + (ze - samesize); qFrac = qeFrac - (parent.p2Frac - parent.p1Frac) + zeFrac;
+//              } else {                               //same as next, refer
+//                q = parent.p2 + parent.pb; qFrac = parent.p2Frac + parent.pbf;         //q = parent.pe + parent.pb the next right/down
+//                qe = q + (parent.p2 - parent.p1) + ze - samesize; qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac; 
+//              }
+//            } break;
+//            //
+//            default: {
+//              q = parent.p1; qFrac = parent.p1Frac; qe = parent.p2; qeFrac = parent.p2Frac;  //don't change this coordinate. It may be the other one.              
+//            }
+//          }
+//        } break;
+//        default: 
+//          assert(false);
+//          testCase = 12;
+//          q = z; qFrac = zFrac; 
+//          qe = ze; qeFrac = zeFrac;
+//      }
       
       if(!(q1 <= q2 || q2 <=0)){
         throw new IllegalArgumentException("start > end " + q1 + " > " + q2);
@@ -1110,23 +1232,23 @@ public class GralPos implements Cloneable
       if(!(q1 > -1000 && q1 < 1000 && ((q2 > -1000 && q2 < 1000) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
         throw new IllegalArgumentException("positions out of range" + q1 + ", " + q2);
       }
-      if(q1Frac >= 20){  //can be on adding distance
-        this.p1 = q1 +2; this.p1Frac = q1Frac -20;
-      } else if(q1Frac >= 10){
-          this.p1 = q1 +1; this.p1Frac = q1Frac -10;
-      } else if(q1Frac < 0){
-        this.p1 = q1 - 1; this.p1Frac = q1Frac +10;
+      if(q1f >= 20){  //can be on adding distance
+        this.p1 = q1 +2; this.p1Frac = q1f -20;
+      } else if(q1f >= 10){
+          this.p1 = q1 +1; this.p1Frac = q1f -10;
+      } else if(q1f < 0){
+        this.p1 = q1 - 1; this.p1Frac = q1f +10;
       } else {
-        this.p1 = q1; this.p1Frac = q1Frac;   
+        this.p1 = q1; this.p1Frac = q1f;   
       }
-      if(q2Frac >= 20){
-        this.p2 = q2 +2; this.p2Frac = q2Frac -20;
-      } else if(q2Frac >= 10){
-        this.p2 = q2 +1; this.p2Frac = q2Frac -10;
-      } else if(q2Frac < 0){
-        this.p2 = q2 - 1; this.p2Frac = q2Frac +10;
+      if(q2f >= 20){
+        this.p2 = q2 +2; this.p2Frac = q2f -20;
+      } else if(q2f >= 10){
+        this.p2 = q2 +1; this.p2Frac = q2f -10;
+      } else if(q2f < 0){
+        this.p2 = q2 - 1; this.p2Frac = q2f +10;
       } else {
-        this.p2 = q2; this.p2Frac = q2Frac;   
+        this.p2 = q2; this.p2Frac = q2f;   
       }
       if(!(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 )){
         throw new IllegalArgumentException("Fractional position failure: " + p1Frac + ", " + p2Frac);
@@ -1173,6 +1295,10 @@ public class GralPos implements Cloneable
       }
     }
     
+    
+    @Override public String toString() {
+      return this.p1 + "." + this.p1Frac + ".." + this.p2 + "." + this.p2Frac;
+    }
   }
   
   

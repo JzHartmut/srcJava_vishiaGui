@@ -190,7 +190,7 @@ public class GralCfgBuilder
   throws ParseException
   {
     String sError = null;
-    cfge.setPos(gralMng);
+    //cfge.setPos(gralMng);
     if(cfge.widgetType.type !=null){
       GralCfgData.GuiCfgWidget typeData = cfgData.idxTypes.get(cfge.widgetType.type);
       if(typeData == null){

@@ -33,8 +33,8 @@ public class GralHtmlBox extends GralWidget
   public final static int version = 0x20120303;
 
   
-  public GralHtmlBox(String name)
-  { super(name, 'h');
+  public GralHtmlBox(GralPos currPos, String name)
+  { super(currPos, name, 'h');
   }
 
   public void setUrl(String url){ ((ImplAccess)_wdgImpl).setUrl(url); }

@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidget.ImplAccess;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow_setifc;
@@ -141,7 +142,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
    * @param onTop
    * @return
    */
-  public static GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
+  public static GralInfoBox createHtmlInfoBox(GralPos currPos, String posString, String name, String title, boolean onTop)
   {
     int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     if(onTop){ props |= GralWindow_ifc.windOnTop; }
@@ -150,7 +151,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     window.setToPanel(mng);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
-    GralHtmlBox text = new GralHtmlBox(name); //     mng.addHtmlBox(name);
+    GralHtmlBox text = new GralHtmlBox(currPos, name); //     mng.addHtmlBox(name);
     text.setToPanel(mng);
     mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
@@ -478,6 +479,17 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
   @Override public Object getData()
   {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override public void setVisibleStateWidget (
+      boolean visible ) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public ImplAccess getImpl () {
     // TODO Auto-generated method stub
     return null;
   }

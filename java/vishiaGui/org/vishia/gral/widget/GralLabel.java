@@ -1,6 +1,7 @@
 package org.vishia.gral.widget;
 
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 
@@ -12,25 +13,40 @@ public class GralLabel extends GralWidget
    */
   int origin;
 
-  public GralLabel(String sName)
+  public GralLabel(GralPos currPos, String sName)
   {
-    super(sName, 'S');
+    super(currPos, sName, 'S');
+  }
+
+  public GralLabel(String sName) {
+    this(null, sName);
   }
   
-  public GralLabel(String sName, String sText, int origin)
+  public GralLabel(GralPos currPos, String sName, String sText, int origin)
   {
-    super(sName, 'S');
+    super(currPos, sName, 'S');
     this.origin = origin;
     super.setText(sText);
   }
   
+  public GralLabel(String sName, String sText, int origin) {
+    this(null, sText, sName, sText, origin);
+  }
   
-  public GralLabel(String pos, String sName, String sText, int origin)
+  public GralLabel(GralPos currPos, String pos, String sName, String sText, int origin)
   {
-    super(pos,sName, 'S');
+    super(currPos, pos,sName, 'S');
     this.origin = origin;
     super.setText(sText);
   }
+  
+
+  public GralLabel(String pos, String sName, String sText, int origin) {
+    this(null, pos, sName, sText, origin);
+  }
+
+  
+  
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess

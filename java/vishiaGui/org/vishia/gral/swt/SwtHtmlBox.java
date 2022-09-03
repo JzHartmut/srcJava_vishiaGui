@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 
 public class SwtHtmlBox extends GralHtmlBox.ImplAccess
@@ -54,12 +55,12 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
   public SwtHtmlBox(GralHtmlBox box, SwtMng mngSwt)
   { super(box);
     //SwtMng mngSwt = (SwtMng)(GralMng.get()).impl;
-    GralPanelContent panel = widgg.pos().panel;
+    GralPanel_ifc panel = widgg.pos().panel;
     Composite parent;
     if(panel == null){
       parent = mngSwt.displaySwt.getActiveShell();
     } else {
-      parent = (Composite)(panel.getWidgetImplementation());
+      parent = (Composite)(panel.getImpl().getWidgetImplementation());
       //parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
     }
     try {

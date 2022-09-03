@@ -23,6 +23,7 @@ public final class GralCfgData
   
   /**Version and history
    * <ul>
+   * <li>2022-08 not elaborately changed, same data, toString() operations. 
    * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2013-12-02 Hartmut new conditional configuration. 
    * <li>2012-04-22 Hartmut support {@link #new_Type()}.
@@ -164,6 +165,7 @@ public final class GralCfgData
       if(color1 ==null){ color1 = src.color1; }
     }
     
+    @Override public String toString() { return "Widget name=: " + this.name; }
     
   }//class WidgetTypeBase
   
@@ -174,6 +176,8 @@ public final class GralCfgData
   {
     public String typeName;
     public GuiCfgType(){ super(null, '*'); }
+
+    @Override public String toString() { return "Widget Type...: "; }
   }
   
   
@@ -187,6 +191,7 @@ public final class GralCfgData
     public void XXXset_colorValue(int value){
       //colorName = 
     }
+    @Override public String toString() { return "Textfield: " + super.text; }
   }
   
   
@@ -199,6 +204,8 @@ public final class GralCfgData
     
     @Override
     public void set_data(String val){ this.data = val; }
+
+    @Override public String toString() { return "Led: "; }
 
   }
   
@@ -217,6 +224,8 @@ public final class GralCfgData
     public GuiCfgCoord new_coord(){ return new GuiCfgCoord(); }
     
     public void add_coord(GuiCfgCoord value){ coords.add(value); }
+
+    @Override public String toString() { return "Line: "; }
   }
   
   
@@ -239,6 +248,8 @@ public final class GralCfgData
     public GuiCfgImage(GralCfgElement itsElement){ super(itsElement, 'i'); }
   
     public void set_file(String value){ file_ = value; }
+
+    @Override public String toString() { return "Image: "; }
   }
   
   
@@ -258,6 +269,9 @@ public final class GralCfgData
   {
     
     public GuiCfgInputFile(GralCfgElement itsElement){ super(itsElement, 'F'); }
+
+    @Override public String toString() { return "InputFile: "; }
+
   }
   
   
@@ -268,6 +282,8 @@ public final class GralCfgData
     final boolean bSwitch;
     public GuiCfgButton(GralCfgElement itsElement){ super(itsElement, 'B'); bSwitch = false; }
     public GuiCfgButton(GralCfgElement itsElement, boolean bSwitch){ super(itsElement, 'B'); this.bSwitch = bSwitch; }
+
+    @Override public String toString() { return "Switch-Button: "; }
   }
   
   
@@ -288,6 +304,8 @@ public final class GralCfgData
     public void set_text(String value){ super.text = value; }
     
     public List<Integer> getColumnWidths(){ return columnWidths; } 
+
+    @Override public String toString() { return "Table: "; }
   }
   
   
@@ -332,7 +350,9 @@ public final class GralCfgData
       newLine = null;
     } 
     
-    
+
+    @Override public String toString() { return "CurveView: "; }
+
   }
   
 
@@ -347,12 +367,19 @@ public final class GralCfgData
     public int colorValue = 0;
     public float offset, scale;
     public int nullLine;
+
+    @Override public String toString() { return "CurveView-Line: "; }
+
   }
   
   
   public final static class GuiCfgColor
   {
     public String color;
+    
+
+    @Override public String toString() { return "Color: " + color; }
+
   }
   
   
@@ -387,7 +414,7 @@ public final class GralCfgData
   
   GralCfgPanel actPanel;
   
-  /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
+  /**Map of panels. Filled via {@link #add_Element(GralCfgElement)}  */
   private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
 
   
@@ -475,7 +502,9 @@ public final class GralCfgData
   }
 
   
-  /**ZBNF: DataReplace: < ?Element >[ | | ] */
+  /**ZBNF: filled on "GuiDialogZbnfControlled::= ... <Element>"
+   * or also on "Conditional::=  ... <Element>"
+   * It is the second level of syntax or the third one if Conditional. */
   public GralCfgElement new_Element()
   { 
     if(newGuiElement == null){ newGuiElement = new GralCfgElement(); }
@@ -495,11 +524,17 @@ public final class GralCfgData
   }  
 
   
-  /**From ZBNF: DataReplace: < DataReplace> */
+  /**ZBNF: filled on "GuiDialogZbnfControlled::= ... <Element>"
+   * or also on "Conditional::=  ... <Element>"
+   * It is the second level of syntax or the third one if Conditional. 
+   * <br>
+   * It checks the content:
+   * 
+   * */
   public void add_Element(GralCfgElement value)
   { 
     if(actualConditional ==null || actualConditional.condition){
-      String sPanel = value.positionInput.panel;
+      String sPanel = value.panel;
       if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
         stop();
       if(sPanel == null){ //the last panel is used furthermore.
