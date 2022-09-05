@@ -601,6 +601,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     @Override public void drawBackground(GC g, int xView, int yView, int dxView, int dyView) {
       //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
       SwtCurveView.this.drawBackground(g, getSize(), xView, yView, dxView, dyView);
+      SwtMng.storeGralPixBounds(SwtCurveView.this, this);
     }    
   }
 

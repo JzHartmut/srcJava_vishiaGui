@@ -110,6 +110,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
+   * <li>2022-00-04 {@link #storeGralPixBounds(org.vishia.gral.base.GralWidget.ImplAccess, Control)} general usable.
    * <li>2022-08 {@link #createImplWidget_Gthread(GralWidget)} enhanced.
    * <li>2016-09-02 Hartmut chg: Some {@link GralPanelContent#GralPanelContent(String, String, char)} and {@link GralTabbedPanel#GralTabbedPanel(String, String, GralPanelActivated_ifc, int)}
    *   was invoked with "@" for the posString without any more posString information. That is false. The idea was: Set the current panel. But that does not run. 
@@ -160,7 +161,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
 	 */
   //@SuppressWarnings("hiding")
-  public final static String version = "2022-08-31";
+  public final static String version = "2022-09-04";
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
@@ -555,6 +556,21 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     rectangle.y += yPos;
     return rectangle;
     */
+  }
+  
+  
+  /**Stores the Control#getBounds() in the {@link GralWidget.ImplAccess#pixBounds}.
+   * This operation is called on 
+   * @param widgg The appropriate GralWidget
+   * @param widg The SWT widget which is presented with this Gral Widget.
+   *   On comprehensive GralWidgets this routine is especially implemented. 
+   */
+  static void storeGralPixBounds(GralWidget.ImplAccess widgg, Control widg) {
+    Rectangle bounds = widg.getBounds();
+    widgg.pixBounds.x = bounds.x;
+    widgg.pixBounds.y = bounds.y;
+    widgg.pixBounds.dx = bounds.width;
+    widgg.pixBounds.dy = bounds.height;
   }
   
   
@@ -1112,7 +1128,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     
     @Override public void focusGained(FocusEvent ev)
     { GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(ev.widget.getData());
-    if(widgg !=null) { gralFocus.focusGainedGral(widgg); }
+      if(widgg !=null) { gralFocus.focusGainedGral(widgg); }
     }
   }
   

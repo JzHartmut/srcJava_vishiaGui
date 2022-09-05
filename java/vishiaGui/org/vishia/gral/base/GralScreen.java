@@ -196,12 +196,6 @@ public class GralScreen implements GralPanel_ifc {
     return false;
   }
 
-  @Override public void specifyContextMenu (
-      GralMenu menu ) {
- 
-    
-  }
-
   @Override public void setPrimaryWidget (
       GralWidget widg ) {
  
@@ -239,4 +233,5 @@ public class GralScreen implements GralPanel_ifc {
     
   }
 
+  
 }

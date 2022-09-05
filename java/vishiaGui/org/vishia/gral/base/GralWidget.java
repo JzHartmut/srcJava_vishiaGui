@@ -338,7 +338,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2016-09-02";
+  public static final String sVersion = "2022-09-04";
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -350,6 +350,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   private GralPos _wdgPos;
 
 
+  private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
+  
   /**The implementation specific widget. The instance is derived from the graphic implementation-specific
    * super class of all widgets such as {@link org.eclipse.swt.widgets.Control} or {@link java.awt.Component}. 
    * The user can check and cast this instance if some special operations may be need graphic-implementation-dependent.
@@ -1926,7 +1928,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     protected GralWidgetImpl_ifc wdgimpl;
     
     /**Bounds of the implementation widget in its container. null if not used. */
-    public GralRectangle pixBounds;
+    public GralRectangle pixBounds = new GralRectangle(0,0,0,0);
     
     @Deprecated protected ImplAccess(GralWidget widgg, GralMng mng){
       this(widgg);

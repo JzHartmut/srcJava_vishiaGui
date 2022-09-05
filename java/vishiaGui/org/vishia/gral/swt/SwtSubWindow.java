@@ -197,7 +197,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     if(!bHasResizeAction && resizeAction() != null){
       window.addControlListener(resizeListener);  //This listener calls the resizeAction
     }
-    this.swtPanel = new SwtPanel(wdgGral);
+    this.swtPanel = new SwtPanel(wdgGral, this.window);    // create the SwtPanel beside SwtSubWindow, but with the same set.Composite, the Shell
     this.swtPanel.checkCreateTabFolder(this.window, mng);
     
     
@@ -415,7 +415,11 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   }
 
 
-  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); window.setVisible(bVisible); }
+  @Override public void setVisibleGThread(boolean bVisible) { 
+    this.window.open();                                    // on primary window
+    super.setVisibleState(bVisible); 
+    this.window.setVisible(bVisible); 
+  }
 
 
 
@@ -447,8 +451,9 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
       window.setFullScreen(bFullScreen = super.isFullScreen());
     }
     acknChanged(acknChg);
-    window.update();
-    window.redraw();
+    this.window.update();
+    this.window.redraw();
+    SwtMng.storeGralPixBounds(this, this.window);
     //swtWindow_setifc.repaintGthread(); 
   }
 

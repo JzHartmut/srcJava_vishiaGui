@@ -93,11 +93,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   void checkCreateTabFolder(Composite composite, SwtMng swt) {
     if(super.isTabbed()) {
-      this.tabFolder = new TabFolder(composite, SWT.TOP);
-      GralRectangle rectangle = swt.calcWidgetPosAndSizeSwt(widgg.pos(), composite, 500, 300);
-      this.tabFolder.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy);
-      this.tabFolder.addSelectionListener(this.tabItemSelectListener);
-      this.tabFolder.addControlListener(this.resizeListener);
+      this.tabFolder = new TabFolder(composite, SWT.BORDER);
+      Rectangle areaFolder = composite.getClientArea();
+      //GralRectangle rectangle = swt.calcWidgetPosAndSizeSwt(widgg.pos(), composite, 500, 300);
+      this.tabFolder.setBounds(areaFolder);
+      //todo this.tabFolder.addSelectionListener(this.tabItemSelectListener);
+      //todo this.tabFolder.addControlListener(this.resizeListener);
 
     }
   }
@@ -122,6 +123,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   @Override public void repaintGthread(){
     if(panelComposite !=null){
       ((Composite)panelComposite).redraw();
+      SwtMng.storeGralPixBounds(this, (Composite)panelComposite);
     }
   }
 

@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralLabel;
@@ -56,9 +57,12 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   SwtLabel(GralLabel widgg, SwtMng mng)
   {
     widgg.super(widgg, mng.mng);                           // calls the super ctor of this but with the instance of the environment class.
-    Composite panelSwt = mng.getCurrentPanel();
+    GralPos pos = widgg.pos();
+    GralWidget.ImplAccess parentImpl = pos.panel.getImpl();
+    Composite panelSwt = (Composite)parentImpl.getWidgetImplementation();
+    //assert(parentImpl.tabFolder ==null);
     int styleSwt = 0;
-    labelSwt = new Label(panelSwt, styleSwt);
+    this.labelSwt = new Label(panelSwt, styleSwt);
     super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
     int mode;
     switch(origin()){
@@ -73,8 +77,8 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     case 9: mode = SWT.RIGHT; break;
     default: mode = 0;
     }
-    labelSwt.setAlignment(mode);
-    mng.setBounds_(widgg.pos(), labelSwt);
+    this.labelSwt.setAlignment(mode);
+    mng.setBounds_(widgg.pos(), this.labelSwt);
     mng.mng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }

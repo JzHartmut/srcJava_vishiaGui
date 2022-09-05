@@ -109,12 +109,14 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
      * */
     protected boolean bGridZoomed;
     
-    /**True then all widgets of this panel are tab from a tabbed pane. 
+    /**>=0 then all widgets of this panel are tab from a tabbed pane. 
+     * It is ==0 on creation, it contains the height of the tab line if at least one tab is created.
+     * If -1 (initial) then this panel is not a tabbed panel. 
      * Usual the widgets are also then panes, or maybe also a table or such one (comprehensive widgets).
      * With this designation the older GralTabbedPanel is no more necessary, it makes the system simpler.
      * The implementation should regard this designation and build specific tab folder and items in the implementing widgets.
      */
-    boolean bTabbed;
+    public short pixelTab = -1;
     
     /**If this values are set, a grid should be shown. 
      * yGrid, xGrid are the spaces for the fine grid, yGrid2, xGrid2 describes which nth grid line should be more determined.
@@ -126,7 +128,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
      * of the implementation graphic. */
     public GralCanvasStorage canvas;
   };
-  Data _panel = new Data();
+  public Data _panel = new Data();
   
   @Deprecated public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
   //public PanelContent(CanvasStorePanel panelComposite)
@@ -205,10 +207,12 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * This feature can only be set initially, not removed. 
    */
   public void setToTabbedPanel() {
-    if(!this._panel.bTabbed && this._panel.widgetList.size()>0) {
-      throw new IllegalArgumentException(" setToTabbedPanel() can only invoked if the panel is empty.");
-    } else {
-      this._panel.bTabbed = true;
+    if(this._panel.pixelTab <0) {
+      if(this._panel.widgetList.size()>0) {
+        throw new IllegalArgumentException(" setToTabbedPanel() can only invoked if the panel is empty.");
+      } else {
+        this._panel.pixelTab = 0;                          // not tab till yet
+      }
     }
   }
   
@@ -327,7 +331,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   @Override public GralCanvasStorage canvas() { return this._panel.canvas; }
 
-  public boolean isTabbed() { return this._panel.bTabbed; }
+  public boolean isTabbed() { return this._panel.pixelTab >=0; }
 
   
   @Override public GralWidget getPanelWidget () {
@@ -482,14 +486,14 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
       this.widgg = widgg;
       this._panel = widgg._panel;
       //for all following actions: this is the current panel.
-      GralMng mng = GralMng.get();
-      mng.setPosPanel((GralPanelContent)widgg);   
+      //GralMng mng = GralMng.get();
+      //mng.setPosPanel((GralPanelContent)widgg);   
     }
     
     public GralPanelContent gralPanel(){ return (GralPanelContent) widgg; } //It is the correct type.
     
     
-    protected boolean isTabbed() { return this.widgg._panel.bTabbed; }
+    protected boolean isTabbed() { return this.widgg._panel.pixelTab >=0; }
     
     /**Returns the absolute position of this panel on screen and its size.
      * If it is a main window, the useable area of the window without title and menu bar is returned.

@@ -4,6 +4,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabItem;
 import org.vishia.gral.base.GralMng;
@@ -64,21 +65,31 @@ public class SwtGridPanel extends SwtCanvasStorePanel
   
 	public SwtGridPanel(GralPanelContent panelg, Composite xxxparent, int style, Color backGround, int xG, int yG, int xS, int yS, GralMng gralMng)
 	{ super(panelg);
-	  GralPanel_ifc parentPanel = panelg.pos().panel;
+	  GralPanel_ifc parentPanelifc = panelg.pos().panel;
+	  GralPanelContent parentPanel = (GralPanelContent)parentPanelifc;
 	  Composite parent = (Composite)panelg.pos().panel.getImpl().getWidgetImplementation();  
-	  if(((GralPanelContent)parentPanel).isTabbed()) {
+	  if(parentPanel.isTabbed()) {
       GralWidget.ImplAccess swtPanelifc = parentPanel.getImpl();
       final SwtPanel swtPanel;
       if(swtPanelifc instanceof SwtSubWindow) {
-        swtPanel = ((SwtSubWindow)swtPanelifc).swtPanel;
+        swtPanel = ((SwtSubWindow)swtPanelifc).swtPanel;   // access the SwtPanel data beside the SwtSubWindow.ImplAccess 
       } else {
         swtPanel = null; //TODO
       }
-      parent = swtPanel.tabFolder;
-      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
+      parent = swtPanel.tabFolder;                         // from the GralPanel
+      Rectangle areaFolder = parent.getClientArea();     
       TabItem tab = new TabItem(swtPanel.tabFolder, SWT.None);
       tab.setText(panelg.getName());
+      //The parent of the composite of a tab is the composite, which contains the TabFolder, not the TabFolder itself.
+      //The TabFolder is not a swt.Control.
+      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
       tab.setControl(this.swtCanvas);
+      if(parentPanel._panel.pixelTab ==0) {                      // the first tab:
+        Rectangle areaTab = this.swtCanvas.getClientArea();// has automatically the max. size
+        parentPanel._panel.pixelTab = (short)(areaFolder.height - areaTab.height);
+      } else {
+      }
+      this.swtCanvas.setBounds(50, 50+parentPanel._panel.pixelTab, areaFolder.width, areaFolder.height - parentPanel._panel.pixelTab );
     }
 	  else {
      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);

@@ -59,6 +59,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   }
 
 
+  @Override public Object getImplWidget ( ) { return this.widgetSwt; }
 
 
   public static GralColor getColor(Color swtColor)
@@ -154,6 +155,10 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   }
   
   
+  /**Calculates the absolute position of the widget on the screen. 
+   * It searches the whole window {@link Shell} and calculates from there through all composites.
+   * @return absolute Position and size on the screen.
+   */
   public GralRectangle getPixelPositionSize(){
     int posx = 0, posy = 0;
     Rectangle r = widgetSwt.getBounds();

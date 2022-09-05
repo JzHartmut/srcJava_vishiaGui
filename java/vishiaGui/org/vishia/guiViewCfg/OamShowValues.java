@@ -100,7 +100,7 @@ public class OamShowValues
   }
   
   public boolean readVariableCfg()
-  { int nrofVariable = this.cfgOamVariable.readVariableCfg("GUI/oamVar.cfg");
+  { int nrofVariable = this.cfgOamVariable.readVariableCfg("guiCfg/oamVar.cfg");
     if( nrofVariable>0){
       this.log.writeInfoln("success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");
     } else {

@@ -120,6 +120,7 @@ public class GralGraphicThread implements Runnable
   
   /**Version and history.
    * <ul>
+   * <li>2022-09-04 in {@link #run()} set the thread ID before (!) the implementation is started. 
    * <li>2020-02-01 in {@link #run()}: The {@link GralWindow_ifc#windHasMenu} is not forced, it is set compatible
    *   in {@link GralArea9MainCmd#parseArgumentsAndInitGraphic(String, String, char, String)}. 
    *   <br>Usage of {@link GralWindow#GralWindow(String, String, String, int)} 
@@ -166,7 +167,7 @@ public class GralGraphicThread implements Runnable
    * 
    * 
    */
-  public final static String sVersion = "2020-01-20";
+  public final static String sVersion = "2022-04-04";
   
   //protected GralPrimaryWindow window;
   
@@ -300,6 +301,8 @@ public class GralGraphicThread implements Runnable
    * @see java.lang.Runnable#run()
    */
   @Override public void run() {
+    long guiThreadId1 = Thread.currentThread().getId(); // should set firstly because in createImplWidget_Gthread it is necesarry. 
+    this.graphicThreadId = guiThreadId1;
     impl.initGraphic();
     //add important properties for the main window, the user should not thing about:
     impl.mainWindow.windProps |= GralWindow.windIsMain  | GralWindow.windHasMenu;
@@ -316,9 +319,7 @@ public class GralGraphicThread implements Runnable
     }
 
     //The last action, set the GuiThread
-    long guiThreadId1 = Thread.currentThread().getId(); ///
     synchronized(this){
-      this.graphicThreadId = guiThreadId1;
       orderList.start();
       bStarted = true;
       this.notify();      //wakeup the waiting calling thread.

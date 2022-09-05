@@ -82,7 +82,7 @@ public class OamRcvValue implements Runnable
 
   private final InterProcessComm ipc;
 
-  private final Address_InterProcessComm targetAddr = InterProcessCommFactory.getInstance().createAddress("UDP:localHost:60083");
+  private final Address_InterProcessComm targetAddr = InterProcessCommFactory.getInstance().createAddress("UDP:localHost:60084");
   
   byte[] recvData = new byte[1500];
   
@@ -96,7 +96,7 @@ public class OamRcvValue implements Runnable
     this.thread = new Thread(this, "oamRcv");
     this.log = log;
     this.showValues = showValues;
-    String ownAddr = "UDP:0.0.0.0:0xeab2";
+    String ownAddr = "UDP:0.0.0.0:0xeab3";
     
     this.ipc = InterProcessCommFactory.getInstance().create(ownAddr); //It creates and opens the UDP-Port.
     this.ipc.open(null, true); //InterProcessComm.receiverShouldbeBlocking);
@@ -123,9 +123,15 @@ public class OamRcvValue implements Runnable
   {
     int[] result = new int[1];
     Address_InterProcessComm sender = this.ipc.createAddress();
+    int ctnl=0;
     while(this.bRun){
       this.ipc.receiveData(result, this.recvData, sender);
       if(result[0] > 0) {
+        System.out.append('.');
+        if(--ctnl <0) {
+          ctnl = 100;
+          System.out.append('\n');
+        }
         try{ evalTelg(this.recvData, result[0]); }
         catch(ParseException exc){
           this.ctCorruptData +=1;
@@ -143,7 +149,7 @@ public class OamRcvValue implements Runnable
     this.datagramRcv.setBigEndian(true);                   // it is the general approach.
     int nrofBytesInfoHead = this.infoEntity.getLengthHead(); // the symbolic data starts as one item, from position 0x18
     int catastrophicalCount = 1001;
-    while(this.datagramRcv.sufficingBytesForNextChild(this.infoEntity.getLengthHead()) && --catastrophicalCount >=0){
+    if(this.datagramRcv.sufficingBytesForNextChild(this.infoEntity.getLengthHead()) && --catastrophicalCount >=0){
       this.datagramRcv.addChild(this.infoEntity);
       int nrofBytesInfo = this.infoEntity.getLenInfo();
       if(nrofBytesInfo < nrofBytesInfoHead) throw new ParseException("head of info corrupt, nrofBytes", nrofBytesInfo);

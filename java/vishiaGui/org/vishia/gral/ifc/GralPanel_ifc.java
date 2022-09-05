@@ -13,7 +13,7 @@ import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
  * @since 2022-08
  *
  */
-public interface GralPanel_ifc extends GralWidget_ifc, GralWidgetImpl_ifc {
+public interface GralPanel_ifc extends GralWidget_ifc {
 
   
   void setPrimaryWidget(GralWidget widg);
