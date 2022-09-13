@@ -87,7 +87,7 @@
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2022-08-28 18:26:09  x     GralButton.java                          ::         20.821 -1268915599 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
-2022-08-28 18:27:36  x     GralCurveView.java                       ::         87.526  0403356992 
+2022-09-05 22:07:26  x     GralCurveView.java                       ::         88.057  0000935408 
 2022-09-05 08:17:40  x     GralGraphicThread.java                   ::         22.168  0589516833 
 2021-10-04 14:29:55  x     GralGraphicTimeOrder.java                ::          4.626  0308339593 
 2021-10-04 14:29:51  x     GralGridProperties.java                  ::         12.850 -0251460719 
@@ -125,7 +125,7 @@
 2022-08-28 20:05:36  x     GralCfgPosition.java                     ::          5.088  0166729575 
 2022-08-27 09:53:30  x     GralCfgWindow.java                       ::          7.232  0299899569 
 2022-08-28 20:17:41  x     GralCfgWriter.java                       ::         10.486 -0873649842 
-2022-09-03 21:20:57  x     GralCfgZbnf.java                         ::         33.418 -0063742096 
+2022-09-05 19:29:29  x     GralCfgZbnf.java                         ::         33.413 -1748161259 
 2022-08-28 20:01:08  x     Syntax.zbnf                              ::          4.769  1546734108 
 2012-03-28 07:42:16  x     package-info.java                        ::           .907  0254677754 
 
@@ -182,7 +182,7 @@
 2022-01-29 19:50:45  x     SwtButton.java                           ::         11.894  1694953324 
 2021-10-04 14:29:58  x     SwtCanvasDrawer.java                     ::          1.154  1236147349 
 2022-09-02 20:53:17  x     SwtCanvasStorePanel.java                 ::          6.077 -1566466900 
-2022-09-04 18:02:03  x     SwtCurveView.java                        ::         26.925 -0414069445 
+2022-09-05 23:42:47  x     SwtCurveView.java                        ::         27.647 -0842363147 
 2021-10-04 14:29:52  x     SwtDragListener.java                     ::          4.215 -0163176230 
 2021-10-04 14:29:56  x     SwtDropListener.java                     ::          4.387  1572688082 
 2022-09-01 20:11:58  x     SwtFactory.java                          ::          1.222 -0500448440 
@@ -252,7 +252,7 @@
 
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
 2022-08-26 09:17:00  x     OamOutFileReader.java                    ::          3.375 -0576691088 
-2022-09-04 23:50:12  x     OamRcvValue.java                         ::          6.403 -0061894749 
+2022-09-08 23:40:55  x     OamRcvValue.java                         ::          7.739  2117009024 
 2022-09-04 23:48:24  x     OamShowValues.java                       ::         21.852 -1149626017 
 2022-09-03 19:21:56  x     ViewCfg.java                             ::         13.069 -0204832461 
 

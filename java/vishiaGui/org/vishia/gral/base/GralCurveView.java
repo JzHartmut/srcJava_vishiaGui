@@ -756,10 +756,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
 
-  public GralCurveView(GralPos currPos, String sName, int maxNrofXvaluesP, CommonCurve common)
+  /**Constructs the CurveView comprehensive widget.
+   * @param currPos CursorPosition currently used for positioning, will be cloned for the widget.
+   * @param sName widget name or also "@<position>: name" for cursor positioning relative or absolute.
+   * @param maxNrofXvaluesP deepness of values, max. 16000000 (16 Mega), usual 10000 or such. This value will be increased to the next power of 2.
+   * @param curveVariables information about variable, as shared information, or null if only local.
+   */
+  public GralCurveView(GralPos currPos, String sName, int maxNrofXvaluesP, CommonCurve curveVariables)
   {
     super(currPos, sName, 'c');
-    this.common = common == null ? new CommonCurve() : common;
+    this.common = curveVariables == null ? new CommonCurve() : curveVariables;
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
     while(maxNrofXvalues1 < maxNrofXvaluesP){

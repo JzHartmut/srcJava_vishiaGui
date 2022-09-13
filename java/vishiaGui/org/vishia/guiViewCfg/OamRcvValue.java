@@ -66,6 +66,26 @@ public class OamRcvValue implements Runnable
   private final Thread thread;
   
   boolean bRun;
+  
+  /**This parameter can be changed on debug suspend to influence output for one received telegram.
+   * It can be used if receiving is the problem.
+   *
+   */
+  static class ShowParam {
+    /**Default switchted off, used as boolean. */
+    int printDotOnReceivedTelegr = 0;
+    
+    int printTime = 0;
+    
+    /**ctdot & mask ==0 then write dot, reduction ratio. */
+    int maskWriteDot = 0x0f; 
+    
+    /**Newline after receiving that number of telegrams. Should be proper to maskWriteDot, but changed and hence calculated manual. */
+    int newlineOnTelgCt = 16 * 100;
+    
+    long timeLast;
+  }
+  ShowParam showParam = new ShowParam();
 
   int ctCorruptData;
   
@@ -125,17 +145,33 @@ public class OamRcvValue implements Runnable
     Address_InterProcessComm sender = this.ipc.createAddress();
     int ctnl=0;
     while(this.bRun){
+      long time1 = System.currentTimeMillis();
       this.ipc.receiveData(result, this.recvData, sender);
+      long time2 = System.currentTimeMillis();
       if(result[0] > 0) {
-        System.out.append('.');
-        if(--ctnl <0) {
-          ctnl = 100;
-          System.out.append('\n');
+        if(showParam.printDotOnReceivedTelegr !=0) {
+          System.out.append('.');
+          if(--ctnl <0) {
+            ctnl = showParam.newlineOnTelgCt;
+            if( (ctnl & showParam.maskWriteDot) ==0) {
+              System.out.append('\n');
+            }
+          }
         }
         try{ evalTelg(this.recvData, result[0]); }
         catch(ParseException exc){
           this.ctCorruptData +=1;
+          if(showParam.printDotOnReceivedTelegr !=0) {
+            System.out.append('x');
+          }
         }
+      }
+      if(showParam.printTime !=0) {
+        long dTimeEval = System.currentTimeMillis() - time2;
+        long dTimewait = time2 - time1;
+        long dTyimeCycle = time1 - this.showParam.timeLast;
+        this.showParam.timeLast = time1;
+        System.out.printf("rx %s: %d + %d\n", dTyimeCycle, dTimewait, dTimeEval);
       }
     }
     this.ipc.close();

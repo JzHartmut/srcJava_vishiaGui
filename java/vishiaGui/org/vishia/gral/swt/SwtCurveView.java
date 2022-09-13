@@ -85,6 +85,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   
   protected final Color colorCursor, colorBack;
   
+  long timeRepaintLast, timeRepaintCall;
 
   
   public SwtCurveView(GralCurveView widgg, SwtMng mng) //String sName, GralPos pos, SwtMng mng, int nrofXvalues, GralCurveView.CommonCurve common)
@@ -126,6 +127,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       curveSwt.setVisible(false);
     }
     dyda().acknChanged(acknChg);
+    this.timeRepaintCall = System.currentTimeMillis(); //nanoTime();
+    
     curveSwt.redraw();
   }
 
@@ -565,12 +568,21 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     
     
     
+    /**The paint event is forced by an handling on operation system, for example hide or show a window, resize etc. pp.
+     * It is also forced by new data, from calling of {@link #repaintGthread()}. 
+     */
     PaintListener paintListener = new PaintListener()
     {
-
+      boolean show = true;
+      
       @Override public void paintControl(PaintEvent e) {
         GC gc = e.gc;
+        long time1 = System.currentTimeMillis(); //nanoTime();
+        long dCycle = time1 - timeRepaintLast;
+        long dCall = time1 - SwtCurveView.this.timeRepaintCall;
         drawBackground(e.gc, e.x, e.y, e.width, e.height);
+        long dCalc = (SwtCurveView.this.timeRepaintLast = System.currentTimeMillis()) - time1;
+        if(this.show) {System.out.printf("curveViewGT %d: %d + %d\n", dCycle, dCall, dCalc); }
       }
       
     };

@@ -645,7 +645,7 @@ public class GralCfgZbnf
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
-      GralCurveView widg = new GralCurveView(this.currPos, sName, nrofTracks, null);
+      GralCurveView widg = new GralCurveView(this.currPos, sName, 10000, null);
       widg.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.data;
