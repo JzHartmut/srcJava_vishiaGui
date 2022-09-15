@@ -1,12 +1,16 @@
 package org.vishia.gral.swt;
 
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralLabel;
 
@@ -54,16 +58,16 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
   private Font fontSwt;
   
-  SwtLabel(GralLabel widgg, SwtMng mng)
+  SwtLabel(GralLabel widgg, SwtMng swtMng)
   {
-    widgg.super(widgg, mng.mng);                           // calls the super ctor of this but with the instance of the environment class.
+    widgg.super(widgg, swtMng.gralMng);                           // calls the super ctor of this but with the instance of the environment class.
     GralPos pos = widgg.pos();
     GralWidget.ImplAccess parentImpl = pos.panel.getImpl();
     Composite panelSwt = (Composite)parentImpl.getWidgetImplementation();
     //assert(parentImpl.tabFolder ==null);
     int styleSwt = 0;
     this.labelSwt = new Label(panelSwt, styleSwt);
-    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
+    super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(this.labelSwt, swtMng);
     int mode;
     switch(origin()){
     case 1: mode = SWT.LEFT; break;
@@ -78,8 +82,20 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     default: mode = 0;
     }
     this.labelSwt.setAlignment(mode);
-    mng.setBounds_(widgg.pos(), this.labelSwt);
-    mng.mng.registerWidget(widgg);
+    //swtMng.setPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
+    GralRectangle rectangle = swtMng.calcWidgetPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
+    this.labelSwt.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
+    Color bkcolor = swtMng.getColorImpl(widgg.getBackColor(0));
+    this.labelSwt.setBackground(bkcolor);
+    //this.labelSwt.set
+    Color color = swtMng.getColorImpl(GralColor.getColor("dgn"));
+    this.labelSwt.setForeground(color);
+    float height = this.widgg.pos().height();
+    GralFont gralFont = swtMng.gralMng.propertiesGui.getTextFont(height);
+    Font swtFont = swtMng.propertiesGuiSwt.fontSwt(gralFont);
+    this.labelSwt.setFont(swtFont);
+    //on SWT it invokes the resize listener if given.
+    swtMng.gralMng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }
 

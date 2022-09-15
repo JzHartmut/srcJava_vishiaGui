@@ -356,30 +356,36 @@ public class GralCfgZbnf
   }
   
   
+  /**Creates a Graphic application with a given config file.
+   * <br>It calls:
+   * <ul><li>{@link #configureWithZbnf(CharSequence, GralCfgData)}
+   * <li>{@link #buildGui()}
+   * </ul>
+   * @param sGui The config file.
+   * @return The main window of the graphic application
+   * @throws ParseException on syntax error in sGui
+   */
   public static GralWindow configWithZbnf ( CharSequence sGui ) throws ParseException { 
     String ret = null;
     GralCfgZbnf thiz = new GralCfgZbnf();                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(sGui, thiz.cfgData);
     thiz.buildGui();    
-    return thiz.window;
+    return thiz.window;                                    // only the window is used, the rest can be garbaged.
   }
   
   
   
   
   /**Builds the appearance of the whole graphic with the given {@link GralCfgData} cfgData.
+   * The cfgData can be filled manually per programming, or especially by {@link #configureWithZbnf(CharSequence, GralCfgData)}.
    * Calls {@link #buildPanel(org.vishia.gral.cfg.GralCfgPanel)} for the any panel 
    * in the {@link GralCfgData#idxPanels}. Fills the panels one after another.
    * 
    * @param log maybe null, errors and warnings are written
    * @param msgIdent The message identification for output.
    * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
-   */
-  /**
-   * @param log
-   * @param msgIdent
-   * @return
+   *   The window can be gotten by #window. The rest of this class may be not furthermore used.
    */
   public String buildGui ( ) {
     String sError = null;
@@ -615,8 +621,8 @@ public class GralCfgZbnf
         dirMask = replaceAlias(widgt.data);
       } else { dirMask = ""; }
       //reduce the length of the text field:
-      GralPos pos1 = new GralPos(currPos);
-      pos1.setPositionSize(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2, 'r', null);
+      GralPos pos1 = new GralPos(this.currPos);
+      pos1.setPosition(this.currPos, GralPos.same, GralPos.same, GralPos.same, GralPos.same -2);
       GralTextField widg = new GralTextField(this.currPos, sName);
       widg.setEditable(cfge.widgetType.editable);
       if(sPrompt !=null) { widg.setPrompt(sPrompt, sPromptPos); }

@@ -54,7 +54,7 @@ public class GralLed extends GralWidget
   
   /**
    * @param name
-   * @param mng
+   * @param gralMng
    */
   public GralLed(GralPos currPos, String sPosName)
   { super(currPos, sPosName, 'D');

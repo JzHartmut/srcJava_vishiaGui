@@ -197,6 +197,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     if(!bHasResizeAction && resizeAction() != null){
       window.addControlListener(resizeListener);  //This listener calls the resizeAction
     }
+    //this.checkCreateTabFolder(this.window, mng);
     this.swtPanel = new SwtPanel(wdgGral, this.window);    // create the SwtPanel beside SwtSubWindow, but with the same set.Composite, the Shell
     this.swtPanel.checkCreateTabFolder(this.window, mng);
     

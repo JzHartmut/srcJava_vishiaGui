@@ -86,7 +86,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
   
   /**The constructor creates the instance but does nothing with the graphic appearance.
    * @param name
-   * @param mng
+   * @param gralMng
    */
   public GralHorizontalSelector(GralPos currPos, String name, GralUserAction actionOnSelect){
     super(currPos, name, 'n');

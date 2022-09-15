@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
@@ -177,6 +178,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-09-13 new {@link #toString(Appendable)} usable for comprehensive reports and toString() 
    * <li>2022-08 new {@link GralWidget#GralWidget(GralPos, String, char)} for the new concept, some more adaptions. 
    * <li>2016-09-30 Hartmut improved: {@link #repaint(int, int)} now the second argument can be really 0 to prevent a not required repaint from the first repaint call
    *   if some more replaints are registered per delay.
@@ -338,7 +340,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2022-09-04";
+  public static final String sVersion = "2022-09-13";
 
   
   /**The widget manager from where the widget is organized. Most of methods need the information
@@ -347,7 +349,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**The position of the widget. 
    * The GralPos contains also the reference to the parent composite panel {@link GralPanel_ifc} which contains the widget. */
-  private GralPos _wdgPos;
+  protected GralPos _wdgPos;
 
 
   private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
@@ -645,8 +647,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
      * If this elements are null, the standard color should be used. */
-    public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr")
-      , lineColor = GralColor.getColor("bk"), textColor = GralColor.getColor("bk");
+    public GralColor backColor = GralColor.getColor("wh")  // proper for show fields
+      , backColorNoFocus = GralColor.getColor("lgr")
+      , lineColor = GralColor.getColor("bk")
+      , textColor = GralColor.getColor("bk");
 
     /**It depends of the pixel size. Therefore set after setToPanel, if GralMng is known. */
     public GralFont textFont;
@@ -1520,7 +1524,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Gets the current value of the content of the widget in the given context.
-   * @param mng The context.
+   * @param gralMng The context.
    * @return The value in String representation, null if the widget has no possibility of input.
    */
   public String getValue()
@@ -1884,22 +1888,32 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Especially for test and debug, short info about widget.
    * @see java.lang.Object#toString()
    */
-  @Override public String toString()
-  { StringBuilder u = new StringBuilder(240);
+  @Override public String toString ( ) { 
+    StringBuilder u = new StringBuilder(240);
+    try { 
+      toString(u);
+    } catch(IOException exc) { throw new RuntimeException("unexpected: ", exc); };
+    return u.toString();
+  }
+
+  
+  
+  public Appendable toString(Appendable u) throws IOException {
     u.append(whatIs).append(":").append(name).append(": ").append(sDataPath);
-    if(_wdgPos !=null && _wdgPos.panel !=null){
-      u.append(" @").append(_wdgPos.panel.getName());
+    if(_wdgPos !=null){
+      this._wdgPos.toString(u, true);
     } else {
-      u.append(" @?");
+      u.append("@?");
     }
+    u.append(name);
     if(variable !=null){
       String vString = variable.toString();
       u.append(" var=").append(vString);
     }
-    //u.append('\n');
-    return u.toString();
+    return u;
   }
-
+  
+  
   
   /**Methods which should be called back by events of the implementation layer.
    * This class is used only for the implementation level of the graphic. It is not intent to use

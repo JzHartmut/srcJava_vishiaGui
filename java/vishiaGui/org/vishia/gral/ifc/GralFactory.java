@@ -2,6 +2,8 @@ package org.vishia.gral.ifc;
 
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.msgDispatch.LogMessage;
 
@@ -15,6 +17,7 @@ public abstract class GralFactory
 
   /**Version, history and license.
    * <ul>
+   * <li>2022-09-14 chg  {@link #createGraphic(GralWindow, char, LogMessage)} now public, this should be the main way to create.
    * <li>2017-01-15 Hartmut chg in deprecated createWindow, see comment there. 
    * <li>2016-07-16 Hartmut new: {@link #createGraphic(GralWindow, char, LogMessage, String)} as non abstract static method
    *   creates the graphic, for several implementation platforms by "AWT", "SWT" or special factory class.
@@ -95,13 +98,24 @@ public abstract class GralFactory
     }
   }
 
-  /**This method should intitialize the implementation layer manager, primary window and the graphic thread.
+  /**This method should initialize the whole implementation graphic with the given GralWindow 
+   * and all {@link GralPanelContent} and all {@link GralWidget} into. 
+   * <br>
+   * It means it is the new concept since ~2016/18 established for all in 2022: 
+   * <ul><li>First create the graphic independent graphic description data.
+   * <li>2th create the proper Factory
+   * <li>3th with this operation create the implementation graphic as a whole.
+   * <ul>
+   * Using specific GralFactory implementors can enable also other graphic systems.
+   * Examples see {@link org.vishia.guiViewCfg.ViewCfg}.
+   * <br>
+   * It creates the implementation graphic manager, primary window and the graphic thread.
    * @param windowg
-   * @param sizeShow
-   * @param log
-   * @return
+   * @param sizeShow 'A' ... 'G' for the size, pixel per grid
+   * @param log a log necessary?
+   * @return the Graphic Thread can be used to add {@link GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicTimeOrder)}.
    */
-  protected abstract GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log);
+  public abstract GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log);
   
   
   

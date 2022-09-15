@@ -3,6 +3,8 @@ package org.vishia.guiViewCfg;
 import java.io.File;
 import java.text.ParseException;
 
+import org.vishia.communication.InspcDataExchangeAccess;
+import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.area9.GuiCallingArgs;
@@ -17,6 +19,7 @@ import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralFactory;
 //import org.vishia.gral.gui.GuiDispatchCallbackWorker;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.swt.SwtFactory;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -24,7 +27,15 @@ import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.CheckVs;
 import org.vishia.util.FileFunctions;
 
-/**Class contains main, it is able to use for a GUI without any programming in Java.*/
+/**This class can be used as Operation and Monitoring for process values. 
+ * The GUI design is controlled by a script, see {@link GralCfgZbnf}.
+ * It means the GUI can be configured without any programming in Java.
+ * Especially one {@link GralCurveView} is supported to show currently values.
+ * The class contains a {@link InterProcessComm}, usual Socket Ethernet communication. 
+ * The communication protocol, UDP, is adequate the {@link InspcDataExchangeAccess}.
+ * The association between positions in the datagram and the GUI is also script controlled.
+ * See {@link OamOutFileReader}
+ * */
 public class ViewCfg //extends GuiCfg 
 {
   
@@ -342,35 +353,49 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
     //Initializes the graphic window and parse the parameter of args (command line parameter).
     //Parameter errors will be output in the graphic window in its given output area.
     //old: bOk = cmdgui.parseArgumentsAndInitGraphic("ViewCfg", "3A3C");
-    new InterProcessCommFactorySocket();
-    ViewCfg main = new ViewCfg(cargs);
-    if(error ==0){
-    	
-      String sCfg = FileFunctions.readFile(cargs.fileGuiCfg);
-      try {
-        main.window = GralCfgZbnf.configWithZbnf(sCfg);         // does all, reads the config file, parses, creates Graphic Elements
-      } catch (ParseException e) {
-        error=9;
-        System.err.println("Graphic confic error: " + e.getMessage());
-      }                  
-    }
-    if(error ==0) {
-      GralWidget curveView = GralMng.get().getWidget("userCurves");
-      if(curveView !=null && curveView instanceof GralCurveView) {
-        main.oamShowValues.setCurveView((GralCurveView)curveView);
+    try {
+      
+      new InterProcessCommFactorySocket();
+      ViewCfg main = new ViewCfg(cargs);
+      if(error ==0){
+      	
+        String sCfg = FileFunctions.readFile(cargs.fileGuiCfg);
+        try {
+          main.window = GralCfgZbnf.configWithZbnf(sCfg);         // does all, reads the config file, parses, creates Graphic Elements
+        } catch (ParseException e) {
+          error=9;
+          System.err.println("Graphic confic error: " + e.getMessage());
+        }                  
       }
-      LogMessage log = new LogMessageStream(System.out);  //a logging system.
-      main.window.create("SWT", 'C', log, null);  //creates the primary window, starts the whole graphic engine.
-      //wait, a parallel thread to the grahic.
-      //GralFactory.createGraphic(main.window, 'C', null, "SWT");
-      
-      main.oamRcvUdpValue.start();
-      //main.execute();
-      main.doSomethinginMainthreadTillClosePrimaryWindow();
-      
-      main.oamRcvUdpValue.stopThread();
-    }    
-    GralMng.closeGral();
+      main.window.reportAllContent(System.out);
+      if(error ==0) {
+        GralWidget curveView = GralMng.get().getWidget("userCurves");
+        if(curveView !=null && curveView instanceof GralCurveView) {
+          main.oamShowValues.setCurveView((GralCurveView)curveView);
+        }
+        LogMessage log = new LogMessageStream(System.out);  //a logging system.
+        if(cargs.graphicFactory ==null) {
+          cargs.graphicFactory = new SwtFactory();         // default use SWT.
+        }
+//        if(cargs.graphicFactory !=null) {
+        cargs.graphicFactory.createGraphic(main.window, cargs.sizeShow, log);
+//        } else {
+//          main.window.create("AWT", cargs.sizeShow, log, null);  //creates the primary window, starts the whole graphic engine.
+//        }
+          //wait, a parallel thread to the grahic.
+        //GralFactory.createGraphic(main.window, 'C', null, "SWT");
+        
+        main.oamRcvUdpValue.start();
+        //main.execute();
+        main.doSomethinginMainthreadTillClosePrimaryWindow();
+        
+        main.oamRcvUdpValue.stopThread();
+      }    
+      GralMng.closeGral();
+    } catch(Exception exc) {
+      System.err.println("Unexpected exception: " + exc.getMessage());
+      exc.printStackTrace(System.err);
+    }
     return 0;
   }
 

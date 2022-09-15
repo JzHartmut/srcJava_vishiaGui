@@ -61,7 +61,7 @@ public class GuiCallingArgs extends Arguments
   
   /**The graphic base factory can be detected from command line arguments
    * or set directly from the calling level. */
-  GralFactory graphicFactory;
+  public GralFactory graphicFactory;
   
   /**Name of the config-file for the Gui-appearance. */
   //String sFileGui;

@@ -50,7 +50,7 @@ public class SwtLed extends GralLed.GraphicImplAccess
   }
   
   SwtLed(GralLed widgg, SwtMng mng){
-    widgg.super(widgg, mng.mng);
+    widgg.super(widgg, mng.gralMng);
     //super(name, mng);
     this.mng = mng;
     switch('r'){ 
@@ -114,7 +114,7 @@ public class SwtLed extends GralLed.GraphicImplAccess
 private class SwtLedImpl extends Canvas
   {
   		/**Creates a LED.
-  	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
+  	 * @param gralMng The Gui-panel-manager contains information about the graphic frame and properties.
   	 * @param kind Use 'r' or 'q' for a round or a square LED.
   	 */
   	public SwtLedImpl(Composite panel)

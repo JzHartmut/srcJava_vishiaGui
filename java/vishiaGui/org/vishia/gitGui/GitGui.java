@@ -758,6 +758,12 @@ public class GitGui
   final SimpleDateFormat dateFmtyyMMdd = new SimpleDateFormat("yy-MM-dd");
 
   
+  /**For stand alone application: Call as doubleclick in windows:
+   * The only one argument is the full path to a .git file directory or .git file or name.gitRepository file.
+   * More arguments which controls where git is found, which graphic size, where is the diff viewer are possible
+   * Describe it, todo.
+   * @param sCmdArgs 
+   */
   public static void main(String[]sCmdArgs){
     GitGuiCmd.CmdArgs cmdArgs = GitGuiCmd.parseArgsGitGui(sCmdArgs);
     if(cmdArgs !=null) {

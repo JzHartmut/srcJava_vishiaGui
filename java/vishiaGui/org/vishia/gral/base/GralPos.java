@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
@@ -624,6 +625,33 @@ public class GralPos implements Cloneable
     */
   }
   
+
+  /**Sets the position
+   * @param framePos The frame or last pos for relative positions.
+   * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
+   *   it is the bottom line for the position. 
+   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
+   *   with a negative value, the framePos {@link GralPos#y.p2} is used. If it is designated
+   *   with {@link #same} but with any offset, the {@link GralPos#y} is used as refer position, it is the top line position.
+   *   Elsewhere it is the top position.
+   * 
+   * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
+   * @param column
+   * @param columnEndOrSize
+   * @param origin
+   * @param direction
+   */
+  public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize ) {
+    int[] pos = new int[10];
+    frac(line, pos, 0);
+    frac(lineEndOrSize, pos, 2);
+    frac(column, pos, 4);
+    frac(columnEndOrSize, pos, 6);
+    frac(framePos.x.pb, pos, 8);
+    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], 0, 'r', pos[8], pos[9], framePos);
+  }
+  
+  
   
   /**Returns true if this position is from right or bottom, so that a resize of the panel needs new positions for this widget.
    */
@@ -914,41 +942,68 @@ public class GralPos implements Cloneable
 
 
 
-  private static void appendPos(StringBuilder b, int p, int pFrac)
+  private static void appendPos(Appendable b, int p, int pFrac) throws IOException
   {
     if(pFrac >0) {
-      if(p < 0) { b.append(p-1); } else { b.append(p); }
-      b.append('.').append(pFrac);
+      if(p < 0) { b.append(Integer.toString(p-1)); } else { b.append(Integer.toString(p)); }
+      b.append('.').append(Integer.toString(pFrac));
     } else {
-      b.append(p);
+      b.append(Integer.toString(p));
     }
   }
 
 
   
   
-  public String posString() 
-  { StringBuilder b = new StringBuilder(16);
-    b.append('@');
-    if(panel != null) {
-      b.append(panel.getName()).append(", ");
-    }
-    appendPos(b, y.p1, y.p1Frac);
-    b.append("..");
-    appendPos(b, y.p2, y.p2Frac);
-    b.append(",");
-    appendPos(b, x.p1, x.p1Frac);
-    b.append("..");
-    appendPos(b, x.p2, x.p2Frac);
+  /**Returns the position in a syntax which is able to parse 
+   * Useful to write back to a configuration file.
+   */
+  public String posString ( ) { 
+    StringBuilder b = new StringBuilder(16);
+    try {
+      b.append('@');
+      if(this.panel != null) {
+        b.append(this.panel.getName()).append(", ");
+      }
+      appendPos(b, this.y.p1, this.y.p1Frac);
+      b.append("..");
+      appendPos(b, this.y.p2, this.y.p2Frac);
+      b.append(", ");
+      appendPos(b, this.x.p1, this.x.p1Frac);
+      b.append("..");
+      appendPos(b, this.x.p2, this.x.p2Frac);
+    } catch(IOException exc) { throw new RuntimeException("unecpected", exc); }
     return b.toString();
+  }
+  
+  
+  
+  /**Append position to given Appendable, for toString of using widgets.
+   * @param b append here
+   * @return b for concatenate.
+   * @throws IOException can be force RuntimeException if a StringBuilder is given as Appendable
+   */
+  public Appendable toString(Appendable b, boolean bAppendPanel) throws IOException 
+  { b.append('@');
+    if(bAppendPanel && this.panel != null) {
+      b.append(this.panel.getName()).append(", ");
+    }
+    appendPos(b, this.y.p1, this.y.p1Frac);
+    b.append("..");
+    appendPos(b, this.y.p2, this.y.p2Frac);
+    b.append(", ");
+    appendPos(b, this.x.p1, this.x.p1Frac);
+    b.append("..");
+    appendPos(b, this.x.p2, this.x.p2Frac);
+    return b;
   }
   
   /**Use especially for debug.
    * @see java.lang.Object#toString()
    */
   @Override public String toString()
-  { return "panel=" + (panel == null ? "?" : panel.toString()) + ", "
-    +"line=" + y.toString() + " col=" + x.toString() + " " + x.dirNext + y.dirNext + y.origin + x.origin;
+  { return "panel=" + (this.panel == null ? "?" : this.panel.toString()) + ", "
+    +"line=" + this.y.toString() + " col=" + this.x.toString() + " " + this.x.dirNext + this.y.dirNext + this.y.origin + this.x.origin;
   }
 
   
@@ -1074,13 +1129,16 @@ public class GralPos implements Cloneable
       } //switch for z coord
       //
       switch(zeType) {
-      case 0: q2 = ze; q2f = zeFrac; break;             // no specific designation: absloute pos
+      case 0: q2 = ze; q2f = zeFrac; break;                // no specific designation: absloute pos
       case size:
-        int ze2 = (ze - size) + q1;                         // relative end position to start pos
+        int ze2 = (ze - size);                             // relative end position to start pos
         if(zeNeg) { 
-          q2 = q1; q2f = q1f; q1 = ze2; q1f = zeFrac; // "10-2": negative size: q2 is the end point, q1 caculate with size
+          q2 = q1; q2f = q1f;                              // "10-2": negative size: q2 is the end point, 
+          q1f = q1f -zeFrac; q1 = q1 + ze2;                   // q1 
+          if(q1f <0) { q1f +=10; q1 -=1; }                 // q1 1 gridunit left/top because frac increased the distance
         } else { 
-          q2 = ze2; q2f = zeFrac;                       // "10+2" positive size, end is caculate with size
+          q2 = q1 + ze2; q2f = q1f + zeFrac;               // "10+2" positive size, end is caculate with size
+          if(q2f >=10) { q2f -=10; q2 +=1; }
         }
         break;
       case same:                                           //"" not textual

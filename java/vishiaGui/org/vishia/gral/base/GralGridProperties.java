@@ -48,16 +48,16 @@ public class GralGridProperties
    * First index is the height of field, second is the size of presentation.
    */
   protected final static int[][] stdTextFontSize =
-  { {5, 5, 6, 7, 7, 8, 9}  ////1, 1.1, 1.2
-  , {6, 6, 7, 8, 9, 9,10}  // 1 1/3,
-  , {6, 7, 8, 9, 9,10,12}  //1.5
-  , {7, 7, 8, 10,10,12,14}  //1 2/3
-  , {7, 8, 9, 11,12,14,18}  //2
-  , {8, 9, 10,11,12,14,18}  //2 1/3
-  , {9,10, 11, 11,12,14,18}  //2.5, 2 2/3
-  , {9,11, 11, 12, 12,14,18}  //3
-  , {10,11,11,12, 12,14,18}  //3.5
-  , {10,11,11,12, 12,14,18}  //>=4
+  { {4, 5, 5, 7, 7, 8, 9}  ////1, 1.1, 1.2
+  , {5, 6, 6, 8, 9, 9,10}  // 1 1/3,
+  , {5, 7, 7, 9, 9,10,12}  //1.5
+  , {6, 9, 8, 10,10,12,14}  //1 2/3
+  , {7, 10, 9, 11,12,14,18}  //2
+  , {7, 11, 10,11,12,14,18}  //2 1/3
+  , {9,12, 14, 11,12,14,18}  //2.5, 2 2/3
+  , {12,14, 16, 12, 12,14,18}  //3
+  , {12,16,18,12, 12,14,18}  //3.5
+  , {15,18,20,12, 12,14,18}  //>=4
   };
   
   protected final static int[] smallPromptFontSize = stdTextFontSize[0];
@@ -66,6 +66,7 @@ public class GralGridProperties
   
   /** Number of pixel for fractional part and for the grid size.
    * The array is organized in a 2-dimensional array <code>[frac][size]</code>.
+   * The <code>[frac][10]</code> contains the number of pixel for 1 grid unit. 
    * <ul>
    * <li>The first column contains 0 for frac = 0.
    * <li>The last column: <code>pixelFrac[size] [10]</code> contains the pixel size of the grid.
@@ -106,12 +107,12 @@ public class GralGridProperties
  //       1/5   2/5   3/5   4/5      Divisions of 5
  //     1  2  3  4  5  6  7  8  9   0   the number given
   { {0, 1, 1, 2, 2, 3, 4, 4, 5, 5,  6 }  //pixel size A
-  , {0, 1, 1, 2, 3, 3, 4, 5, 6, 6,  7 }
-  , {0, 1, 2, 3, 3, 4, 5, 6, 6, 7,  8 }
-  , {0, 1, 2, 3, 4, 4, 5, 6, 7, 8,  9 }
-  , {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-  , {0, 1, 2, 4, 5, 6, 7, 8,10,11, 12 }
-  , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }
+  , {0, 1, 1, 2, 3, 3, 4, 5, 6, 6,  7 }  //pixel size B
+  , {0, 1, 2, 3, 3, 4, 5, 6, 6, 7,  8 }  //pixel size C
+  , {0, 1, 2, 3, 4, 4, 5, 6, 7, 8,  9 }  //pixel size D
+  , {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }  //pixel size E
+  , {0, 1, 2, 4, 5, 6, 7, 8,10,11, 12 }  //pixel size F
+  , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }  //pixel size G
   };
   
   //protected final static int[][] yPixelFrac = xPixelFrac;

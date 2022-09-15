@@ -83,7 +83,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   //public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
   SwtButton(GralButton widgg, SwtMng mng)
   {
-    widgg.super(widgg, mng.mng);
+    widgg.super(widgg, mng.gralMng);
     widgg.setActionMouse(mouseWidgetAction, 0);
     mouseListener = new SwtGralMouseListener.MouseListenerGralAction();
     //Control xx = mng.pos.panel.panelComposite;
@@ -96,7 +96,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
     widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgetSwt.addMouseListener(mouseListener);
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
-    widgetSwt.addKeyListener(new KeyListener(mng.mng._impl.gralKeyListener));
+    widgetSwt.addKeyListener(new KeyListener(mng.gralMng._impl.gralKeyListener));
     widgetSwt.addTraverseListener(SwtMng.swtTraverseListener);
     setBoundsGraphic(widgg.pos(), mng);
     float ySize = widgg.pos().height();

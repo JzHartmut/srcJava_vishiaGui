@@ -99,7 +99,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       new AwtTextField((GralTextField)widgg, this);
     } else if(widgg instanceof GralHorizontalSelector<?>){
       //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
-      mng.registerWidget(widgg);
+      gralMng.registerWidget(widgg);
     } else if(widgg instanceof GralTable<?>){
       //AwtTable.addTable((GralTable<?>)widgg, this);
     } else if(widgg instanceof GralButton){
@@ -335,7 +335,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new AwtMenu(widg, widgSwt, mng);  //TODO
+    GralMenu menu = new GralMenu(); new AwtMenu(widg, widgSwt, gralMng);  //TODO
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
     widgSwt.add(menuAwt);
     menuAwt.show(widgSwt, 10, 10);
@@ -346,7 +346,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
     Frame windowAwt = (Frame)windg.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new AwtMenu(windg, windowAwt, mng);  //TODO
+    GralMenu menu = new GralMenu(); new AwtMenu(windg, windowAwt, gralMng);  //TODO
     return menu;
   }
  
@@ -363,9 +363,9 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       Container parent = (Container)pos().panel.getImpl().getWidgetImplementation();
       
       parent.add(box);
-      setPosAndSize_(mng.getPosOldPositioning(), box);
+      setPosAndSize_(gralMng.getPosOldPositioning(), box);
       Dimension size = box.getSize();
-      GralPanelContent panel = new AwtPanel(name, mng, box);
+      GralPanelContent panel = new AwtPanel(name, gralMng, box);
       //mng.registerPanel(panel);
       return panel;
   }
@@ -439,7 +439,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       dxFrame = rectParent.width; dyFrame = rectParent.height;
     }
     */
-    final GralRectangle rectangle = mng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
+    final GralRectangle rectangle = gralMng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
     rectangle.x += windowFrame.x;
     rectangle.y += windowFrame.y;
     /*
@@ -518,7 +518,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       Component swtWidget = (Component)owidg;
       GralPanel_ifc panel = widgd.pos().panel;
       GralRectangle size = panel.getImpl().getPixelPositionSize(); //PixelSize();
-      GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
+      GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
       swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
       swtWidget.repaint();
@@ -559,15 +559,15 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    */
   protected void XXXsetPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
   {
-    mng.setNextPosition();
+    gralMng.setNextPosition();
     Component parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
     if(parentComp == null){
-      rectangle = mng.calcWidgetPosAndSize(pos(), 800, 600, widthwidgetNat, heigthWidgetNat);
+      rectangle = gralMng.calcWidgetPosAndSize(pos(), 800, 600, widthwidgetNat, heigthWidgetNat);
     } else {
       final Rectangle parentSize = parentComp.getBounds();
-      rectangle = mng.calcWidgetPosAndSize(pos(), parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+      rectangle = gralMng.calcWidgetPosAndSize(pos(), parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
     }
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
        
@@ -624,7 +624,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(mng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return pos.calcWidgetPosAndSize(gralMng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -656,7 +656,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     } else {
       parentSize = parentComp.getBounds();
     }
-    return mng.calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return gralMng.calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
 

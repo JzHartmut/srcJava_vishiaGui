@@ -1,5 +1,7 @@
 package org.vishia.gral.widget;
 
+import java.io.IOException;
+
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidgImpl_ifc;
@@ -46,7 +48,12 @@ public class GralLabel extends GralWidget
   }
 
   
-  
+  @Override public String toString() {
+    StringBuilder b = new StringBuilder();
+    try { super._wdgPos.toString(b, true).append(" Text:").append(getText());
+    } catch(IOException exc) { throw new RuntimeException("unexpected: ", exc); };
+    return b.toString();
+  }
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess

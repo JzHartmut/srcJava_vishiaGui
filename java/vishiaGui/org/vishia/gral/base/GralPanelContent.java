@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   /**Version history:
    * 
    * <ul>
+   * <li>2022-09-14: new {@link #reportAllContent(Appendable)}
    * <li>2022-08: {@link Data#bTabbed} as designation, this is a tabbed panel.
    *   The old class GralTabbedPanel is no more necessary. 
    * <li>2022-08: New class {@link Data} to encapsulate all elements of this. It is better to view in debug to distinguish form GralWidget fields.
@@ -69,7 +71,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20120713;
+  public final static int version = 20120914;
 
   //public GralPrimaryWindow_ifc mainWindow;
   
@@ -417,12 +419,32 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   /**Returns the container instance of the panel of the implementing graphic.
    * @return The container.
+   * @throws IOException 
    */
   //public abstract Object getPanelImpl();
   
+  public void reportAllContent(Appendable out) throws IOException {
+    reportAllContent(out, 0);
+  }
   
+  public void reportAllContent(Appendable out, int level) throws IOException {
+    if(level < 20) {
+      final String nl = "\n| | | |                               ";
+      out.append(nl.substring(0, 2*level+1)).append("Panel: ").append(this.name);
+      for(GralWidget widg: this._panel.widgetList) {
+        if(widg instanceof GralPanelContent) {
+          reportAllContent(out, level+1);
+        } else {
+          out.append(nl.substring(0,2*level+1)).append("+-");
+          widg.toString(out);
+        }
+      }
+    } else {
+      out.append("\n .... more");
+    }
+  }
   
-  @Override public String toString(){ return "GralPanel:" + name; }
+  @Override public String toString(){ return "GralPanel:" + this.name; }
 
   
   

@@ -57,7 +57,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
   
   AwtLabel(GralLabel widgg, AwtWidgetMng mng)
   {
-    widgg.super(widgg, mng.mng);
+    widgg.super(widgg, mng.gralMng);
     //Container panelSwt = mng.getCurrentPanel();
     //int styleSwt = 0;
     int mode;
@@ -79,7 +79,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
     widgHelper = new AwtWidgetHelper(labelAwt, mng);
     labelAwt.setAlignment(mode);
     mng.setBounds_(widgg.pos(), labelAwt);
-    mng.mng.registerWidget(widgg);
+    mng.gralMng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }
 

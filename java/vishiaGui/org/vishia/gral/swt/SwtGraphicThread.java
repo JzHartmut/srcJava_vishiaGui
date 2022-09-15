@@ -220,7 +220,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
     SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
     
-    gralMng.mng.registerPanel(mainWindow);
+    gralMng.gralMng.registerPanel(mainWindow);
     
     windowSwt = windSwt.window; //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     //windowSwt.addKeyListener(keyListener);

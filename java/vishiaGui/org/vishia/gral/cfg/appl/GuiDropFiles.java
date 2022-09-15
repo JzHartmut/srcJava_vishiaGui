@@ -19,11 +19,14 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.cfg.GralCfgWindow;
+import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
 import org.vishia.util.FileSystem;
 
@@ -168,11 +171,15 @@ public class GuiDropFiles {
     this.gralMng.registerUserAction(null, this.action_abortCmd);
     this.gralMng.registerUserAction(null, this.action_clearOutput);
     this.gralMng.registerUserAction(null, this.action_readJZtc);
-    this.window = GralCfgWindow.createWindow("Guidropfiles", "Gui drop files and execute via JzTxtCmd", 'C', sCfg, null, null);
+    this.window = GralCfgZbnf.configWithZbnf(sCfg);
+    //this.window = GralCfgWindow.createWindow("Guidropfiles", "Gui drop files and execute via JzTxtCmd", 'C', sCfg, null, null);
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
+    LogMessage log = new LogMessageStream(System.out);  //a logging system.
+    this.window.create("SWT", 'C', log, null);
     readJZtcScript();
+    
   }
   
   

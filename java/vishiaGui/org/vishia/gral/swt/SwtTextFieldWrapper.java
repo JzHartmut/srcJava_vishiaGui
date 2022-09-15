@@ -154,7 +154,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    KeyListener swtKeyListener = new TextFieldKeyListener(mng.mng._impl.gralKeyListener);
+    KeyListener swtKeyListener = new TextFieldKeyListener(mng.gralMng._impl.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     textFieldSwt.setMenu(null);  //default: no contextMenu, use GralMenu?
     
@@ -196,11 +196,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.setData(this);
     textFieldSwt.addPaintListener(paintListener);
     if(!widgg.isEditable()){
-      mng.mng.registerShowField(widgg);
+      mng.gralMng.registerShowField(widgg);
     }
     super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
 
-    mng.mng.registerWidget(widgg);
+    mng.gralMng.registerWidget(widgg);
     
   }
 
@@ -445,7 +445,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   {
     
     TextFieldFocusListener(SwtMng mng){
-      mng.super(mng.mng);
+      mng.super(mng.gralMng);
     }
 
     @Override public void focusLost(FocusEvent ev){

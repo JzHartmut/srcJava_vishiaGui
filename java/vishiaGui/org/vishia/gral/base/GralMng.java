@@ -204,8 +204,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       }
       this.sMask = sMask1;
       this.sLocalDir = sLocalDir1;
-      this.dialogFile = singleton.createFileDialog();      // TODO this is a problem if created not in the graphic thread.
-      this.dialogFile.open(sTitle, mode);
+      this.dialogFile = null; //singleton.createFileDialog();      // TODO this is a problem if created not in the graphic thread.
+      //this.dialogFile.open(sTitle, mode);
     }
     
   }
@@ -1857,26 +1857,26 @@ public GralButton addCheckButton(
    * 
    */
   public static abstract class ImplAccess {
-    public GralMng mng;
+    public GralMng gralMng;
     
     
     public ImplAccess(GralMng mng, GralGridProperties props){
-      this.mng = mng;
+      this.gralMng = mng;
       mng.setProperties(props);
       mng.impl = this;
     }
     
-    protected GralPos pos(){ return mng.pos().pos; }
+    protected GralPos pos(){ return gralMng.pos().pos; }
 
-    protected String sCurrPanel(){ return mng.sCurrPanel; }
+    protected String sCurrPanel(){ return gralMng.sCurrPanel; }
     
-    protected void listVisiblePanels_add(GralTabbedPanel panel){ mng.listVisiblePanels.add(panel); }
+    protected void listVisiblePanels_add(GralTabbedPanel panel){ gralMng.listVisiblePanels.add(panel); }
     
     public abstract Object getCurrentPanel();
     
-    protected GralWidget indexNameWidgets(String name){ return mng.indexNameWidgets.get(name); }
+    protected GralWidget indexNameWidgets(String name){ return gralMng.indexNameWidgets.get(name); }
     
-    protected GralUserAction userMainKeyAction(){ return mng.userMainKeyAction; }
+    protected GralUserAction userMainKeyAction(){ return gralMng.userMainKeyAction; }
     
     
     /**This operation creates the proper implementation widgets due to the underlying Graphic system.

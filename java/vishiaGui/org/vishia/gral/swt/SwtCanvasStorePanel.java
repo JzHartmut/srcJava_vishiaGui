@@ -167,12 +167,12 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     SwtPolyLine(GralCanvasStorage.PolyLine line, SwtMng gralMng){
       nrofPoints = line.points.size();
       points = new int[2 * nrofPoints];
-      GralRectangle rr = line.pos.calcWidgetPosAndSize(gralMng.mng.propertiesGui, 0, 0, 800, 600);
+      GralRectangle rr = line.pos.calcWidgetPosAndSize(gralMng.gralMng.propertiesGui, 0, 0, 800, 600);
       int ix = -1;
       int xf, yf;
       if(line.bPointsAreGralPosUnits){
-        xf = gralMng.mng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-        yf = gralMng.mng.propertiesGui.xPixelUnit();
+        xf = gralMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
+        yf = gralMng.gralMng.propertiesGui.xPixelUnit();
       } else {
         xf = rr.dx;  //0.0..1.0 is size of line.pos
         yf = rr.dy;

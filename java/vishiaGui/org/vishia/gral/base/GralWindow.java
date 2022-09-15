@@ -191,13 +191,16 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * @param size 'A'..'G', 'A' is a small size, 'G' is the largest.
    * @param log maybe null. If not given a {@link LogMessageStream} with System.out will be created. For internal logging.
    * @param initializeInGraphicThread maybe null, an order which will be executed in the graphic thread after creation of the window.
+   * @deprecated create new {@link org.vishia.gral.swt.SwtFactory} or new {@link org.vishia.gral.awt.AwtFactory} and then
+   *   call the overridden operation {@link org.vishia.gral.ifc.GralFactory#createGraphic(GralWindow, char, LogMessage)}.
+   *   You can then use also any other Factory for the graphic system for any other graphic system. 
    */
-  public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
-    if(_wdgImpl !=null) throw new IllegalStateException("window already created.");
+  @Deprecated public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
+    if(this._wdgImpl !=null) throw new IllegalStateException("window already created.");
     GralMng mng = GralMng.get();
     GralGraphicThread gthread = mng.gralDevice();
     if(gthread.isRunning()) {
-      gthread.addDispatchOrder(createImplWindow);
+      gthread.addDispatchOrder(this.createImplWindow);
     } else {
       //it is the primary window, start the graphic with it.
       if(log == null) { log = new LogMessageStream(System.out); }

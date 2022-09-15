@@ -96,9 +96,9 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  SwtCanvasStorePanel panel;
 	  Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-	    panel = new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.mng);
+	    panel = new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng);
 	  } else {
-	    panel = new SwtGridPanel(panelg, widgetSwt, 0, colorBackground, mng.mng.propertiesGui.xPixelUnit(), mng.mng.propertiesGui.yPixelUnit(), 5, 5, mng.mng);
+	    panel = new SwtGridPanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng.propertiesGui.xPixelUnit(), mng.gralMng.propertiesGui.yPixelUnit(), 5, 5, mng.gralMng);
 	  }
 	  panel.swtCanvas.setBounds(sizeTabFolder);
 	  panel.itsTabSwt = tabItem;
@@ -108,7 +108,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  //mng.mng.registerPanel(gralPanel);   //register the panel in the mng.
 	  //mng.mng.registerWidget(gralPanel);
 	  //panels.put(sName, gralPanel);   //register the tab panel in the TabbedPanel
-	  mng.mng.setPosition(0, 0, 0, 0, 0, '.');
+	  mng.gralMng.setPosition(0, 0, 0, 0, 0, '.');
 	  return gralPanel;
 	}
 
@@ -119,7 +119,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	   TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 	   tabItemOperation.setText(sLabel);
 	   Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	   SwtCanvasStorePanel swtPanel = (new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.mng));
+	   SwtCanvasStorePanel swtPanel = (new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng));
 	   GralPanelContent panel = swtPanel.gralPanel();
 	   //mng.mng.registerPanel(panel);
 	   tabItemOperation.setControl(swtPanel.swtCanvas);
@@ -134,7 +134,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	@Override public GralPanelContent selectTab(String name)
 	{ //assert(false);
 	  
-	  GralPanel_ifc panel = mng.mng.getPanel(name);
+	  GralPanel_ifc panel = mng.gralMng.getPanel(name);
 	  Object oSwtPanel = panel.getImpl();  //getWidgetImplementation();
 	  SwtPanel swtPanel = (SwtPanel)oSwtPanel;
 	  if(swtPanel.itsTabSwt !=null){

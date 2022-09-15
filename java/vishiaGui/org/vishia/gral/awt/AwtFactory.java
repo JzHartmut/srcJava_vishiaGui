@@ -11,7 +11,7 @@ public class AwtFactory  extends GralFactory
 {
 
   
-  @Override protected GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
+  @Override public GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
     AwtGraphicThread graphicThread = new AwtGraphicThread(windowg, sizeShow, windowg.gralMng().log);
     GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
     return gralGraphicThread;

@@ -97,7 +97,7 @@ public class GralCfgWindow
    * @param log interface for logging output of parser and creation.
    * @throws ParseException on errors in the sCfg
    */
-  private GralCfgWindow(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
+  @Deprecated private GralCfgWindow(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
     this.log = log !=null ? log : log;
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
     this.imgDir = imgDir;
@@ -127,7 +127,7 @@ public class GralCfgWindow
    * @param log log output for status and parse messages
    * @throws ParseException on errors in the sCfg
    */
-  public static GralWindow createWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
+  @Deprecated public static GralWindow createWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
   throws ParseException
   {
     GralCfgWindow thiz = new GralCfgWindow(sName, sTitle, size, sCfg, imgDir, log);

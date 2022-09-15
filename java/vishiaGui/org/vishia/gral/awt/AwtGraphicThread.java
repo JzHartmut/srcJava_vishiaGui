@@ -49,6 +49,11 @@ public class AwtGraphicThread extends GralGraphicThread.ImplAccess
   
   AwtWidgetMng awtMng;
   
+  /**Starts the Graphic thread see {@link GralGraphicThread#run()} 
+   * @param windowGral
+   * @param sizeShow
+   * @param log
+   */
   AwtGraphicThread(GralWindow windowGral, char sizeShow, LogMessage log)
   { super(sizeShow, windowGral, log);
     //this.xPos = left; this.yPos = top; this.xSize = xSize; this.ySize = ySize; 

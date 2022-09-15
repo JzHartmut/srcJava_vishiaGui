@@ -17,7 +17,7 @@ public class SwtFactory extends GralFactory
    * The orders are given to the GraphicThread usual by {@link GralWidget#repaint()} requested with the changed data of the widget.
    * It means nothing is necessary with the GralGraphicThread from user level.
    */
-  @Override protected GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
+  @Override public GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
     SwtGraphicThread graphicThread = new SwtGraphicThread(windowg, sizeShow, log);
     GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
     return gralGraphicThread;
