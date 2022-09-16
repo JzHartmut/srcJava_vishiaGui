@@ -311,50 +311,50 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   }
   
   
-  /**This class is not intent to use from an application, it is the super class for the implementation layer
-   * to access all necessary data and methods with protected access rights.
-   * The methods are protected because an application should not use it. This class is public because
+  /**This class is not intent to use from an application.
+   * It is instantiated with the implementation graphic, 
+   * for SWT especially aggregated from {@link org.vishia.gral.swt.SwtPanel}.
+   * This implementation access class has a special role with the aggregation,
+   * in opposite to ImplAccess from other widgets, which are the super class for the implementation layer.
+   * This class allows access to all necessary data and methods of the environment class with protected access rights.
+   * The class and methods are public here because elsewhere cannot access from the swt package.
+   * An application should not use it. This class is public because
    * it should be visible from the graphic implementation which is located in another package. 
    */
-  public abstract static class GraphicImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
+  public abstract static class WindowImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
   implements GralWidgImpl_ifc
   {
     
-    protected final GralWindow gralWindow;  //its outer class.
+    public final GralWindow gralWindow;  //its outer class.
     
-    protected GraphicImplAccess(GralWindow gralWdg){
+    protected WindowImplAccess(GralWindow gralWdg){
       super(gralWdg);
       this.gralWindow = gralWdg;  //References the environment class
     }
     
     /**The title is stored in the {@link GralWidget.DynamicData#displayedText}. */
-    protected String getTitle(){ return gralWindow.dyda.displayedText; }
+    public String getTitle(){ return gralWindow.dyda.displayedText; }
     
     /**Window properties as Gral bits given on ctor of GralWindow. */
-    protected int getWindowProps(){ return gralWindow.windProps; }
+    public int getWindowProps(){ return gralWindow.windProps; }
     
     
     
     //protected boolean isVisible(){ return gralWindow.bVisible; }
     
-    protected boolean isFullScreen(){ return gralWindow.bFullScreen; }
+    public boolean isFullScreen(){ return gralWindow.bFullScreen; }
     
-    protected boolean shouldClose(){ return gralWindow.bShouldClose; }
+    public boolean shouldClose(){ return gralWindow.bShouldClose; }
     
     /**The resizeAction from the {@link GralWindow_ifc#setResizeAction(GralUserAction)} */
-    protected GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
+    public GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
   
     /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
-    protected GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
+    public GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
   
     /**The invisibleSetAction from the {@link GralWindow_ifc#specifyActionOnCloseWindow(GralUserAction)} */
-    protected GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }  
-  
-  
-  
-  
-  
-  
+    public GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }
+
   }
 
 

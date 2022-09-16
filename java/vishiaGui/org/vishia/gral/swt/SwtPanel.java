@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
@@ -61,14 +62,28 @@ public class SwtPanel extends GralPanelContent.ImplAccess
    */
   public TabItem itsTabSwt; 
   
+  /**If this panel represents a Window, it is the GralWindow implementation.
+   * The {@link SwtSubWindow} does not inherit from {@link GraphicImplAccess}.
+   * This aggregation is null if the panel is not the window's panel.
+   */
+  protected GralWindow.WindowImplAccess swtGralWindow;
+  
 
   //protected Composite panelSwt;
   
   SwtPanel(GralPanelContent panelg)
   { super(panelg);
     panelComposite = null;
+    this.swtGralWindow = null;
   }
 
+  
+  protected void setWindowImpl(GralWindow.WindowImplAccess swtGralWindow) {
+    if(this.swtGralWindow !=null) throw new IllegalStateException("can only be done once");
+    this.swtGralWindow = swtGralWindow;
+  }
+  
+  
   /**Constructs a panel
    * @param name of panel.
    * @param mng The widget manager
@@ -81,6 +96,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     if(panelSwt !=null){
       panelSwt.addControlListener(resizeItemListener);
     }
+    this.swtGralWindow = null;
   }
 
   /*
@@ -154,24 +170,6 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   
   
-  protected ControlListener resizeItemListener = new ControlListener()
-  { @Override public void controlMoved(ControlEvent e) 
-    { //do nothing if moved.
-    }
-
-    @Override public void controlResized(ControlEvent e) 
-    { 
-      Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
-      //Control parent = wparent;
-      for(GralWidget widg1: ((GralPanelContent)widgg).getWidgetsToResize()){
-        widg1.gralMng().resizeWidget(widg1, 0, 0);
-      }
-      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
-    }
-    
-  };
-
-
   @Override public boolean setFocusGThread()
   {
     setVisibleGThread(true);
@@ -193,6 +191,24 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     // TODO Auto-generated method stub
     
   }
+
+
+  protected ControlListener resizeItemListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
+    }
+  
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
+      //Control parent = wparent;
+      for(GralWidget widg1: ((GralPanelContent)widgg).getWidgetsToResize()){
+        widg1.gralMng().resizeWidget(widg1, 0, 0);
+      }
+      //validateFrameAreas();  //calculates the size of the areas newly and redraw.
+    }
+    
+  };
 
 
   public SelectionListener tabItemSelectListener = new SelectionListener(){

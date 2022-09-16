@@ -23,7 +23,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.util.Debugutil;
 
 
-public class AwtSubWindow extends GralWindow.GraphicImplAccess implements GralWidgImpl_ifc
+public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWidgImpl_ifc
 {
   
   protected final Frame window;
