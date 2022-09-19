@@ -414,6 +414,13 @@ public interface GralWidget_ifc extends Removeable
   
   
   Object getContentInfo();
+  
+  /**Returns the implementation widget or its Wrapper.
+   * Need cast due to implementation level.
+   * @return null if implementation is not existing. 
+   */
+  Object getImplWidget ( );
+
 
   /**Capability for any widget to update its content from its associated variables described in its sDataPath.
    * @param container The container is used only if the variable is not known by direct reference

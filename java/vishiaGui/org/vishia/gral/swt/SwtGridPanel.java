@@ -3,6 +3,7 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -68,45 +69,68 @@ public class SwtGridPanel extends SwtCanvasStorePanel
 	public SwtGridPanel(GralPanelContent wdgg, Composite xxxparent, int style, Color backGround, int xG, int yG, int xS, int yS, GralMng gralMng)
 	{ super(wdgg);
 	  GralWidget_ifc parentPanelifc = wdgg.pos().parent;
+	  xG +=1;
 	  //GralPanelContent parentPanel = (GralPanelContent)parentPanelifc;
-	  Composite parent = (Composite)parentPanelifc.getImpl().getWidgetImplementation();  
-    Rectangle areaParent = parent.getClientArea();     
-	  if(widgg.isTabbed()) {
-      GralWidget.ImplAccess swtPanelifc = parentPanelifc.getImpl();
-      final SwtPanel swtPanel;
-      if(swtPanelifc instanceof SwtSubWindow) {
-        //swtPanel = ((SwtSubWindow)swtPanelifc).swtPanel;   // access the SwtPanel data beside the SwtSubWindow.ImplAccess 
-      } else {
-        //swtPanel = null; //TODO
-      }
-      //parent = swtPanel.tabFolder;                         // from the GralPanel
-      TabFolder tabFolder = (TabFolder)parent;             // The parent panel must be a Tab folder.
-      TabItem tab = new TabItem(tabFolder, SWT.None);
-      tab.setText(wdgg.getName());
-      //The parent of the composite of a tab is the composite, which contains the TabFolder, not the TabFolder itself.
-      //The TabFolder is not a swt.Control.
-      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
-      tab.setControl(this.swtCanvas);
-//      if(parentPanel._panel.pixelTab ==0) {                      // the first tab:
-//        Rectangle areaTab = this.swtCanvas.getClientArea();// has automatically the max. size
-//        parentPanel._panel.pixelTab = (short)(areaFolder.height - areaTab.height);
-//      } else {
-//      }
-//      this.swtCanvas.setBounds(150, 150+parentPanel._panel.pixelTab, areaFolder.width-10, areaFolder.height -130 - parentPanel._panel.pixelTab );
+	  SwtMng swtMng = (SwtMng)GralMng.get().impl;
+    Composite parent = (Composite)SwtMng.getSwtImpl(parentPanelifc);
+	  Rectangle areaParent = parent.getClientArea();     
+	  if(wdgg.isTabbed()) {
+	    if(this.tabFolder == null) {
+	      this.tabFolder = new TabFolder(parent, 0);
+	      this.wdgimpl = this.tabFolder;
+	      //((GralPanelContent)this.wdgimpl)._wdgImpl = this.tabFolder;
+	      this.tabFolder.setBounds(areaParent);                     // The tab folder should fill the whole area. Without the setBounds the TabFolder is not visible.
+	      SwtMng.storeGralPixBounds(this, this.tabFolder);
+//	      Font fontTab = new Font(this.impl., "Arial", 10, SWT.ITALIC);
+//	      tabFolder.setFont(fontTab);
+	    }
+      Rectangle areaTabFolder1 = this.tabFolder.getClientArea ();  // position inside the areaWindow, size inclusively the tabs itself
+//      final SwtPanel swtPanel;
+//      //parent = swtPanel.tabFolder;                         // from the GralPanel
+//      TabItem tab = new TabItem(tabFolder, SWT.None);
+//      tab.setText(wdgg.getName());
+//      //The parent of the composite of a tab is the composite, which contains the TabFolder, not the TabFolder itself.
+//      //The TabFolder is not a swt.Control.
+//      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
+//      tab.setControl(this.swtCanvas);
+      super.panelSwtImpl = this.tabFolder;
     }
 	  else {
      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
-     this.swtCanvas.setBounds(areaParent);
-	  }
-  	super.panelSwtImpl = this.swtCanvas;
-    this.swtCanvas.addControlListener(this.resizeItemListener);
-    this.swtCanvas.setData(this);
-    this.swtCanvas.setLayout(null);
-    this.currColor = this.swtCanvas.getForeground();
-    this.swtCanvas.addPaintListener(this.swtCanvas.paintListener);
-    if(backGround !=null) { this.swtCanvas.setBackground(backGround); }
-	  setGridWidth(xG, yG, xS, yS);
-	  this.swtCanvas.setVisible(true);  
+    	super.panelSwtImpl = this.swtCanvas;
+      this.swtCanvas.addControlListener(this.resizeItemListener);
+      this.swtCanvas.setData(this);
+      this.swtCanvas.setLayout(null);
+      this.currColor = this.swtCanvas.getForeground();
+      this.swtCanvas.addPaintListener(this.swtCanvas.paintListener);
+      if(backGround !=null) { this.swtCanvas.setBackground(backGround); }
+  	  setGridWidth(xG, yG, xS, yS);
+    }
+    if(parent instanceof TabFolder) {
+      TabItem tab = new TabItem((TabFolder)parent, SWT.None);
+      tab.setText(wdgg.getName());
+      tab.setControl(this.panelSwtImpl);
+      Rectangle areaTab;
+      GralPanelContent parentPanel = (GralPanelContent)parentPanelifc;
+      GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess)parentPanel.getImpl();
+      if(parentPanel._panel.pixelTab == 0) {
+        areaTab = this.swtCanvas.getClientArea ();
+        parentPanel._panel.pixelTab = (short)(parentImplAccess.pixBounds.dy - areaTab.height);
+      } else {
+        this.swtCanvas.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dy, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab );
+        areaTab = this.swtCanvas.getClientArea ();
+      }
+      
+      if(parentPanel._panel.pixelTab ==0) {                      // the first tab:
+        areaTab = this.swtCanvas.getClientArea();// has automatically the max. size
+        parentPanel._panel.pixelTab = (short)(parentImplAccess.pixBounds.dy - areaTab.height);
+      } else {
+      }
+      this.swtCanvas.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab );
+    } else {
+      this.swtCanvas.setBounds(areaParent);
+    }
+	  this.panelSwtImpl.setVisible(true);  
 	}
 	
 	public void setGridWidth(int xG, int yG, int xS, int yS)

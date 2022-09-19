@@ -2681,6 +2681,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       // TODO Auto-generated method stub
       return null;
     }
+
+
+
+
+    @Override public Object getImplWidget () {
+      // TODO Auto-generated method stub
+      return null;
+    }
   }
   
   /**Data for each Text widget of the graphical implementation layer.

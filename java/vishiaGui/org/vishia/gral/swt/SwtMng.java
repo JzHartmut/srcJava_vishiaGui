@@ -164,6 +164,16 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	 */
   //@SuppressWarnings("hiding")
   public final static String version = "2022-09-04";
+  
+  
+  public static Control getSwtImpl(GralWidget_ifc widgg) {
+    Object oImpl = widgg.getImplWidget();
+    if(oImpl instanceof Control) return (Control) oImpl;
+    else if(oImpl instanceof SwtWidgetHelper) {
+      return ((SwtWidgetHelper)oImpl).widgetSwt;
+    }
+    else return null;
+  }
 
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 

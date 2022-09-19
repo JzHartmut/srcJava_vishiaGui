@@ -233,5 +233,10 @@ public class GralScreen implements GralPanel_ifc {
     
   }
 
+  @Override public Object getImplWidget () {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   
 }

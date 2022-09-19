@@ -1084,8 +1084,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public void specifyContextMenu(GralMenu menu) {
-    if(_wdgImpl !=null && _wdgImpl.wdgimpl !=null) { _wdgImpl.wdgimpl.specifyContextMenu(menu); }
-    else { } //TODO set to instanciation data
+//    if(_wdgImpl !=null && _wdgImpl.wdgimpl !=null) { _wdgImpl.wdgimpl.specifyContextMenu(menu); }
+//    else { } //TODO set to instanciation data
   
   }
   
@@ -1828,6 +1828,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public GralMng gralMng(){ return itsMng; }
   
+  /**Returns the implementation widget or its Wrapper.
+   * Need cast due to implementation level.
+   * @return null if implementation is not existing. 
+   */
+  @Override public Object getImplWidget ( ) {
+    return this._wdgImpl == null ? null: this._wdgImpl.wdgimpl;
+  }
+  
   
   /**Gets the panel where the widget is member of. 
    * @return The panel.
@@ -1944,8 +1952,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public final GralWidget widgg;
     
     
-    /**Aggregation to the widget implementation which resolves the required implementation methods. */
-    protected GralWidgetImpl_ifc wdgimpl;
+    /**Aggregation to the widget implementation.
+     * This can be a {@link GralWidgetHelper} instance which refers the implementation widget
+     * or the widget itself. Should be cast due to implementation level. */
+    protected Object wdgimpl;
     
     /**Bounds of the implementation widget in its container. null if not used. */
     public GralRectangle pixBounds = new GralRectangle(0,0,0,0);
