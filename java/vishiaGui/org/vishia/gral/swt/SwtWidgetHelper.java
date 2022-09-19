@@ -103,7 +103,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
       Object gralObj = parent1.getData();
       if(gralObj !=null && gralObj instanceof SwtPanel){
         SwtPanel gralPanel = (SwtPanel) gralObj;
-        TabItem tabitem = gralPanel.itsTabSwt;
+        TabItem tabitem = null; //gralPanel.itsTabSwt;
         if(tabitem !=null){
           tabitem.getParent().setSelection(tabitem);
         }

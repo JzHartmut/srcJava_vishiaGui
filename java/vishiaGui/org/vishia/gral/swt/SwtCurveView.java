@@ -95,7 +95,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     mouseListenerCurve = new SwtGralMouseListener.MouseListenerGralAction();
   
     GralRectangle bounds = mng.calcWidgetPosAndSize(widgg.pos(), 700, 600);
-    Composite panelSwt = (Composite)widgg.pos().parent.getImpl().getWidgetImplementation();
+    //Composite panelSwt = (Composite)widgg.pos().parent.getImpl().getWidgetImplementation();
+    Composite panelSwt = (Composite)SwtMng.getSwtImpl(widgg.pos().parent);
     curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, widgg.maxNrofXValues);
     curveSwt.setData(this);
     curveSwt.setSize(bounds.dx, bounds.dy);

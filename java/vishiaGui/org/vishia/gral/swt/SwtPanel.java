@@ -51,7 +51,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   /**If this panel is a TabbedPanel, this is the adequate tabFolder instance.
    * 
    */
-  TabFolder tabFolder;
+  //TabFolder tabFolder;
   
   /**The associated tab in a TabFolder if this panel is the main panel of the TabItem, or null 
    * if it isn't a main panel of a tab in a tabbed panel.
@@ -60,13 +60,13 @@ public class SwtPanel extends GralPanelContent.ImplAccess
    * a panel is a tab-panel can't be presented with an extra subclass, because this class is the subclass 
    * of several Swt panel types. Use the aggregation principle instead multi-inheritance.   
    */
-  public TabItem itsTabSwt; 
+  //public TabItem itsTabSwt; 
   
   /**If this panel represents a Window, it is the GralWindow implementation.
    * The {@link SwtSubWindow} does not inherit from {@link GraphicImplAccess}.
    * This aggregation is null if the panel is not the window's panel.
    */
-  protected GralWindow.WindowImplAccess swtGralWindow;
+  //protected GralWindow.WindowImplAccess swtGralWindow;
   
 
   //protected Composite panelSwt;
@@ -74,14 +74,14 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   SwtPanel(GralPanelContent panelg)
   { super(panelg);
     panelSwtImpl = null;
-    this.swtGralWindow = null;
+//    this.swtGralWindow = null;
   }
 
   
-  protected void setWindowImpl(GralWindow.WindowImplAccess swtGralWindow) {
-    if(this.swtGralWindow !=null) throw new IllegalStateException("can only be done once");
-    this.swtGralWindow = swtGralWindow;
-  }
+//  protected void setWindowImpl(GralWindow.WindowImplAccess swtGralWindow) {
+//    if(this.swtGralWindow !=null) throw new IllegalStateException("can only be done once");
+//    this.swtGralWindow = swtGralWindow;
+//  }
   
   
   /**Constructs a panel
@@ -96,7 +96,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     if(panelSwt !=null){
       panelSwt.addControlListener(resizeItemListener);
     }
-    this.swtGralWindow = null;
+//    this.swtGralWindow = null;
   }
 
   /*
@@ -105,21 +105,6 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     return (Composite)panelComposite;
   }*/
   
-
-  
-  void checkCreateTabFolder(Composite composite, SwtMng swt) {
-    if(super.isTabbed()) {
-      this.tabFolder = new TabFolder(composite, SWT.BORDER);
-      Rectangle areaFolder = composite.getClientArea();
-      //GralRectangle rectangle = swt.calcWidgetPosAndSizeSwt(widgg.pos(), composite, 500, 300);
-      this.tabFolder.setBounds(areaFolder);
-      this.panelSwtImpl = this.tabFolder;
-      //todo this.tabFolder.addSelectionListener(this.tabItemSelectListener);
-      //todo this.tabFolder.addControlListener(this.resizeListener);
-
-    }
-  }
-
   
   @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelSwtImpl); }
 
@@ -154,10 +139,10 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   public boolean remove(){
     
     //super.remove();
-    if(itsTabSwt !=null){
-      itsTabSwt.dispose();
-      itsTabSwt = null;
-    }
+//    if(itsTabSwt !=null){
+//      itsTabSwt.dispose();
+//      itsTabSwt = null;
+//    }
     if(panelSwtImpl !=null){
       panelSwtImpl.dispose();
     }

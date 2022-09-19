@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Control;
 public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
 {
 	
-  protected SwtCanvas swtCanvas;
+  //protected SwtCanvas swtCanvas;
 	
 	/**The storage for the Canvas content. */
 	//GralCanvasStorage store = new GralCanvasStorage();
@@ -50,7 +50,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   public SwtCanvasStorePanel(GralPanelContent panelg, Composite parent, int style, Color backGround, GralMng gralMng)
   { super(panelg, (Composite)null);
     //gralPanel().panel.canvas = new GralCanvasStorage();
-    swtCanvas = new SwtCanvas(this,parent, style);
+    SwtCanvas swtCanvas = new SwtCanvas(this,parent, style);
     super.panelSwtImpl = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);
@@ -58,6 +58,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     currColor = swtCanvas.getForeground();
     swtCanvas.addPaintListener(swtCanvas.paintListener);
     swtCanvas.setBackground(backGround);
+    this.wdgimpl = swtCanvas;
   }
   
   /**Constructor called in derived classes. The derived class have to be instantiate the Canvas
@@ -146,12 +147,12 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
 
 	}
 	
-  @Override public Control getWidgetImplementation(){ return swtCanvas; } 
+  @Override public Control getWidgetImplementation(){ return (Control)this.wdgimpl; } 
 
   @Override public boolean setFocusGThread()
   {
     if(!super.setFocusGThread()){
-      return swtCanvas.setFocus();
+      return ((Control)this.wdgimpl).setFocus();
     } else return true;
   }
 

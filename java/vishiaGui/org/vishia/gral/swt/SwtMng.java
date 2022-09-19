@@ -166,7 +166,19 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   public final static String version = "2022-09-04";
   
   
-  public static Control getSwtImpl(GralWidget_ifc widgg) {
+  /**Returns the Swt widget which implements the given GralWidget.
+   * It calls {@link GralWidget_ifc#getImplWidget()} and then checks,
+   * whether the Swt impl Widget is immediately an Control, 
+   * or it istype of {@link SwtWidgetHelper}. 
+   * In the last case {@link SwtWidgetHelper#widgetSwt} is returned.
+   * <br>
+   * New since 2022-09. The approach is, only the {@link GralWidget.ImplAccess#wdgimpl} should be used
+   * to store the aggregation to the implementation widget, so simple as possible. 
+   *  
+   * @param widgg
+   * @return null if a implementation is not available.
+   */
+  public static Control getSwtImpl ( GralWidget_ifc widgg) {
     Object oImpl = widgg.getImplWidget();
     if(oImpl instanceof Control) return (Control) oImpl;
     else if(oImpl instanceof SwtWidgetHelper) {
@@ -175,6 +187,15 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     else return null;
   }
 
+  
+  
+  
+  public static Composite getSwtParent ( GralPos pos) {
+    return (Composite)getSwtImpl(pos.parent);
+  }
+  
+  
+  
 	/**The GUI may be determined by a external user file. Not all planned fields, buttons etc. 
    * may be placed in the GUI, a user can desire about the elements. 
    * But an access to a non-existing element should be detected. This Exception should be caught

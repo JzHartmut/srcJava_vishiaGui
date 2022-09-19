@@ -1884,7 +1884,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public boolean remove()
   {
     if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
-    if(_wdgPos.parent !=null) {
+    if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent) {
       ((GralPanelContent)_wdgPos.parent).removeWidget(this);
     }
     itsMng.deregisterWidgetName(this);

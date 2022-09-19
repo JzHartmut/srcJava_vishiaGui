@@ -63,7 +63,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     widgg.super(widgg, swtMng.gralMng);                           // calls the super ctor of this but with the instance of the environment class.
     GralPos pos = widgg.pos();
     GralWidget.ImplAccess parentImpl = pos.parent.getImpl();
-    Composite panelSwt = (Composite)parentImpl.getWidgetImplementation();
+    Composite panelSwt = SwtMng.getSwtParent(pos);
     //assert(parentImpl.tabFolder ==null);
     int styleSwt = 0;
     this.labelSwt = new Label(panelSwt, styleSwt);

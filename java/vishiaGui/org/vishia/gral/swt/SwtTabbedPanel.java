@@ -100,10 +100,10 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  } else {
 	    panel = new SwtGridPanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng.propertiesGui.xPixelUnit(), mng.gralMng.propertiesGui.yPixelUnit(), 5, 5, mng.gralMng);
 	  }
-	  panel.swtCanvas.setBounds(sizeTabFolder);
-	  panel.itsTabSwt = tabItem;
-	  tabItem.setControl(panel.swtCanvas);
-	  panel.swtCanvas.addFocusListener(focusTabListener); //unused...
+//	  panel.swtCanvas.setBounds(sizeTabFolder);
+//	  panel.itsTabSwt = tabItem;
+//	  tabItem.setControl(panel.swtCanvas);
+//	  panel.swtCanvas.addFocusListener(focusTabListener); //unused...
 	  GralPanelContent gralPanel = panel.gralPanel();
 	  //mng.mng.registerPanel(gralPanel);   //register the panel in the mng.
 	  //mng.mng.registerWidget(gralPanel);
@@ -122,7 +122,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	   SwtCanvasStorePanel swtPanel = (new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng));
 	   GralPanelContent panel = swtPanel.gralPanel();
 	   //mng.mng.registerPanel(panel);
-	   tabItemOperation.setControl(swtPanel.swtCanvas);
+//	   tabItemOperation.setControl(swtPanel.swtCanvas);
 	   return panel;
 	}
 	
@@ -137,9 +137,9 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  GralPanel_ifc panel = mng.gralMng.getPanel(name);
 	  Object oSwtPanel = panel.getImpl();  //getWidgetImplementation();
 	  SwtPanel swtPanel = (SwtPanel)oSwtPanel;
-	  if(swtPanel.itsTabSwt !=null){
-	  	  widgetSwt.setSelection(swtPanel.itsTabSwt);
-  	  }
+//	  if(swtPanel.itsTabSwt !=null){
+//	  	  widgetSwt.setSelection(swtPanel.itsTabSwt);
+//  	  }
 	  return (GralPanelContent)panel;
 	}
 	
