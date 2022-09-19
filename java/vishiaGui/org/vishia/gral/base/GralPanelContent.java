@@ -425,6 +425,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   public void reportAllContent(Appendable out) throws IOException {
     reportAllContent(out, 0);
+    out.append("\n");
   }
   
   public void reportAllContent(Appendable out, int level) throws IOException {
@@ -433,7 +434,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
       out.append(nl.substring(0, 2*level+1)).append("Panel: ").append(this.name);
       for(GralWidget widg: this._panel.widgetList) {
         if(widg instanceof GralPanelContent) {
-          reportAllContent(out, level+1);
+          ((GralPanelContent)widg).reportAllContent(out, level+1);
         } else {
           out.append(nl.substring(0,2*level+1)).append("+-");
           widg.toString(out);

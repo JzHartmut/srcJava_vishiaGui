@@ -46,6 +46,7 @@ import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.CheckVs;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileFunctions;
 import org.vishia.util.FileSystem;
@@ -685,21 +686,25 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#createImplWidget_Gthread(org.vishia.gral.base.GralWidget)
    */
   @Override public void createImplWidget_Gthread(GralWidget widgg){ 
-    if(widgg instanceof GralWindow){
-      GralWindow wind1 = (GralWindow)widgg;
-      this.impl.createSubWindow(wind1);
-//      for(Map.Entry<String, GralPanelContent> e: wind1.panels.entrySet()) {
-//        GralPanelContent tab = e.getValue();
-//        
-//      }
-      //registerPanel(wind1);
-      //set the current position of the manager to this window, initalize it.
-      //PosThreadSafe pos = pos();
-      //pos.pos.panel = wind1; //it is selected.
-      //pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
-
-    } else {  
-      impl.createImplWidget_Gthread(widgg); 
+    try {
+      if(widgg instanceof GralWindow){
+        GralWindow wind1 = (GralWindow)widgg;
+        this.impl.createSubWindow(wind1);
+  //      for(Map.Entry<String, GralPanelContent> e: wind1.panels.entrySet()) {
+  //        GralPanelContent tab = e.getValue();
+  //        
+  //      }
+        //registerPanel(wind1);
+        //set the current position of the manager to this window, initalize it.
+        //PosThreadSafe pos = pos();
+        //pos.pos.panel = wind1; //it is selected.
+        //pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
+  
+      } else {  
+        impl.createImplWidget_Gthread(widgg); 
+      }
+    } catch(Exception exc) {
+      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
     }
   }
   
@@ -1931,7 +1936,7 @@ public GralButton addCheckButton(
     @Deprecated public abstract GralWindow createWindow(String name, String title, int windProps);
     
     
-    protected abstract void createSubWindow(GralWindow windowGral);
+    protected abstract void createSubWindow(GralWindow windowGral) throws IOException;
     
     public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
     
@@ -2154,7 +2159,11 @@ public GralButton addCheckButton(
   { GralPos pos = pos().pos;  //without clone.
     String sPos = pos.posString(); 
     GralWindow windowGral = new GralWindow(sPos, name, title, windProps);
-    impl.createSubWindow(windowGral);
+    try {
+      impl.createSubWindow(windowGral);
+    } catch(Exception exc) {
+      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
+    }
     return windowGral;
   }
 

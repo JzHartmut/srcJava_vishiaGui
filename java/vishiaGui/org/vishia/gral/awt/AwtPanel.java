@@ -54,7 +54,7 @@ public class AwtPanel  extends GralPanelContent
   /**Constructs a panel
    * @param name of panel.
    * @param mng The widget manager
-   * @param panelSwt may be null, then the {@link GralPanelContent#panelComposite} should be set 
+   * @param panelSwt may be null, then the {@link GralPanelContent#panelSwtImpl} should be set 
    *   after construction of a derived class.
    */
   public AwtPanel(String name, GralMng mng, Container panelAwt)

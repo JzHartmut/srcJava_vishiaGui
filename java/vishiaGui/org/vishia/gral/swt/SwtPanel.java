@@ -45,7 +45,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   /**It is either a Composite or a SwtCanvas
    * 
    */
-  public Composite panelComposite;
+  public Composite panelSwtImpl;
   
   
   /**If this panel is a TabbedPanel, this is the adequate tabFolder instance.
@@ -73,7 +73,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   SwtPanel(GralPanelContent panelg)
   { super(panelg);
-    panelComposite = null;
+    panelSwtImpl = null;
     this.swtGralWindow = null;
   }
 
@@ -87,12 +87,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   /**Constructs a panel
    * @param name of panel.
    * @param mng The widget manager
-   * @param panelSwt may be null, then the {@link GralPanelContent#panelComposite} should be set 
+   * @param panelSwt may be null, then the {@link GralPanelContent#panelSwtImpl} should be set 
    *   after construction of a derived class.
    */
   public SwtPanel(GralPanelContent panelg, Composite panelSwt)
   { super(panelg);
-    panelComposite = panelSwt;
+    panelSwtImpl = panelSwt;
     if(panelSwt !=null){
       panelSwt.addControlListener(resizeItemListener);
     }
@@ -113,6 +113,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       Rectangle areaFolder = composite.getClientArea();
       //GralRectangle rectangle = swt.calcWidgetPosAndSizeSwt(widgg.pos(), composite, 500, 300);
       this.tabFolder.setBounds(areaFolder);
+      this.panelSwtImpl = this.tabFolder;
       //todo this.tabFolder.addSelectionListener(this.tabItemSelectListener);
       //todo this.tabFolder.addControlListener(this.resizeListener);
 
@@ -120,26 +121,26 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   }
 
   
-  @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelComposite); }
+  @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelSwtImpl); }
 
 
   @Override public GralRectangle getPixelSize(){
-    Rectangle r = ((Composite)panelComposite).getClientArea();
+    Rectangle r = ((Composite)panelSwtImpl).getClientArea();
     GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
     return posSize;
   }
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { ((Composite)panelComposite).setBounds(x,y,dx,dy);
+  { ((Composite)panelSwtImpl).setBounds(x,y,dx,dy);
   }
   
   
   
   @Override public void repaintGthread(){
-    if(panelComposite !=null){
-      ((Composite)panelComposite).redraw();
-      SwtMng.storeGralPixBounds(this, (Composite)panelComposite);
+    if(panelSwtImpl !=null){
+      ((Composite)panelSwtImpl).redraw();
+      SwtMng.storeGralPixBounds(this, (Composite)panelSwtImpl);
     }
   }
 
@@ -147,9 +148,9 @@ public class SwtPanel extends GralPanelContent.ImplAccess
 
 
   @Override public void removeWidgetImplementation()
-  { if(panelComposite !=null){
-      ((Composite)panelComposite).dispose();
-      panelComposite = null;
+  { if(panelSwtImpl !=null){
+      ((Composite)panelSwtImpl).dispose();
+      panelSwtImpl = null;
     }
   }
   
@@ -162,8 +163,8 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       itsTabSwt.dispose();
       itsTabSwt = null;
     }
-    if(panelComposite !=null){
-      panelComposite.dispose();
+    if(panelSwtImpl !=null){
+      panelSwtImpl.dispose();
     }
     return true;
   }
@@ -173,17 +174,17 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   @Override public boolean setFocusGThread()
   {
     setVisibleGThread(true);
-    boolean bRet = panelComposite.setFocus();
+    boolean bRet = panelSwtImpl.setFocus();
     return bRet;
   }
 
-  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); panelComposite.setVisible(bVisible); }
+  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); panelSwtImpl.setVisible(bVisible); }
 
 
   @Override public Object getWidgetImplementation()
   {
     // TODO Auto-generated method stub
-    return panelComposite;
+    return panelSwtImpl;
   }
 
   @Override

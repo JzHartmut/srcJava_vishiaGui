@@ -1,5 +1,7 @@
 package org.vishia.gral.swt;
 
+import java.io.IOException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.KeyEvent;
@@ -216,7 +218,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
     
   }
 
-  void XXX_Old_createWindow__(){
+  void XXX_Old_createWindow__() throws IOException{
   
     SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
     

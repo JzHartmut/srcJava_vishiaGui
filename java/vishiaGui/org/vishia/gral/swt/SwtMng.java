@@ -1,5 +1,6 @@
 package org.vishia.gral.swt;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -65,6 +66,7 @@ import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.gral.widget.GralPlotArea;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.CheckVs;
 
 
 
@@ -430,7 +432,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   @Override public boolean remove(GralPanel_ifc compositeBox)
-  { Composite panelSwt = ((SwtPanel)compositeBox.getImpl().getWidgetImplementation()).panelComposite;
+  { Composite panelSwt = ((SwtPanel)compositeBox.getImpl().getWidgetImplementation()).panelSwtImpl;
     panelSwt.dispose();
     return true;
   }
@@ -446,7 +448,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     //GralWindow windowGral = new GralWindow("@", name, title, windProps);
     GralWindow windowGral = new GralWindow(null, name, title, windProps);
     //SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
-    createSubWindow(windowGral);
+    try {
+      createSubWindow(windowGral);
+    } catch(Exception exc) {
+      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
+    }
     return windowGral;
 
   }
@@ -457,7 +463,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(org.vishia.gral.base.GralWindow)
    */
-  @Override public void createSubWindow(GralWindow windowGral) {
+  @Override public void createSubWindow(GralWindow windowGral) throws IOException {
     SwtSubWindow windowSwt = new SwtSubWindow(this, windowGral);
     //GralRectangle rect = calcPositionOfWindow(windowGral.pos());
     //windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
@@ -826,7 +832,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
     SwtPanel swtPanel = (SwtPanel)pos().panel.getImpl();
-    Composite swtWidg = swtPanel.panelComposite;
+    Composite swtWidg = swtPanel.panelSwtImpl;
     Image image = new Image(swtWidg.getDisplay(), imageData); 
     GralImageBase imageGui = new SwtImage(image);
     GralRectangle size = imageGui.getPixelSize();

@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -67,18 +68,19 @@ public class SwtGridPanel extends SwtCanvasStorePanel
 	{ super(panelg);
 	  GralPanel_ifc parentPanelifc = panelg.pos().panel;
 	  GralPanelContent parentPanel = (GralPanelContent)parentPanelifc;
-	  Composite parent = (Composite)panelg.pos().panel.getImpl().getWidgetImplementation();  
+	  Composite parent = (Composite)parentPanelifc.getImpl().getWidgetImplementation();  
 	  if(parentPanel.isTabbed()) {
       GralWidget.ImplAccess swtPanelifc = parentPanel.getImpl();
       final SwtPanel swtPanel;
       if(swtPanelifc instanceof SwtSubWindow) {
-        swtPanel = ((SwtSubWindow)swtPanelifc).swtPanel;   // access the SwtPanel data beside the SwtSubWindow.ImplAccess 
+        //swtPanel = ((SwtSubWindow)swtPanelifc).swtPanel;   // access the SwtPanel data beside the SwtSubWindow.ImplAccess 
       } else {
-        swtPanel = null; //TODO
+        //swtPanel = null; //TODO
       }
-      parent = swtPanel.tabFolder;                         // from the GralPanel
+      //parent = swtPanel.tabFolder;                         // from the GralPanel
       Rectangle areaFolder = parent.getClientArea();     
-      TabItem tab = new TabItem(swtPanel.tabFolder, SWT.None);
+      TabFolder tabFolder = (TabFolder)parent;             // The parent panel must be a Tab folder.
+      TabItem tab = new TabItem(tabFolder, SWT.None);
       tab.setText(panelg.getName());
       //The parent of the composite of a tab is the composite, which contains the TabFolder, not the TabFolder itself.
       //The TabFolder is not a swt.Control.
@@ -89,12 +91,12 @@ public class SwtGridPanel extends SwtCanvasStorePanel
         parentPanel._panel.pixelTab = (short)(areaFolder.height - areaTab.height);
       } else {
       }
-      this.swtCanvas.setBounds(50, 50+parentPanel._panel.pixelTab, areaFolder.width, areaFolder.height - parentPanel._panel.pixelTab );
+      this.swtCanvas.setBounds(150, 150+parentPanel._panel.pixelTab, areaFolder.width-10, areaFolder.height -130 - parentPanel._panel.pixelTab );
     }
 	  else {
      this.swtCanvas = new SwtCanvasGridPanel(this, parent, style);
 	  }
-  	super.panelComposite = this.swtCanvas;
+  	super.panelSwtImpl = this.swtCanvas;
     this.swtCanvas.addControlListener(this.resizeItemListener);
     this.swtCanvas.setData(this);
     this.swtCanvas.setLayout(null);

@@ -352,7 +352,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected GralPos _wdgPos;
 
 
-  private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
+  //private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
   
   /**The implementation specific widget. The instance is derived from the graphic implementation-specific
    * super class of all widgets such as {@link org.eclipse.swt.widgets.Control} or {@link java.awt.Component}. 
@@ -1906,6 +1906,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       u.append("@?");
     }
     u.append(name);
+    if(this._wdgImpl !=null) {
+    u.append( " pixel:").append(Integer.toString(this._wdgImpl.pixBounds.x)).append(',')
+                     .append(Integer.toString(this._wdgImpl.pixBounds.y)).append("+(")
+                     .append(Integer.toString(this._wdgImpl.pixBounds.x)).append('*')
+                     .append(Integer.toString(this._wdgImpl.pixBounds.y)).append(") ");
+    }
     if(variable !=null){
       String vString = variable.toString();
       u.append(" var=").append(vString);

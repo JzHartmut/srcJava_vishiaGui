@@ -51,7 +51,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   { super(panelg, (Composite)null);
     //gralPanel().panel.canvas = new GralCanvasStorage();
     swtCanvas = new SwtCanvas(this,parent, style);
-    super.panelComposite = swtCanvas;
+    super.panelSwtImpl = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);
     swtCanvas.setLayout(null);

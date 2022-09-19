@@ -1,5 +1,6 @@
 package org.vishia.gral.swt;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,6 +48,18 @@ import org.vishia.util.KeyCode;
  *                            +&lt;*>-->{@link GralWindow.WindowImplAccess#gralWindow} : {@link GralWindow}&lt;>-->{@link GralPanelContent}&lt;>-->{@link GralWidget}
  *                                     ^
  *   {@link SwtWindowImplAccess}&lt;>-------------+
+ *   
+ * SwtSubWindow<>--->SwtPanel<>--->GralPanelContent.ImplAccess<>---->GralWidget.ImplAccess
+ *  |                 |                              |                               +-widgg-->GralWindow<>-->GralWidget
+ *  |                 |                              +-widgg : GralPanelContent      +-wdgimpl-->GralWidgetImpl_ifc<>-+
+ *  |                 +-panelComposite--->
+ *  |                 +-tabFolder : TabFolder
+ *  |                 +-itsTabSwt : TabItem
+ *  |
+ *  +-swtWidgWrapper--------------->SwtWidgetHelper<------------------------------------------------------------------
+ *  +-window-->swt.Shell<>-->Control<--widgetSwt-+ 
+ *  +-swtPanel--->SwtPanel
+ *  +-menuBar--->SwtMenu
  * </pre>
  * To access the {@link GralWindow.WindowImplAccess#gralWindow} you should use the aggregation {@link SwtPanel#swtGralWindow}
  * from the SwtPanel super class.
@@ -124,8 +137,6 @@ public class SwtSubWindow extends SwtPanel implements GralWidgImpl_ifc
   SwtWidgetHelper swtWidgWrapper;
   
   
-  final SwtPanel swtPanel;
-
   protected Shell window;
   
   
@@ -152,8 +163,9 @@ public class SwtSubWindow extends SwtPanel implements GralWidgImpl_ifc
    * @param title
    * @param windProps
    * @param gralMng
+   * @throws IOException 
    */
-  SwtSubWindow(SwtMng mng, GralWindow wdgGral)
+  SwtSubWindow(SwtMng mng, GralWindow wdgGral) throws IOException
   //SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { //super(name, windProps, gralMng, null);
     super(wdgGral );  //Invoke constructor of the super class, with knowledge of its outer class.
@@ -203,8 +215,10 @@ public class SwtSubWindow extends SwtPanel implements GralWidgImpl_ifc
       window.addControlListener(resizeListener);  //This listener calls the resizeAction
     }
     //this.checkCreateTabFolder(this.window, mng);
-    this.swtPanel = new SwtPanel(wdgGral, this.window);    // create the SwtPanel beside SwtSubWindow, but with the same set.Composite, the Shell
-    this.swtPanel.checkCreateTabFolder(this.window, mng);
+    SwtMng.storeGralPixBounds(this, this.window);
+    this.widgg.toString(System.out);
+
+    super.checkCreateTabFolder(this.window, mng);
     
     
     /* test
@@ -228,7 +242,14 @@ public class SwtSubWindow extends SwtPanel implements GralWidgImpl_ifc
   */
   
   
-  @Override public Object getWidgetImplementation(){ return window; }
+  /**The Swt widget implementation is either the Shell itself which is a Composite,
+   * or it is the TabFolder, which is created as only one Composite inside this shell composite. 
+   * Both are referenced via the abstraction class {@link SwtPanel#panelSwtImpl}.
+   */
+  @Override public Object getWidgetImplementation(){ 
+    return super.panelSwtImpl;
+    //return window; 
+  }
   
   
   
@@ -482,7 +503,7 @@ public class SwtSubWindow extends SwtPanel implements GralWidgImpl_ifc
       }
     }
   };
-  
+
   
   
   
