@@ -791,12 +791,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   void registerWidget() {
-    if(this._wdgPos.panel == this) {
+    if(this._wdgPos.parent == this) {
       //don't register the panel itself!
-    } else if(_wdgPos.panel !=null){
-      this._wdgPos.panel.addWidget(this, _wdgPos.toResize());
-    } else {
-      this._wdgPos.panel = itsMng.getCurrentPanel();
+    } else if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent){
+      ((GralPanelContent)this._wdgPos.parent).addWidget(this, _wdgPos.toResize());
+    } else if(_wdgPos ==null) {
+      this._wdgPos.parent = itsMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
     this.itsMng.registerWidget(this);
@@ -873,7 +873,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public void setPrimaryWidgetOfPanel(){
-    _wdgPos.panel.setPrimaryWidget(this);
+    ((GralPanelContent)_wdgPos.parent).setPrimaryWidget(this);
   }
 
   
@@ -1766,7 +1766,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       if(!bHasFocus) {
         GralWidget_ifc child = this;
         if(! (child instanceof GralWindow)) {
-          GralPanel_ifc parent = _wdgPos.panel;
+          GralWidget_ifc parent = _wdgPos.parent;
           int catastrophicalCount = 100;
           //set the visible state and the focus of the parents.
           while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
@@ -1788,7 +1788,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
               parent = null;
             } else {
               child = parent;
-              parent = parent.pos().panel; //
+              parent = parent.pos().parent; //
             }
           }
         }
@@ -1832,7 +1832,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Gets the panel where the widget is member of. 
    * @return The panel.
    */
-  public GralPanel_ifc getItsPanel(){ return _wdgPos.panel; }
+  public GralPanel_ifc getItsPanel(){ return (GralPanelContent)_wdgPos.parent; }
   
   
   /* (non-Javadoc)
@@ -1876,8 +1876,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public boolean remove()
   {
     if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
-    if(_wdgPos.panel !=null) {
-      _wdgPos.panel.removeWidget(this);
+    if(_wdgPos.parent !=null) {
+      ((GralPanelContent)_wdgPos.parent).removeWidget(this);
     }
     itsMng.deregisterWidgetName(this);
     return true;
@@ -1909,8 +1909,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(this._wdgImpl !=null) {
     u.append( " pixel:").append(Integer.toString(this._wdgImpl.pixBounds.x)).append(',')
                      .append(Integer.toString(this._wdgImpl.pixBounds.y)).append("+(")
-                     .append(Integer.toString(this._wdgImpl.pixBounds.x)).append('*')
-                     .append(Integer.toString(this._wdgImpl.pixBounds.y)).append(") ");
+                     .append(Integer.toString(this._wdgImpl.pixBounds.dx)).append('*')
+                     .append(Integer.toString(this._wdgImpl.pixBounds.dy)).append(") ");
     }
     if(variable !=null){
       String vString = variable.toString();
@@ -2104,7 +2104,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   final public void setVisibleStateWidget(boolean visible){
     bVisibleState = visible;
-    String name = _wdgPos.panel == null ? "main window" : _wdgPos.panel.getName();
+    String name = _wdgPos.parent == null ? "main window" : _wdgPos.parent.getName();
     System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + name + ":" + toString());
     lastTimeSetVisible = System.currentTimeMillis();
   }

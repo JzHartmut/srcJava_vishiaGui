@@ -493,4 +493,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     // TODO Auto-generated method stub
     return null;
   }
+
+  @Override public GralPos pos () {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

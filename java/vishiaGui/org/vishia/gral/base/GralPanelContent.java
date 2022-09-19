@@ -518,20 +518,6 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     
     protected boolean isTabbed() { return this.widgg._panel.pixelTab >=0; }
     
-    /**Returns the absolute position of this panel on screen and its size.
-     * If it is a main window, the useable area of the window without title and menu bar is returned.
-     * @return
-     */
-    @Override
-    public abstract   GralRectangle getPixelPositionSize();
-    
-    
-    
-  /**Returns the size of this panel in pixel.
-   * @return the x and y is 0, the dy and dy is the size.
-   */
-    public abstract GralRectangle getPixelSize();
-    
     
     
   }

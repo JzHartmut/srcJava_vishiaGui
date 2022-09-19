@@ -367,7 +367,7 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
           System.err.println("Graphic confic error: " + e.getMessage());
         }                  
       }
-      main.window.reportAllContent(System.out);
+      main.window.mainPanel.reportAllContent(System.out);
       if(error ==0) {
         GralWidget curveView = GralMng.get().getWidget("userCurves");
         if(curveView !=null && curveView instanceof GralCurveView) {

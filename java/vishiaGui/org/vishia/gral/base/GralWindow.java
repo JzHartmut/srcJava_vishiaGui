@@ -16,7 +16,7 @@ import org.vishia.msgDispatch.LogMessageStream;
  * @author Hartmut Schorrig
  *
  */
-public class GralWindow extends GralPanelContent implements GralWindow_ifc
+public class GralWindow extends GralWidget implements GralWindow_ifc
 {
 
   /**Version, history and license.
@@ -90,7 +90,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   { 
     ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
-    { for(GralWidget widgd: getWidgetsToResize()){
+    { for(GralWidget widgd: GralWindow.this.mainPanel.getWidgetsToResize()){
         if(widgd instanceof GralWindow) {
           System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
         } else {
@@ -104,6 +104,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   /**Or of some wind... constants.
    */
   int windProps;  
+  
+  public GralPanelContent mainPanel;
   
   /**This action is called whenever the window is resized by user handling on GUI
    * and the window is determined as {@link GralWindow_ifc#windResizeable}.
@@ -225,7 +227,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
   @Override public boolean remove() {
     super.remove();
-    itsMng.deregisterPanel(this);
+    itsMng.deregisterPanel(this.mainPanel);
     return true;
   }
   
@@ -321,7 +323,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * An application should not use it. This class is public because
    * it should be visible from the graphic implementation which is located in another package. 
    */
-  public abstract static class WindowImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
+  public abstract static class WindowImplAccess extends GralWidget.ImplAccess //access to GralWidget
   implements GralWidgImpl_ifc
   {
     
@@ -330,6 +332,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
     protected WindowImplAccess(GralWindow gralWdg){
       super(gralWdg);
       this.gralWindow = gralWdg;  //References the environment class
+      gralWdg._wdgImpl = this;
     }
     
     /**The title is stored in the {@link GralWidget.DynamicData#displayedText}. */

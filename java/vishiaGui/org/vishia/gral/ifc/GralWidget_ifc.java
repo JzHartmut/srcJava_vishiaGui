@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.util.Debugutil;
@@ -150,6 +151,8 @@ public interface GralWidget_ifc extends Removeable
 
   
   public String getName();
+  
+  public GralPos pos();
   
   public String getDataPath();
   

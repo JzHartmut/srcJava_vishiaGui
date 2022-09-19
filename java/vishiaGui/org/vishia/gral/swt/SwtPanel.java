@@ -124,11 +124,6 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelSwtImpl); }
 
 
-  @Override public GralRectangle getPixelSize(){
-    Rectangle r = ((Composite)panelSwtImpl).getClientArea();
-    GralRectangle posSize = new GralRectangle(0, 0, r.width, r.height);
-    return posSize;
-  }
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)

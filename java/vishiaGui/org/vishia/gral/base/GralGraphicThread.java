@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 
+import java.io.IOException;
 import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -317,7 +318,13 @@ public class GralGraphicThread implements Runnable
     if(pos.x.p2 == 0 && pos.y.p2 == 0){
       impl.mainWindow.setFullScreen(true);  
     }
-
+    impl.mainWindow.mainPanel.createImplWidget_Gthread();
+    impl.mainWindow.mainPanel.setVisible(true);
+    
+    impl.finishInit();
+    try{ impl.reportContent(System.out);
+    } catch(IOException exc) { }
+    
     //The last action, set the GuiThread
     synchronized(this){
       orderList.start();
@@ -433,7 +440,11 @@ public class GralGraphicThread implements Runnable
 
     }
     
+    public abstract void reportContent(Appendable out) throws IOException;
 
+    public abstract void finishInit();
+    
+    
     protected void startThread() {
       threadGuiDispatch.start();
       gralGraphicThread.waitForStart();

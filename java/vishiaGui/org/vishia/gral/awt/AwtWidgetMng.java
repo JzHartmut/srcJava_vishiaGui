@@ -46,6 +46,7 @@ import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
@@ -81,13 +82,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   
-  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getImpl().getWidgetImplementation(); }
+  @Override public Container getCurrentPanel(){ return (Container)pos().parent.getImpl().getWidgetImplementation(); }
 
   
   public Container getWidgetsPanel(GralWidget widg){ 
     GralPos pos = widg.pos();
     if(pos == null) { pos = pos(); } //from GralMng
-    return ((Container)pos.panel.getImpl().getWidgetImplementation()); 
+    return ((Container)pos.parent.getImpl().getWidgetImplementation()); 
   }
 
 
@@ -345,7 +346,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
-    Frame windowAwt = (Frame)windg.getWidgetImplementation();
+    Frame windowAwt = (Frame)windg._wdgImpl.getWidgetImplementation();
     GralMenu menu = new GralMenu(); new AwtMenu(windg, windowAwt, gralMng);  //TODO
     return menu;
   }
@@ -360,7 +361,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   {
       //Composite box = new Composite(graphicFrame, 0);
       Container box = new Container();
-      Container parent = (Container)pos().panel.getImpl().getWidgetImplementation();
+      Container parent = (Container)pos().parent.getImpl().getWidgetImplementation();
       
       parent.add(box);
       setPosAndSize_(gralMng.getPosOldPositioning(), box);
@@ -421,11 +422,11 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   GralRectangle calcPositionOfWindow(GralPos posWindow)
   {
     final GralRectangle windowFrame;
-    if(posWindow.panel !=null) {
-      Object awtWidg = posWindow.panel.getImpl().getWidgetImplementation();
+    if(posWindow.parent !=null) {
+      Object awtWidg = posWindow.parent.getImpl().getWidgetImplementation();
       Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
       Point loc;
-      windowFrame = getPixelUseableAreaOfWindow(posWindow.panel.getPanelWidget());
+      windowFrame = getPixelUseableAreaOfWindow(((GralPanelContent)posWindow.parent).getPanelWidget());
     } else {
       windowFrame = new GralRectangle(0,0,800,600);
     }
@@ -516,7 +517,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     int test = 6;
     if(owidg !=null){
       Component swtWidget = (Component)owidg;
-      GralPanel_ifc panel = widgd.pos().panel;
+      GralWidget_ifc panel = widgd.pos().parent;
       GralRectangle size = panel.getImpl().getPixelPositionSize(); //PixelSize();
       GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
@@ -611,7 +612,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
-    Component parentComp = (Component)pos.panel.getImpl().getWidgetImplementation();
+    Component parentComp = (Component)pos.parent.getImpl().getWidgetImplementation();
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;

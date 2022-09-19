@@ -680,7 +680,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   { GralMng panelMng = GralMng.get();
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = panelMng.getPositionInPanel();
-    GralPanel_ifc panel = posAll.panel;
+    GralWidget_ifc panel = posAll.parent;
     String sPanel = panel.getName();
     //Text field for path above list
     panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');

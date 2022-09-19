@@ -123,7 +123,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
     public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
     {
       GralMng.PosThreadSafe pos = itsMng.pos();
-      if(pos.pos.panel != this) {
+      if(pos.pos.parent != this) {
         pos.pos.setPosition(this, 0, 0, 0, 0, 0, 'd', 0);   //initializes the position of this GralTabbedPanel to have the correct parent for the tab 
       }
       GralPanelContent panelg = new GralPanelContent("@", sName);
@@ -133,7 +133,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
     
     public GralPanelContent addCanvasPanel(String sName, String sLabel){
       GralMng.PosThreadSafe pos = itsMng.pos();
-      if(pos.pos.panel != this) {
+      if(pos.pos.parent != this) {
         pos.pos.setPosition(this, 0, 0, 0, 0, 0, 'd', 0);   //initializes the position of this GralTabbedPanel to have the correct parent for the tab 
       }
       GralPanelContent panelg = new GralPanelContent("@", sName);

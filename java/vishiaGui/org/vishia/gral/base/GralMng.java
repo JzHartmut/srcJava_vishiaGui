@@ -571,7 +571,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   //private String lastClickedVariable;
   
-  @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return pos().pos.panel.getWidgetList(); }
+  @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
 	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
@@ -648,7 +648,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public void setFirstlyThePrimaryWindow(GralWindow primaryWindow){
     if(this.windPrimary ==null) {
       this.windPrimary = primaryWindow; 
-      panels.put("primaryWindow", primaryWindow);
+      panels.put("primaryWindow", primaryWindow.mainPanel);
     }
   };
   
@@ -704,7 +704,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
         impl.createImplWidget_Gthread(widgg); 
       }
     } catch(Exception exc) {
-      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
+      System.err.println(CheckVs.exceptionInfo("unexpected", exc, 0, 10));
     }
   }
   
@@ -836,13 +836,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   @Override public GralPanel_ifc selectPanel(String sName){ 
     PosThreadSafe pos = pos();
-    GralPanel_ifc panel = pos.pos.panel = this.panels.get(sName);
+    GralPanel_ifc panel = this.panels.get(sName);
+    pos.pos.parent = panel;
     sCurrPanel = sName;
-    if(pos.pos.panel == null && XXXcurrTabPanel !=null) {
+    if(pos.pos.parent == null && XXXcurrTabPanel !=null) {
       //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
       pos.pos.set(XXXcurrTabPanel.pos());  
-      pos.pos.panel = XXXcurrTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
-      panels.put(sName, pos.pos.panel);  //TODO unnecessay, see addGridPanel
+      pos.pos.parent = XXXcurrTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
+      panels.put(sName, panel);  //TODO unnecessay, see addGridPanel
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
     }
@@ -853,13 +854,13 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**Selects the given panel as current panel to build some content. */
   @Override public void selectPanel(GralPanel_ifc panel) {
-    pos().pos.panel = panel;
+    pos().pos.parent = panel;
     sCurrPanel = panel == null ? null: panel.getName();
     setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
   }
   
   /**Selects the primary window as current panel to build some content. */
-  @Override public void selectPrimaryWindow() { selectPanel(windPrimary); } 
+  @Override public void selectPrimaryWindow() { selectPanel(windPrimary.mainPanel); } 
   
   @Override public boolean currThreadIsGraphic(){
     return Thread.currentThread().getId() == gralDevice.getThreadIdGui();
@@ -1012,7 +1013,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Deprecated public void setPosPanel(GralPanel_ifc panel) {
     GralMng.PosThreadSafe pos = pos();
-    pos.pos.panel = panel;
+    pos.pos.parent = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
     pos.pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0, pos.pos);
     sCurrPanel = panel.getName();
@@ -1066,7 +1067,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param tabbedPanel
    */
   /*package private*/public void setTabbedPanel(GralPanel_ifc tabbedPanel){
-    pos().pos.panel = tabbedPanel;
+    pos().pos.parent = tabbedPanel;
   }
   
   
@@ -1078,7 +1079,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralWindow getPrimaryWindow(){ return windPrimary; }
   
   
-  public GralPanel_ifc getCurrentPanel(){ return pos().pos.panel; }
+  public GralPanel_ifc getCurrentPanel(){ return (GralPanelContent)pos().pos.parent; }
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
   { @Override public void panelActivatedGui(List<GralWidget> widgetsP)
@@ -1413,7 +1414,7 @@ public GralButton addCheckButton(
    */
   @Deprecated @Override public void addLine(int colorValue, float xa, float ya, float xe, float ye){
     //if(pos().pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
-    if(pos().pos.panel.canvas() !=null){
+    if(((GralPanelContent)pos().pos.parent).canvas() !=null){
       GralColor color = propertiesGui.color(colorValue);
       int xgrid = propertiesGui.xPixelUnit();
       int ygrid = propertiesGui.yPixelUnit();
@@ -1424,7 +1425,7 @@ public GralButton addCheckButton(
       //Any panel which is created in the SWT-implementation is a CanvasStorePanel.
       //This is because lines should be drawn.
       //((SwtCanvasStorePanel) pos().pos.panel.getPanelImpl()).store.drawLine(color, x1, y1, x2, y2);
-      pos().pos.panel.canvas().drawLine(color, x1, y1, x2, y2);
+      ((GralPanelContent)pos().pos.parent).canvas().drawLine(color, x1, y1, x2, y2);
       //furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
     } else {
       log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
@@ -1433,8 +1434,9 @@ public GralButton addCheckButton(
   
   
   @Override public void addLine(GralColor color, List<GralPoint> points){
-    if(pos().pos.panel.canvas() !=null){
-      pos().pos.panel.canvas().drawLine(pos().pos, color, points);
+    GralPanelContent panel = (GralPanelContent)pos().pos.parent;
+    if(panel.canvas() !=null){
+      panel.canvas().drawLine(pos().pos, color, points);
     } else {
       log.sendMsg(0, "GralMng.addLine - panel is not a CanvasStorePanel;");
     }
@@ -1639,7 +1641,7 @@ public GralButton addCheckButton(
       //GralPanel_ifc currPanel = 
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        GralPanel_ifc panel = widgd.pos().panel;
+        GralWidget_ifc panel = widgd.pos().parent;
         String namePanel = panel.getName();
         cfgBuilder.buildGui(log, 0);
         //designer.editFieldProperties(widgd, null);
@@ -1725,7 +1727,7 @@ public GralButton addCheckButton(
   
   @Override public void repaintCurrentPanel()
   {
-    pos().pos.panel.repaint();
+    pos().pos.parent.repaint();
   }
   
   

@@ -2673,6 +2673,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
     @Override public ImplAccess getImpl () { return GralTable.this.getImpl(); }
+
+
+
+
+    @Override public GralPos pos () {
+      // TODO Auto-generated method stub
+      return null;
+    }
   }
   
   /**Data for each Text widget of the graphical implementation layer.

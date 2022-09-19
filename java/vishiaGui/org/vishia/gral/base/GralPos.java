@@ -6,6 +6,7 @@ import java.text.ParseException;
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.StringPart;
@@ -350,8 +351,8 @@ public class GralPos implements Cloneable
    * Because also the end values (right, bottom) are 0, it is the whole left to right and top to bottom position.
    * @param panel The given panel
    */
-  public GralPos(GralPanelContent panel) {
-    this.panel = panel;
+  public GralPos(GralWidget parent) {
+    this.parent = parent;
   }
   
   /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
@@ -372,7 +373,7 @@ public class GralPos implements Cloneable
   /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
   //public int xSepLine, ySepLine;
   
-  public GralPanel_ifc panel;
+  public GralWidget_ifc parent;
   
   /**Sets all values of this with the values of pos (copy values)
    * @param pos The src pos
@@ -383,7 +384,7 @@ public class GralPos implements Cloneable
     x.p1Frac = pos.x.p1Frac; x.p2Frac = pos.x.p2Frac; y.p1Frac = pos.y.p1Frac; y.p2Frac = pos.y.p2Frac;
     x.origin = pos.x.origin; y.origin = pos.y.origin; x.sepLine = pos.x.sepLine; y.sepLine = pos.y.sepLine;
     x.dirNext = pos.x.dirNext; y.dirNext = pos.y.dirNext;
-    panel = pos.panel;
+    parent = pos.parent;
   }
   
   
@@ -457,12 +458,12 @@ public class GralPos implements Cloneable
             spPos.close();
             throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
           }
-          if(posParent !=null && panel == posParent.panel) {
+          if(posParent !=null && panel == posParent.parent) {
             posParent1 = posParent;
           } else {
             //only if it is another panel, remove the given parent.
             posParent1 = null; //new GralPos();                    // should exist formally
-            this.panel = panel;
+            this.parent = panel;
           }
         } else {
           posParent1 = posParent;  //the parent is valid. Because no other panel. Use the current panel.
@@ -545,7 +546,7 @@ public class GralPos implements Cloneable
   
   
   /**Sets the position absolutely or also relative to the given position with given values.
-   * @param panel The panel which is used as container. If null then left the existing panel unchanged.
+   * @param parent The panel which is used as container. If null then left the existing panel unchanged.
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
    *   it is the bottom line for the position. 
    *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
@@ -559,18 +560,18 @@ public class GralPos implements Cloneable
    * @param origin
    * @param direction
    */
-  public void setPosition(GralPanel_ifc panel, float line, float lineEndOrSize, float column, float columnEndOrSize
+  public void setPosition(GralWidget_ifc parent, float line, float lineEndOrSize, float column, float columnEndOrSize
       , int origin, char direction, float border)
   {
-    if(panel !=null) { this.panel = panel; }               // change the panel only if given
-    assert(this.panel !=null);                             // should always have a panel information. 
+    if(parent !=null) { this.parent = parent; }               // change the parent only if given
+    assert(this.parent !=null);                             // should always have a parent information. 
     int[] pos = new int[10];
     frac(line, pos, 0);
     frac(lineEndOrSize, pos, 2);
     frac(column, pos, 4);
     frac(columnEndOrSize, pos, 6);
     frac(border, pos, 8);
-    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], origin, direction, pos[8], pos[9], panel.pos());
+    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], origin, direction, pos[8], pos[9], parent.pos());
     /*
     int y1 = (int)(line);
     int y1f = frac(y1, line);
@@ -653,7 +654,7 @@ public class GralPos implements Cloneable
   
   
   
-  /**Returns true if this position is from right or bottom, so that a resize of the panel needs new positions for this widget.
+  /**Returns true if this position is from right or bottom, so that a resize of the parent needs new positions for this widget.
    */
   public boolean toResize(){ return x.p1 < 0 || x.p2 <= 0 || y.p1< 0 || y.p2 <=0; }
   
@@ -861,7 +862,7 @@ public class GralPos implements Cloneable
     GralPos newObj = new GralPos();
     newObj.x.set(x);
     newObj.y.set(y);
-    newObj.panel = panel;
+    newObj.parent = parent;
     //try{ newObj = (GralGridPos)super.clone(); 
     //} catch(CloneNotSupportedException exc){ assert(false); }
     return newObj; 
@@ -871,7 +872,7 @@ public class GralPos implements Cloneable
   
   
   /**Sets the given position with the given posString.
-   * @param posString "@panel,line, col:" syntax see description on class level.
+   * @param posString "@parent,line, col:" syntax see description on class level.
    * @return new calculated position equal to this.
    *   The clone is done because the result is intend to use as position for the current Gral Widget
    *   during building the Gui. This instance is furthermore used as currently calculated,
@@ -879,8 +880,8 @@ public class GralPos implements Cloneable
    * @throws ParseException
    */
   public GralPos calcNextPos(String posString) throws ParseException {
-    if(posString.equals("!")) {  //new window, initialize the position without panel because it is top.
-      panel = null;
+    if(posString.equals("!")) {  //new window, initialize the position without parent because it is top.
+      parent = null;
       setFinePosition(0,0,0,0,0,0,0,0,0,'d', 0,0, null);
     } else {
       setPosition(posString, this);
@@ -962,8 +963,8 @@ public class GralPos implements Cloneable
     StringBuilder b = new StringBuilder(16);
     try {
       b.append('@');
-      if(this.panel != null) {
-        b.append(this.panel.getName()).append(", ");
+      if(this.parent != null) {
+        b.append(this.parent.getName()).append(", ");
       }
       appendPos(b, this.y.p1, this.y.p1Frac);
       b.append("..");
@@ -985,8 +986,8 @@ public class GralPos implements Cloneable
    */
   public Appendable toString(Appendable b, boolean bAppendPanel) throws IOException 
   { b.append('@');
-    if(bAppendPanel && this.panel != null) {
-      b.append(this.panel.getName()).append(", ");
+    if(bAppendPanel && this.parent != null) {
+      b.append(this.parent.getName()).append(", ");
     }
     appendPos(b, this.y.p1, this.y.p1Frac);
     b.append("..");
@@ -1002,7 +1003,7 @@ public class GralPos implements Cloneable
    * @see java.lang.Object#toString()
    */
   @Override public String toString()
-  { return "panel=" + (this.panel == null ? "?" : this.panel.toString()) + ", "
+  { return "panel=" + (this.parent == null ? "?" : this.parent.toString()) + ", "
     +"line=" + this.y.toString() + " col=" + this.x.toString() + " " + this.x.dirNext + this.y.dirNext + this.y.origin + this.x.origin;
   }
 

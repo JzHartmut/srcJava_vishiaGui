@@ -140,7 +140,7 @@ public class GralCfgWindow
    * @return null if name is faulty.
    */
   public GralWidget getWidget(String name) {
-    return this.window.getWidget(name);
+    return this.window.mainPanel.getWidget(name);
   }
   
 

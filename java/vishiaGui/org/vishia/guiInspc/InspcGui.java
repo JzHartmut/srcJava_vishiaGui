@@ -246,7 +246,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   private void callbackOnReceivedData(){
     long time = System.currentTimeMillis();
     GralMng gralMng = GralMng.get();
-    GralPanelContent primaryWindow = gralMng.getPrimaryWindow(); 
+    GralPanelContent primaryWindow = gralMng.getPrimaryWindow().mainPanel; 
     long timeAtleast = System.currentTimeMillis() - 5000;
     checkWidgetsToRefresh(primaryWindow, time, timeAtleast, 0);
     

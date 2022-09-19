@@ -65,11 +65,6 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     return new GralRectangle(r.x, r.y, r.width, r.height);
   }
 
-  @Override public GralRectangle getPixelSize(){
-    int dx = window.getWidth();
-    int dy = window.getHeight();
-    return new GralRectangle(0,0,dx, dy);
-  }
 
 
 

@@ -395,7 +395,10 @@ public class GralCfgZbnf
       this.currPos.calcNextPos("screen, 10+100, 10+150");  //the size of the window and position on the screen
       int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
       this.window = new GralWindow(this.currPos, null, "wmain", "Title", windowProps);
-      this.currPos = new GralPos(this.window);             // initial GralPos for widgets inside the window.
+      this.currPos = new GralPos(this.window);             // initial GralPos for the main Panel inside the window.
+      GralPanelContent mainPanel = new GralPanelContent(this.currPos, null, "window");
+      this.window.mainPanel = mainPanel;
+      this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
       Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = this.cfgData.getPanels();
       if(setIdxPanels.size()==0){                            // no more panels, it means all is on level of the window
         //gralMng.selectPanel(cfgData.actPanel);
@@ -406,8 +409,8 @@ public class GralCfgZbnf
         //this.window.addWidget(tabs, false);
         for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
           GralCfgPanel cfgPanel = panelEntry.getValue();
-          this.window.setToTabbedPanel();
-          this.currPos = new GralPos(this.window);
+          this.window.mainPanel.setToTabbedPanel();
+          this.currPos = new GralPos(this.window.mainPanel);
           GralPanelContent panel = new GralPanelContent(this.currPos, null, cfgPanel.name, '@');
           //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
           this.currPos = new GralPos(panel);

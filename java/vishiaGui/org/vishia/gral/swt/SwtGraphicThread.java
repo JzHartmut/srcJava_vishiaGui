@@ -9,6 +9,9 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -19,6 +22,7 @@ import org.vishia.gral.base.GralGraphicThread.ImplAccess;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Debugutil;
@@ -218,11 +222,48 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
     
   }
 
+
+  
+  @Override public void finishInit() {
+    this.windowSwt = (Shell)super.mainWindow._wdgImpl.getWidgetImplementation();
+  }
+  
+  
+  @Override public void reportContent(Appendable out) throws IOException {
+    reportContent(out, this.windowSwt, 0);
+  }
+  
+  static final String nl = "\n| | | | | | | | ";
+  
+  
+  void reportContent(Appendable out, Composite parent, int recursion) throws IOException {
+    Control[] children = parent.getChildren();
+    for(Control child : children) {
+      if(child !=null) {
+        Rectangle pos = child.getBounds();
+        out.append(nl.substring(0, 2*recursion+1));
+        if(child instanceof Composite) {
+          GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
+          out.append(child.toString());
+          reportContent(out, (Composite)child, recursion+1);
+        }
+        else  {
+          out.append("+-");
+          GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
+          out.append(child.toString());
+        }
+      }
+    }
+  }
+  
+  
+  
+  
   void XXX_Old_createWindow__() throws IOException{
   
     SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
     
-    gralMng.gralMng.registerPanel(mainWindow);
+    gralMng.gralMng.registerPanel(mainWindow.mainPanel);
     
     windowSwt = windSwt.window; //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     //windowSwt.addKeyListener(keyListener);

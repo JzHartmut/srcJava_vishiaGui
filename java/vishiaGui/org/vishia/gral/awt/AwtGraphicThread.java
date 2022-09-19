@@ -1,6 +1,7 @@
 package org.vishia.gral.awt;
 
 import java.awt.Frame;
+import java.io.IOException;
 
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralWindow;
@@ -90,6 +91,17 @@ public class AwtGraphicThread extends GralGraphicThread.ImplAccess
   @Override
   public void wakeup()
   {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void reportContent ( Appendable out )
+      throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void finishInit () {
     // TODO Auto-generated method stub
     
   }

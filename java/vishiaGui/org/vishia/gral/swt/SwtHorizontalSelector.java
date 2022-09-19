@@ -80,7 +80,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
   { super(wdgGral, mng.gralMng);  //Invoke constructor of the super class, with knowledge of its outer class.
     //this.mng = mng;
-    Composite panel = (Composite)outer.pos().panel.getImpl().getWidgetImplementation();
+    Composite panel = (Composite)outer.pos().parent.getImpl().getWidgetImplementation();
     //widgetSwt = new Canvas(panel,0);
     super.wdgimpl = this.swtWdgW = new SwtWidgetHelper(new Canvas(panel,0), mng);
     swtWdgW.widgetSwt.setData(wdgGral);
