@@ -370,7 +370,7 @@ public class GralCfgZbnf
     GralCfgZbnf thiz = new GralCfgZbnf();                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(sGui, thiz.cfgData);
-    thiz.buildGui();    
+    thiz.buildGui();                                       // build only the Gral instances without implementation graphic
     return thiz.window;                                    // only the window is used, the rest can be garbaged.
   }
   
@@ -392,7 +392,7 @@ public class GralCfgZbnf
     this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
     this.currPos = new GralPos();
     try {
-      this.currPos.calcNextPos("screen, 10+100, 10+150");  //the size of the window and position on the screen
+      this.currPos.calcNextPos("screen, 10+100, 20+150");  //the size of the window and position on the screen
       int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
       this.window = new GralWindow(this.currPos, null, "wmain", "Title", windowProps);
       this.currPos = new GralPos(this.window);             // initial GralPos for the main Panel inside the window.

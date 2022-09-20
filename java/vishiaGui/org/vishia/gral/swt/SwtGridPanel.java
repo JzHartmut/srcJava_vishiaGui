@@ -66,8 +66,9 @@ public class SwtGridPanel extends SwtCanvasStorePanel
 	
   int xS, yS;
   
-	public SwtGridPanel(GralPanelContent wdgg, Composite xxxparent, int style, Color backGround, int xG, int yG, int xS, int yS, GralMng gralMng)
-	{ super(wdgg);
+	public SwtGridPanel ( GralPanelContent wdgg, Composite xxxparent, int style, Color backGround, int xG, int yG, int xS, int yS, GralMng gralMng) { 
+	  super(wdgg);
+	  SwtMng swtMng = (SwtMng)GralMng.get().impl;
     Composite parent = SwtMng.getSwtParent(wdgg.pos());
 	  Rectangle areaParent = parent.getClientArea();     
 	  Composite swtPanel;
@@ -79,7 +80,6 @@ public class SwtGridPanel extends SwtCanvasStorePanel
 	      //((GralPanelContent)this.wdgimpl)._wdgImpl = this.tabFolder;
       swtPanel.setBounds(areaParent);                   // The tab folder should fill the whole area. Without the setBounds the TabFolder is not visible.
       SwtMng.storeGralPixBounds(this, tabFolder);        // store the pixel size in the ImplAccess level
-      SwtMng swtMng = (SwtMng)GralMng.get().impl;
       Font fontTab = new Font(swtMng.displaySwt, "Arial", 10, SWT.ITALIC);
       swtPanel.setFont(fontTab);
     }
@@ -120,6 +120,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel
       swtPanel.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab );
     } else {
       swtPanel.setBounds(areaParent);
+      swtMng.listVisiblePanels_add(wdgg);
     }
 	  this.panelSwtImpl.setVisible(true);  
 	}

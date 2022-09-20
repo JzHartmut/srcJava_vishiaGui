@@ -1877,7 +1877,7 @@ public GralButton addCheckButton(
 
     protected String sCurrPanel(){ return gralMng.sCurrPanel; }
     
-    protected void listVisiblePanels_add(GralTabbedPanel panel){ gralMng.listVisiblePanels.add(panel); }
+    public void listVisiblePanels_add(GralVisibleWidgets_ifc panel){ gralMng.listVisiblePanels.add(panel); }
     
     public abstract Object getCurrentPanel();
     

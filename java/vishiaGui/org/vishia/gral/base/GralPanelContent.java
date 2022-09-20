@@ -11,6 +11,7 @@ import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Debugutil;
 
@@ -23,7 +24,7 @@ import org.vishia.util.Debugutil;
  * <br>
  * For positioning grid lines can be drawn in the implementing graphic. 
  */
-public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralWidget_ifc
+public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralWidget_ifc, GralVisibleWidgets_ifc
 {
 
   /**Version history:
@@ -348,8 +349,14 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    */
   @Deprecated public List<GralWidget> widgetList(){ return this._panel.widgetList; }
   
-  public List<GralWidget> getWidgetList(){ return this._panel.widgetList; }
+  @Override public List<GralWidget> getWidgetList(){ return this._panel.widgetList; }
   
+  @Override public List<GralWidget> getWidgetsVisible () {
+    return this._panel.widgetList;    //all widgets is too much, first version. Compare with GralTabbedPanel
+  }
+
+
+
   public List<GralWidget> getWidgetsToResize(){ return this._panel.widgetsToResize; }
   
   /**Gets a named widget on this panel. Returns null if faulty name. 

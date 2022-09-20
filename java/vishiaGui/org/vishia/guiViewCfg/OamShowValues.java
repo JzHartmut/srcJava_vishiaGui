@@ -12,6 +12,7 @@ import org.vishia.mainCmd.Report;
 
 import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
@@ -55,7 +56,7 @@ public class OamShowValues
   List<GralWidget> widgetsInTab;
   
   /**The access to the gui, to change data to show. */
-  protected final GralMng_ifc guiAccess;
+  protected final GralMng guiAccess;
   
   Set<Map.Entry<String, GralWidget>> fieldsToShow;
   
@@ -85,7 +86,7 @@ public class OamShowValues
 
   public OamShowValues(
     MainCmdLogging_ifc log
-  , GralMng_ifc guiAccess
+  , GralMng guiAccess
   )
   {
     this.log = log;
@@ -223,7 +224,7 @@ public class OamShowValues
   /**
    * 
    */
-  @Deprecated void writeValuesOfTab()
+  void writeValuesOfTab()
   { if(this.dataValid){
       this.timeNow = System.currentTimeMillis();
       ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = this.guiAccess.getVisiblePanels();

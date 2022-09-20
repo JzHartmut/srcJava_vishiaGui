@@ -3,6 +3,7 @@ package org.vishia.guiViewCfg;
 import java.io.File;
 import java.text.ParseException;
 
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactorySocket;
@@ -252,6 +253,16 @@ public class ViewCfg //extends GuiCfg
   }
   
   
+
+  void testChgVariable() {
+    VariableAccess_ifc var1 = this.oamShowValues.getVariable("var1", null);
+    float val1 = var1.getFloat();
+    val1 +=0.01;
+    if(val1 >1.0f) {val1 = -1.0f;}
+    var1.setFloat(val1);
+    this.oamShowValues.writeValuesOfTab();
+  }
+  
   
 
   //@Override 
@@ -260,6 +271,7 @@ public class ViewCfg //extends GuiCfg
     try{
     	//oamOutValues.checkData();
       //msgReceiver.testAndReceive();
+      testChgVariable();
       this.oamRcvUdpValue.sendRequest();
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
