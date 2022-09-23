@@ -943,8 +943,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setDataPath(String sDataPath){  
     this.sDataPath = sDataPath;
-    variable = null;
-    variables = null;
+    this.variable = null;              // should be associated newly
+    this.variables = null;
   }
   
   /**Changes the data path
@@ -1335,6 +1335,23 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   }
   
+
+  
+  /**Sets a variable associated to the widget to refresh with a value.
+   * For refreshing call {@link #refreshFromVariable(VariableContainer_ifc)}.
+   * The variable can be set independent from a given {@link #setDataPath(String)}
+   * but also depending on a {@link #getDataPath()} especially from config reading. 
+   * <br>
+   * On a new called {@link #setDataPath(String)} this variable association is loss.
+   * This is intent to associate a new variable. 
+   * On {@link #refreshFromVariable(VariableContainer_ifc)} also this association 
+   * with the maybe newly {@link #setDataPath(String)} is done.
+   * 
+   * @param variable Any variable from anywhere.
+   */
+  public void setVariable ( VariableAccess_ifc variable) {
+    this.variable = variable;
+  }
   
   
   /**Gets the info to access the values for this widget in the users context.
@@ -1396,7 +1413,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
           stop();
         String sPath2 = sDataPath.trim();
         String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
-        variable = container.getVariable(sPath);
+        this.variable = container.getVariable(sPath);
       }
     }
     if(variable !=null) return variable;

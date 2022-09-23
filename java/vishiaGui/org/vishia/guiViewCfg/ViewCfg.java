@@ -1,6 +1,6 @@
 package org.vishia.guiViewCfg;
 
-import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -10,17 +10,12 @@ import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.area9.GuiCallingArgs;
-import org.vishia.gral.area9.GuiCfg;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.cfg.GralCfgWindow;
 import org.vishia.gral.cfg.GralCfgZbnf;
-import org.vishia.gral.ifc.GralFactory;
-//import org.vishia.gral.gui.GuiDispatchCallbackWorker;
-import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
@@ -71,6 +66,8 @@ public class ViewCfg //extends GuiCfg
   
   GralWindow window;
   
+  LogMessage logCfg;
+  
   GralTextBox outTextbox;
   
   MainCmdLogging_ifc logTextbox;
@@ -83,20 +80,35 @@ public class ViewCfg //extends GuiCfg
   static class CallingArguments extends GuiCallingArgs
   {
     /**Name of the config-file for the Gui-appearance. */
-    String sFileGui;
+    final Argument sFileGui = new Argument("-gui", ":path/to/config.gui  The gui configuration file. Syntax see ...");
   	
     /**Directory where sFileCfg is placed, with / on end. The current dir if sFileCfg is given without path. */
     String sParamBin;
     
     String sFileCtrlValues;
     
-    /**File with the values from the S7 to show. */
-    String sFileOamValues;
+    /**File with values to show alternatively to UDP input. */
+    final Argument sFileOamValues = new Argument("-oamFile", ":path/to/val.bin  File with values for oam");
     
-    /**File with the values from the S7 to show. */
-    String sFileOamUcell;
+    /**File to configure the Oam variables. */
+    final Argument sFileOamVariables = new Argument("-oamCfg", ":path/to/oam.cfg  file with oam variables");
     
-    String sFileCfg;
+    /**UDP:0.0.0.0:60000 IP and port to listen for incomming UDP telegrams.
+     * If not given, do not listen. 
+     * Values back are sent to the sender.
+     */
+    final Argument sIPlisten = new Argument("-ip", ":UDP:192.168.1.77:41234 IP of the connection slot and port to listen, use 0.0.0.0 for listen on all connections.");
+    
+    CallingArguments() {
+      super();
+      super.aboutInfo = "Configurable Gui, made by Hartmut Schorrig, 2010, 2022-09-23";
+      super.helpInfo = "see https://www.vishia.org/gral/index.html";
+      super.addArg(this.sFileOamValues);
+      super.addArg(this.sFileOamVariables);
+      super.addArg(this.sIPlisten);
+      super.addArg(this.sFileGui);
+    }
+
     
   } //class CallingArguments
   
@@ -110,7 +122,6 @@ public class ViewCfg //extends GuiCfg
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;   
-  
   
   
   
@@ -164,15 +175,16 @@ public class ViewCfg //extends GuiCfg
     @Override protected boolean testArgument(String arg, int nArg)
     { boolean bOk = true;  //set to false if the argc is not passed
       try {
+        
         if(arg.startsWith("-parambin=")) 
 	      { this.cargs.sParamBin = getArgument(10);   //an example for default output
 	      }
 	      else if(arg.startsWith("-ctrlbin=")) 
 	      { this.cargs.sFileCtrlValues = getArgument(9);   //an example for default output
 	      }
-	      else if(arg.startsWith("-oambin=")) 
-	      { this.cargs.sFileOamValues = getArgument(8);   //an example for default output
-	      }
+//	      else if(arg.startsWith("-oambin=")) 
+//	      { this.cargs.sFileOamValues = getArgument(8);   //an example for default output
+//	      }
 	      else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){
       }
@@ -197,11 +209,18 @@ public class ViewCfg //extends GuiCfg
    * @param cargs The given calling arguments.
    * @param gui The GUI-organization.
    */
-  ViewCfg(CallingArguments cargs) 
-  { 
+  ViewCfg(CallingArguments cargs) { 
     this.callingArguments = cargs;
-
-
+    Appendable fLogFile = null;
+    if(cargs.sFileLogCfg.val !=null) {
+      try {
+        FileWriter flogCfg = new FileWriter(cargs.sFileLogCfg.val);
+        fLogFile = flogCfg;
+      } catch (Exception exc) {
+        System.err.println("not possible to write to: " + cargs.sFileLogCfg.val + " : " + exc.getMessage());
+      }
+    }
+    this.logCfg = new LogMessageStream(System.out, null, fLogFile, true, null);
     
     
     
@@ -227,12 +246,13 @@ public class ViewCfg //extends GuiCfg
     } else {
       throw new IllegalArgumentException("argument -gui:path/to/gui.cfg is mandatory. ");
     }
-    this.window.mainPanel.reportAllContent(System.out);
-    LogMessage log = new LogMessageStream(System.out);  //a logging system.
+    this.window.mainPanel.reportAllContent(this.logCfg);
+    this.logCfg.flush();
     if(cargs.graphicFactory ==null) {
       cargs.graphicFactory = new SwtFactory();         // default use SWT.
     }
-    cargs.graphicFactory.createGraphic(this.window, cargs.sizeShow, log);
+    cargs.graphicFactory.createGraphic(this.window, cargs.sizeShow, this.logCfg);
+    this.logCfg.flush();
     GralTextBox msgOut = (GralTextBox)this.guiAccess.getWidget("msgOut");
     this.outTextbox = msgOut;
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
@@ -242,8 +262,12 @@ public class ViewCfg //extends GuiCfg
     this.oamShowValues = new OamShowValues(this.logTextbox, this.guiAccess);
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
-    this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox);
-    
+    if(this.callingArguments.sIPlisten.val !=null) {
+      this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox, this.callingArguments);
+    } else { 
+      this.oamRcvUdpValue = null;
+    }
+    this.logCfg.flush();
     //msgReceiver = new MsgReceiver(console, dlgAccess, cargs.sTimeZone);
     
   
@@ -255,7 +279,8 @@ public class ViewCfg //extends GuiCfg
   //@Override 
   protected void initViewCfg ( CallingArguments cargs ) throws IOException { 
       
-    if(! this.oamShowValues.readVariableCfg()) {
+    if(! this.oamShowValues.readVariableCfg(this.callingArguments)) {
+      this.logCfg.sendMsg(99, "error oamShowValues.readVariableCfg()");
       System.err.println("error oamShowValues.readVariableCfg()");
     }
     
@@ -263,9 +288,10 @@ public class ViewCfg //extends GuiCfg
     if(curveView !=null && curveView instanceof GralCurveView) {
       this.oamShowValues.setCurveView((GralCurveView)curveView);
     }
-    this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields());
-
-    this.oamRcvUdpValue.start();
+    this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields(), this.logCfg);
+    if(this.oamRcvUdpValue !=null) {
+      this.oamRcvUdpValue.start();
+    }
   }
   
   
@@ -287,8 +313,12 @@ public class ViewCfg //extends GuiCfg
     try{
     	//oamOutValues.checkData();
       //msgReceiver.testAndReceive();
-      //testChgVariable();
-      this.oamRcvUdpValue.sendRequest();
+      //
+      if(this.oamRcvUdpValue !=null) {
+        this.oamRcvUdpValue.sendRequest();
+      } else {
+        testChgVariable();
+      }
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
       System.out.println(CheckVs.exceptionInfo("ViewCfg - unexpected Exception; ", exc, 0, 7));
@@ -373,7 +403,7 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
       System.err.println("cmdline arg exception: " + exc.getMessage());
       error = 255;
     }
-
+    
     //Initializes the GUI till a output window to show informations:
     //old: CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
     
@@ -386,10 +416,12 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
       new InterProcessCommFactorySocket();
       ViewCfg main = new ViewCfg(cargs);                   // reads all config files, creates Graphic
       main.initViewCfg(cargs);
+      main.logCfg.close();                                 // close the configuration log, it is done.
       //main.execute();
       main.doSomethinginMainthreadTillClosePrimaryWindow();
-        
-      main.oamRcvUdpValue.stopThread();
+      if(main.oamRcvUdpValue !=null) {  
+        main.oamRcvUdpValue.stopThread();
+      }
       GralMng.closeGral();
     } catch(Exception exc) {
       System.err.println("Unexpected exception: " + exc.getMessage());

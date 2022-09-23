@@ -111,20 +111,22 @@ public class OamRcvValue implements Runnable
   
   byte[] sendData = new byte[1500];
   
-  public OamRcvValue(
-    OamShowValues showValues
-  , MainCmdLogging_ifc log
-  )
-  {
+  public OamRcvValue ( OamShowValues showValues, MainCmdLogging_ifc log
+    , ViewCfg.CallingArguments args
+      ) {
     this.thread = new Thread(this, "oamRcv");
     this.log = log;
     this.showValues = showValues;
-    String ownAddr = "UDP:0.0.0.0:0xeab3";
-    
-    this.ipc = InterProcessCommFactory.getInstance().create(ownAddr); //It creates and opens the UDP-Port.
-    this.ipc.open(null, true); //InterProcessComm.receiverShouldbeBlocking);
-    if(this.ipc != null){
-      this.bIpcOpened = true;
+    String ownAddr = args.sIPlisten.val; //"UDP:0.0.0.0:0xeab3";
+    if(ownAddr !=null) {
+      this.ipc = InterProcessCommFactory.getInstance().create(ownAddr); //It creates and opens the UDP-Port.
+      this.ipc.open(null, true); //InterProcessComm.receiverShouldbeBlocking);
+      if(this.ipc != null){
+        this.bIpcOpened = true;
+      }
+    } else {
+      this.ipc = null;
+      System.out.println("no -ip given, not listen to ethernet.");
     }
   }
 

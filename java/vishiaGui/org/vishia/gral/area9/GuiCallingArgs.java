@@ -113,6 +113,8 @@ public class GuiCallingArgs extends Arguments
   public File msgConfig;
 
   
+  public final Argument sFileLogCfg = new Argument("-logcfg", ":path/to/logfile_for_configProcess.txt  - will be closed after startup.");
+  
   /**Returns that directory where the configuration file is found. That directory may contain some more files
    * for the application. */
   public File getDirCfg(){ return fileGuiCfg.getAbsoluteFile().getParentFile(); }
@@ -120,18 +122,17 @@ public class GuiCallingArgs extends Arguments
   
   
   
-  /*---------------------------------------------------------------------------------------------*/
-  /** Tests one argument. This method is invoked from parseArgument. It is abstract in the superclass MainCmd
-      and must be overwritten from the user.
-      :TODO: user, test and evaluate the content of the argument string
-      or test the number of the argument and evaluate the content in dependence of the number.
-
-      @param argc String of the actual parsed argument from cmd line
-      @param nArg number of the argument in order of the command line, the first argument is number 1.
-      @return true is okay,
-              false if the argument doesn't match. The parseArgument method in MainCmd throws an exception,
-              the application should be aborted.
-  */
+  /**Tests one argument. This method is invoked from parseArgument. 
+   * It overrides the  {@link Arguments#testArgument(String, int)}
+   * for specific tests here. The superclass testArgument(...) is called if no argument matches here.
+   * This operation is called from {@link Arguments#parseArgs(String[], Appendable)}
+   * which is called from the user level.
+   * @param arg String of the actual parsed argument from cmd line
+   * @param nArg number of the argument in order of the command line, the first argument is number 1.
+   * @return true is okay,
+   *          false if the argument doesn't match. The parseArgument method in MainCmd throws an exception,
+   *          the application should be aborted.
+   */
   @Override protected boolean testArgument(String arg, int nArg) { 
     boolean bOk = true;  //set to false if the argc is not passed
     GuiCallingArgs cargs = this;
@@ -151,7 +152,7 @@ public class GuiCallingArgs extends Arguments
       cargs.cfgConditions.add(sCfg);
     }
     else if((value = checkArgVal("-ownIpc", arg)) !=null) 
-    { cargs.sOwnIpcAddr = value;   //an example for default output
+    { cargs.sOwnIpcAddr = value;
     }
     else if((value = checkArgVal("-inspectorPort", arg)) !=null) 
     { cargs.sInspectorOwnPort = value;   //an example for default output
@@ -196,7 +197,7 @@ public class GuiCallingArgs extends Arguments
     }
     
     else 
-    { super.testArgument(arg, nArg);
+    { super.testArgument(arg, nArg);             // uses the argList of all other arguments
     }
     return bOk;
   }
@@ -206,8 +207,22 @@ public class GuiCallingArgs extends Arguments
 
   @Override
   public boolean testArgs(Appendable msg) throws IOException {
-    // TODO Auto-generated method stub
-    return false;
+    return true;
   }
 
+
+
+
+  public GuiCallingArgs() {
+    super();
+    super.aboutInfo = "Configurable Gui, made by Hartmut Schorrig, 2010, 2022-09-23";
+    super.helpInfo = "see https://www.vishia.org/gral/index.html";
+    super.addArg(this.sFileLogCfg);
+  }
+
+  
+  
+  
+  
+  
 }

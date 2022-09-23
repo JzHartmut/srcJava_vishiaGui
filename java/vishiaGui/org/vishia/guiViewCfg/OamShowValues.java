@@ -1,5 +1,6 @@
 package org.vishia.guiViewCfg;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -7,6 +8,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
+import org.vishia.byteData.VariableAccessArray_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
 
@@ -100,8 +102,8 @@ public class OamShowValues
     this.dataValid = true;   //it can be set because empty data are present, see above, use to test.
   }
   
-  public boolean readVariableCfg()
-  { int nrofVariable = this.cfgOamVariable.readVariableCfg("guiCfg/oamVar.cfg");
+  public boolean readVariableCfg(ViewCfg.CallingArguments args)
+  { int nrofVariable = this.cfgOamVariable.readVariableCfg(args.sFileOamVariables.val);
     if( nrofVariable>0){
       this.log.writeInfoln("success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");
     } else {
@@ -111,9 +113,18 @@ public class OamShowValues
     return nrofVariable >0;
   }
   
-  public void setFieldsToShow(Set<Map.Entry<String, GralWidget>> fields)
+  public void setFieldsToShow(Set<Map.Entry<String, GralWidget>> fields, Appendable log) throws IOException
   {
     this.fieldsToShow = fields;
+    for(Map.Entry<String, GralWidget> e: fields) {         // complete all show fields with variable
+      final GralWidget widg = e.getValue();
+      final String sData = widg.getDataPath();             // path to the variable, maybe null
+      final VariableAccessArray_ifc var = sData == null ? null : this.accessOamVariable.getVariable(sData);
+      widg.setVariable(var);                                   //null if no data path or variable not exists.
+      log.append(widg.getName()).append(" shows ->").append(var.toString());
+    }
+    
+    
   }
   
   
@@ -259,15 +270,8 @@ public class OamShowValues
 //              }
 //              curve.setSample(values, (int)timeMilliSecFromBaseyear);
             } else {
-              String sContentInfo = widget.getDataPath();
-              if(sContentInfo !=null && sContentInfo.length() >0 && widget !=null){
-                stop();
-                if(!callMethod(widget)){
-                  //show value direct
-                  writeField(widget);
-                }
-                //log.reportln(3, "TAB: " + sContentInfo);
-              }
+              //Note: the variable is assigned from container only once, no effort
+              widget.refreshFromVariable(this.accessOamVariable);  
             }
           }
         }

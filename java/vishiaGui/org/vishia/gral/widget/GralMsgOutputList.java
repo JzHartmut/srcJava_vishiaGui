@@ -1,5 +1,6 @@
 package org.vishia.gral.widget;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatPrecisionException;
@@ -133,5 +134,24 @@ public class GralMsgOutputList  implements LogMessage
     return true;
   }
   
+  @Override
+  public Appendable append(CharSequence csq) throws IOException {
+    sendMsg(0, csq.toString());
+    return this;
+  }
+
+  @Override
+  public Appendable append(CharSequence csq, int start, int end) throws IOException {
+    sendMsg(0, csq.subSequence(start, end).toString());
+    return this;
+  }
+
+  @Override
+  public Appendable append(char c) throws IOException {
+    String s = "" + c;
+    sendMsg(0, s);
+    return this;
+  }
+
 }
 
