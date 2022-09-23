@@ -430,9 +430,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    */
   //public abstract Object getPanelImpl();
   
-  public void reportAllContent(Appendable out) throws IOException {
-    reportAllContent(out, 0);
-    out.append("\n");
+  public void reportAllContent(Appendable out){
+    try {
+      reportAllContent(out, 0);
+      out.append("\n");
+    } catch(Exception exc) {
+      System.err.println("exception on reportAllContent: " + exc.getMessage());
+    }
   }
   
   public void reportAllContent(Appendable out, int level) throws IOException {

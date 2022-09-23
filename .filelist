@@ -99,7 +99,7 @@
 2022-09-20 10:28:00  x     GralMng.java                             ::         83.611  0226552797 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
-2022-09-20 10:21:17  x     GralPanelContent.java                    ::         20.540 -0872163363 
+2022-09-23 10:55:24  x     GralPanelContent.java                    ::         20.649  0696417323 
 2022-09-19 20:09:02  x     GralPos.java                             ::         63.334  1740147290 
 2022-09-19 23:52:18  x     GralScreen.java                          ::          4.204  0278832673 
 2022-08-31 20:31:40  x     GralShowMethods.java                     ::         11.732 -1383563975 
@@ -110,7 +110,7 @@
 2022-08-28 18:51:19  x     GralTextField.java                       ::         33.688  1447617859 
 2022-08-28 18:53:03  x     GralValueBar.java                        ::          6.210  1454250108 
 2022-01-31 19:37:42  x     GralWidgImpl_ifc.java                    ::          5.263 -0147301171 
-2022-09-20 01:16:29  x     GralWidget.java                          ::         99.195 -0044753327 
+2022-09-20 14:15:31  x     GralWidget.java                          ::         99.188 -0901987678 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-09-19 19:28:12  x     GralWindow.java                          ::         15.761  1593822377 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
@@ -118,7 +118,7 @@
 
 ============================== java/vishiaGui/org/vishia/gral/cfg/ =================================
 2022-08-28 20:18:19  x     GralCfgBuilder.java                      ::         19.664  1130248061 
-2022-09-03 21:15:56  x     GralCfgData.java                         ::         18.839 -1442443144 
+2022-09-23 11:20:53  x     GralCfgData.java                         ::         19.218 -0453785899 
 2022-08-28 20:17:08  x     GralCfgDesigner.java                     ::         15.580 -1911478894 
 2022-08-28 20:15:11  x     GralCfgElement.java                      ::         10.583  1606335891 
 2021-10-04 14:29:48  x     GralCfgPanel.java                        ::          2.140  1145000466 
@@ -251,10 +251,10 @@
 2021-10-04 14:29:51  x     InspcViewTargetComm.java                 ::         14.819  0586218237 
 
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
-2022-08-26 09:17:00  x     OamOutFileReader.java                    ::          3.375 -0576691088 
-2022-09-08 23:40:55  x     OamRcvValue.java                         ::          7.739  2117009024 
+2022-09-23 10:23:34  x     OamOutFileReader.java                    ::          3.543  1655028191 
+2022-09-23 11:23:10  x     OamRcvValue.java                         ::          8.207  0966302981 
 2022-09-20 10:15:47  x     OamShowValues.java                       ::         21.869  0384639448 
-2022-09-20 10:07:46  x     ViewCfg.java                             ::         14.642  0297222290 
+2022-09-23 11:04:03  x     ViewCfg.java                             ::         14.165  1611833268 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
 2021-07-09 14:52:12  x     StimuliSelector.java                     ::         40.544  0386394394 

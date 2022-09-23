@@ -920,7 +920,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This info can be set and changed anytime. */
   public void setData(Object data){  oContentInfo = data;}
   
-  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
+  /**Gets the application specific info. See {@link #setData(Object)}. */
   public Object getData(){ return oContentInfo; }
   
  

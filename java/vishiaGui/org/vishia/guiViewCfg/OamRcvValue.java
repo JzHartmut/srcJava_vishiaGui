@@ -27,6 +27,7 @@ public class OamRcvValue implements Runnable
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2022-09-22 for experience check of the timestamp is built in to report lost telegrams. 
    * <li>2022-08 
    * <li>2010-06 created.
    * </ul>
@@ -55,7 +56,7 @@ public class OamRcvValue implements Runnable
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String version = "2022-08-31";
+  public final static String version = "2022-09-23";
 
   
   
@@ -88,6 +89,8 @@ public class OamRcvValue implements Runnable
   ShowParam showParam = new ShowParam();
 
   int ctCorruptData;
+  
+  int currCnt = 0;
   
   boolean bIpcOpened;
   
@@ -139,40 +142,55 @@ public class OamRcvValue implements Runnable
     this.bRun = false;
   }
   
-  @Override public void run()
-  {
+  
+  private void receiveAndExec() {
     int[] result = new int[1];
     Address_InterProcessComm sender = this.ipc.createAddress();
     int ctnl=0;
-    while(this.bRun){
-      long time1 = System.currentTimeMillis();
-      this.ipc.receiveData(result, this.recvData, sender);
-      long time2 = System.currentTimeMillis();
-      if(result[0] > 0) {
+    long time1 = System.currentTimeMillis();
+    this.ipc.receiveData(result, this.recvData, sender);
+    long time2 = System.currentTimeMillis();
+    if(result[0] > 0) {
+      if(showParam.printDotOnReceivedTelegr !=0) {
+        System.out.append('.');
+        if(--ctnl <0) {
+          ctnl = showParam.newlineOnTelgCt;
+          if( (ctnl & showParam.maskWriteDot) ==0) {
+            System.out.append('\n');
+          }
+        }
+      }
+      int currCnt1 = (((int)this.recvData[24])<<8) | (this.recvData[25] & 0x00ff);
+      if(currCnt1 != this.currCnt+1) {
+        System.out.append(" currCnt-Delta: ").append(Integer.toString(currCnt1 - this.currCnt)).append("  ").append(Integer.toHexString(currCnt1)).append('\n');
+      }
+      this.currCnt = currCnt1;
+      try{ evalTelg(this.recvData, result[0]); }
+      catch(ParseException exc){
+        this.ctCorruptData +=1;
         if(showParam.printDotOnReceivedTelegr !=0) {
-          System.out.append('.');
-          if(--ctnl <0) {
-            ctnl = showParam.newlineOnTelgCt;
-            if( (ctnl & showParam.maskWriteDot) ==0) {
-              System.out.append('\n');
-            }
-          }
-        }
-        try{ evalTelg(this.recvData, result[0]); }
-        catch(ParseException exc){
-          this.ctCorruptData +=1;
-          if(showParam.printDotOnReceivedTelegr !=0) {
-            System.out.append('x');
-          }
+          System.out.append('x');
         }
       }
-      if(showParam.printTime !=0) {
-        long dTimeEval = System.currentTimeMillis() - time2;
-        long dTimewait = time2 - time1;
-        long dTyimeCycle = time1 - this.showParam.timeLast;
-        this.showParam.timeLast = time1;
-        System.out.printf("rx %s: %d + %d\n", dTyimeCycle, dTimewait, dTimeEval);
-      }
+    }
+    if(showParam.printTime !=0) {
+      long dTimeEval = System.currentTimeMillis() - time2;
+      long dTimewait = time2 - time1;
+      long dTyimeCycle = time1 - this.showParam.timeLast;
+      this.showParam.timeLast = time1;
+      System.out.printf("rx %s: %d + %d\n", dTyimeCycle, dTimewait, dTimeEval);
+    }
+  }
+  
+  
+  
+  
+  
+  
+  @Override public void run()
+  {
+    while(this.bRun){
+      receiveAndExec();
     }
     this.ipc.close();
     this.bIpcOpened = false;

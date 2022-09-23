@@ -23,6 +23,8 @@ public final class GralCfgData
   
   /**Version and history
    * <ul>
+   * <li>2022-09-23 {@link GuiCfgWidget#set_data(String)} now sets default also the name. 
+   *   Hence Show(data=path); is sufficient for a simple show field. The path is also the name for access. 
    * <li>2022-08 not elaborately changed, same data, toString() operations. 
    * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2013-12-02 Hartmut new conditional configuration. 
@@ -121,7 +123,10 @@ public final class GralCfgData
       this.whatIs = whatIs;
     }
     
-    public void set_data(String val){ this.data = val; }
+    public void set_data(String val){ 
+      this.data = val;                           // the data path, usual use a variable
+      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
+    }
     
     public void set_help(String sHelp){ this.help = sHelp; }
     

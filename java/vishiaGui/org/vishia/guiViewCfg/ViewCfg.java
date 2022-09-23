@@ -1,6 +1,7 @@
 package org.vishia.guiViewCfg;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 
 import org.vishia.byteData.VariableAccess_ifc;
@@ -57,7 +58,7 @@ public class ViewCfg //extends GuiCfg
   //private final OamOutFileReader oamOutValues;
   
   @SuppressWarnings("unused")
-  private final boolean showValuesOk;
+  private boolean showValuesOk;
   
   private final OamRcvValue oamRcvUdpValue;
   
@@ -200,56 +201,71 @@ public class ViewCfg //extends GuiCfg
   { 
     this.callingArguments = cargs;
 
-    if(cargs.fileGuiCfg !=null) {
-      try { 
-        
-        GralMng gralMng = GralMng.get();
-        this.guiAccess = gralMng;
-  //    gralMng.registerUserAction(null, this.action_dropFilePath);
-  //    gralMng.registerUserAction(null, this.action_exec);
-  //    gralMng.registerUserAction(null, this.action_abortCmd);
-  //    gralMng.registerUserAction(null, this.action_clearOutput);
-  //    gralMng.registerUserAction(null, this.action_readJZtc);
-//        this.window = GralCfgWindow.createWindow("ViewCfg", " View cfg ", 'C', sCfg, null, null);
-        GralTextBox msgOut = (GralTextBox)gralMng.getWidget("msgOut");
-        this.outTextbox = msgOut;
-        this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
-      } 
-      catch(Exception exc) {
-        System.err.println("Exception: " + exc.getMessage());
-      }
-    } else {
-      System.err.println("argument -gui:path/to/gui.cfg is mandatory. ");
-    }
 
     
     
     
     //super(cargs, cmdgui, null, null, null);
+
+    int error = 0;    
+    if(cargs.fileGuiCfg !=null) {
+      GralMng gralMng = GralMng.get();
+      this.guiAccess = gralMng;
+//      gralMng.registerUserAction(null, this.action_dropFilePath);
+//      gralMng.registerUserAction(null, this.action_exec);
+//      gralMng.registerUserAction(null, this.action_abortCmd);
+//      gralMng.registerUserAction(null, this.action_clearOutput);
+//      gralMng.registerUserAction(null, this.action_readJZtc);
+//        this.window = GralCfgWindow.createWindow("ViewCfg", " View cfg ", 'C', sCfg, null, null);
+      
+      String sCfg = FileFunctions.readFile(cargs.fileGuiCfg);
+      try {
+        this.window = GralCfgZbnf.configWithZbnf(sCfg);         // does all, reads the config file, parses, creates Graphic Elements
+      } catch (ParseException e) {
+        throw new IllegalArgumentException("\"Graphic confic error: \" + e.getMessage()");
+      }                  
+    } else {
+      throw new IllegalArgumentException("argument -gui:path/to/gui.cfg is mandatory. ");
+    }
+    this.window.mainPanel.reportAllContent(System.out);
+    LogMessage log = new LogMessageStream(System.out);  //a logging system.
+    if(cargs.graphicFactory ==null) {
+      cargs.graphicFactory = new SwtFactory();         // default use SWT.
+    }
+    cargs.graphicFactory.createGraphic(this.window, cargs.sizeShow, log);
+    GralTextBox msgOut = (GralTextBox)this.guiAccess.getWidget("msgOut");
+    this.outTextbox = msgOut;
+    this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
     
+  
+  
     this.oamShowValues = new OamShowValues(this.logTextbox, this.guiAccess);
-    this.showValuesOk = this.oamShowValues.readVariableCfg();
-    
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
     this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox);
     
     //msgReceiver = new MsgReceiver(console, dlgAccess, cargs.sTimeZone);
     
-	  this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields());
-
+  
     //msgReceiver.test(); //use it after initGuiDialog!
     
   }
   
   
   //@Override 
-  protected void initMain()
-  {
-    //super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
-    //msgReceiver.start();
-    this.oamRcvUdpValue.start();
+  protected void initViewCfg ( CallingArguments cargs ) throws IOException { 
+      
+    if(! this.oamShowValues.readVariableCfg()) {
+      System.err.println("error oamShowValues.readVariableCfg()");
+    }
+    
+    GralWidget curveView = GralMng.get().getWidget("userCurves");
+    if(curveView !=null && curveView instanceof GralCurveView) {
+      this.oamShowValues.setCurveView((GralCurveView)curveView);
+    }
+    this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields());
 
+    this.oamRcvUdpValue.start();
   }
   
   
@@ -271,7 +287,7 @@ public class ViewCfg //extends GuiCfg
     try{
     	//oamOutValues.checkData();
       //msgReceiver.testAndReceive();
-      testChgVariable();
+      //testChgVariable();
       this.oamRcvUdpValue.sendRequest();
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
@@ -368,41 +384,12 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
     try {
       
       new InterProcessCommFactorySocket();
-      ViewCfg main = new ViewCfg(cargs);
-      if(error ==0){
-      	
-        String sCfg = FileFunctions.readFile(cargs.fileGuiCfg);
-        try {
-          main.window = GralCfgZbnf.configWithZbnf(sCfg);         // does all, reads the config file, parses, creates Graphic Elements
-        } catch (ParseException e) {
-          error=9;
-          System.err.println("Graphic confic error: " + e.getMessage());
-        }                  
-      }
-      main.window.mainPanel.reportAllContent(System.out);
-      if(error ==0) {
-        GralWidget curveView = GralMng.get().getWidget("userCurves");
-        if(curveView !=null && curveView instanceof GralCurveView) {
-          main.oamShowValues.setCurveView((GralCurveView)curveView);
-        }
-        LogMessage log = new LogMessageStream(System.out);  //a logging system.
-        if(cargs.graphicFactory ==null) {
-          cargs.graphicFactory = new SwtFactory();         // default use SWT.
-        }
-//        if(cargs.graphicFactory !=null) {
-        cargs.graphicFactory.createGraphic(main.window, cargs.sizeShow, log);
-//        } else {
-//          main.window.create("AWT", cargs.sizeShow, log, null);  //creates the primary window, starts the whole graphic engine.
-//        }
-          //wait, a parallel thread to the grahic.
-        //GralFactory.createGraphic(main.window, 'C', null, "SWT");
+      ViewCfg main = new ViewCfg(cargs);                   // reads all config files, creates Graphic
+      main.initViewCfg(cargs);
+      //main.execute();
+      main.doSomethinginMainthreadTillClosePrimaryWindow();
         
-        main.oamRcvUdpValue.start();
-        //main.execute();
-        main.doSomethinginMainthreadTillClosePrimaryWindow();
-        
-        main.oamRcvUdpValue.stopThread();
-      }    
+      main.oamRcvUdpValue.stopThread();
       GralMng.closeGral();
     } catch(Exception exc) {
       System.err.println("Unexpected exception: " + exc.getMessage());
