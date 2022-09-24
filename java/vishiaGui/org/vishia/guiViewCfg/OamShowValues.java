@@ -119,9 +119,17 @@ public class OamShowValues
     for(Map.Entry<String, GralWidget> e: fields) {         // complete all show fields with variable
       final GralWidget widg = e.getValue();
       final String sData = widg.getDataPath();             // path to the variable, maybe null
-      final VariableAccessArray_ifc var = sData == null ? null : this.accessOamVariable.getVariable(sData);
-      widg.setVariable(var);                                   //null if no data path or variable not exists.
-      log.append(widg.getName()).append(" shows ->").append(var.toString());
+      if(sData ==null) {
+        log.append(widg.getName()).append(" potential Show field without dataPath ");
+      } else {
+        final VariableAccessArray_ifc var = sData == null ? null : this.accessOamVariable.getVariable(sData);
+        if(var == null) {
+          log.append(widg.getName()).append(" variable not found: ").append(sData);
+        } else {
+          widg.setVariable(var);                                   //null if no data path or variable not exists.
+          log.append(widg.getName()).append(" shows ->").append(var.toString());
+        }
+      }
     }
     
     

@@ -1924,13 +1924,15 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public Appendable toString(Appendable u) throws IOException {
-    u.append(whatIs).append(":").append(name).append(": ").append(sDataPath);
+    u.append(whatIs);
+    if(this.name !=null) { u.append(":").append(name);}
+    if(sDataPath !=null) { u.append(": ").append(sDataPath);}
+    if(this.dyda.displayedText !=null) { u.append(" :text=").append(this.dyda.displayedText);}
     if(_wdgPos !=null){
       this._wdgPos.toString(u, true);
     } else {
       u.append("@?");
     }
-    u.append(name);
     if(this._wdgImpl !=null) {
     u.append( " pixel:").append(Integer.toString(this._wdgImpl.pixBounds.x)).append(',')
                      .append(Integer.toString(this._wdgImpl.pixBounds.y)).append("+(")

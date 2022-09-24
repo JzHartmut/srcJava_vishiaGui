@@ -110,7 +110,7 @@
 2022-08-28 18:51:19  x     GralTextField.java                       ::         33.688  1447617859 
 2022-08-28 18:53:03  x     GralValueBar.java                        ::          6.210  1454250108 
 2022-01-31 19:37:42  x     GralWidgImpl_ifc.java                    ::          5.263 -0147301171 
-2022-09-23 20:09:44  x     GralWidget.java                          ::        100.013  2016442651 
+2022-09-23 21:16:54  x     GralWidget.java                          ::        100.150 -2010161402 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-09-19 19:28:12  x     GralWindow.java                          ::         15.761  1593822377 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
@@ -118,7 +118,7 @@
 
 ============================== java/vishiaGui/org/vishia/gral/cfg/ =================================
 2022-08-28 20:18:19  x     GralCfgBuilder.java                      ::         19.664  1130248061 
-2022-09-23 11:20:53  x     GralCfgData.java                         ::         19.218 -0453785899 
+2022-09-23 21:34:18  x     GralCfgData.java                         ::         19.548 -1311027335 
 2022-08-28 20:17:08  x     GralCfgDesigner.java                     ::         15.580 -1911478894 
 2022-08-28 20:15:11  x     GralCfgElement.java                      ::         10.583  1606335891 
 2021-10-04 14:29:48  x     GralCfgPanel.java                        ::          2.140  1145000466 
@@ -252,9 +252,9 @@
 
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
 2022-09-23 10:23:34  x     OamOutFileReader.java                    ::          3.543  1655028191 
-2022-09-23 13:57:48  x     OamRcvValue.java                         ::          8.400 -0005805571 
-2022-09-23 20:10:07  x     OamShowValues.java                       ::         22.346 -1598223440 
-2022-09-23 20:22:09  x     ViewCfg.java                             ::         15.849 -0458827663 
+2022-09-24 19:47:34  x     OamRcvValue.java                         ::          9.632 -1836530057 
+2022-09-23 21:20:24  x     OamShowValues.java                       ::         22.627  1284170721 
+2022-09-24 19:38:42  x     ViewCfg.java                             ::         15.832 -0030916530 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
 2021-07-09 14:52:12  x     StimuliSelector.java                     ::         40.544  0386394394 

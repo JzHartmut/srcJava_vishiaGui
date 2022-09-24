@@ -97,7 +97,7 @@ public class ViewCfg //extends GuiCfg
      * If not given, do not listen. 
      * Values back are sent to the sender.
      */
-    final Argument sIPlisten = new Argument("-ip", ":UDP:192.168.1.77:41234 IP of the connection slot and port to listen, use 0.0.0.0 for listen on all connections.");
+    final Argument targetIpc = new Argument("-targetIpc", ":UDP:192.168.1.77:41234 IP for commands to the target should be given if Ethernet is used.");
     
     CallingArguments() {
       super();
@@ -105,7 +105,7 @@ public class ViewCfg //extends GuiCfg
       super.helpInfo = "see https://www.vishia.org/gral/index.html";
       super.addArg(this.sFileOamValues);
       super.addArg(this.sFileOamVariables);
-      super.addArg(this.sIPlisten);
+      super.addArg(this.targetIpc);
       super.addArg(this.sFileGui);
     }
 
@@ -262,7 +262,7 @@ public class ViewCfg //extends GuiCfg
     this.oamShowValues = new OamShowValues(this.logTextbox, this.guiAccess);
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
-    if(this.callingArguments.sIPlisten.val !=null) {
+    if(this.callingArguments.sOwnIpcAddr !=null) {
       this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox, this.callingArguments);
     } else { 
       this.oamRcvUdpValue = null;

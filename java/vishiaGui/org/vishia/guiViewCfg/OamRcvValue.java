@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.byteData.ByteDataAccessSimple;
 import org.vishia.communication.Address_InterProcessComm;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
@@ -100,26 +101,41 @@ public class OamRcvValue implements Runnable
   
   InspcDataExchangeAccess.Inspcitem infoEntity = new InspcDataExchangeAccess.Inspcitem();
   
+  ByteDataAccessSimple txInfoAccess = new ByteDataAccessSimple(true);
+  
   final MainCmdLogging_ifc log;
 
 
   private final InterProcessComm ipc;
 
-  private final Address_InterProcessComm targetAddr = InterProcessCommFactory.getInstance().createAddress("UDP:localHost:60084");
+  /**Create firstly an invalid address (port 0), it is filled from sender, if telegrams are received. */
+  private final Address_InterProcessComm targetAddr;
+  
+  /**Stores here the sender of incoming telegrams. */
+  private final Address_InterProcessComm senderAddr;
+  
+  /**If the {@link #targetAddr} was set by receiving without error, it is true.
+   * False if an error occurs while receiving (means the socket is faulty).
+   */
+  boolean bTargetAddrValid;
   
   byte[] recvData = new byte[1500];
   
   byte[] sendData = new byte[1500];
   
-  public OamRcvValue ( OamShowValues showValues, MainCmdLogging_ifc log
-    , ViewCfg.CallingArguments args
-      ) {
+  public OamRcvValue ( OamShowValues showValues, MainCmdLogging_ifc log, ViewCfg.CallingArguments args) {
     this.thread = new Thread(this, "oamRcv");
     this.log = log;
     this.showValues = showValues;
-    String ownAddr = args.sIPlisten.val; //"UDP:0.0.0.0:0xeab3";
-    if(ownAddr !=null) {
-      this.ipc = InterProcessCommFactory.getInstance().create(ownAddr); //It creates and opens the UDP-Port.
+    senderAddr = InterProcessCommFactory.getInstance().createAddress("UDP:127.0.0.1:0xffff");
+    if(args.targetIpc.val !=null) {
+      this.targetAddr = InterProcessCommFactory.getInstance().createAddress(args.targetIpc.val);
+      bTargetAddrValid = true;                             // should transmit commands to this Ethernet destination
+    } else {
+      this.targetAddr = null;                              // targetAddr is only a placeholder
+    }
+    if(args.sOwnIpcAddr !=null) {                          // the slot used for transmit and listen 
+      this.ipc = InterProcessCommFactory.getInstance().create(args.sOwnIpcAddr); //It creates and opens the UDP-Port.
       this.ipc.open(null, true); //InterProcessComm.receiverShouldbeBlocking);
       if(this.ipc != null){
         this.bIpcOpened = true;
@@ -128,6 +144,7 @@ public class OamRcvValue implements Runnable
       this.ipc = null;
       System.out.println("no -ip given, not listen to ethernet.");
     }
+    this.txInfoAccess.assign(this.sendData, 50, 0);
   }
 
   /**Starts the receiver thread. */
@@ -147,12 +164,12 @@ public class OamRcvValue implements Runnable
   
   private void receiveAndExec() {
     int[] result = new int[1];
-    Address_InterProcessComm sender = this.ipc.createAddress();
     int ctnl=0;
     long time1 = System.currentTimeMillis();
-    this.ipc.receiveData(result, this.recvData, sender);
+    this.ipc.receiveData(result, this.recvData, this.senderAddr);
     long time2 = System.currentTimeMillis();
     if(result[0] > 0) {
+      this.bTargetAddrValid = true;
       if(showParam.printDotOnReceivedTelegr !=0) {
         System.out.append('.');
         if(--ctnl <0) {
@@ -164,7 +181,7 @@ public class OamRcvValue implements Runnable
       }
       int currCnt1 = (((int)this.recvData[24])<<8) | (this.recvData[25] & 0x00ff);
       if(currCnt1 != this.currCnt+1) {
-        System.out.append(" currCnt-Delta: ").append(Integer.toString(currCnt1 - this.currCnt)).append("  ").append(Integer.toHexString(currCnt1)).append('\n');
+        //System.out.append(" currCnt-Delta: ").append(Integer.toString(currCnt1 - this.currCnt)).append("  ").append(Integer.toHexString(currCnt1)).append('\n');
       }
       this.currCnt = currCnt1;
       try{ evalTelg(this.recvData, result[0]); }
@@ -174,6 +191,9 @@ public class OamRcvValue implements Runnable
           System.out.append('x');
         }
       }
+    } else {
+      this.bTargetAddrValid = false;
+      System.out.println("error receive");
     }
     if(showParam.printTime !=0) {
       long dTimeEval = System.currentTimeMillis() - time2;
@@ -201,7 +221,7 @@ public class OamRcvValue implements Runnable
   
   private void evalTelg(byte[] recvData, int nrofBytes) throws ParseException
   { 
-    this.datagramRcv.assign(recvData, nrofBytes);          // The head of the datagram should be appropriate the head of an inspector datagram.
+    this.datagramRcv.assign(recvData, nrofBytes, 2);          // The head of the datagram should be appropriate the head of an inspector datagram.
     this.datagramRcv.setBigEndian(true);                   // it is the general approach.
     int nrofBytesInfoHead = this.infoEntity.getLengthHead(); // the symbolic data starts as one item, from position 0x18
     int catastrophicalCount = 1001;
@@ -225,8 +245,11 @@ public class OamRcvValue implements Runnable
     catch (InterruptedException e)
     { //dialogZbnfConfigurator.terminate();
     }
-
-    this.ipc.send(this.sendData, 10, this.targetAddr);
+    if(this.bTargetAddrValid) {
+      long timeAbs = System.currentTimeMillis();
+      this.txInfoAccess.setIntVal(2+8, 8, timeAbs);   //Position uint16 data[4] for embedded
+      this.ipc.send(this.sendData, 0x40, this.targetAddr);
+    }
   }
   
   

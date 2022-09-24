@@ -265,6 +265,16 @@ public final class GralCfgData
   {
     
     public GuiCfgShowField(GralCfgElement itsElement){ super(itsElement, 'S'); }
+    
+    /**For Show(varx) use the text as {@link {@link #data} and #name. It is the simple form. 
+     * Also set the field {@link #text}
+     * @param val
+     */
+    public void set_text(String val) {
+      if(this.data == null) { this.data = val; }
+      if(this.name == null) { this.name = val;}
+      this.text = val;
+    }
   }
   
   
