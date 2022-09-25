@@ -1020,9 +1020,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
-  /*package private*/ void deregisterPanel(GralPanel_ifc panel) {
+  /*package private*/ 
+  void deregisterPanel(GralPanel_ifc panel) {
     if(sCurrPanel.equals(panel.getName())) {
-      sCurrPanel = windPrimary.name;
+//      sCurrPanel = windPrimary.name;
     }
     panels.remove(panel.getName());
   }

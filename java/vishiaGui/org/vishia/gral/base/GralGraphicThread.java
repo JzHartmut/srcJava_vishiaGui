@@ -228,6 +228,7 @@ public class GralGraphicThread implements Runnable
   /*package private*/ void storeEvent(EventObject ev){
     if(ev instanceof GralGraphicTimeOrder) { 
       queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
+      //System.out.println("storeEventPaint, wakeup");
       impl.wakeup();
    } else {
       throw new IllegalArgumentException("can only store events of type GralDispatchCallbackWorker");

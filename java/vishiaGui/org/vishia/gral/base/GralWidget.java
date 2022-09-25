@@ -1883,7 +1883,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @see org.vishia.gral.ifc.GralWidget_ifc#repaint(int, int)
    */
   @Override public void repaint(int delay, int latest){
-    if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
+    if(itsMng !=null && itsMng.impl !=null ){ //NOTE: set of changes is possible before setToPanel was called. 
       if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
         _wdgImpl.repaintGthread();
       } else {
@@ -2004,6 +2004,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     
     
     
+    /**Access to the GralMng from the implementation level.  */
+    public GralMng gralMng() { return this.widgg.itsMng; }
+
+
     /**This method is not intent to call by user. It may be called from all widget implementation 
      * if the focus of the widget is gained. Use {@link #setFocus()} to set a widget in the focus.
      * 
@@ -2112,7 +2116,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @return null if the widget has not an implementation yet.
    */
   public ImplAccess getImpl(){ return _wdgImpl; }
-  
   
   /**This time order calls the {@link #repaintGthread()} in the graphical thread.
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.

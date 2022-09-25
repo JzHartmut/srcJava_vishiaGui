@@ -112,7 +112,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
-   * <li>2022-00-04 {@link #storeGralPixBounds(org.vishia.gral.base.GralWidget.ImplAccess, Control)} general usable.
+   * <li>2022-09-24 new {@link #swtMng(org.vishia.gral.base.GralWidget.ImplAccess)} 
+   * <li>2022-09-04 {@link #storeGralPixBounds(org.vishia.gral.base.GralWidget.ImplAccess, Control)} general usable.
    * <li>2022-08 {@link #createImplWidget_Gthread(GralWidget)} enhanced.
    * <li>2016-09-02 Hartmut chg: Some {@link GralPanelContent#GralPanelContent(String, String, char)} and {@link GralTabbedPanel#GralTabbedPanel(String, String, GralPanelActivated_ifc, int)}
    *   was invoked with "@" for the posString without any more posString information. That is false. The idea was: Set the current panel. But that does not run. 
@@ -164,6 +165,29 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	 */
   //@SuppressWarnings("hiding")
   public final static String version = "2022-09-04";
+  
+  
+  /**Gets the SwtMng instance for the given implementation Widget from the {@link GralWidget#itsMng}.
+   * Note: It is a quest of effort, simplicity or universality where to use only one instance for the GralMng and SwtMng
+   * (Singleton) or reference it. The reference is a small effort in data. 
+   * The access via reference or from singleton is approximately the same (run time effort).
+   * But using a singleton prohibits a system with different graphic appearances in one running JRE environment. 
+   * This should be also possible in future. Consider that many applications can run in one JRE environment. 
+   * It is really a restriction using a singleton. 
+   * <br>
+   * Hence a simple unified way should be use to access the GralMng and the SwtMng from the GralWidget.
+   * This is this operation. 
+   * <br>
+   * In the past the singleton was favored, but all GralWidgets have the GralMng reference {@link GralWidget#itsMng}
+   * So the singleton usage can be refactored. 
+   * @param widgi The implementation access, anytime accessible from the SWT implementation level. 
+   * @return The reference to the GralMng is found via {@link ImplAccess#gralMng()}, 
+   *   then the {@link GralMng#impl} is anytime the SwtMng if the graphic is running. 
+   *   It is unconditionally downcasted here from the universal {@link GralMng.ImplAccess} to the SwtMng. 
+   */
+  static SwtMng swtMng(GralWidget.ImplAccess widgi) {
+    return (SwtMng) widgi.gralMng().impl;
+  }
   
   
   /**Returns the Swt widget which implements the given GralWidget.
@@ -332,7 +356,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	, LogMessage log)
   { //super(sTitle); 
   	this(display, new SwtProperties(display, displaySize), log);
-  	
   }
 
   /**Creates an instance.
@@ -414,7 +437,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       GralPanelContent widgp = (GralPanelContent)widgg;
       SwtPanel tab;
       if(widgp.canvas() !=null) { tab = new SwtCanvasStorePanel(widgp); }
-      else { tab = new SwtGridPanel(widgp, null, 0, null, 2, 2, 10, 10, gralMng); }
+      else { tab = new SwtGridPanel(widgp, 0); }
       GralWidget_ifc parent = widgg.pos().parent;
       if(parent instanceof GralTabbedPanel) {
         SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImpl();
@@ -452,8 +475,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
   { GralPanelContent panelg = new GralPanelContent(null, namePanel);
+    panelg.setGrid(yG, xG, yS, xS, -8, -12);
     Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
-    SwtGridPanel panel = new SwtGridPanel(panelg, null, 0, backColorSwt, xG, yG, xS, yS, gralMng);
+    SwtGridPanel panel = new SwtGridPanel(panelg, 0);
     GralPanelContent gralPanel = panel.gralPanel();
     //mng.registerPanel(gralPanel);
 

@@ -98,7 +98,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  if(yGrid <0 || xGrid <0){
 	    panel = new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng);
 	  } else {
-	    panel = new SwtGridPanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng.propertiesGui.xPixelUnit(), mng.gralMng.propertiesGui.yPixelUnit(), 5, 5, mng.gralMng);
+	    panel = new SwtGridPanel(panelg, 0);
 	  }
 //	  panel.swtCanvas.setBounds(sizeTabFolder);
 //	  panel.itsTabSwt = tabItem;
@@ -167,7 +167,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
   				if(data != null){
   					@SuppressWarnings("unchecked")
   					SwtPanel swtPanel = (SwtPanel)data;
-  					GralPanelContent panelContent = (GralPanelContent)(swtPanel.widgg);
+  					GralPanelContent panelContent = (GralPanelContent)(swtPanel.gralPanel);
   					List<GralWidget> widgetInfos = panelContent.getWidgetList(); 
   					widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
   					if(getFocusedTab() !=null){

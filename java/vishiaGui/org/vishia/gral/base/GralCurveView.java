@@ -1111,6 +1111,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(bRefreshed && timeshort != this.timeorg.timeshortLast) {
         //don't write points with the same time, ignore seconds.
         setSample(values, timeshort);
+      //  System.out.println("setSample");
         this.timeorg.timeshortLast = timeshort;
       }
     }

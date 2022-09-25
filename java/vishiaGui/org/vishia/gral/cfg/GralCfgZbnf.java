@@ -397,6 +397,7 @@ public class GralCfgZbnf
       this.window = new GralWindow(this.currPos, null, "wmain", "Title", windowProps);
       this.currPos = new GralPos(this.window);             // initial GralPos for the main Panel inside the window.
       GralPanelContent mainPanel = new GralPanelContent(this.currPos, null, "window");
+      mainPanel.setGrid(2,2,5,5,-8,-30);
       this.window.mainPanel = mainPanel;
       this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
       Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = this.cfgData.getPanels();
@@ -412,6 +413,7 @@ public class GralCfgZbnf
           this.window.mainPanel.setToTabbedPanel();
           this.currPos = new GralPos(this.window.mainPanel);
           GralPanelContent panel = new GralPanelContent(this.currPos, null, cfgPanel.name, '@');
+          panel.setGrid(2,2,5,5,-12,-20);
           //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
           this.currPos = new GralPos(panel);
           sError = buildPanel(cfgPanel);  

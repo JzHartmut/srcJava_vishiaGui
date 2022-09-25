@@ -183,7 +183,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     { 
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
-      for(GralWidget widg1: ((GralPanelContent)widgg).getWidgetsToResize()){
+      for(GralWidget widg1: ((GralPanelContent)gralPanel).getWidgetsToResize()){
         widg1.gralMng().resizeWidget(widg1, 0, 0);
       }
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
@@ -215,13 +215,13 @@ public class SwtPanel extends GralPanelContent.ImplAccess
           if(data != null){
             @SuppressWarnings("unchecked")
             SwtPanel swtPanel = (SwtPanel)data;
-            GralPanelContent gralPanel = (GralPanelContent)(swtPanel.widgg);
+            GralPanelContent gralPanel = (GralPanelContent)(swtPanel.gralPanel);
             List<GralWidget> widgetInfos = gralPanel.getWidgetList(); 
             //widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
             if(gralPanel.getFocusedWidget() !=null){
-              widgg.getFocusedWidget().setVisibleState(false);  //the last focused tab.
+              gralPanel.getFocusedWidget().setVisibleState(false);  //the last focused tab.
             }
-            widgg.setPrimaryWidget( gralPanel );
+            gralPanel.setPrimaryWidget( gralPanel );
             //done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
             gralPanel.setFocus();
             //System.out.printf("Fcmd-selectTab; %s", panelContent.toString());

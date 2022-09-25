@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.vishia.gral.ifc.GralCanvasStorage;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -30,6 +31,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   /**Version history:
    * 
    * <ul>
+   * <li>2022-09-25: own colors for grid lines used in implementation. 
    * <li>2022-09-14: new {@link #reportAllContent(Appendable)}
    * <li>2022-08: {@link Data#bTabbed} as designation, this is a tabbed panel.
    *   The old class GralTabbedPanel is no more necessary. 
@@ -72,7 +74,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20120914;
+  public final static int version = 20220915;
 
   //public GralPrimaryWindow_ifc mainWindow;
   
@@ -125,7 +127,15 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
      * yGrid, xGrid are the spaces for the fine grid, yGrid2, xGrid2 describes which nth grid line should be more determined.
      * Typical values 1 and 10 or 2 and 5
      */
-    int yGrid, xGrid, yGrid2, xGrid2;
+    public int yGrid, xGrid, yGrid2, xGrid2;
+    
+    /**Value for difference for all 3 color components for the grid relative to the background.
+     * Use a negative value for more darker grid lines, or a positive for more lighter.
+     * Typical values -8 and -10 (in relation to 255) for a light gray background. 
+     * General the grid lines have the same color as the background, all 3 components are vary with the same difference.
+     */
+    public GralColor colorGridLine, colorGridLine2;
+    
     
     /**If this instance is not null, the content of that should be paint in the paint routine
      * of the implementation graphic. */
@@ -177,6 +187,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     int property = 0; //TODO parameter
     this._panel.bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
     this._panel.bGridZoomed = (property & GralMngBuild_ifc.propGridZoomedPanel) !=0;
+    setBackColor(GralColor.getColor("pgr"), 0);
   }
 
   
@@ -230,11 +241,20 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @param yGrid2
    * @param xGrid2
    */
-  public void setGrid(int yGrid, int xGrid, int yGrid2, int xGrid2) {
+  public void setGrid(int yGrid, int xGrid, int yGrid2, int xGrid2, int colordiff, int colordiff2) {
     this._panel.yGrid = yGrid; 
     this._panel.xGrid = xGrid; 
     this._panel.yGrid2 = yGrid2; 
     this._panel.xGrid2 = xGrid2; 
+    GralColor colorBack = this.getBackColor(0);
+    int rd1 = colorBack.red + colordiff;
+    int gn1 = colorBack.green + colordiff;
+    int bl1 = colorBack.blue + colordiff;
+    this._panel.colorGridLine = GralColor.getColor(rd1, gn1, bl1);
+    int rd2 = colorBack.red + colordiff2;
+    int gn2 = colorBack.green + colordiff2;
+    int bl2 = colorBack.blue + colordiff2;
+    this._panel.colorGridLine2 = GralColor.getColor(rd2, gn2, bl2);
   }
   
   /*package private*/
@@ -507,9 +527,9 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   public abstract static class ImplAccess extends GralWidget.ImplAccess
   {
 
-    public final GralPanelContent widgg;
+    public final GralPanelContent gralPanel;
     
-    protected final GralPanelContent.Data _panel;
+    public final GralPanelContent.Data _panel;
     
     /**Same reference as {@link GralWidget.ImplAccess#widgg} but type of this class. */
     //GralPanelContent gralPanel;
@@ -517,17 +537,17 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     protected ImplAccess(GralPanelContent widgg)
     {
       super(widgg);
-      this.widgg = widgg;
+      this.gralPanel = widgg;
       this._panel = widgg._panel;
       //for all following actions: this is the current panel.
       //GralMng mng = GralMng.get();
       //mng.setPosPanel((GralPanelContent)widgg);   
     }
     
-    public GralPanelContent gralPanel(){ return (GralPanelContent) widgg; } //It is the correct type.
+    public GralPanelContent gralPanel(){ return (GralPanelContent) gralPanel; } //It is the correct type.
     
     
-    protected boolean isTabbed() { return this.widgg._panel.pixelTab >=0; }
+    protected boolean isTabbed() { return this.gralPanel._panel.pixelTab >=0; }
     
     
     
