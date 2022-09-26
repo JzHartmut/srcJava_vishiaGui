@@ -1,5 +1,6 @@
 package org.vishia.guiViewCfg;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
@@ -38,12 +39,13 @@ public class ViewCfg //extends GuiCfg
   
   /**Version and history
    * <ul>
+   * <li>2022-09-26 Hartmut more refactored. New concepts with docu.
    * <li>2022-08-26 Hartmut little bit refactored because of newly usage, prevent warnings.
    * <li>2012-20-22 Hartmut chg now works yet.
    * <li>2010-06-00 Hartmut created
    * </ul>
    */
-  public static final int versionViewCfg = 0x20120222;
+  public static final int versionViewCfg = 0x20220926;
   
   private final OamShowValues oamShowValues;
 	  
@@ -237,11 +239,11 @@ public class ViewCfg //extends GuiCfg
 //      gralMng.registerUserAction(null, this.action_readJZtc);
 //        this.window = GralCfgWindow.createWindow("ViewCfg", " View cfg ", 'C', sCfg, null, null);
       
-      String sCfg = FileFunctions.readFile(cargs.fileGuiCfg);
       try {
-        this.window = GralCfgZbnf.configWithZbnf(sCfg);         // does all, reads the config file, parses, creates Graphic Elements
-      } catch (ParseException e) {
-        throw new IllegalArgumentException("\"Graphic confic error: \" + e.getMessage()");
+        File fCfg = /*new File*/(cargs.fileGuiCfg);
+        this.window = GralCfgZbnf.configWithZbnf(fCfg);         // does all, reads the config file, parses, creates Graphic Elements
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Graphic confic error: " + e.getMessage());
       }                  
     } else {
       throw new IllegalArgumentException("argument -gui:path/to/gui.cfg is mandatory. ");

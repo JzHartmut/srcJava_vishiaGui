@@ -355,7 +355,7 @@ protected void initMain()
       File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
       GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax);
       System.out.println("GuiCfg - start parsing cfg file; " + cargs.fileGuiCfg.getAbsolutePath());
-      String sError = cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
+      String sError = "todo"; //cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
       System.out.println("GuiCfg - finish parsing cfg file; ");
       if(sError !=null){
         console.writeError(sError);

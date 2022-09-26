@@ -1517,7 +1517,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         }
       } else if(sDataPath !=null){
         setText("?? " + sDataPath); //called on fault variable path.
-        setBackColor(colorOld, 0);
+        if(colorOld !=null) { setBackColor(colorOld, 0); }
       }
     }
     

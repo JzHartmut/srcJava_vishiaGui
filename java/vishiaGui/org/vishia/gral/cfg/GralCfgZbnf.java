@@ -5,6 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,6 +41,7 @@ import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.Debugutil;
+import org.vishia.util.FileFunctions;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPartFromFileLines;
 import org.vishia.zbnf.ZbnfJavaOutput;
@@ -59,6 +63,8 @@ public class GralCfgZbnf
   
   /**Version and history
    * <ul>
+   * <li>2022-09-26 new {@link #configureWithZbnf(File, GralCfgData)} and {@link #configWithZbnf(File)} 
+   *   Should be used on file input, also regarding encoding.  
    * <li>2022-08 new {@link #configWithZbnf(CharSequence)}, {@link #buildGui()}. 
    *   This operations were (are yet) part of GralCfgBuilder too, but for the new concept, it should be contained here
    *   (refactored here as copy). It means this class is complete responsible to build the GUI with config data.  
@@ -90,7 +96,7 @@ public class GralCfgZbnf
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final int version = 20220926;
 
   
   private final ZbnfParser parser;
@@ -238,7 +244,8 @@ public class GralCfgZbnf
     this.fileSyntax = null;
     String syntax = getSyntaxFromJar();
     this.parser = new ZbnfParser(console);
-    try{ this.parser.setSyntax(syntax); //Std);
+    try{ 
+      this.parser.setSyntax(syntax); //Std);
     } catch(ParseException exc){
       throw new RuntimeException(exc);  //unexpected because syntax is given here. 
     }
@@ -250,6 +257,12 @@ public class GralCfgZbnf
   { this.console = log;
     this.fileSyntax = fileSyntax;
     this.parser = new ZbnfParser(log);
+    try{ 
+      String syntax = FileFunctions.readFile(this.fileSyntax);
+      this.parser.setSyntax(syntax); 
+    } catch(ParseException exc){
+      throw new RuntimeException(exc);  //unexpected because syntax is given here. 
+    }
     this.zbnfJavaOutput = new ZbnfJavaOutput(log);
   }
 
@@ -292,38 +305,27 @@ public class GralCfgZbnf
    * @param fileConfigurationZbnf File containing the configuration. The file should be exist and able to read.
    * @return true if successfully, false on any error. If false, an error message was written
    *         using the own Report-implementation.
+   * @throws IOException 
+   * @throws FileNotFoundException 
+   * @throws UnsupportedCharsetException 
+   * @throws IllegalCharsetNameException 
+   * @throws ParseException 
    */
-  public String configureWithZbnf(File fileConfigurationZbnf, GralCfgData destination)
-  { String sError = null;
-    File dirOfconfig = fileConfigurationZbnf.getParentFile();
-    System.out.println("GralCfgZbnf - start parse cfg file; " + fileConfigurationZbnf.getAbsolutePath());
-    //parses the configuration file and fill the configuration data.
+  public void configureWithZbnf(File fileConfigurationZbnf, GralCfgData destination) 
+      throws IllegalCharsetNameException, UnsupportedCharsetException, FileNotFoundException, IOException, ParseException
+  { //parses the configuration file and fill the configuration data.
     //Note: The building of the graphic appearance will be done in the graphic thread with this data later.
-    sError = ZbnfJavaOutput.parseFileAndFillJavaObject(destination.getClass(), destination
-      , fileConfigurationZbnf, fileSyntax, console, 0);
-    if(sError != null)
-    { return "Error reading config file" + sError;
+    boolean bOk = parser.parseFile(fileConfigurationZbnf, 10000, "encoding=", Charset.forName("UTF-8"));
+    if(!bOk) {
+      String sError = parser.getSyntaxErrorReport();
+      throw new ParseException(sError, 0);
     }
-
-    
-    StringPartFromFileLines spToParse = null;
-    try
-    { //spToParse = new StringPartFromFileLines(new File(sFileIn));
-      spToParse = new StringPartFromFileLines(fileConfigurationZbnf, -1, null, null);
+    else {
+      try{ zbnfJavaOutput.setContent(destination.getClass(), destination, parser.getFirstParseResult());
+      } catch(Exception exc) {
+        throw new RuntimeException(exc);  //unexpected because semantic and data structure is given here. 
+     }
     }
-    catch(FileNotFoundException exception)
-    { sError = "file not found:" + fileConfigurationZbnf.getAbsolutePath();
-      console.writeError(sError);
-    }
-    catch(IOException exception)
-    { sError = "file read error:" + fileConfigurationZbnf.getAbsolutePath();
-      console.writeError(sError);
-    }
-    if(spToParse != null)
-    { //sError = configureWithZbnf(sTitle, spToParse, panel, dirOfconfig);
-      spToParse.close();  //close the StringPart, it means it can't be used furthermore.
-    }
-    return sError;
   }
   
 
@@ -356,7 +358,7 @@ public class GralCfgZbnf
   }
   
   
-  /**Creates a Graphic application with a given config file.
+  /**Creates a Graphic application with a given config String.
    * <br>It calls:
    * <ul><li>{@link #configureWithZbnf(CharSequence, GralCfgData)}
    * <li>{@link #buildGui()}
@@ -366,10 +368,27 @@ public class GralCfgZbnf
    * @throws ParseException on syntax error in sGui
    */
   public static GralWindow configWithZbnf ( CharSequence sGui ) throws ParseException { 
-    String ret = null;
     GralCfgZbnf thiz = new GralCfgZbnf();                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(sGui, thiz.cfgData);
+    thiz.buildGui();                                       // build only the Gral instances without implementation graphic
+    return thiz.window;                                    // only the window is used, the rest can be garbaged.
+  }
+  
+  
+  /**Creates a Graphic application with a given config File.
+   * <br>It calls:
+   * <ul><li>{@link #configureWithZbnf(CharSequence, GralCfgData)}
+   * <li>{@link #buildGui()}
+   * </ul>
+   * @param fGui The config file.
+   * @return The main window of the graphic application
+   * @throws ParseException on syntax error in sGui
+   */
+  public static GralWindow configWithZbnf ( File fGui ) throws Exception { 
+    GralCfgZbnf thiz = new GralCfgZbnf();                  // temporary instance of this
+    thiz.cfgData = new GralCfgData(null);
+    thiz.configureWithZbnf(fGui, thiz.cfgData);
     thiz.buildGui();                                       // build only the Gral instances without implementation graphic
     return thiz.window;                                    // only the window is used, the rest can be garbaged.
   }
