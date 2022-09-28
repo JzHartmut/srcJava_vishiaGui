@@ -144,6 +144,7 @@ public class OamRcvValue implements Runnable
       this.ipc = null;
       System.out.println("no -ip given, not listen to ethernet.");
     }
+    this.txInfoAccess.setLittleEndianBig2();
     this.txInfoAccess.assign(this.sendData, 50, 0);
   }
 
@@ -184,7 +185,9 @@ public class OamRcvValue implements Runnable
         //System.out.append(" currCnt-Delta: ").append(Integer.toString(currCnt1 - this.currCnt)).append("  ").append(Integer.toHexString(currCnt1)).append('\n');
       }
       this.currCnt = currCnt1;
-      try{ evalTelg(this.recvData, result[0]); }
+      try {  //====>>>>>>                        // evaluate the received telegram: 
+        evalTelg(this.recvData, result[0]); 
+      }
       catch(ParseException exc){
         this.ctCorruptData +=1;
         if(showParam.printDotOnReceivedTelegr !=0) {
@@ -222,7 +225,8 @@ public class OamRcvValue implements Runnable
   private void evalTelg(byte[] recvData, int nrofBytes) throws ParseException
   { 
     this.datagramRcv.assign(recvData, nrofBytes, 2);          // The head of the datagram should be appropriate the head of an inspector datagram.
-    this.datagramRcv.setBigEndian(true);                   // it is the general approach.
+    this.datagramRcv.setLittleEndianBig2();
+    //this.datagramRcv.setBigEndian(true);                   // it is the general approach.
     int nrofBytesInfoHead = this.infoEntity.getLengthHead(); // the symbolic data starts as one item, from position 0x18
     int catastrophicalCount = 1001;
     if(this.datagramRcv.sufficingBytesForNextChild(this.infoEntity.getLengthHead()) && --catastrophicalCount >=0){
@@ -234,7 +238,7 @@ public class OamRcvValue implements Runnable
       int nrofBytes1 = nrofBytesInfo - nrofBytesInfoHead;
       this.showValues.show(recvData, nrofBytes1, posBuffer);
     }
-    this.showValues.showRedraw();
+    //this.showValues.showRedraw();
     if(catastrophicalCount <0) throw new RuntimeException("unterminated while-loop");
   }
   
@@ -247,6 +251,8 @@ public class OamRcvValue implements Runnable
     }
     if(this.bTargetAddrValid) {
       long timeAbs = System.currentTimeMillis();
+      this.txInfoAccess.setIntVal(2+0, 2, 0x20);   //Position uint16 data[0] for embedded: length item
+      this.txInfoAccess.setIntVal(2+2, 2, 0x65);   //Position uint16 data[4] for embedded: cmd
       this.txInfoAccess.setIntVal(2+8, 8, timeAbs);   //Position uint16 data[4] for embedded
       this.ipc.send(this.sendData, 0x40, this.targetAddr);
     }

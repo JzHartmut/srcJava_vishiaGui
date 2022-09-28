@@ -31,6 +31,7 @@ import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
+import org.vishia.util.TimedValues;
 import org.vishia.util.Timeshort;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
@@ -241,6 +242,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       }
     }
   }
+  
+  
+  
+  public TimedValues tracksValue;
   
   
   /**The describing and the actual data of one track (one curve)
@@ -682,7 +687,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * is only present on startup of graphic and only if the difference is in range of presentation width,
    * see {@link #prepareIndicesDataForDrawing(int, int)}
    */
-  public final int[] timeValues;
+  //public final int[] timeValues;
 
 
   /**Distance of nrofValues for one vertical strong grid line.
@@ -766,6 +771,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   {
     super(currPos, sName, 'c');
     this.common = curveVariables == null ? new CommonCurve() : curveVariables;
+
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
     while(maxNrofXvalues1 < maxNrofXvaluesP){
@@ -778,8 +784,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     this.mIxData = ~(this.adIxData -1); //all bits which have to be used, mask out lower bits.
     this.mIxiData = maxNrofXValues -1;  //e.g. from 0x1000 to 0xfff
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
-    //
-    timeValues = new int[maxNrofXValues];
+    this.tracksValue = new TimedValues(this.maxNrofXValues);
+
     cleanBuffer();
     saveOrg.nrofValuesAutoSave = (int)(maxNrofXValues * 0.75);
     //values = new float[maxNrofXvalues][nrofTracks];
@@ -796,15 +802,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public void cleanBuffer()
   {
     for(int ix = 0; ix < maxNrofXValues; ++ix){
-      timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
+      //timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
     }
-    timeorg.calc();
-    timeorg.timeshortAdd = 0;
-    timeorg.timeshortLast = 0;
-    timeorg.absTime.clean();
+    this.tracksValue.cleanSetCapacity(this.maxNrofXValues);
+    this.timeorg.calc();
+    this.timeorg.timeshortAdd = 0;
+    this.timeorg.timeshortLast = 0;
+    this.timeorg.absTime.clean();
     if(super._wdgImpl !=null) {
       GraphicImplAccess wdgi = (GraphicImplAccess)super._wdgImpl;
-      wdgi.ixDataDraw = ixDataWr =0;
+      wdgi.ixDataDraw = this.ixDataWr =0;
       wdgi.ixDataCursor1 = wdgi.ixDataCursor2 = 0;
       wdgi.ixDataShowRight = 0;
       Arrays.fill(wdgi.ixDataShown, 0);
@@ -963,7 +970,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   public long timeRight(){
     int ixData = ((GraphicImplAccess)super._wdgImpl).ixDataShown[0];  //right
-    int timeShort1 = timeValues[(ixData >> shIxiData) & mIxiData];
+    int timeShort1 = this.tracksValue.getTimeShort((ixData >> this.shIxiData) & this.mIxiData);
     //synchronized()
     return timeorg.absTime.absTimeshort(timeShort1);
     
@@ -1014,8 +1021,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       }
     }
     //
-    int timeLast = timeValues[ixWr];
-    timeValues[ixWr] = timeshort;
+    int timeLast = this.tracksValue.getsetTimeShort(ixWr, timeshort, 0);
     
     timeorg.lastShortTimeDateInCurve = timeshort;
     if(nrofValues < maxNrofXValues){
@@ -1091,7 +1097,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(this.common.timeVariable !=null){
         //the time variable should contain a relative time stamp. It is the short time.
         //Usual it is in 1 ms-step. To use another step width, a mechanism in necessary.
-        //1 ms in 32 bit are ca. 2000000 seconds.
+        //1 ms in 32 bit are ca. +- 2000000 seconds or ~ +-23 days as longest time for differences.
         timeshort = this.common.timeVariable.getInt() + this.timeorg.timeshortAdd;
         this.common.timeVariable.requestValue(timeyet);
         if(this.timeorg.absTime.isCleaned()) {
@@ -1203,7 +1209,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     int ixData;
     if(super._wdgImpl ==null) return "--no graphic--";
     dataOrg.ixDataStartSave = ((GraphicImplAccess)super._wdgImpl).ixDataShown[dataOrg.zPixelDataShown-1];
-    int timeShort1 = timeValues[(dataOrg.ixDataStartSave >> shIxiData) & mIxiData];
+    int timeShort1 = this.tracksValue.getTimeShort((dataOrg.ixDataStartSave >> shIxiData) & mIxiData);
     dataOrg.ixDataEndSave = ((GraphicImplAccess)super._wdgImpl).ixDataShown[0];
     if(!common.bFreeze){
       //running curve, autosave starts after it.
@@ -1233,8 +1239,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
   private CharSequence buildDate(int ixStart, int ixEnd){
-    int timeShortStart = timeValues[(ixStart >> shIxiData) & mIxiData];
-    int timeShortEnd = timeValues[(ixEnd >> shIxiData) & mIxiData];
+    int timeShortStart = this.tracksValue.getTimeShort((ixStart >> shIxiData) & mIxiData);
+    int timeShortEnd = this.tracksValue.getTimeShort((ixEnd >> shIxiData) & mIxiData);
     long timeStart = timeorg.absTime.absTimeshort(timeShortStart);
     long timeEnd = timeorg.absTime.absTimeshort(timeShortEnd);
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
@@ -1404,7 +1410,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         }
         float[] record = new float[listTracks1.size()];
         int ix = (ixDataStart >> shIxiData) & mIxiData;
-        int timeshortLast = timeValues[ix];
+        int timeshortLast = this.tracksValue.getTimeShort(ix);
         out.writeCurveStart(timeshortLast);
         int ixData = ixDataStart;
         int ctValues = this.nrofValues -1;  //read first, may be increment in next step
@@ -1414,7 +1420,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           for(Track track: listTracks1){
             record[++ixTrack] = track.values[ix];
           }
-          int timeshort = timeValues[ix];
+          int timeshort = this.tracksValue.getTimeShort(ix);
           if((timeshort - timeshortLast)<0){
             //This is a older value since the last one,
             //it means it is the first value, all others are overwritten.
@@ -1776,8 +1782,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1) / 10) & widgg.mIxData);
       int ixiData1 = (ixDataShown[xpCursor1] >> widgg.shIxiData) & widgg.mIxiData;
       int ixiData2 = (ixDataShown[xpCursor2] >> widgg.shIxiData) & widgg.mIxiData;
-      int time1 = widgg.timeValues[ixiData1];
-      int time2 = widgg.timeValues[ixiData2];
+      int time1 = widgg.tracksValue.getTimeShort(ixiData1);
+      int time2 = widgg.tracksValue.getTimeShort(ixiData2);
       if((time2 - time1)>0){
         widgg.timeorg.timeSpread = (time2 - time1) * 10/8;
         assert(widgg.timeorg.timeSpread >0);
@@ -1934,7 +1940,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       int ixp2 = 0;
       int ixp = 0; //pixel from right to left
       int nrofPixel4Data =0;
-      final int timeRight = widgg.timeValues[ixD]; //timestamp of the right value.
+      final int timeRight = widgg.tracksValue.getTimeShort(ixD); //timestamp of the right value.
       //
       if(xViewPart > 100){
         widgg.timeorg.timeLeftShowing = timeRight - (int)((xViewPart +1) * widgg.timeorg.timePerPixel);
@@ -2004,7 +2010,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           }
           else {
             ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData;  //the correct index in data.
-            time = widgg.timeValues[ixD];   //timestamp of that data point 
+            time = widgg.tracksValue.getTimeShort(ixD);   //timestamp of that data point 
             dtime2 = time - time2;    //difference time from the last one. It is negative.
             //dtime = time9 - time; //offset to first right point
             if((dtime2) <0){  //from rigth to left, dtime2 <0 is expected

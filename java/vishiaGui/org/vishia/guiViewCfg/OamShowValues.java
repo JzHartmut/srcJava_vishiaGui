@@ -11,7 +11,7 @@ import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.byteData.VariableAccessArray_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
-
+import org.vishia.util.Debugutil;
 import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMng;
@@ -156,12 +156,21 @@ public class OamShowValues
   public void show(byte[] binData, int nrofBytes, int from)
   {
     this.accessOamVariable.assignData(binData, nrofBytes, from, System.currentTimeMillis());
+    this.accessOamVariable.dataAccess.setLittleEndianBig2();
     this.dataValid = true;
+    long timeAbs = this.accessOamVariable.dataAccess.getLongVal(0x0, 8);
+    long timeShortAbs = this.accessOamVariable.dataAccess.getIntVal(0x8, 4);
+    long timeShort = this.accessOamVariable.dataAccess.getIntVal(0xc, 4);
+    this.timeMilliSecFromBaseyear = timeAbs + (timeShort - timeShortAbs);
     if(this.varTimeMilliSecFromBaseyear !=null){
       //read the time stamp from the record:
       this.timeMilliSecFromBaseyear = this.varTimeMilliSecFromBaseyear.getInt( 0);
     } else {
-      this.timeMilliSecFromBaseyear = System.currentTimeMillis();
+      //this.timeMilliSecFromBaseyear = System.currentTimeMillis();
+    }
+    int yMov = this.accessOamVariable.getVariable("yMov").getInt();
+    if(yMov > 100) {
+      Debugutil.stop();
     }
     writeValuesOfTab();   //write the values in the current tab, most of them will be received here newly.
     //TEST TODO:

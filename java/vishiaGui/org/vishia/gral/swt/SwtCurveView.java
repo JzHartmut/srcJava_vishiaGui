@@ -156,7 +156,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     float yFactor = size.y / -10.0F / track.scale.yScale;  //y-scaling
     float y0Pix = (1.0F - track.scale.y0Line/100.0F) * size.y; //y0-line
     float yF = track.values[ixD];
-    int time2 = widgg.timeValues[ixD];
+    int time2 = this.widgg.tracksValue.getTimeShort(ixD);
     int time1;
     int yp9 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
     int yp2 = yp9;  //right value
@@ -186,7 +186,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
               yp11 = track.ypixLast;
           } else {
             yF = track.values[ixD];
-            time1 = widgg.timeValues[ixD];
+            time1 = widgg.tracksValue.getTimeShort(ixD);
             int dTime = time2 - time1;
             //pixelFromRight += dTime * pixel7time;
             yp11 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
@@ -445,8 +445,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
           widgg.testStopWr = true;
           stop();
         }  
-        int timeLast = widgg.timeValues[(super.ixDataDraw >> widgg.shIxiData) & widgg.mIxiData];
-        int timeNow = widgg.timeValues[(ixDataRight >> widgg.shIxiData) & widgg.mIxiData];
+        int timeLast = widgg.tracksValue.getTimeShort((super.ixDataDraw >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeNow = widgg.tracksValue.getTimeShort((ixDataRight >> this.widgg.shIxiData) & this.widgg.mIxiData);
         timeDiff = timeNow - timeLast + super.timeCaryOverNewValue;  //0 if nothing was written.
         xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
         if(xViewPart > size.x){
