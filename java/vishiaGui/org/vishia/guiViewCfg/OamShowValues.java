@@ -158,10 +158,11 @@ public class OamShowValues
     this.accessOamVariable.assignData(binData, nrofBytes, from, System.currentTimeMillis());
     this.accessOamVariable.dataAccess.setLittleEndianBig2();
     this.dataValid = true;
-    long timeAbs = this.accessOamVariable.dataAccess.getLongVal(0x0, 8);
-    long timeShortAbs = this.accessOamVariable.dataAccess.getIntVal(0x8, 4);
-    long timeShort = this.accessOamVariable.dataAccess.getIntVal(0xc, 4);
-    this.timeMilliSecFromBaseyear = timeAbs + (timeShort - timeShortAbs);
+    //long timeAbs = this.accessOamVariable.dataAccess.getLongVal(0x0, 8);
+    int timeShortAdd = 0; //this.accessOamVariable.dataAccess.getIntVal(0x8, 4);
+    int timeShort = this.accessOamVariable.dataAccess.getIntVal(0xc, 4);
+    this.accessOamVariable.setTimeShort(timeShort, timeShortAdd);
+    //this.timeMilliSecFromBaseyear = timeAbs + (timeShort - timeShortAdd);
     if(this.varTimeMilliSecFromBaseyear !=null){
       //read the time stamp from the record:
       this.timeMilliSecFromBaseyear = this.varTimeMilliSecFromBaseyear.getInt( 0);

@@ -123,6 +123,11 @@ public class GralSwitchExclusiveButtonMng implements VariableAccess_ifc
   public void requestValue(long timeRequested, Runnable run) { }
   
   @Override public boolean isRequestedValue(long timeEarlyRequested, boolean retryFaultyVariables){ return false; }
+
+  @Override public int[] getLastRefreshTimeShort () {
+    // TODO Auto-generated method stub
+    return null;
+  }
   
 
 

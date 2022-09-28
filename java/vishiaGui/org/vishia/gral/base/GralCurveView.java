@@ -51,6 +51,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-09-28 Hartmut deal with timeShort from the measurement resp. value source.
+   *   The absolute time is either associated here from the {@link System#currentTimeMillis()} 
+   *   or also possible for a given absolute time relation for the values outside of the current values.
    * <li>2018-09-20 Hartmut new feature on {@link #readCurveCsvHeadline(File)}, a variable which is not yet in cfg is disabled.
    *   Elsewhere not prepared stuff is shown in the graphic. It can be enabled and scaled by the user afterwards.
    *   The importance is, the variable will be inserted as signal (track) automatically
@@ -134,7 +137,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public final static int version = 20130327;
+  public final static int version = 20220928;
   
   
   
@@ -250,8 +253,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**The describing and the actual data of one track (one curve)
    */
-  public static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
+  public final static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
+    
+    public final TimedValues.Track valueTrack;
     
     /**The index of the track in the List of tracks. 
      * It is the correspondent index in the float parameter for {@link GralCurveView#setSample(float[], int)}
@@ -265,7 +270,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     /**This value is set in {@link GralCurveView#refreshFromVariable(VariableContainer_ifc)}
      * after {@link #setDataPath(String)} is given. 
      */
-    private VariableAccess_ifc variable;
+    protected VariableAccess_ifc variable;
     
     private Object oContent;
     
@@ -275,8 +280,6 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     private int dataIx;
     
     public float YYYactValue;
-    
-    public float min, max;
     
     /**Reference to the scaling to show the track. More as one track can build a scale group 
      * which refers the same instance. */
@@ -295,9 +298,6 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     public int showSelected = 1;
     //public float y0Pix;
     
-    /**Array stores the last values which are able to show. */
-    public float[] values;
-    
     /**last values for paint. 
      * The current paint goes from lastValueY[1] to the current point.
      * The lastValueY[0] is used to repaint the last curve peace while shifting draw content.
@@ -310,7 +310,13 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     public int ypixLast;
     
     public Track(GralCurveView outer, String name, int ixList){ 
-      this.outer = outer; this.name = name; this.ixList = ixList; }
+      this.outer = outer; this.name = name; this.ixList = ixList; 
+      TimedValues.Track valueTrack = outer.tracksValue.getTrack(name);
+      if(valueTrack ==null) {                              // use an existing ValueTrack
+        valueTrack = outer.tracksValue.addTrack(name, 'F');// or create it here for all.
+      }
+      this.valueTrack = valueTrack;
+    }
 
     @Override public void setContentInfo(Object content) { oContent = content; }
 
@@ -338,7 +344,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * @see org.vishia.gral.ifc.GralSetValue_ifc#setMinMax(float, float)
      */
     @Override public void setMinMax(float minValue, float maxValue) {
-      this.min = minValue; this.max = maxValue;
+      this.valueTrack.min = minValue; this.valueTrack.max = maxValue;
     }
 
     @Override public int getLinePercent(){ return scale.y0Line; }
@@ -393,7 +399,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(cursor >=0 && cursor < ((GraphicImplAccess)outer._wdgImpl).ixDataShown.length){
         try{
           int ixData = ((GraphicImplAccess)outer._wdgImpl).getIxDataFromPixelRight(cursor);
-          value = values[ixData]; 
+          value = this.valueTrack.getFloat(ixData); 
         } catch(Exception exc){
           value = 77777.7f;
         }
@@ -875,7 +881,6 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   {
     //Track track = initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset, listTracksNew);
     Track track = new Track(this, sNameTrack, listTracks.size());
-    track.values = new float[this.maxNrofXValues];
     track.scale = new TrackScale();
     track.sDataPath =sDataPath;
     track.variable = null;                                 // will be found and set in {@link GralCurveView#refreshFromVariable(VariableContainer_ifc)
@@ -986,7 +991,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   /**
    * @see org.vishia.gral.ifc.GralCurveView_ifc#setSample(float[], int)
    */
-  @Override public void setSample(float[] values, int timeshort) {
+  @Override public void setSample(float[] values, int timeShort, int timeShortAdd) {
     if(testStopWr) return;  //only for debug test.
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
@@ -1013,20 +1018,20 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     for(Track track: listTracks){ 
       if(ixSource < values.length -1){
         float val = values[++ixSource];  //write in the values.
-        track.values[ixWr] = val;  //write in the values.
-        if(track.min > val ){ track.min = val; }
-        if(track.max < val ){ track.max = val; }
+        track.valueTrack.setFloat(ixWr, val);  //write in the values.
+        if(track.valueTrack.min > val ){ track.valueTrack.min = val; }
+        if(track.valueTrack.max < val ){ track.valueTrack.max = val; }
       } else {
-        track.values[ixWr] = 0;
+        track.valueTrack.setFloat(ixWr, 0);
       }
     }
     //
-    int timeLast = this.tracksValue.getsetTimeShort(ixWr, timeshort, 0);
+    int timeLast = this.tracksValue.getsetTimeShort(ixWr, timeShort, timeShortAdd);
     
-    timeorg.lastShortTimeDateInCurve = timeshort;
+    timeorg.lastShortTimeDateInCurve = timeShort;
     if(nrofValues < maxNrofXValues){
       if(nrofValues ==0){
-        timeorg.firstShortTimeDateInCurve = timeshort;
+        timeorg.firstShortTimeDateInCurve = timeShort;
       }
       this.nrofValues +=1;
     } else {
@@ -1044,7 +1049,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
 
   
   
-  /**
+  /**The specific for this refresh is, that all variables are quest with the same time. 
+   * If any variable is not refreshed, then it is not able to recognize.
+   * Maybe later write curves in another kind. 
+   * It may be assumed that all variables are updated simultaneously.
    * @see org.vishia.gral.base.GralWidget#refreshFromVariable(org.vishia.byteData.VariableContainer_ifc)
    */
   @Override public void refreshFromVariable(VariableContainer_ifc container){
@@ -1052,6 +1060,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
       float[] values = new float[listTracks1.size()];
       int ixTrack = -1;
+      int[] timeShortAbsLastFromVariable = null;
+      boolean bDifferentTime = false;
       boolean bRefreshed = false; //set to true if at least one variable is refreshed.
       for(Track track: listTracks1){
         if(track.variable ==null && bNewGetVariables){ //no variable known, get it.
@@ -1074,10 +1084,21 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         final float value;
         
         if(track.variable !=null ){
+          int[] timeShort = track.variable.getLastRefreshTimeShort();
+          if(timeShort !=null && timeShort[0] !=0) {
+            if(timeShortAbsLastFromVariable == null) { timeShortAbsLastFromVariable = timeShort; }
+            else if(timeShort != timeShortAbsLastFromVariable) {      // has another time 
+              //maybe todo  possibility to mark a curve as old
+              bDifferentTime = timeShortAbsLastFromVariable[0] != timeShort[0];
+              if((timeShort[0] - timeShortAbsLastFromVariable[0] ) >0) {
+                timeShortAbsLastFromVariable[0] = timeShort[0];   //use the last value
+                timeShortAbsLastFromVariable[1] = timeShort[1];
+              }
+            }
+          }
           if(track.variable.isRefreshed()){
             bRefreshed = true;
           }
-          track.variable.requestValue();
           if(track.getDataPath().startsWith("xxx:"))
             stop();
           value = track.variable.getFloat();
@@ -1089,7 +1110,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       }  
       bNewGetVariables = false;
       final long timeyet = System.currentTimeMillis();
-      int timeshort;
+      final int timeshort, timeshortAdd;
       if(this.common.timeDatapath !=null && this.common.timeVariable ==null){
         String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
         this.common.timeVariable = container.getVariable(sPath);
@@ -1102,22 +1123,31 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         this.common.timeVariable.requestValue(timeyet);
         if(this.timeorg.absTime.isCleaned()) {
           setTimePoint(timeyet, timeshort, 1.0f);  //the first time set.
+          timeshortAdd = 0;
         }
         else if((timeshort - this.timeorg.timeshortLast) <0 || this.timeorg.absTime.isCleaned()) {
           //new simulation time:
-          int timeshortAdd = this.timeorg.absTime.timeshort4abstime(timeyet);
-          timeshort += timeshortAdd;
+          timeshortAdd = this.timeorg.absTime.timeshort4abstime(timeyet);
           this.timeorg.timeshortAdd += timeshortAdd; 
           setTimePoint(timeyet, timeshort, 1.0f);  //for later times set the timePoint newly to keep actual.
+        } else {
+          timeshortAdd = 0;
+        }
+      } else if(timeShortAbsLastFromVariable !=null) {
+        timeshort = timeShortAbsLastFromVariable[0];
+        timeshortAdd = timeShortAbsLastFromVariable[1];
+        if(this.timeorg.absTime.isCleaned()) {
+          setTimePoint(timeyet, timeshort + timeshortAdd, 1.0f);  //set always a timePoint if abstime is not given.
         }
       } else {
         timeshort = (int)timeyet;  //The milliseconds from absolute time.
+        timeshortAdd = 0;
         setTimePoint(timeyet, timeshort, 1.0f);  //set always a timePoint if not data time is given.
       }
       if(bRefreshed && timeshort != this.timeorg.timeshortLast) {
         //don't write points with the same time, ignore seconds.
-        setSample(values, timeshort);
-      //  System.out.println("setSample");
+        setSample(values, timeshort, timeshortAdd);
+        //System.out.println("setSample");
         this.timeorg.timeshortLast = timeshort;
       }
     }
@@ -1334,7 +1364,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         }
         bFirstCol = false;
       }
-      setSample(fvalues, timeshort);
+      setSample(fvalues, timeshort, 0);
     }
     ifile.close();
   }
@@ -1418,7 +1448,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           ix = (ixData >> shIxiData) & mIxiData;
           ixTrack = -1;
           for(Track track: listTracks1){
-            record[++ixTrack] = track.values[ix];
+            record[++ixTrack] = track.valueTrack.getFloat(ix);
           }
           int timeshort = this.tracksValue.getTimeShort(ix);
           if((timeshort - timeshortLast)<0){
@@ -1651,7 +1681,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       ctLastSelected +=1;
       List<Track> listTracks1 = widgg.listTracks; //Atomic access, iterate in local referenced list.
       for(Track track: listTracks1){  //NOTE: break inside.
-        float val = track.values[ixData];
+        float val = track.valueTrack.getFloat(ixData);
         float yFactor = ysize / -10.0F / track.scale.yScale;  //y-scaling
         float y0Pix = (1.0F - track.scale.y0Line/100.0F) * ysize; //y0-line
         

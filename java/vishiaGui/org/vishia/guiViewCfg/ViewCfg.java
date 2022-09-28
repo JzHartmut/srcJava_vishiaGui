@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 
+import org.vishia.byteData.VariableAccessArray_ifc;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
@@ -291,6 +292,11 @@ public class ViewCfg //extends GuiCfg
       this.oamShowValues.setCurveView((GralCurveView)curveView);
     }
     this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields(), this.logCfg);
+    final VariableAccessArray_ifc varTimeShort = this.oamShowValues.accessOamVariable.getVariable("timeShort");
+    if(varTimeShort !=null) {
+      
+    }
+    
     if(this.oamRcvUdpValue !=null) {
       this.oamRcvUdpValue.start();
     }

@@ -433,5 +433,14 @@ public interface GralWidget_ifc extends Removeable
   
   
   
+  /**Capability of any widget for {@link #refreshFromVariable(VariableContainer_ifc)}
+   * but additionally the widget is shown as "too old" if the time stored with the variable is old. 
+   * This helps to show the state of fields for updating. 
+   * @param container
+   * @param timeAtleast The absolute time stamp after them the variable should be gotten a new value.
+   *   It may be for example some seconds before the current time. 
+   * @param colorRefreshed show with this background color if refreshed
+   * @param colorOld show with this background color if not refresehed.
+   */
   void refreshFromVariable(VariableContainer_ifc container, long timeAtleast, GralColor colorRefreshed, GralColor colorOld);
 }
