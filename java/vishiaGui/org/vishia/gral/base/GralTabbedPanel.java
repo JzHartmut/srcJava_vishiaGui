@@ -95,7 +95,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
 	 * @param user
 	 */
 	public GralTabbedPanel(String posString, String sName, GralPanelActivated_ifc user, int property)
-	{ super(posString, sName);
+	{ super((GralPos)null, sName, GralMng.get());
 	  //super(sName, '@', mng);
 	  this.notifyingUserInstanceWhileSelectingTab = user;
 	}
@@ -122,11 +122,11 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
      */
     public GralPanelContent addGridPanel(String sName, String sLabel, int yGrid, int xGrid, int yGrid2, int xGrid2)
     {
-      GralMng.PosThreadSafe pos = itsMng.pos();
+      GralMng.PosThreadSafe pos = this.itsMng.pos();
       if(pos.pos.parent != this) {
         pos.pos.setPosition(this, 0, 0, 0, 0, 0, 'd', 0);   //initializes the position of this GralTabbedPanel to have the correct parent for the tab 
       }
-      GralPanelContent panelg = new GralPanelContent("@", sName);
+      GralPanelContent panelg = new GralPanelContent(pos.pos, sName, this.itsMng);
       ((ImplAccess)_wdgImpl).addGridPanel(panelg, sLabel, yGrid, xGrid, yGrid2, xGrid2);
       return panelg;
     }
@@ -136,7 +136,7 @@ public class GralTabbedPanel extends GralPanelContent /*extends GralWidget*/ imp
       if(pos.pos.parent != this) {
         pos.pos.setPosition(this, 0, 0, 0, 0, 0, 'd', 0);   //initializes the position of this GralTabbedPanel to have the correct parent for the tab 
       }
-      GralPanelContent panelg = new GralPanelContent("@", sName);
+      GralPanelContent panelg = new GralPanelContent(pos.pos, sName, this.itsMng);
       ((ImplAccess)_wdgImpl).addCanvasPanel(panelg, sLabel);
       return panelg;
       

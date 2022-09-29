@@ -643,6 +643,8 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     colorBack = GralColor.getColor("wh");
     colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
+    
+    createGraphic(this.itsMng);                                 // creates the sub content for this comprehensive widget
   }
   
   
@@ -662,23 +664,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     dateFormatOlder = new SimpleDateFormat(sFormat);
   }
   
+
   
-  /**Sets the widgets of this instance to a panel.
-   * The panel and the position in the panel 
-   * should be set before using {@link GralMngBuild_ifc#selectPanel(String)} and 
-   * {@link GralMngBuild_ifc#setPositionInPanel(float, float, float, float, char)}.
-   * The instance has more as one widget, all widgets are set in the area of the given position.
-   * The position area should be a range of at least 3 lines.
-   * @param panelMng The panelManager. 
-   * @param identArgJbat The name of the table widget. The Text-widget for the path gets the name * "-Path".
-   * @param rows Number of rows to show
-   * @param columns Array with column width.
-   * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
-   *        the font size especially. 
-   */
-  public void createImplWidget_Gthread() //GralMngBuild_ifc panelMng)
-  { GralMng panelMng = GralMng.get();
-    //The macro widget consists of more as one widget. Position the inner widgets:
+  private void createGraphic(GralMng panelMng) {
     GralPos posAll = panelMng.getPositionInPanel();
     GralWidget_ifc panel = posAll.parent;
     String sPanel = panel.getName();
@@ -691,12 +679,12 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     menuFolder.addMenuItem("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     widgBtnFavor = new GralButton(null, "favor", actionFavorButton);
-    widgBtnFavor.createImplWidget_Gthread();
+    // widgBtnFavor.createImplWidget_Gthread();
     widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    selectList.createImplWidget_Gthread();
+    // selectList.createImplWidget_Gthread();
     selectList.wdgdTable.setVisible(true);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, actionSwitchoffCheckRefresh);
@@ -731,6 +719,28 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     //questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
     panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.
+
+  }
+  
+  
+  /**Sets the widgets of this instance to a panel.
+   * The panel and the position in the panel 
+   * should be set before using {@link GralMngBuild_ifc#selectPanel(String)} and 
+   * {@link GralMngBuild_ifc#setPositionInPanel(float, float, float, float, char)}.
+   * The instance has more as one widget, all widgets are set in the area of the given position.
+   * The position area should be a range of at least 3 lines.
+   * @param panelMng The panelManager. 
+   * @param identArgJbat The name of the table widget. The Text-widget for the path gets the name * "-Path".
+   * @param rows Number of rows to show
+   * @param columns Array with column width.
+   * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
+   *        the font size especially. 
+   */
+  public void createImplWidget_Gthread() //GralMngBuild_ifc panelMng)
+  { GralMng panelMng = GralMng.get();
+    //The macro widget consists of more as one widget. Position the inner widgets:
+    Debugutil.stop();
+  
   }
   
   

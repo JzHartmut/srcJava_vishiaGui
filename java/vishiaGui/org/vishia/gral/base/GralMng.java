@@ -26,6 +26,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPoint;
@@ -39,6 +40,8 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindowMng_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralFileSelectWindow;
+import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.inspcPC.InspcReplAlias;
@@ -112,7 +115,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.
    * <li>2012-06-30 Hartmut new: Composition {@link #widgetHelper} The widget helper is implemented in the graphic system
    *   for example as {@link org.vishia.gral.swt.SwtWidgetHelper} to do some widget specific things.
-   * <li>2012-06-30 Hartmut new: Composition {@link #_impl}.{@link InternalPublic#gralKeyListener}
+   * <li>2012-06-30 Hartmut new: Composition {@link #_implListener}.{@link InternalPublic#gralKeyListener}
    * <li>2012-04-22 Hartmut new: {@link #addLine(GralColor, List)} to add in a {@link GralCanvasStorage}.
    * <li>2012-04-01 Hartmut new: {@link #addDataReplace(Map)}, {@link #replaceDataPathPrefix(String)}.
    *   using alias in the {@link GralWidget#setDataPath(String)}. The resolving of the alias is done
@@ -586,7 +589,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
   private final Map<String, String> dataReplace = new TreeMap<String,String>();
 
-  public ImplAccess impl;
+  /**The graphic specific implementation part of the GralMng
+   * This implementation should care about the correct implementation widgets. 
+   */
+  public ImplAccess _mngImpl;
   
   private static GralMng singleton;
 	
@@ -689,7 +695,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     try {
       if(widgg instanceof GralWindow){
         GralWindow wind1 = (GralWindow)widgg;
-        this.impl.createSubWindow(wind1);
+        this._mngImpl.createSubWindow(wind1);
   //      for(Map.Entry<String, GralPanelContent> e: wind1.panels.entrySet()) {
   //        GralPanelContent tab = e.getValue();
   //        
@@ -701,7 +707,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
         //pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
   
       } else {  
-        impl.createImplWidget_Gthread(widgg); 
+        _mngImpl.createImplWidget_Gthread(widgg); 
       }
     } catch(Exception exc) {
       System.err.println(CheckVs.exceptionInfo("unexpected", exc, 0, 10));
@@ -837,7 +843,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public GralPanel_ifc selectPanel(String sName){ 
     PosThreadSafe pos = pos();
     GralPanel_ifc panel = this.panels.get(sName);
-    pos.pos.parent = panel;
+    pos.pos.parent = panel;                                // the current pos in GralMng is marked with the panel as parent
     sCurrPanel = sName;
     if(pos.pos.parent == null && XXXcurrTabPanel !=null) {
       //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
@@ -1168,8 +1174,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   {
     GralLabel widgg = new GralLabel(null, sText, origin);
     widgg.setTextColor(textColor);
-    widgg.setBackColor(backColor, 0);
-    widgg.setToPanel(this); //Note: sets TextFont, don't call this.setToPanel
+    if(backColor !=null) { widgg.setBackColor(backColor, 0); }
     return widgg;
   }
 
@@ -1192,7 +1197,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     GralTextField widgg = new GralTextField(name);
     widgg.setPrompt(prompt, promptStylePosition);
     widgg.setEditable(editable);
-    createImplWidget_Gthread(widgg);
+    // createImplWidget_Gthread(widgg);
     //SwtTextFieldWrapper.createTextField(widgg, this);   
     return widgg;
   }
@@ -1222,7 +1227,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   prompt1[0] = promptStylePosition;
   widgg.setPrompt(prompt, new String(prompt1));
   widgg.setEditable(editable);
-  createImplWidget_Gthread(widgg);
+  // createImplWidget_Gthread(widgg);
   //SwtTextFieldWrapper.createTextField(widgg, this);   
   return widgg;
 
@@ -1238,7 +1243,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 { 
   GralValueBar wdgg = new GralValueBar(sName);
   wdgg.setDataPath(sDataPath);
-  wdgg.setToPanel(this);
+  // wdgg.setToPanel(this);
   return wdgg;
 }
 
@@ -1278,7 +1283,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   widgButton.sCmd = sCmd;
   widgButton.setDataPath(sDataPath);
   registerWidget(widgButton);
-  createImplWidget_Gthread(widgButton);
+//  createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1311,7 +1316,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   widgButton.sCmd = sCmd;
   widgButton.setDataPath(sDataPath);
   registerWidget(widgButton);
-  createImplWidget_Gthread(widgButton);
+//  createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1335,7 +1340,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
   //in ctor: widgButton.setPanelMng(this);
   if(sName !=null){ registerWidget(widgButton); }
-  createImplWidget_Gthread(widgButton);
+  // createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1360,7 +1365,7 @@ public GralButton addCheckButton(
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn, sButtonTextDisabled);
   //widgButton.setPanelMng(this);
   if(sName !=null){ registerWidget(widgButton); }
-  createImplWidget_Gthread(widgButton);
+  // createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -1380,7 +1385,7 @@ public GralButton addCheckButton(
   //SwtLed swtLed = new SwtLed(gralLed, this);
   gralLed.setDataPath(sDataPath);
   //registerWidget(gralLed);
-  gralLed.setToPanel(this);
+  // gralLed.setToPanel(this);
   return gralLed;
 }
 
@@ -1484,9 +1489,9 @@ public GralButton addCheckButton(
   
   @Override public List<GralWidget> getWidgetsInFocus(){ return widgetsInFocus; }
   
-  @Override public int getColorValue(String sColorName){ return propertiesGui.getColorValue(sColorName); }
+  @Override public int getColorValue(String sColorName){ return GralColor.getColor(sColorName).getColorValue(); }
 
-  @Override public GralColor getColor(String sColorName){ return propertiesGui.color(getColorValue(sColorName)); }
+  @Override public GralColor getColor(String sColorName){ return GralColor.getColor(sColorName); }
 
 
 
@@ -1711,7 +1716,7 @@ public GralButton addCheckButton(
    */
   @Override public GralWidget addText(String text)
   { //return addText(text, 0, GralColor.getColor("bk"), GralColor.getColor("wh"));
-    return addText(text, 0, GralColor.getColor("bk"), propertiesGui.colorBackground_);
+    return addText(text, 0, GralColor.getColor("bk"), null);
   }
   
   
@@ -1855,7 +1860,7 @@ public GralButton addCheckButton(
   /**Implementation specific fields.
    * 
    */
-  public final InternalPublic _impl = new InternalPublic();
+  public final InternalPublic _implListener = new InternalPublic();
   
   
   /**This class is used only for the implementation level of the graphic. It is not intent to use
@@ -1871,7 +1876,7 @@ public GralButton addCheckButton(
     public ImplAccess(GralMng mng, GralGridProperties props){
       this.gralMng = mng;
       mng.setProperties(props);
-      mng.impl = this;
+      mng._mngImpl = this;
     }
     
     protected GralPos pos(){ return gralMng.pos().pos; }
@@ -1911,7 +1916,7 @@ public GralButton addCheckButton(
      * @return
      * @since 2010-05-01
      */
-    protected abstract GralPanelContent createCompositeBox(String name);
+    //protected abstract GralPanelContent createCompositeBox(String name);
    
     /**Creates an independent grid panel which is managed by this.
      * The panel can be associated to any graphic frame.
@@ -1923,7 +1928,7 @@ public GralButton addCheckButton(
      * @param yS
      * @return
      */
-    protected abstract GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
+    //protected abstract GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
 
     
     public abstract boolean remove(GralPanel_ifc compositeBox);
@@ -2062,85 +2067,92 @@ public GralButton addCheckButton(
   void stop(){}
 
   
-  protected GralMenu createContextMenu(GralWidget widg){ return impl.createContextMenu(widg); }
+  protected GralMenu createContextMenu(GralWidget widg){ 
+    return widg.getContextMenu();
+  }
   
-  protected GralMenu createMenuBar(GralWindow windg){ return impl.createMenuBar(windg); }
+  protected GralMenu createMenuBar(GralWindow windg){ 
+    return windg.getMenuBar();
+  }
 
   
   @Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
       int properties)
   {
-    return impl.addTabbedPanel(namePanel, user, properties);
+    return new GralTabbedPanel(null, namePanel, user, properties);
   }
 
   @Override public GralWidget addSlider(String sName, GralUserAction action, String sShowMethod,
       String sDataPath)
   {
-    // TODO Auto-generated method stub
-    return impl.addSlider(sName, action, sShowMethod, sDataPath);
+    GralSlider slider = new GralSlider(sName, this);
+    slider.setActionChange(action);
+    slider.setDataPath(sDataPath);
+    return slider;
   }
 
   @Override @Deprecated public GralTable addTable(String sName, int height, int[] columnWidths)
   {
-    // TODO Auto-generated method stub
-    return impl.addTable(sName, height, columnWidths);
+    GralTable table = new GralTable<>(sName, height, columnWidths);
+    return table;
   }
 
   @Override @Deprecated public GralWidget addText(String sText, char size, int color)
   {
-    // TODO Auto-generated method stub
-    return impl.addText(sText, size, color);
+    GralLabel label = new GralLabel(pos().pos, sText, sText, 0);
+    label.setTextColor(GralColor.getColor(color));
+    return label;    
   }
 
   @Override public Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd)
-  {
+  { //GralImageBase
     // TODO Auto-generated method stub
-    return impl.addImage(sName, imageStream, height, width, sCmd);
+    return null; //_mngImpl.addImage(sName, imageStream, height, width, sCmd);
   }
 
   @Override public GralHtmlBox addHtmlBox(String name)
   {
-    // TODO Auto-generated method stub
-    return impl.addHtmlBox(name);
+    return new GralHtmlBox(pos().pos, name);
   }
 
   @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, CommonCurve common)
   {
-    // TODO Auto-generated method stub
-    return impl.addCurveViewY(sName, nrofXvalues, common);
+    return new GralCurveView(sName, nrofXvalues, common);
   }
 
   @Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter,
       String sCmdRelease)
   {
-    // TODO Auto-generated method stub
     return addFocusAction(sName, action, sCmdEnter, sCmdRelease);
   }
 
   @Override public void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter,
       String sCmdRelease)
   {
-    // TODO Auto-generated method stub
-    impl.addFocusAction(widgetInfo, action, sCmdEnter, sCmdRelease);
+    addFocusAction(widgetInfo, action, sCmdEnter, sCmdRelease);
   }
 
   @Override public GralPanelContent createCompositeBox(String name)
   {
-    // TODO Auto-generated method stub
-    return impl.createCompositeBox(name);
+    return new GralPanelContent(pos().pos, name, this);
   }
 
   @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
       int xS, int yS)
   {
-    // TODO Auto-generated method stub
-    return impl.createGridPanel(namePanel, backGround, xG, yG, xS, yS);
+    GralPanelContent panel = new GralPanelContent(pos().pos, namePanel, this);
+    panel.setBackColor(backGround, 0);
+    panel.setGrid(yG, xG, yS, xS, 15, 25);
+    return panel;
   }
 
   @Override public boolean remove(GralPanel_ifc compositeBox)
   {
-    // TODO Auto-generated method stub
-    return impl.remove(compositeBox);
+    if(this._mngImpl !=null) {
+      return _mngImpl.remove(compositeBox);
+    } else {
+      return false;
+    }
   }
 
   
@@ -2153,39 +2165,42 @@ public GralButton addCheckButton(
   
 
 
-  /* (non-Javadoc)
+  /**Creates only the GralWindow with position in GralMng
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(java.lang.String, java.lang.String, int)
-   * @deprecated use {@link GralWindow#GralWindow(String, String, String, int)} and then {@link GralWidget#createImplWidget_Gthread()}
+   * @ccdeprecated use {@link GralWindow#GralWindow(String, String, String, int)} and then {@link GralWidget#createImplWidget_Gthread()}
    *   with this window.
    */
-  @Override @Deprecated public GralWindow createWindow(String name, String title, int windProps)
+  @Override public GralWindow createWindow(String posName, String title, int windProps)
   { GralPos pos = pos().pos;  //without clone.
-    String sPos = pos.posString(); 
-    GralWindow windowGral = new GralWindow(sPos, name, title, windProps);
-    try {
-      impl.createSubWindow(windowGral);
-    } catch(Exception exc) {
-      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
-    }
+    //String sPos = pos.posString(); 
+    GralWindow windowGral = new GralWindow(pos, posName, title, windProps, this);
+//    try {
+//      impl.createSubWindow(windowGral);
+//    } catch(Exception exc) {
+//      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
+//    }
     return windowGral;
   }
 
   @Override public GralFileDialog_ifc createFileDialog()
   {
-    // TODO Auto-generated method stub
-    return impl.createFileDialog();
+    GralFileSelectWindow fileSelWin = new GralFileSelectWindow("File select", this);
+    return fileSelWin;
   }
 
   @Override public void redrawWidget(String sName)
   {
-    // TODO Auto-generated method stub
-    impl.redrawWidget(sName);
+    if(this._mngImpl !=null) {
+      _mngImpl.redrawWidget(sName);
+    }
   }
 
   @Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
   {
     // TODO Auto-generated method stub
-    impl.resizeWidget(widgd, xSizeParent, ySizeParent);
+    if(this._mngImpl !=null) {
+    _mngImpl.resizeWidget(widgd, xSizeParent, ySizeParent);
+    }
   }
 
   @Override public boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos)
@@ -2196,7 +2211,7 @@ public GralButton addCheckButton(
 
   @Override public void setSampleCurveViewY(String sName, float[] values)
   {
-    impl.setSampleCurveViewY(sName, values);
+    //_mngImpl.setSampleCurveViewY(sName, values);
   }
 	
 

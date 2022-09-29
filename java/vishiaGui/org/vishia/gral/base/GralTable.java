@@ -538,7 +538,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       menuColumns = new GralMenu[zColumn];
     }
     if(menuColumns[col] == null){
-      menuColumns[col] = gi.createColumnMenu(col); //for all cells of this column
+      menuColumns[col] = new GralMenu(); //gi.createColumnMenu(col); //for all cells of this column
     }
     return menuColumns[col];
   }

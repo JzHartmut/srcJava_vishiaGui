@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
@@ -209,7 +210,7 @@ public class InspcFieldTable
   
   public InspcFieldTable(InspcMng inspcMng)
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
-    this.wind = new GralWindow(null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    this.wind = new GralWindow((GralPos)null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.widgPath = new GralTextField("InspcFieldTableWind");
     this.widgTable = new GralTable<InspcFieldOfStruct>("InspcFieldTable", new int[]{sizeStruct, sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(2, true);

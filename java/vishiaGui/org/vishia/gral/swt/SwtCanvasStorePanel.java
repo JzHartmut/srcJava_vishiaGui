@@ -100,7 +100,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     	for(GralCanvasStorage.PaintOrder order: storeMng.gralPanel().canvas().paintOrders){
     		switch(order.paintWhat){
       		case GralCanvasStorage.paintLine: {
-      			g.setForeground(((SwtMng)storeMng.gralPanel().gralMng().impl).getColorImpl(order.color));
+      			g.setForeground(((SwtMng)storeMng.gralPanel().gralMng()._mngImpl).getColorImpl(order.color));
       	  	g.drawLine(order.x1, order.y1, order.x2, order.y2);
       	  
       	  } break;
@@ -116,7 +116,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
       		  SwtPolyLine swtLine;
             { Object oImpl = line.getImplData();
         		  if(oImpl == null){
-                swtLine = new SwtPolyLine(line, ((SwtMng)storeMng.gralPanel().gralMng().impl));
+                swtLine = new SwtPolyLine(line, ((SwtMng)storeMng.gralPanel().gralMng()._mngImpl));
                 line.setImplData(swtLine);
               } else {
                 swtLine = (SwtPolyLine) oImpl;

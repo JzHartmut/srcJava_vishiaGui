@@ -424,6 +424,8 @@ public class GralGraphicThread implements Runnable
     /**The thread which runs all graphical activities. */
     protected final Thread threadGuiDispatch;
 
+    protected final GralMng gralMng;
+    
     public final GralWindow mainWindow;
     
     protected final LogMessage log;
@@ -433,6 +435,7 @@ public class GralGraphicThread implements Runnable
 
     protected ImplAccess(char sizeCharProperties, GralWindow mainWindow, LogMessage log) {
       this.mainWindow = mainWindow;
+      this.gralMng = mainWindow.gralMng();
       this.log = log;
       this.gralGraphicThread = GralMng.get().gralDevice;
       this.gralGraphicThread.impl = this;

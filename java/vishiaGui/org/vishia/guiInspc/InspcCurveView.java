@@ -145,6 +145,8 @@ public final class InspcCurveView
   /**The window for curve view. */
   GralWindow windCurve;
   
+  GralWindow windVariables;
+  
   /**Used for read/write config and for read/write data*/
   private final GralFileSelector widgFileSelector;
   
@@ -244,17 +246,21 @@ public final class InspcCurveView
       , Map<String, String> curveExporterClasses){
     //this.comm = comm;
     this.sName = sName;
-    this.curveExporterClasses = curveExporterClasses;
-    this.variables = variables;
     this.gralMng = gralMng;
-    this.fileCurveCfg = defaultDirCfg;
-    this.fileCurveData = defaultDirSave;
-    this.sHelpDir = sHelpDir;
+    int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
+    this.windCurve = this.gralMng.createWindow("@screen,12+100,20+100=CurveView", "CurveView", windowProps);
+    this.colorSelector = new GralColorSelector("colorSelector", this.gralMng);
     this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
     this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
     this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
     this.widgFilename = new GralTextField("-filename", GralTextField.Type.editable);
+    buildGraphic(this.windCurve, colorSelector, null);
+    this.curveExporterClasses = curveExporterClasses;
+    this.variables = variables;
+    this.fileCurveCfg = defaultDirCfg;
+    this.fileCurveData = defaultDirSave;
+    this.sHelpDir = sHelpDir;
      
   }
   
@@ -264,14 +270,12 @@ public final class InspcCurveView
    * @param sName The name, used for menu entry too, sample "curve A"
    */
   public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common)
-  {
-    this.colorSelector = colorSelector;
-    gralMng.selectPanel("primaryWindow");
+  { gralMng.selectPanel("primaryWindow");
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(4, 56, 4, 104, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop; // | GralWindow.windResizeable;
-    windCurve = gralMng.createWindow("windMapVariables", sName, windProps);
+    windVariables = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     buildGraphicInCurveWindow(common);
     GralMenu menu = wind.getMenuBar();
@@ -280,18 +284,22 @@ public final class InspcCurveView
 
   
   
-  void buildGraphicInCurveWindow(GralCurveView.CommonCurve common)
+  /**Also used from Inspector
+   * @param common
+   */
+  public void buildGraphicInCurveWindow(GralCurveView.CommonCurve common)
   {
     int posright = -20;
+    gralMng.selectPanel("primaryWindow");
     
     gralMng.setPosition(0, -4, 0, posright, 0, 'd');
-    widgFileSelector.createImplWidget_Gthread();
-    widgFileSelector.setVisible(false);
+//    widgFileSelector.createImplWidget_Gthread();
+//    widgFileSelector.setVisible(false);
     //widgFileSelector.set
     //widgFileSelector.specifyActionOnFileSelected(actionSelectFile);
     //widgFileSelector.setActionOnEnterFile(actionOk);
     gralMng.setPosition(-4, -2, 0, posright, 0, 'd');
-    widgFilename.createImplWidget_Gthread();
+//    widgFilename.createImplWidget_Gthread();
     widgFilename.setVisible(false);
     widgFilename.setText("TEST xyz");
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
@@ -307,7 +315,7 @@ public final class InspcCurveView
     widgTableVariables = new GralTable<GralCurveViewTrack_ifc>("variables", new int[]{-posright});
     gralMng.setPosition(3, GralPos.size +20, posright, 0, 0, 'd', 0);
     widgTableVariables.setColumnEditable(0, true);
-    widgTableVariables.setToPanel(gralMng);
+    //widgTableVariables.setToPanel(gralMng);
     widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
     widgTableVariables.setActionChange(actionKeyHandlingTable);
     //widgTableVariables.set

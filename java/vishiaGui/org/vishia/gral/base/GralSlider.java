@@ -2,7 +2,7 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralSlider_ifc;
 
-public abstract class GralSlider extends GralWidget implements GralSlider_ifc
+public class GralSlider extends GralWidget implements GralSlider_ifc
 {
   protected float posSlider;
 

@@ -182,11 +182,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * So the singleton usage can be refactored. 
    * @param widgi The implementation access, anytime accessible from the SWT implementation level. 
    * @return The reference to the GralMng is found via {@link ImplAccess#gralMng()}, 
-   *   then the {@link GralMng#impl} is anytime the SwtMng if the graphic is running. 
+   *   then the {@link GralMng#_mngImpl} is anytime the SwtMng if the graphic is running. 
    *   It is unconditionally downcasted here from the universal {@link GralMng.ImplAccess} to the SwtMng. 
    */
   static SwtMng swtMng(GralWidget.ImplAccess widgi) {
-    return (SwtMng) widgi.gralMng().impl;
+    return (SwtMng) widgi.gralMng()._mngImpl;
   }
   
   
@@ -351,11 +351,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  protected SwtMng(Display display /*, Composite graphicFrame */
+  protected SwtMng(GralMng gralMng, Display display /*, Composite graphicFrame */
   , char displaySize//, VariableContainer_ifc variableContainer
 	, LogMessage log)
   { //super(sTitle); 
-  	this(display, new SwtProperties(display, displaySize), log);
+  	this(gralMng, display, new SwtProperties(display, displaySize), log);
   }
 
   /**Creates an instance.
@@ -365,12 +365,13 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public SwtMng(Display display 
+  public SwtMng ( GralMng gralMng
+    , Display display 
     , SwtProperties propertiesGui
   	//, VariableContainer_ifc variableContainer
-  	, LogMessage log
+    , LogMessage log
   	)
-  { super(GralMng.get(), propertiesGui);
+  { super(gralMng, propertiesGui);
     this.propertiesGuiSwt = propertiesGui;
     //pos().x.p1 = 0; //start-position
     //pos().y.p1 = 4 * propertiesGui.yPixelUnit();
@@ -459,30 +460,30 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 
   
   
-  @Override public GralPanelContent createCompositeBox(String name)
-  {
-    //Composite box = new Composite(graphicFrame, 0);
-    Composite box = new Composite(getCurrentPanel(), 0);
-    setPosAndSize_(gralMng.getPosOldPositioning(), box);
-    Point size = box.getSize();
-    GralPanelContent panelg = new GralPanelContent(null, name);
-    GralPanelContent panel = (new SwtPanel(panelg, box)).gralPanel();
-    //mng.registerPanel(panel);
-    //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
-    return panel;
-  }
+//  @Override public GralPanelContent createCompositeBox(String name)
+//  {
+//    //Composite box = new Composite(graphicFrame, 0);
+//    Composite box = new Composite(getCurrentPanel(), 0);
+//    setPosAndSize_(gralMng.getPosOldPositioning(), box);
+//    Point size = box.getSize();
+//    GralPanelContent panelg = new GralPanelContent(null, name);
+//    GralPanelContent panel = (new SwtPanel(panelg, box)).gralPanel();
+//    //mng.registerPanel(panel);
+//    //GuiPanelMngSwt mng = new GuiPanelMngSwt(gralDevice, size.y, size.x, propertiesGuiSwt, variableContainer, log);
+//    return panel;
+//  }
 
   
-  @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
-  { GralPanelContent panelg = new GralPanelContent(null, namePanel);
-    panelg.setGrid(yG, xG, yS, xS, -8, -12);
-    Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
-    SwtGridPanel panel = new SwtGridPanel(panelg, 0);
-    GralPanelContent gralPanel = panel.gralPanel();
-    //mng.registerPanel(gralPanel);
-
-    return gralPanel;
-  }
+//  @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS)
+//  { GralPanelContent panelg = new GralPanelContent(null, namePanel);
+//    panelg.setGrid(yG, xG, yS, xS, -8, -12);
+//    Color backColorSwt = propertiesGuiSwt.colorSwt(backGround);
+//    SwtGridPanel panel = new SwtGridPanel(panelg, 0);
+//    GralPanelContent gralPanel = panel.gralPanel();
+//    //mng.registerPanel(gralPanel);
+//
+//    return gralPanel;
+//  }
   
   
   
@@ -501,7 +502,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   @Override public GralWindow createWindow(String name, String title, int windProps)
   {
     //GralWindow windowGral = new GralWindow("@", name, title, windProps);
-    GralWindow windowGral = new GralWindow(null, name, title, windProps);
+    GralWindow windowGral = new GralWindow((GralPos)null, name, title, windProps);
     //SwtGraphicThread swtDevice = (SwtGraphicThread)gralDevice;
     try {
       createSubWindow(windowGral);

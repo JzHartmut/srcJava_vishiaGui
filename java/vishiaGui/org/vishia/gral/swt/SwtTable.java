@@ -1022,7 +1022,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
 
   
-  protected SwtKeyListener swtKeyListener = new SwtKeyListener(widgg.gralMng()._impl.gralKeyListener)
+  protected SwtKeyListener swtKeyListener = new SwtKeyListener(widgg.gralMng()._implListener.gralKeyListener)
   {
 
     @Override public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ 

@@ -154,7 +154,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
     textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    KeyListener swtKeyListener = new TextFieldKeyListener(mng.gralMng._impl.gralKeyListener);
+    KeyListener swtKeyListener = new TextFieldKeyListener(mng.gralMng._implListener.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     textFieldSwt.setMenu(null);  //default: no contextMenu, use GralMenu?
     
@@ -221,11 +221,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * @param mng
    */
   static void createTextField(GralTextField widgg, GralMng mng){
-    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng.impl, false);
+    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng._mngImpl, false);
   }
   
   static void createTextBox(GralTextField widgg, GralMng mng){
-    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng.impl, true);
+    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng._mngImpl, true);
   }
   
   

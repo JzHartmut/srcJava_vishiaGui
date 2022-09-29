@@ -79,7 +79,7 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
   //SwtPrimaryWindow instance;
   
-  SwtMng gralMng;
+  SwtMng swtMng;
   
   /**The windows-closing event handler. It is used private only, but public set because documentation. 
    * The close event will be fired also when a SubWindow is closed. Therefore test the Shell instance.
@@ -210,15 +210,15 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
   
   
-  /**
+  /**It sets the Aggregation {@link GralMng.ImplAccess#gralMng} 
    * @see org.vishia.gral.base.GralGraphicThread#initGraphic()
    */
   @Override protected void initGraphic(){
-    displaySwt = new Display();  //The organization class of the whole graphic independent of a concrete window.
-    displaySwt.addFilter(SWT.Close, windowsCloseListener);  //it sets bExit on close of windows for the graphic thread
-    displaySwt.addFilter(SWT.Traverse, traverseKeyFilter);
-    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, sizeCharProperties);
-    gralMng = new SwtMng(displaySwt, propertiesGui, log);
+    this.displaySwt = new Display();  //The organization class of the whole graphic independent of a concrete window.
+    this.displaySwt.addFilter(SWT.Close, this.windowsCloseListener);  //it sets bExit on close of windows for the graphic thread
+    this.displaySwt.addFilter(SWT.Traverse, this.traverseKeyFilter);
+    SwtProperties propertiesGui = new SwtProperties(this.displaySwt, this.sizeCharProperties);
+    this.swtMng = new SwtMng(super.gralMng, this.displaySwt, propertiesGui, this.log);  //sets the aggregation GralMng
     
   }
 
@@ -261,9 +261,9 @@ class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnabl
   
   void XXX_Old_createWindow__() throws IOException{
   
-    SwtSubWindow windSwt = new SwtSubWindow(gralMng, mainWindow);
+    SwtSubWindow windSwt = new SwtSubWindow(this.swtMng, mainWindow);
     
-    gralMng.gralMng.registerPanel(mainWindow.mainPanel);
+    swtMng.gralMng.registerPanel(mainWindow.mainPanel);
     
     windowSwt = windSwt.window; //, SWT.ON_TOP | SWT.MAX | SWT.TITLE);
     //windowSwt.addKeyListener(keyListener);

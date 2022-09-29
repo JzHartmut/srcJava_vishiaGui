@@ -94,7 +94,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
         if(widgd instanceof GralWindow) {
           System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
         } else {
-          widgd.gralMng().impl.resizeWidget(widgd, 0, 0);
+          widgd.gralMng()._mngImpl.resizeWidget(widgd, 0, 0);
         }
       }
       return true;
@@ -150,7 +150,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
   
   
-  /**Constructs a window.
+  /**Constructs a window with an empty {@link #mainPanel}
    * @param currPos will be cloned to the widget, either ready to use or base pos with posString.
    *   The position of a window describes the size and the first position on the screen.
    * @param posString the position relative to a given position of the parent window. "!" on top level window. 
@@ -158,17 +158,28 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * @param sTitle
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
    */
-  public GralWindow(GralPos currPos, String posString, String nameWindow, String sTitle, int windProps)
+  public GralWindow(GralPos currPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
-    super(currPos, posString, nameWindow, 'w');
-    dyda.displayedText = sTitle;  //maybe null
+    super(currPos, posName, 'w', gralMng);
+    this.dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
+    GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
+    this.mainPanel = new GralPanelContent(posPanel, this.name + "Panel", this.gralMng());
+    //                                                     // A window has anytime only one GralPanel, the mainPanel.
+    gralMng.setFirstlyThePrimaryWindow(this);
     if((windProps & windResizeable)!=0){
-      resizeAction = new ActionResizeOnePanel();
+      this.resizeAction = new ActionResizeOnePanel();
     }
 
   }
 
+  public GralWindow(GralPos currPos, String posName, String sTitle, int windProps)
+  { this(currPos, posName, sTitle, windProps, GralMng.get());
+  }
+  
+  public GralWindow(GralPos currPos, String posString, String nameWindow, String sTitle, int windProps)
+  { this(currPos, posString + "=" + nameWindow, sTitle, windProps, GralMng.get());
+  }
   
   public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
   { this(null, posString, nameWindow, sTitle, windProps);
@@ -260,11 +271,11 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * If the window has a menu bar already, it is stored in the reference {@link #menuBarGral}.
    * @return the menu root for this window.
    */
-  public GralMenu getMenuBar(){
-    if(menuBarGral == null){
-      menuBarGral = itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
+  @Override public GralMenu getMenuBar(){
+    if(this.menuBarGral == null){
+      this.menuBarGral = new GralMenu(); //itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
     }
-    return menuBarGral;
+    return this.menuBarGral;
   }
   
   

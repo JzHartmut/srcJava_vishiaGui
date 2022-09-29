@@ -43,6 +43,7 @@ public class GralLabel extends GralWidget
   }
   
 
+
   public GralLabel(String pos, String sName, String sText, int origin) {
     this(null, pos, sName, sText, origin);
   }

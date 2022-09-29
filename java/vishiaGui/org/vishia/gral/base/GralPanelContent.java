@@ -160,29 +160,20 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
 
 
-  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
-  public GralPanelContent(String posString, String namePanel)
-  { this(null, posString, namePanel, '$');
-  }
 
-  /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. */
-  public GralPanelContent(GralPos currPos, String posString, String namePanel)
-  { this(currPos, posString, namePanel, '$');
-  }
-
+  
+  
   /**Create a panel, registers it and sets the {@link GralMng#pos()} of this thread to the panel. 
    * @param posString can be null if namePanel contains "@pos=name"
    * @param namePanel can also be combined "@pos=name"
    * @param whatIsit See {@link GralWidget#whatIs}
    */
-  public GralPanelContent(GralPos currPos, String posString, String namePanel, char whatIsit)
+  public GralPanelContent(GralPos currPos, String posName, char whatIsit, GralMng gralMng)
   //public PanelContent(CanvasStorePanel panelComposite)
-  { super(currPos, posString, namePanel, whatIsit);
-    this.name = namePanel;
-    GralMng mng = GralMng.get();
-    mng.registerPanel(this);
+  { super(currPos, posName, whatIsit, gralMng);
+    gralMng.registerPanel(this);
     if( pos()!=null) {
-      mng.setPosPanel(this);
+      gralMng.setPosPanel(this);
     }
     int property = 0; //TODO parameter
     this._panel.bZoomed = (property & GralMngBuild_ifc.propZoomedPanel) !=0;
@@ -190,11 +181,11 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     setBackColor(GralColor.getColor("pgr"), 0);
   }
 
-  
-  public GralPanelContent(String posString, String namePanel, char whatIsit) {
-    this(null, posString, namePanel, whatIsit);
+  public GralPanelContent(GralPos currPos, String posName, GralMng gralMng) {
+    this(currPos, posName, '$', gralMng);
   }
-
+  
+ 
   
   
   /*

@@ -7,8 +7,10 @@ import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
@@ -22,6 +24,8 @@ public class InspcCurveViewApp
   InspcCurveView curveView;
   //GralWindow wind;
   GralMng gralMng;
+  
+  GralWindow windMain;
   
   Args argData = new Args();
   
@@ -47,17 +51,29 @@ public class InspcCurveViewApp
   
   
   private void execute(){
-    GralFactory gralFactory = new SwtFactory();
+    this.gralMng = GralMng.get();                       // GralMng the singleton
     LogMessage log = new LogMessageStream(System.out);     // Note: Creating a window outside is necessary because:
-    GralWindow wind = gralFactory.createWindow(log, "Curve View", 'B', 100, 50, 800, 600);
+    //GralWindow wind = gralFactory.createWindow(log, "Curve View", 'B', 100, 50, 800, 600);
     FileCluster fileCluster = FileRemote.clusterOfApplication;
     FileRemote fileCfg = fileCluster.getFile(this.argData.dirCfg.getAbsolutePath(), this.argData.fileCfg);
     FileRemote fileData = fileCluster.getFile(this.argData.dirData.getAbsolutePath(), this.argData.fileData);
-    //                                                     // The InspcCurveView is a widget on any Window-Application
-    this.curveView = new InspcCurveView("curves", null, wind.gralMng(), fileCfg, fileData, this.argData.dirHtmlHelp.getAbsolutePath(), null);
-    this.curveView.windCurve = wind;
-    this.gralMng = wind.gralMng();
-    this.gralMng.gralDevice.addDispatchOrder(this.initGraphic);
+    // =================================================== // Create an empty Window
+    GralPos currPos = new GralPos();
+    try {
+//      currPos.calcNextPos("screen, 10+100, 20+150");  //the size of the window and position on the screen
+//      int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
+//      this.windMain = new GralWindow(currPos, null, "wmain", "Curve View", windowProps);
+  
+      //                                                     // The InspcCurveView is a Sub Window on any Window-Application
+      this.curveView = new InspcCurveView("curves", null, this.gralMng, fileCfg, fileData, this.argData.dirHtmlHelp.getAbsolutePath(), null);
+      this.curveView.windCurve.mainPanel.reportAllContent(log);
+  
+      //this.curveView.windCurve = wind;
+      GralFactory gralFactory = new SwtFactory();
+      gralFactory.createGraphic(this.curveView.windCurve, 'C', log);
+    } catch(Exception exc) {
+      System.out.println(exc.getMessage());
+    }
     //initGraphic.awaitExecution(1, 0);
     while(this.gralMng.gralDevice.isRunning()){
       try{ Thread.sleep(100);} 
@@ -156,7 +172,7 @@ public class InspcCurveViewApp
   GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
     @Override public void executeOrder()
     {
-      curveView.buildGraphicInCurveWindow(null);
+      //curveView.buildGraphicInCurveWindow(null);
       //
   } };
   

@@ -96,7 +96,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
     widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgetSwt.addMouseListener(mouseListener);
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
-    widgetSwt.addKeyListener(new KeyListener(mng.gralMng._impl.gralKeyListener));
+    widgetSwt.addKeyListener(new KeyListener(mng.gralMng._implListener.gralKeyListener));
     widgetSwt.addTraverseListener(SwtMng.swtTraverseListener);
     setBoundsGraphic(widgg.pos(), mng);
     float ySize = widgg.pos().height();

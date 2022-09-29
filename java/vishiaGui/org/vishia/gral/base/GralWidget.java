@@ -505,7 +505,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>U: a graphical value representation (bar etc)
    * <li>V: a graphical value enter representation (slider etc)
    * <li>w: A window.
-   * <li>@: A Tabbed Panel
+   * <li>xx@: A Tabbed Panel deprecated
    * <li>$: Any Panel (composite)
    * <li>+: A canvas panel
    * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
@@ -726,13 +726,23 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param name if posName == null, should be given as name, can be null if name is defined by posName writing "... = name"
    * @param whatIs See {@link #whatIs}, type of widget.
    */
-  public GralWidget(GralPos currPos, String posName, String name, char whatIs){ 
+  public GralWidget(GralPos currPos, String posName, String name, char whatIs, GralMng gralMng){ 
     this(currPos                                           // can also be the position immediately to use if pos == null
         , posName ==null ? name                            // pos not given, use only name. Name can start with @ and contains then a posString.
           : ( (posName.startsWith("@") ? "" : "@")         // supplement @ if not given in pos 
               + posName + 
               ( name == null ? "" : "=" + name) )          // combine @pos = name 
-        , whatIs);
+        , whatIs, gralMng);
+  }
+
+
+  public GralWidget(GralPos currPos, String posName, String name, char whatIs){
+    this(currPos, posName, name, whatIs, GralMng.get());
+  }
+  
+  
+  public GralWidget(GralPos currPos, String sPosName, char whatIs){
+    this(currPos, sPosName, whatIs, GralMng.get());
   }
 
   
@@ -751,9 +761,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
    * @param whatIs See {@link #whatIs}
    */
-  public GralWidget(GralPos currPos, String sPosName, char whatIs){ 
+  public GralWidget(GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
     int posName;
-    this.itsMng = GralMng.get();
+    this.itsMng = gralMng;
     final GralPos currPos1;
     if(currPos == null) { currPos1 = GralMng.get().pos().pos; }
     else {currPos1 = currPos;}
@@ -1296,7 +1306,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public GralMenu getContextMenu(){
     if(contextMenu == null){
-      contextMenu = itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+      contextMenu = new GralMenu(); //itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
     }
     return contextMenu;
   }
@@ -1883,7 +1893,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @see org.vishia.gral.ifc.GralWidget_ifc#repaint(int, int)
    */
   @Override public void repaint(int delay, int latest){
-    if(itsMng !=null && itsMng.impl !=null ){ //NOTE: set of changes is possible before setToPanel was called. 
+    if(itsMng !=null && itsMng._mngImpl !=null ){ //NOTE: set of changes is possible before setToPanel was called. 
       if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
         _wdgImpl.repaintGthread();
       } else {

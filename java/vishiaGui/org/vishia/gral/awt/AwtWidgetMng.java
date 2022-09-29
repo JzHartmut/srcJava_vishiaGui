@@ -357,19 +357,19 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   
-  @Override public GralPanelContent createCompositeBox(String name)
-  {
-      //Composite box = new Composite(graphicFrame, 0);
-      Container box = new Container();
-      Container parent = (Container)pos().parent.getImpl().getWidgetImplementation();
-      
-      parent.add(box);
-      setPosAndSize_(gralMng.getPosOldPositioning(), box);
-      Dimension size = box.getSize();
-      GralPanelContent panel = new AwtPanel(name, gralMng, box);
-      //mng.registerPanel(panel);
-      return panel;
-  }
+//  @Override public GralPanelContent createCompositeBox(String name)
+//  {
+//      //Composite box = new Composite(graphicFrame, 0);
+//      Container box = new Container();
+//      Container parent = (Container)pos().parent.getImpl().getWidgetImplementation();
+//      
+//      parent.add(box);
+//      setPosAndSize_(gralMng.getPosOldPositioning(), box);
+//      Dimension size = box.getSize();
+//      GralPanelContent panel = new AwtPanel(name, gralMng, box);
+//      //mng.registerPanel(panel);
+//      return panel;
+//  }
 
   @Override
   public GralFileDialog_ifc createFileDialog()
@@ -378,13 +378,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     return null;
   }
 
-  @Override
-  public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
-    int xS, int yS)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+//  @Override
+//  public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
+//    int xS, int yS)
+//  {
+//    // TODO Auto-generated method stub
+//    return null;
+//  }
 
   @Override
   public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,

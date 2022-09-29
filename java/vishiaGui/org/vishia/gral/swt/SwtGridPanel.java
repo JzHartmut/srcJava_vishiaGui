@@ -67,7 +67,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
 
   public SwtGridPanel(final GralPanelContent wdgg, final int style) {
     super(wdgg);
-    final SwtMng swtMng = (SwtMng) GralMng.get().impl;
+    final SwtMng swtMng = (SwtMng) GralMng.get()._mngImpl;
     final Composite parent = SwtMng.getSwtParent(wdgg.pos());
     final Rectangle areaParent = parent.getClientArea();
     Composite swtPanel;
@@ -148,33 +148,35 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
       int xPixel = gralMng.propertiesGui().xPixelUnit();   // Note: the properties are only available in the implementation
       int yPixel = gralMng.propertiesGui().yPixelUnit();
       SwtMng swtMng = SwtMng.swtMng(this.wdgi);
-      final Color color1 = swtMng.getColorImpl( this.wdgi._panel.colorGridLine);
-      final Color color2 = swtMng.getColorImpl( this.wdgi._panel.colorGridLine2);
-      int xGridStep = this.wdgi.gralPanel._panel.xGrid * xPixel;   
-      int xGrid = xGridStep;
-      int xS1 = this.wdgi.gralPanel._panel.xGrid2;
-      while (xGrid < dx) {
-        if (--xS1 <= 0) {
-          xS1 = this.wdgi.gralPanel._panel.xGrid2;
-          g.setForeground(color2);
-        } else {
-          g.setForeground(color1);
+      if(this.wdgi._panel.colorGridLine !=null) {          // grid only given if colorGridLine is given, then all should be given
+        final Color color1 = swtMng.getColorImpl( this.wdgi._panel.colorGridLine);
+        final Color color2 = swtMng.getColorImpl( this.wdgi._panel.colorGridLine2);
+        int xGridStep = this.wdgi.gralPanel._panel.xGrid * xPixel;   
+        int xGrid = xGridStep;
+        int xS1 = this.wdgi.gralPanel._panel.xGrid2;
+        while (xGrid < dx) {
+          if (--xS1 <= 0) {
+            xS1 = this.wdgi.gralPanel._panel.xGrid2;
+            g.setForeground(color2);
+          } else {
+            g.setForeground(color1);
+          }
+          g.drawLine(xGrid, 0, xGrid, dy);
+          xGrid += xGridStep;
         }
-        g.drawLine(xGrid, 0, xGrid, dy);
-        xGrid += xGridStep;
-      }
-      int yGridStep = this.wdgi.gralPanel._panel.yGrid * yPixel;
-      int yGrid = yGridStep;
-      int yS1 = this.wdgi.gralPanel._panel.yGrid2;
-      while (yGrid < dy) {
-        if (--yS1 <= 0) {
-          yS1 = this.wdgi.gralPanel._panel.yGrid2;
-          g.setForeground(color2);
-        } else {
-          g.setForeground(color1);
+        int yGridStep = this.wdgi.gralPanel._panel.yGrid * yPixel;
+        int yGrid = yGridStep;
+        int yS1 = this.wdgi.gralPanel._panel.yGrid2;
+        while (yGrid < dy) {
+          if (--yS1 <= 0) {
+            yS1 = this.wdgi.gralPanel._panel.yGrid2;
+            g.setForeground(color2);
+          } else {
+            g.setForeground(color1);
+          }
+          g.drawLine(0, yGrid, dx, yGrid);
+          yGrid += yGridStep;
         }
-        g.drawLine(0, yGrid, dx, yGrid);
-        yGrid += yGridStep;
       }
       super.drawBackground(g, x, y, dx, dy);
     }
