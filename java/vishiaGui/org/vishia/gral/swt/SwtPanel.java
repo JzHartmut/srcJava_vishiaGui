@@ -3,6 +3,7 @@ package org.vishia.gral.swt;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -21,6 +22,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
@@ -173,6 +175,81 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     
   }
 
+  
+  
+  public static void reportAllContentImpl(Composite swtComp, Appendable out){
+    try {
+      reportAllContentImpl(swtComp, out, 0);
+      out.append("\n");
+    } catch(Exception exc) {
+      System.err.println("unexpected exception on reportAllContent: " + exc.getMessage());
+    }
+  }
+
+  
+  final static String nl = "\n| | | |                               ";
+
+  private void XXXreportAllContent(Appendable out, int level) throws IOException {
+    if(level < 20) {
+      out.append(nl.substring(0, 2*level+1)).append("SwtComposite: ").append(this.widgg.name);
+      outBounds(this.panelSwtImpl, out);
+      for(Control wdgswt: this.panelSwtImpl.getChildren()) {
+        Object widggo = wdgswt.getData();
+        out.append(nl.substring(0,2*level+1)).append("+-").append(wdgswt.toString());
+        outBounds(wdgswt, out);
+        if(wdgswt instanceof Composite) {
+         
+          SwtPanel swtPanel = (SwtPanel)wdgswt.getData();
+          swtPanel.XXXreportAllContent(out, level+1);
+        } else {
+          out.append(nl.substring(0,2*level+1)).append("+-");
+          GralWidget.ImplAccess wdgi = (SwtPanel)wdgswt.getData();
+          wdgi.widgg.toString(out);
+          outBounds(this.panelSwtImpl, out);
+        }
+      }
+    } else {
+      out.append("\n .... more");
+    }
+  }
+
+  
+  private static void reportAllContentImpl(Composite swtComp, Appendable out, int level) throws IOException {
+    for(Control wdgswt: swtComp.getChildren()) {
+      Object widggo = wdgswt.getData();
+      out.append(nl.substring(0,2*level+1)).append("+-").append(wdgswt.toString());
+      outBounds(wdgswt, out);
+      if(widggo == null ) { out.append(" no gral aggr"); }
+      else if(widggo instanceof GralWidget) {
+        GralWidget wdgg = (GralWidget)widggo;
+        wdgg.toString(out);
+      } else if(widggo instanceof GralWidget.ImplAccess) {
+        GralWidget wdgg = ((GralWidget.ImplAccess)widggo).widgg;
+        wdgg.toString(out);
+      } else if(widggo instanceof GralTable.CellData) {
+        out.append("GralTable.CellData");
+      } else {
+        Class type = widggo.getClass();
+        out.append(" data Type = ").append(type.getName());
+      }
+      if(wdgswt instanceof Composite) {
+        reportAllContentImpl((Composite)wdgswt, out, level+1);
+      } else {
+        
+      }
+    }
+  }
+  
+  
+  
+  private static void outBounds(Control swtWdg, Appendable out) throws IOException {
+    Rectangle xy = swtWdg.getBounds();
+    out.append(" [")
+       .append(Integer.toString(xy.x)).append('+').append(Integer.toString(xy.width)).append(" x ")
+       .append(Integer.toString(xy.y)).append('+').append(Integer.toString(xy.height))
+       .append("] ");
+  }
+  
 
   protected ControlListener resizeItemListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 

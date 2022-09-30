@@ -60,7 +60,7 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
     gralPlotArea.super(gralPlotArea);
     this.mng = mng;
     GralWidget_ifc panel = gralPlotArea.pos().parent;
-    Object swtPanel = panel.getImpl().getWidgetImplementation();
+    Object swtPanel = panel.getImplAccess().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
     swtCanvas = new Canvas(panelSwt, 0);
     swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));

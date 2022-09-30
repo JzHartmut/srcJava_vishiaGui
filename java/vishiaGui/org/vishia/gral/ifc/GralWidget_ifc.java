@@ -357,7 +357,7 @@ public interface GralWidget_ifc extends Removeable
   void setHtmlHelp(String url);
   
   
-  GralWidget.ImplAccess getImpl();
+  GralWidget.ImplAccess getImplAccess();
   
   //public abstract GralWidget getGralWidget();
 

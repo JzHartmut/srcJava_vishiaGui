@@ -250,9 +250,14 @@ public final class InspcCurveView
     int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
     this.windCurve = this.gralMng.createWindow("@screen,12+100,20+100=CurveView", "CurveView", windowProps);
     this.colorSelector = new GralColorSelector("colorSelector", this.gralMng);
-    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
-    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
-    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
+    //need a panel and position:
+    gralMng.selectPanel("primaryWindow");
+    //gralMng.setPosition(4, 0, 4, 0, 0, '.');
+    gralMng.setPosition(44, 56, 94, 104, 0, '.');
+    this.widgFileSelector = null;
+    //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
+//    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
+//    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
     this.widgFilename = new GralTextField("-filename", GralTextField.Type.editable);
     buildGraphic(this.windCurve, colorSelector, null);
@@ -275,7 +280,7 @@ public final class InspcCurveView
     gralMng.setPosition(4, 56, 4, 104, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop; // | GralWindow.windResizeable;
-    windVariables = gralMng.createWindow("windMapVariables", sName, windProps);
+    //windVariables = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
     buildGraphicInCurveWindow(common);
     GralMenu menu = wind.getMenuBar();

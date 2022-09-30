@@ -388,16 +388,16 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /**The composite of the panel in SWT.
    * @see org.vishia.gral.base.GralMng.ImplAccess#getCurrentPanel()
    */
-  @Override public Composite getCurrentPanel(){ return ((Composite)pos().parent.getImpl().getWidgetImplementation()); }
+  @Override public Composite getCurrentPanel(){ return ((Composite)pos().parent.getImplAccess().getWidgetImplementation()); }
 
   public Composite getWidgetsPanel(GralWidget widg){ 
     GralPos pos = widg.pos();
     if(pos == null) { pos = pos(); } //from GralMng
-    return ((Composite)pos.parent.getImpl().getWidgetImplementation()); 
+    return ((Composite)pos.parent.getImplAccess().getWidgetImplementation()); 
   }
 
   
-  private Composite getCurrentPanel(GralWidget widgg){ return ((Composite)widgg.pos().parent.getImpl().getWidgetImplementation()); }
+  private Composite getCurrentPanel(GralWidget widgg){ return ((Composite)widgg.pos().parent.getImplAccess().getWidgetImplementation()); }
   
   
   @Override public void createImplWidget_Gthread(GralWidget widgg){
@@ -441,7 +441,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       else { tab = new SwtGridPanel(widgp, 0); }
       GralWidget_ifc parent = widgg.pos().parent;
       if(parent instanceof GralTabbedPanel) {
-        SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImpl();
+        SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
         swtParent.addGridPanel(widgp, widgp.getName(), 2, 2, 10, 10);
       }
     }
@@ -488,7 +488,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   @Override public boolean remove(GralPanel_ifc compositeBox)
-  { Composite panelSwt = ((SwtPanel)compositeBox.getImpl().getWidgetImplementation()).panelSwtImpl;
+  { Composite panelSwt = ((SwtPanel)compositeBox.getImplAccess().getWidgetImplementation()).panelSwtImpl;
     panelSwt.dispose();
     return true;
   }
@@ -548,7 +548,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     Control parentFrame;
     final Shell window;
     if(posWindow.parent !=null) {
-      GralWidget.ImplAccess parentImpl = posWindow.parent.getImpl();
+      GralWidget.ImplAccess parentImpl = posWindow.parent.getImplAccess();
       if(parentImpl ==null) {                              // a primary window
         windowFrame = new GralRectangle(0,0,800,600);
         //?? windowFrame = getPixelUseableAreaOfWindow(posWindow.panel.getPanelWidget());
@@ -739,7 +739,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
     
-    Object oParent = pos.parent.getImpl().getWidgetImplementation();
+    Object oParent = pos.parent.getImplAccess().getWidgetImplementation();
     Composite parentComp = (Composite) oParent; //((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite; //(Composite)pos().panel.getPanelImpl();
     //Rectangle pos;
     final GralRectangle rectangle;
@@ -808,7 +808,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override @Deprecated public GralWidget addText(String sText, char size, int color)
   {
-    Composite swtPanel = ((Composite)(pos().parent.getImpl().getWidgetImplementation()));
+    Composite swtPanel = ((Composite)(pos().parent.getImplAccess().getWidgetImplementation()));
     Label widget = new Label(swtPanel, 0);
     widget.setForeground(propertiesGuiSwt.colorSwt(color));
     widget.setBackground(propertiesGuiSwt.colorBackground);
@@ -887,7 +887,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   {
     ImageData imageData = new ImageData(imageStream);
     byte[] data = imageData.data;
-    SwtPanel swtPanel = (SwtPanel)pos().parent.getImpl();
+    SwtPanel swtPanel = (SwtPanel)pos().parent.getImplAccess();
     Composite swtWidg = swtPanel.panelSwtImpl;
     Image image = new Image(swtWidg.getDisplay(), imageData); 
     GralImageBase imageGui = new SwtImage(image);
@@ -1066,7 +1066,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   	  if(owidg !=null){
   	    Control swtWidget = (Control)owidg;
   	    GralWidget_ifc panel = widgd.pos().parent;
-  	    GralRectangle size = panel.getImpl().getPixelPositionSize(); //PixelSize();
+  	    GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
   	    GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
     	  //Note: the swtWidget may have a resizeListener, see there.
   	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );

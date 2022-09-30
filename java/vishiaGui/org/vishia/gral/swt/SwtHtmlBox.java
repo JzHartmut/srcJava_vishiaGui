@@ -61,7 +61,7 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
     if(panel == null){
       parent = mngSwt.displaySwt.getActiveShell();
     } else {
-      parent = (Composite)(panel.getImpl().getWidgetImplementation());
+      parent = (Composite)(panel.getImplAccess().getWidgetImplementation());
       //parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
     }
     try {

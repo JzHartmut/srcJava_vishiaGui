@@ -20,6 +20,7 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -347,6 +348,23 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     
   }
 
+  
+  /**Reports the tree of content of the window from view of swt {@link Composite#getChildren()}
+   * @param out 
+   * @throws IOException
+   */
+  @Override public void reportAllContentImpl ( Appendable out) throws IOException {
+    GralPanelContent mainPanel = super.gralWindow.mainPanel;
+    SwtPanel swtPanel = (SwtPanel)mainPanel.getImplAccess();
+    Composite swtComposite = swtPanel.panelSwtImpl;
+    if(swtComposite != this.window) {
+      Control[] content = this.window.getChildren();
+      if(content.length !=1 || content[0] != swtComposite ) {
+        out.append("bad Shell content ...");
+      }
+    }
+    SwtPanel.reportAllContentImpl(swtComposite, out);
+  }
 
   
   
@@ -520,55 +538,55 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   
   
   
-  private class SwtWindowImplAccess extends GralWindow.WindowImplAccess {
-
-    public SwtWindowImplAccess(GralWindow gralWdg) {
-      super(gralWdg);
-    }
-    
-    @Override public boolean setFocusGThread () {
-      // TODO Auto-generated method stub
-      return false;
-    }
-
-    @Override public void setVisibleGThread (
-        boolean bVisible ) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override public void removeWidgetImplementation () {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override public void repaintGthread () {
-      // TODO Auto-generated method stub
-      Debugutil.stop();
-    }
-
-    @Override public Object getWidgetImplementation () {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override public void setBoundsPixel ( int x, int y,
-        int dx, int dy ) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override public void updateValuesForAction () {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override public GralRectangle getPixelPositionSize () {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
- 
-  }
+//  private class SwtWindowImplAccess extends GralWindow.WindowImplAccess {
+//
+//    public SwtWindowImplAccess(GralWindow gralWdg) {
+//      super(gralWdg);
+//    }
+//    
+//    @Override public boolean setFocusGThread () {
+//      // TODO Auto-generated method stub
+//      return false;
+//    }
+//
+//    @Override public void setVisibleGThread (
+//        boolean bVisible ) {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public void removeWidgetImplementation () {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public void repaintGthread () {
+//      // TODO Auto-generated method stub
+//      Debugutil.stop();
+//    }
+//
+//    @Override public Object getWidgetImplementation () {
+//      // TODO Auto-generated method stub
+//      return null;
+//    }
+//
+//    @Override public void setBoundsPixel ( int x, int y,
+//        int dx, int dy ) {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public void updateValuesForAction () {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public GralRectangle getPixelPositionSize () {
+//      // TODO Auto-generated method stub
+//      return null;
+//    }
+//
+// 
+//  }
 
 }

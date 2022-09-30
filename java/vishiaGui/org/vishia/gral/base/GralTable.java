@@ -2672,7 +2672,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
 
-    @Override public ImplAccess getImpl () { return GralTable.this.getImpl(); }
+    @Override public ImplAccess getImplAccess () { return GralTable.this.getImplAccess(); }
 
 
 

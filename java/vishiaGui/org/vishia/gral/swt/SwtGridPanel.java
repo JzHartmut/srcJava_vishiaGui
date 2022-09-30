@@ -102,7 +102,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
       Rectangle areaTab;
       final GralWidget_ifc parentPanelifc = wdgg.pos().parent;
       final GralPanelContent parentPanel = (GralPanelContent) parentPanelifc;
-      final GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess) parentPanel.getImpl();
+      final GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess) parentPanel.getImplAccess();
       if (parentPanel._panel.pixelTab == 0) {
         areaTab = swtPanel.getClientArea();
         parentPanel._panel.pixelTab = (short) (parentImplAccess.pixBounds.dy - areaTab.height);

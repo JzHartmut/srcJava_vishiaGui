@@ -131,7 +131,7 @@ public class GralScreen implements GralPanel_ifc {
     
   }
 
-  @Override public ImplAccess getImpl () {
+  @Override public ImplAccess getImplAccess () {
  
     return null;
   }

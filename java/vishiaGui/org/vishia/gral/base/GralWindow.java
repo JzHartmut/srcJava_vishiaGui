@@ -1,5 +1,7 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
+
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
@@ -324,6 +326,24 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
   
   
+  public void reportAllContent(Appendable out) throws IOException {
+    this.mainPanel.reportAllContent(out);
+  }
+  
+  public void reportAllContentImpl(Appendable out) throws IOException {
+    GralWindow.WindowImplAccess wdga = (GralWindow.WindowImplAccess)getImplAccess();
+    out.append("\n==== GralWindow.reportAllContent Implementation ====\n");
+    if(wdga ==null) {
+      out.append("No implementation\n");
+    } else {
+      wdga.reportAllContentImpl(out);
+    }
+  }
+  
+  
+  
+  
+  
   /**This class is not intent to use from an application.
    * It is instantiated with the implementation graphic, 
    * for SWT especially aggregated from {@link org.vishia.gral.swt.SwtPanel}.
@@ -369,6 +389,11 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     /**The invisibleSetAction from the {@link GralWindow_ifc#specifyActionOnCloseWindow(GralUserAction)} */
     public GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }
 
+    
+    abstract public void reportAllContentImpl(Appendable out) throws IOException;
+
+    
+    
   }
 
 

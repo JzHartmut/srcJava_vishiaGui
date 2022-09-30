@@ -87,7 +87,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
       editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
     }
     GralPos pos = widgg.pos();
-    Container panelAwt = (Container)pos.parent.getImpl().getWidgetImplementation();
+    Container panelAwt = (Container)pos.parent.getImplAccess().getWidgetImplementation();
     
     widgetAwt = new TextCanvas(); //TextField();
     widgetAwt.setData(widgg);

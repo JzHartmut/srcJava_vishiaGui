@@ -22,6 +22,7 @@ import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
@@ -726,7 +727,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param name if posName == null, should be given as name, can be null if name is defined by posName writing "... = name"
    * @param whatIs See {@link #whatIs}, type of widget.
    */
-  public GralWidget(GralPos currPos, String posName, String name, char whatIs, GralMng gralMng){ 
+  public GralWidget ( GralPos currPos, String posName, String name, char whatIs, GralMng gralMng){ 
     this(currPos                                           // can also be the position immediately to use if pos == null
         , posName ==null ? name                            // pos not given, use only name. Name can start with @ and contains then a posString.
           : ( (posName.startsWith("@") ? "" : "@")         // supplement @ if not given in pos 
@@ -736,12 +737,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
 
 
-  public GralWidget(GralPos currPos, String posName, String name, char whatIs){
+  public GralWidget ( GralPos currPos, String posName, String name, char whatIs){
     this(currPos, posName, name, whatIs, GralMng.get());
   }
   
   
-  public GralWidget(GralPos currPos, String sPosName, char whatIs){
+  public GralWidget ( GralPos currPos, String sPosName, char whatIs){
     this(currPos, sPosName, whatIs, GralMng.get());
   }
 
@@ -761,11 +762,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
    * @param whatIs See {@link #whatIs}
    */
-  public GralWidget(GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
+  public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
     int posName;
     this.itsMng = gralMng;
     final GralPos currPos1;
-    if(currPos == null) { currPos1 = GralMng.get().pos().pos; }
+    if(currPos == null) { currPos1 = gralMng.pos().pos; }
     else {currPos1 = currPos;}
     if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
       String posString1 = sPosName.substring(0, posName).trim();
@@ -785,7 +786,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     } else {
       this.name = sPosName;
     }
-    this._wdgPos = currPos1.clone();
+    currPos1.checkSetNext();           //mark "used" for the referred GralPos
+    this._wdgPos = currPos1.clone();   //use a clone for the widget.
     //this.widget = null;
     this.whatIs = whatIs;
     //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
@@ -1798,9 +1800,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
           //set the visible state and the focus of the parents.
           while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
               && !parent.isInFocus()
-              && parent.getImpl() !=null
+              && parent.getImplAccess() !=null
               && --catastrophicalCount >=0){
-            parent.getImpl().setFocusGThread();
+            parent.getImplAccess().setFocusGThread();
             parent.setVisibleStateWidget(true);
             if(parent instanceof GralTabbedPanel) {
               //TabbedPanel: The tab where the widget is member of have to be set as active one.
@@ -1935,9 +1937,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   public Appendable toString(Appendable u) throws IOException {
     u.append(whatIs);
+    if(this instanceof GralLabel)
+      Debugutil.stop();
     if(this.name !=null) { u.append(":").append(name);}
-    if(sDataPath !=null) { u.append(": ").append(sDataPath);}
-    if(this.dyda.displayedText !=null) { u.append(" :text=").append(this.dyda.displayedText);}
+    if(sDataPath !=null) { u.append(", data=").append(sDataPath);}
+    if(this.dyda.displayedText !=null) { u.append(", text=").append('\"').append(this.dyda.displayedText).append('\"');}
     if(_wdgPos !=null){
       this._wdgPos.toString(u, true);
     } else {
@@ -2123,9 +2127,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Returns the instance which extends the {@link ImplAccess} of this widget.
+   * <br>
+   * Note: to get the real widget implementation (or its wrapper) call {@link GralWidget#getImplWidget()}
+   * or call with this return value {@link ImplAccess#getWidgetImplementation()}
    * @return null if the widget has not an implementation yet.
    */
-  public ImplAccess getImpl(){ return _wdgImpl; }
+  public ImplAccess getImplAccess(){ return _wdgImpl; }
   
   /**This time order calls the {@link #repaintGthread()} in the graphical thread.
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.

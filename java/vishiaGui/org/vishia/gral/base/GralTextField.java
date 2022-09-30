@@ -740,14 +740,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
         //switch(promptStylePosition){
           //case 't':{
             if(ySize <= 2.5){ //it is very small for top-prompt:
-              yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
+              yPosPrompt = 1.0f;  // from top no more less than 1/2 normal line. 
               heightPrompt = 1.0f;
               heightText = ySize - 0.7f;  //max. 1.8
               if(heightText < 1.0f){ heightText = 1.0f; }
             } else if(ySize <=3.3){ //it is normally 2.5..4
-              heightPrompt = ySize - 2.0f + 0.5f;   //1 to 1.8
-              yPosPrompt = ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
-              heightText = 2.0f;
+              heightPrompt = 1.0f + (ySize - 2.5f);   //1.0 to 1.8, 1.5 for size=3 
+              heightPrompt = ((int)(10.0f*heightPrompt)) / 10.0f;
+              heightText = ySize - heightPrompt + 0.5f;            //            2.0 for size=3
+              yPosPrompt = heightPrompt; //ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
             } else if(ySize <=4.0){ //it is normally 2.5..4
               heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
               if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
@@ -758,10 +759,14 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
               heightPrompt = ySize * 0.4f;;
               heightText = ySize * 0.5f;
             }
-            //from top, size of prompt
-            posPrompt.setPosition(widgg.pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+            //from bottom as base line, size of prompt
+            posPrompt.setPosition(widgg.pos(), GralPos.same
+                , GralPos.same - (ySize - heightPrompt)              //negative value means, base line is bottom
+                , GralPos.same, GralPos.same, 0, '.');
             //from bottom line, size of text
-            posField.setPosition(widgg.pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+            posField.setPosition(widgg.pos(), GralPos.same
+                , GralPos.size - heightText                //negative value means, base line is bottom
+                , GralPos.same, GralPos.same, 0, '.');
           //} break;
         //}
       

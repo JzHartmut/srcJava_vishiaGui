@@ -82,13 +82,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   
-  @Override public Container getCurrentPanel(){ return (Container)pos().parent.getImpl().getWidgetImplementation(); }
+  @Override public Container getCurrentPanel(){ return (Container)pos().parent.getImplAccess().getWidgetImplementation(); }
 
   
   public Container getWidgetsPanel(GralWidget widg){ 
     GralPos pos = widg.pos();
     if(pos == null) { pos = pos(); } //from GralMng
-    return ((Container)pos.parent.getImpl().getWidgetImplementation()); 
+    return ((Container)pos.parent.getImplAccess().getWidgetImplementation()); 
   }
 
 
@@ -423,7 +423,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   {
     final GralRectangle windowFrame;
     if(posWindow.parent !=null) {
-      Object awtWidg = posWindow.parent.getImpl().getWidgetImplementation();
+      Object awtWidg = posWindow.parent.getImplAccess().getWidgetImplementation();
       Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
       Point loc;
       windowFrame = getPixelUseableAreaOfWindow(((GralPanelContent)posWindow.parent).getPanelWidget());
@@ -518,7 +518,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     if(owidg !=null){
       Component swtWidget = (Component)owidg;
       GralWidget_ifc panel = widgd.pos().parent;
-      GralRectangle size = panel.getImpl().getPixelPositionSize(); //PixelSize();
+      GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
       GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
       swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
@@ -612,7 +612,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
-    Component parentComp = (Component)pos.parent.getImpl().getWidgetImplementation();
+    Component parentComp = (Component)pos.parent.getImplAccess().getWidgetImplementation();
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;

@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
+import java.io.IOException;
 
 import org.eclipse.swt.graphics.Point;
 import org.vishia.gral.base.GralMng;
@@ -116,6 +117,23 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   
   
   
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+
+
+  @Override public void reportAllContentImpl ( Appendable out ) throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+
 
   WindowListener windowListener = new WindowListener()
   {
@@ -374,12 +392,6 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
       
     }
   };
-
-  @Override
-  public void updateValuesForAction() {
-    // TODO Auto-generated method stub
-    
-  }
   
   
 }

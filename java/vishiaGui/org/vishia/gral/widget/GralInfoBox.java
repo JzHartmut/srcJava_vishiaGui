@@ -489,7 +489,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     
   }
 
-  @Override public ImplAccess getImpl () {
+  @Override public ImplAccess getImplAccess () {
     // TODO Auto-generated method stub
     return null;
   }

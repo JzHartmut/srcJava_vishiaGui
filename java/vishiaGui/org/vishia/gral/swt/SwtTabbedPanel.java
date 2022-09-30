@@ -68,7 +68,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	SwtTabbedPanel(GralTabbedPanel panelg, SwtMng mng, GralPanelActivated_ifc user, int property)
 	{ super(panelg);  //initializes as GralWidget and as GralPanel
 		this.mng = mng;
-		Object oParent = widgg.pos().parent.getImpl().getWidgetImplementation(); //this.pos().panel.getPanelImpl();
+		Object oParent = widgg.pos().parent.getImplAccess().getWidgetImplementation(); //this.pos().panel.getPanelImpl();
     if(oParent == null || !(oParent instanceof Composite) ){ 
       throw new IllegalArgumentException("Software error. You must select a panel before."); 
     }
@@ -135,7 +135,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	{ //assert(false);
 	  
 	  GralPanel_ifc panel = mng.gralMng.getPanel(name);
-	  Object oSwtPanel = panel.getImpl();  //getWidgetImplementation();
+	  Object oSwtPanel = panel.getImplAccess();  //getWidgetImplementation();
 	  SwtPanel swtPanel = (SwtPanel)oSwtPanel;
 //	  if(swtPanel.itsTabSwt !=null){
 //	  	  widgetSwt.setSelection(swtPanel.itsTabSwt);

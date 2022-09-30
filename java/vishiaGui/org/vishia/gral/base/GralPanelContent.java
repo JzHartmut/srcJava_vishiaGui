@@ -446,7 +446,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
       reportAllContent(out, 0);
       out.append("\n");
     } catch(Exception exc) {
-      System.err.println("exception on reportAllContent: " + exc.getMessage());
+      System.err.println("unexpected exception on reportAllContent: " + exc.getMessage());
     }
   }
   
