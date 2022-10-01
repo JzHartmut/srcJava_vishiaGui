@@ -830,7 +830,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     widget.setSize(textSize);
     //guiContent.add(widget);
     GralWidget widg = new GralWidget("labelText-" + sText, 'S', gralMng);
-    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widget, this);
+    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, widget, this);
     //widg.implMethodWidget_.setWidgetImpl(widgswt);
     return widg;
   }
@@ -914,7 +914,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(gralMng.getPosOldPositioning(), control);
     GralWidget widg = new GralWidget(sName, 'V', gralMng);
-    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(control, this);
+    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, control, this);
     //widg.implMethodWidget_.setWidgetImpl(widgswt);
     widg.setPanelMng(gralMng);
     if(action != null){
@@ -1061,18 +1061,19 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	{
 	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
 	  if(widgd._wdgImpl !=null) {
-  	  Object owidg = widgd._wdgImpl.getWidgetImplementation();
-  	  
-  	  int test = 6;
-  	  if(owidg !=null){
-  	    Control swtWidget = (Control)owidg;
-  	    GralWidget_ifc panel = widgd.pos().parent;
-  	    GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
-  	    GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
-    	  //Note: the swtWidget may have a resizeListener, see there.
-  	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
-    	  swtWidget.redraw();
-  	  }
+	    widgd._wdgImpl.setPosBounds();
+//  	  Object owidg = widgd._wdgImpl.getWidgetImplementation();
+//  	  
+//  	  int test = 6;
+//  	  if(owidg !=null){
+//  	    Control swtWidget = (Control)owidg;
+//  	    GralWidget_ifc panel = widgd.pos().parent;
+//  	    GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
+//  	    GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
+//    	  //Note: the swtWidget may have a resizeListener, see there.
+//  	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
+//    	  swtWidget.redraw();
+//  	  }
 	  }
 	}
 	

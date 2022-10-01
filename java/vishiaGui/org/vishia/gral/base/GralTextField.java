@@ -723,9 +723,17 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
     
     
+    
+    
     protected GraphicImplAccess(GralWidget widgg)
+    { this(widgg, widgg.itsMng._mngImpl);
+    }
+    
+    
+    
+    protected GraphicImplAccess(GralWidget widgg, GralMng.ImplAccess mngImpl)
     {
-      super(widgg);
+      super(widgg, mngImpl);
       if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {
         //mng.setNextPosition();  //deprecated, done in Widget constructor.
         char sizeFontPrompt;

@@ -1990,11 +1990,25 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * or the widget itself. Should be cast due to implementation level. */
     protected Object wdgimpl;
     
+    /**The manager for the implementation. For example {@link org.vishia.gral.swt.SwtMng}
+     * 
+     */
+    protected final GralMng.ImplAccess mngImpl;
+    
     /**Bounds of the implementation widget in its container. null if not used. */
     public GralRectangle pixBounds = new GralRectangle(0,0,0,0);
     
     @Deprecated protected ImplAccess(GralWidget widgg, GralMng mng){
       this(widgg);
+    }
+    
+    
+    /**
+     * @param widgg
+     * @deprecated use {@link ImplAccess#ImplAccess(GralWidget, GralMng.ImplAccess)}
+     */
+    @Deprecated protected ImplAccess(GralWidget widgg){
+      this(widgg, widgg.itsMng._mngImpl);
     }
     
     
@@ -2004,9 +2018,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * Initializes the pos() from the given {@link GralMng#pos} if it is not given by construction. 
      * @param widgg The associated derived class of GralWidget.
      */
-    protected ImplAccess(GralWidget widgg){
+    protected ImplAccess(GralWidget widgg, GralMng.ImplAccess mngImpl){
       this.widgg = widgg;
       widgg._wdgImpl = this; 
+      this.mngImpl = mngImpl;
+      assert(mngImpl !=null);
 
       if(widgg._wdgPos ==null) {
         widgg._wdgPos = widgg.itsMng.getPosCheckNext();
@@ -2016,7 +2032,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
     
     
-    
+    @Override public void setPosBounds ( ) {
+      GralRectangle xyPix = mngImpl.calcWidgetPosAndSize(widgg.pos(), 600, 800);
+      setBoundsPixel(xyPix.x, xyPix.y, xyPix.dx, xyPix.dy );   //the standard approach. 
+    }
     
     /**Access to the GralMng from the implementation level.  */
     public GralMng gralMng() { return this.widgg.itsMng; }

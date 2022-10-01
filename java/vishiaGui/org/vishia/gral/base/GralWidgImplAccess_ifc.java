@@ -106,7 +106,7 @@ public interface GralWidgImplAccess_ifc
    * */
   Object getWidgetImplementation();
   
-  /**This is called especially on resize, but also on creation for comprehensive widgets.. 
+  /**This is called especially on resize from the panel, but also on creation for comprehensive widgets.
    * If the widget is more comprehensive, consist of more basic widgets,
    * then this operation should care about the parts of the widget.
    * @param x
@@ -116,6 +116,15 @@ public interface GralWidgImplAccess_ifc
    */
   void setBoundsPixel(int x, int y, int dx, int dy);
  
+  
+  /**This is called especially on resize from the panel, but also on creation for comprehensive widgets.
+   * If the widget is more comprehensive, consist of more basic widgets,
+   * then this operation should care about the parts of the widget.
+   * The position is gotten from the gral widget.
+   */
+  void setPosBounds ( );
+  
+  
   GralRectangle getPixelPositionSize();
   
   /**This operation should be called before any action is invoked in the user space.

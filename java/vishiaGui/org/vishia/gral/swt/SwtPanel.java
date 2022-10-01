@@ -261,7 +261,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
       for(GralWidget widg1: ((GralPanelContent)gralPanel).getWidgetsToResize()){
-        widg1.gralMng().resizeWidget(widg1, 0, 0);
+        if(widg1._wdgImpl !=null) {
+          widg1._wdgImpl.setPosBounds();
+        } else {
+          Debugutil.stop();
+        }
+        //widg1.gralMng().resizeWidget(widg1, 0, 0);
       }
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
     }

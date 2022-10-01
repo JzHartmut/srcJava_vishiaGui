@@ -118,9 +118,9 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   
   
-  private SwtTextFieldWrapper(GralTextField widgg, SwtMng mng, boolean bbox)
+  private SwtTextFieldWrapper(GralTextField widgg, SwtMng swtMng, boolean bbox)
   {
-    widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
+    widgg.super(widgg, swtMng); //NOTE: superclass is a non static inner class of GralTextField. 
     this.bbox = bbox;
     Composite panelSwt = SwtMng.getSwtParent(widgg.pos()); //    mng.getCurrentPanel();
     //in ctor: setPanelMng(mng);
@@ -132,29 +132,21 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     }
     if(posPrompt !=null) {
       final Font promptFont;
-      GralRectangle boundsPrompt;
       float heightPrompt = posPrompt.height();
-      promptFont = mng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
+      promptFont = swtMng.propertiesGuiSwt.getTextFontSwt(heightPrompt, GralFont.typeSansSerif, GralFont.styleNormal); //.smallPromptFont;
       //boundsPrompt = mng.calcWidgetPosAndSize(posPrompt, boundsAll.dx, boundsAll.dy, 10,100);
       //boundsField = mng.calcWidgetPosAndSize(posField, boundsAll.dx, boundsAll.dy, 10,100);
       promptSwt = new SwtTransparentLabel(panelSwt, SWT.TRANSPARENT);
       promptSwt.setFont(promptFont);
       promptSwt.setText(prompt());
       promptSwt.setBackground(null);
-      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      boundsPrompt = mng.calcWidgetPosAndSizeSwt(posPrompt, promptSwt.getParent(), 10,100);
-      if(promptSize.x > boundsPrompt.dx){
-        boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
-      }
-      promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
     }
     textFieldSwt =  new Text(panelSwt, textProperties);
-    mng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
     //textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
-    textFieldSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
+    textFieldSwt.setFont(swtMng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());
-    textFieldSwt.setBackground(mng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
-    KeyListener swtKeyListener = new TextFieldKeyListener(mng.gralMng._implListener.gralKeyListener);
+    textFieldSwt.setBackground(swtMng.propertiesGuiSwt.colorSwt(GralColor.getColor("wh")));
+    KeyListener swtKeyListener = new TextFieldKeyListener(swtMng.gralMng._implListener.gralKeyListener);
     textFieldSwt.addKeyListener(swtKeyListener);
     textFieldSwt.setMenu(null);  //default: no contextMenu, use GralMenu?
     
@@ -165,7 +157,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 //    textFieldSwt.addMouseListener(mng.mouseClickForInfo);
     this.textFieldSwt.addMouseListener(SwtGralMouseListener.mouseActionStd);  //from SwtTextBox
     //textFieldSwt.addFocusListener(mng.focusListener);
-    TextFieldFocusListener focusListener = new TextFieldFocusListener(mng);
+    TextFieldFocusListener focusListener = new TextFieldFocusListener(swtMng);
     textFieldSwt.addFocusListener(focusListener);
     if(widgg.isEditable()){
       TextFieldModifyListener modifyListener = new TextFieldModifyListener();
@@ -173,34 +165,16 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     } else {
       
     }
-    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
-      Rectangle swtField = textFieldSwt.getBounds();
-      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
-      float hight = widgg.pos().height();
-      final Font promptFont;
-      if(hight <2.0){
-        promptFont = mng.propertiesGuiSwt.smallPromptFont;  
-      } else { 
-        promptFont = mng.propertiesGuiSwt.stdInputFont;  
-      }
-      promptSwt = new SwtTransparentLabel(mng.getCurrentPanel(), SWT.TRANSPARENT);
-      promptSwt.setFont(promptFont);
-      promptSwt.setText(prompt());
-      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      swtPrompt.width = promptSize.x;
-      promptSwt.setBounds(swtPrompt);
-      
-      
-    }
     //
     textFieldSwt.setData(this);
     textFieldSwt.addPaintListener(paintListener);
     if(!widgg.isEditable()){
-      mng.gralMng.registerShowField(widgg);
+      swtMng.gralMng.registerShowField(widgg);
     }
-    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(textFieldSwt, mng);
+    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(textFieldSwt, swtMng);
 
-    mng.gralMng.registerWidget(widgg);
+    swtMng.gralMng.registerWidget(widgg);
+    setPosBounds();
     
   }
 
@@ -375,8 +349,44 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     }
   }
 
-  @Override public void setBoundsPixel(int x, int y, int dx, int dy)
-  { textFieldSwt.setBounds(x,y,dx,dy);
+  @Override public void setBoundsPixel(int x, int y, int dx, int dy) { 
+    throw new IllegalStateException("should not called because setPosBounds() is overridden.");
+    //textFieldSwt.setBounds(x,y,dx,dy);
+  }
+  
+  
+  @Override public void setPosBounds ( ) {
+    SwtMng swtMng = (SwtMng)super.mngImpl;
+    if(posPrompt !=null) {
+      GralRectangle boundsPrompt;
+      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      boundsPrompt = swtMng.calcWidgetPosAndSizeSwt(posPrompt, promptSwt.getParent(), 10,100);
+      if(promptSize.x > boundsPrompt.dx){
+        boundsPrompt.dx = promptSize.x;  //use the longer value, if the prompt text is longer as the field.
+      }
+      promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
+    }
+    swtMng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
+    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
+      Rectangle swtField = textFieldSwt.getBounds();
+      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
+      float hight = widgg.pos().height();
+      final Font promptFont;
+      if(hight <2.0){
+        promptFont = swtMng.propertiesGuiSwt.smallPromptFont;  
+      } else { 
+        promptFont = swtMng.propertiesGuiSwt.stdInputFont;  
+      }
+      promptSwt = new SwtTransparentLabel(swtMng.getCurrentPanel(), SWT.TRANSPARENT);
+      promptSwt.setFont(promptFont);
+      promptSwt.setText(prompt());
+      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+      swtPrompt.width = promptSize.x;
+      promptSwt.setBounds(swtPrompt);
+      
+      
+    }
+
   }
   
   

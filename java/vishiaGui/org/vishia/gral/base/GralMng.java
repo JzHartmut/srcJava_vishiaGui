@@ -2199,7 +2199,7 @@ public GralButton addCheckButton(
   {
     // TODO Auto-generated method stub
     if(this._mngImpl !=null) {
-    _mngImpl.resizeWidget(widgd, xSizeParent, ySizeParent);
+      _mngImpl.resizeWidget(widgd, xSizeParent, ySizeParent);
     }
   }
 

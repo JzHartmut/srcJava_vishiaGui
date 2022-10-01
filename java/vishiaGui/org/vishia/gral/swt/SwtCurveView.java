@@ -677,8 +677,9 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy)
   {
-    // TODO Auto-generated method stub
-    
+    curveSwt.setBounds(x, y, dx, dy);
+    bRedrawAll = true;
+    curveSwt.redraw();
   }
 
 

@@ -5,20 +5,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.vishia.gral.base.GralWidgImplAccess_ifc;
+import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralRectangle;
 
 /**This class wraps a SWT widget. In this form it is able to reference in the SWT-independent GRAL
  * @author Hartmut Schorrig
  *
  */
-public class SwtWidgetSimpleWrapper implements GralWidgImplAccess_ifc
+public class SwtWidgetSimpleWrapper extends GralWidget.ImplAccess  //implements GralWidgImplAccess_ifc
 {
   protected Control widgetSwt;
 
   protected final SwtMng mng;
   
-  public SwtWidgetSimpleWrapper(Control widgetSwt, SwtMng mng)
-  { this.mng = mng;
+  public SwtWidgetSimpleWrapper(GralWidget widgg, Control widgetSwt, SwtMng mng) { 
+    super(widgg);
+    this.mng = mng;
     this.widgetSwt = widgetSwt;
   }
 
