@@ -710,7 +710,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
 
     public static final int chgPrompt = 0x100, chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800

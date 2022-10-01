@@ -1043,7 +1043,7 @@ public class GralPos implements Cloneable
    * @see java.lang.Object#toString()
    */
   @Override public String toString()
-  { return "panel=" + (this.parent == null ? "?" : this.parent.toString()) + ", "
+  { return "panel=" + (this.parent == null ? "?" : this.parent.getName()) + ", "
     +"line=" + this.y.toString() + " col=" + this.x.toString() + " " + this.y.dirNext + this.x.dirNext + this.y.origin + this.x.origin;
   }
 

@@ -121,7 +121,7 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
     
     

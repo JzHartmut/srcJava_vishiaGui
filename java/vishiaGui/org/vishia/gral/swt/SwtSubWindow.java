@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
@@ -70,7 +70,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWidgImpl_ifc
+public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWidgImplAccess_ifc
 {
 
   
@@ -136,7 +136,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   public static final String sVersion = "2016-08-31";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   SwtWidgetHelper swtWidgWrapper;
   
@@ -521,15 +521,56 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
 
 
   
-  /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
-   * It calls this user action on resize. */
+  /**The resizeListener is always associated to the Shell (Swt Window). 
+   * It checks whether the Shell has only one child, which is usual a Composite (a GralPanel).
+   * Then this Composite will be resized with the same size. 
+   * <br>
+   * The resizing of the Composite will force calling the {@link SwtPanel#resizeItemListener}
+   * which is the listener for the Composite to resize the content. See there.
+   * <br>
+   * Resizing of the Window can call a user defined resize action. 
+   * This can be defined from user level with {@link GralWindow#setResizeAction(GralUserAction)}.
+   * The user's action is optional, it is not necessary for resizing itself (changed in 2022-09).
+   * History: before 2022-09 this action does the resizing itself. 
+   */
   private final ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
     }
   
     @Override public void controlResized(ControlEvent e) 
-    { if(SwtSubWindow.this.resizeAction() !=null){
+    { 
+      Shell window = SwtSubWindow.this.window;
+      Object widgg = window.getData();
+      if(widgg instanceof GralPanelContent.ImplAccess) {
+        Debugutil.stop();  //TODO same algorithm as on SwtPanel
+      } else {
+        Control[] children = window.getChildren();          //Note: on first call only after creation of Shell it has no children.
+        for(Control child: children) {
+          if(children.length==1 && child instanceof Composite) {
+//            Object widgachild = child.getData();
+//            if(widgachild instanceof GralPanelContent.ImplAccess) {
+              //GralUserAction resizeAction = ((GralPanelContent.ImplAccess)widgachild).resizeAction();
+              Debugutil.stop();
+//              Rectangle xy = window.getBounds();           // x and y is the absolute position on screen
+//              xy.x = 0;                                    // relative position inside the window is necessary.
+//              xy.y = 0;                                    // relative from left top [0,0] to given size
+              Rectangle xy = window.getClientArea();
+              child.setBounds(xy);                         // call its resize as Swt-listener.
+//            } else {
+//              Rectangle xy = window.getBounds();
+//              child.setBounds(xy);     //call its resize as Swt-listener.
+//            }
+          } else {
+            // the window may be a GralPanelContent.ImplAccess
+            // this is quest above.
+            Debugutil.stop(); //TODO
+          }
+        }
+      }
+      
+      
+      if(SwtSubWindow.this.resizeAction() !=null){
       SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
       }
     }

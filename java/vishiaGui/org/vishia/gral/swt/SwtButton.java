@@ -64,7 +64,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   public static final int version = 20130524;
 
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   
@@ -145,7 +145,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
 
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible) { 
     super.setVisibleState(bVisible); 

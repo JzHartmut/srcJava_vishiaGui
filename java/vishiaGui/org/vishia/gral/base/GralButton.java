@@ -498,7 +498,7 @@ public class GralButton extends GralWidget
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
 
     /**That action effects that the internal variable {@link #switchedOn} is set for a switching button.

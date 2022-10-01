@@ -6,7 +6,7 @@ import java.util.List;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -222,7 +222,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    */
   public static abstract class GraphicImplAccess<UserData> 
   extends GralWidget.ImplAccess //access to GralWidget
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg){ wdgImpl = widg; }

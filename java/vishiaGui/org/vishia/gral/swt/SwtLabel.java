@@ -50,7 +50,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   public static final int version = 20120317;
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   

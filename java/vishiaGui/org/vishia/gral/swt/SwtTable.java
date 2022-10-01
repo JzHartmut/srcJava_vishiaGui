@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
@@ -76,11 +76,11 @@ import org.vishia.util.KeyCode;
  * <li>The {@link GralTable} contains some implementation-non-specific things, most of table structure.
  * <li>To access from this class to the GralTable, the inner class {@link GralTable.GraphicImplAccess}
  *   is used as super class of SwtTable with protected access.
- * <li>The GralTable knows this class via the interface {@link GralWidgImpl_ifc} in its superclass
+ * <li>The GralTable knows this class via the interface {@link GralWidgImplAccess_ifc} in its superclass
  *   association {@link GralWidget#_wdgImpl}.
  * <li>The GralTable knows this class via {@link GralTable#gi} association with the proper type.
  * <li>The {@link GralTable.GraphicImplAccess} defines some abstract methods which are implemented here.  
- * <li>But some implementations of {@link GralWidgImpl_ifc} is found in {@link SwtWidgetHelper}.
+ * <li>But some implementations of {@link GralWidgImplAccess_ifc} is found in {@link SwtWidgetHelper}.
  *   That are unique implementations, reuse it!
  * <li>Therefore for reused implementations this class delegates the interface to {@link #swtWidgHelper}.
  * <li>The Swt widget core implementation is {@link Table} which is derived from 
@@ -98,7 +98,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWidgImpl_ifc
+public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWidgImplAccess_ifc
 , FocusListener  //for the cells
 //public class SwtTable  implements GralWidgImpl_ifc 
 {
@@ -151,7 +151,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   public final static String version = "2015-08-29";
 
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   
@@ -299,7 +299,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
 
   /** TODO implement in {@link GralTable.GraphicImplAccess}
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#repaintGthread()
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#repaintGthread()
    */
   @Override public void repaintGthread(){
     if(bFocusLost){

@@ -8,7 +8,7 @@ import org.vishia.gral.ifc.GralRectangle;
 public class SwtSlider extends GralSlider._GraphicImplAccess_
 {
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWdgW;
 

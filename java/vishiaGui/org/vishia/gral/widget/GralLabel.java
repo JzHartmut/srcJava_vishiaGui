@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 
 public class GralLabel extends GralWidget
@@ -58,7 +58,7 @@ public class GralLabel extends GralWidget
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
     protected GraphicImplAccess(GralWidget widgg, GralMng mng)
     {

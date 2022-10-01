@@ -2,7 +2,7 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralRectangle;
 
-/**This interface is used as reference to the implementation layer for all widgets.
+/**This interface is used as reference to the implementation access layer for all widgets.
  * It defines all possible calls from the application to the implementation widget.
  * <br><br>
  * Note that most of user requirements are done by the {@link GralWidget} capability and the
@@ -19,7 +19,7 @@ import org.vishia.gral.ifc.GralRectangle;
  * @author Hartmut Schorrig
  *
  */
-public interface GralWidgImpl_ifc
+public interface GralWidgImplAccess_ifc
 {
   
   
@@ -106,6 +106,14 @@ public interface GralWidgImpl_ifc
    * */
   Object getWidgetImplementation();
   
+  /**This is called especially on resize, but also on creation for comprehensive widgets.. 
+   * If the widget is more comprehensive, consist of more basic widgets,
+   * then this operation should care about the parts of the widget.
+   * @param x
+   * @param y
+   * @param dx
+   * @param dy
+   */
   void setBoundsPixel(int x, int y, int dx, int dy);
  
   GralRectangle getPixelPositionSize();

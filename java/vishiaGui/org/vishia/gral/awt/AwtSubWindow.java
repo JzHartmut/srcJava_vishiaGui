@@ -18,13 +18,13 @@ import java.io.IOException;
 
 import org.eclipse.swt.graphics.Point;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.util.Debugutil;
 
 
-public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWidgImpl_ifc
+public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWidgImplAccess_ifc
 {
   
   protected final Frame window;
@@ -89,7 +89,7 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
 
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); window.setVisible(bVisible); }
 

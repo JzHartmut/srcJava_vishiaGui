@@ -1493,7 +1493,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
   public abstract static class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc, Removeable
+  implements GralWidgImplAccess_ifc, Removeable
   { 
     protected final GralCurveView widgg;
     

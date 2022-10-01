@@ -1062,6 +1062,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
 	  if(widgd._wdgImpl !=null) {
   	  Object owidg = widgd._wdgImpl.getWidgetImplementation();
+  	  
   	  int test = 6;
   	  if(owidg !=null){
   	    Control swtWidget = (Control)owidg;

@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralHorizontalSelector;
@@ -23,7 +23,7 @@ import org.vishia.gral.widget.GralHorizontalSelector;
  * @author Hartmut Schorrig
  *
  */
-public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAccess implements GralWidgImpl_ifc
+public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAccess implements GralWidgImplAccess_ifc
 {
   /**Version, history and copyright/copyleft.
    * <ul>
@@ -62,7 +62,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWdgW;
 

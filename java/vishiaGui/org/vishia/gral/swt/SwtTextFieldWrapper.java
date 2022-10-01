@@ -44,7 +44,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   /**Version, history and license.
    * <ul>
-   * <li>2015-05-04 Hartmut new: {@link #textFieldFocusLost()} calls {@link org.vishia.gral.base.GralWidgImpl_ifc#updateValuesForAction()}.
+   * <li>2015-05-04 Hartmut new: {@link #textFieldFocusLost()} calls {@link org.vishia.gral.base.GralWidgImplAccess_ifc#updateValuesForAction()}.
    *   implemented here in {@link #updateValuesForAction()} which sets the cursor line and column. 
    * <li>2015-05-04 Hartmut new: Contains all also for the TextBox, replaces SwtTextBox.
    * <li>2015-05-04 Hartmut new: {@link #setBorderWidth(int)} to show the text field with a border. That is not a property
@@ -92,7 +92,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   public static final String version = "2022-01-29";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   

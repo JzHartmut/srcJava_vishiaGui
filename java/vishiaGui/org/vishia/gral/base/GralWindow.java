@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -11,6 +12,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
+import org.vishia.util.ExcUtil;
 
 /**This class represents a window of an application, either the primary window or any sub window.
  * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
@@ -126,7 +128,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   
   /**State of visible, fullScreen, close set by {@link #setVisible(boolean)}, {@link #setFullScreen(boolean)},
    * {@link #closeWindow()} called in another thread than the graphic thread. It is stored here
-   * and executed in the {@link GralWidgImpl_ifc#repaintGthread()}. */
+   * and executed in the {@link GralWidgImplAccess_ifc#repaintGthread()}. */
   protected boolean XXXbVisible, bFullScreen, bShouldClose;
   
 
@@ -355,7 +357,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * it should be visible from the graphic implementation which is located in another package. 
    */
   public abstract static class WindowImplAccess extends GralWidget.ImplAccess //access to GralWidget
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
     
     public final GralWindow gralWindow;  //its outer class.

@@ -3,7 +3,7 @@ package org.vishia.gral.ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.util.Debugutil;
 import org.vishia.util.Removeable;
@@ -39,7 +39,7 @@ import org.vishia.util.Removeable;
  *   The graphic thread organizes it in a proper kind of time.
  * <li>If a {@link org.vishia.gral.base.GralGraphicTimeOrder} is dequeued in the graphic thread, 
  *   its method {@link org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)} is invoked. 
- *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
+ *   This method calls {@link GralWidgImplAccess_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
  *   stored in {@link org.vishia.gral.base.GralWidget#dyda} to the special implementation widget method invocations
@@ -336,13 +336,13 @@ public interface GralWidget_ifc extends Removeable
    * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
    * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
    * in the {@link GralGraphicThread#addTimeOrder(GralGraphicTimeOrder)}. In the requested time that 
-   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImpl_ifc#repaintGthread()}. 
+   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImplAccess_ifc#repaintGthread()}. 
    * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
    * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
    * <br><br>
    * If more as one attribute is changed one after another, only one instance of the {@link GralGraphicTimeOrder}
    * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
-   * {@link GralWidgImpl_ifc#repaintGthread()} quests all changes one after another. 
+   * {@link GralWidgImplAccess_ifc#repaintGthread()} quests all changes one after another. 
    * It means that a thread switch is invoked only one time per widget for more as one change.
    * <br>
    * See {@link DynamicData}. That composite part of a widget stores all standard dynamic data of a widget. 
@@ -383,6 +383,14 @@ public interface GralWidget_ifc extends Removeable
    */
   public void repaint(int delay, int latest);
   
+  /**This operation is used if the pixel are calculated on gral level.
+   * Intrinsic this operation is not system-conform, instead use grid units here. 
+   * TODO look where it is used.
+   * @param x
+   * @param y
+   * @param dx
+   * @param dy
+   */
   void setBoundsPixel(int x, int y, int dx, int dy);
  
   

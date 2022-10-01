@@ -73,7 +73,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   /*packagePrivate*/ Label promptSwt;
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final AwtWidgetHelper widgHelper;
   
@@ -126,7 +126,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   }
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); widgHelper.setVisibleGThread(bVisible); }
 

@@ -467,7 +467,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     }
   }
   
-  @Override public String toString(){ return "GralPanel:" + this.name; }
+  @Override public String toString(){ return "GralPanel:" + this.name + (super._wdgPos == null ? "" : "@" + super._wdgPos.toString()); }
 
   
   

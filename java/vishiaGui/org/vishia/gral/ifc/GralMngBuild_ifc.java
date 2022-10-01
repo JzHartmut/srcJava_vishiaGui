@@ -17,7 +17,7 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;

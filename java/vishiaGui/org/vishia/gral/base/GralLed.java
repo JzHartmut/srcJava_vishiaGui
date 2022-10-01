@@ -126,7 +126,7 @@ public class GralLed extends GralWidget
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
 
     

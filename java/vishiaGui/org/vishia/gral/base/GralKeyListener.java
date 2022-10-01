@@ -56,8 +56,8 @@ public class GralKeyListener implements GralKeySpecial_ifc
 {
   /**Version, history and license
    * <ul>
-   * <li>2022-01-29 Hartmut enhance: {@link #keyPressed(int, GralWidget_ifc, GralWidgImpl_ifc)} 
-   *   calls {@link GralWidgImpl_ifc#updateValuesForAction()} before call an action.
+   * <li>2022-01-29 Hartmut enhance: {@link #keyPressed(int, GralWidget_ifc, GralWidgImplAccess_ifc)} 
+   *   calls {@link GralWidgImplAccess_ifc#updateValuesForAction()} before call an action.
    *  This updates the current line and column from the cursor in a text field, as also the text.
    *  Or maybe also other information of other widgets (not yet done, possible).
    *  It means the key action has current informations.
@@ -106,10 +106,10 @@ public class GralKeyListener implements GralKeySpecial_ifc
    * @param keyCode
    * @param widgi
    * @param widgImpl It comes from the Control, there the added data. 
-   *   Should be instance of {@link GralWidgImpl_ifc}
+   *   Should be instance of {@link GralWidgImplAccess_ifc}
    * @return
    */
-  public boolean keyPressed(int keyCode, GralWidget_ifc widgi, GralWidgImpl_ifc widgImpl){
+  public boolean keyPressed(int keyCode, GralWidget_ifc widgi, GralWidgImplAccess_ifc widgImpl){
     boolean actionDone;
     GralWidget_ifc.ActionChange action = widgi.getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyChgContent); 
     if(action !=null){

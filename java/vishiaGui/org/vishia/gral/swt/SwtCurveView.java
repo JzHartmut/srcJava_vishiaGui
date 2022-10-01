@@ -75,7 +75,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   @SuppressWarnings("hiding")
   public final static int version = 20120317;
 
-  private final CurveView curveSwt;
+  private final CurveViewSwtWidget curveSwt;
   
   private final Image cursorStore1, cursorStore2;
   
@@ -97,7 +97,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     GralRectangle bounds = mng.calcWidgetPosAndSize(widgg.pos(), 700, 600);
     //Composite panelSwt = (Composite)widgg.pos().parent.getImpl().getWidgetImplementation();
     Composite panelSwt = (Composite)SwtMng.getSwtImpl(widgg.pos().parent);
-    curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, widgg.maxNrofXValues);
+    curveSwt = this.new CurveViewSwtWidget(panelSwt, bounds.dx, bounds.dy, widgg.maxNrofXValues);
     curveSwt.setData(this);
     curveSwt.setSize(bounds.dx, bounds.dy);
     curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);
@@ -396,7 +396,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   
   
   
-  /**This routine overrides 
+  /**This routine is called from overridden {@link CurveViewSwtWidget#drawBackground(GC, int, int, int, int)}  
    * @see org.eclipse.swt.widgets.Canvas#drawBackground(org.eclipse.swt.graphics.GC, int, int, int, int)
    * It is called in this class in {@link #paintListener} in the {@link PaintListener#paintControl(PaintEvent)} method.
    * It draws the whole content.
@@ -511,7 +511,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
 
   
   
-  private class CurveView extends Canvas
+  private class CurveViewSwtWidget extends Canvas
   {
     
     //private final CurveView widgSwt;
@@ -521,7 +521,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //private final Color[] lineColors;
     
     
-    public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues){
+    public CurveViewSwtWidget(Composite parent, int xPixel, int yPixel, int nrofXvalues){
       super(parent, org.eclipse.swt.SWT.NO_SCROLL|org.eclipse.swt.SWT.NO_BACKGROUND);
       setData("Control", this);
       setSize(xPixel, yPixel);  //the size may be changed later by drag the window.
@@ -635,7 +635,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     /**Ct if redraw only because new data. */
     int ctRedrawBecauseNewData;
     
-    /**Coordinates while redraw. {@link CurveView#drawBackground(GC, int, int, int, int)}. */
+    /**Coordinates while redraw. {@link CurveViewSwtWidget#drawBackground(GC, int, int, int, int)}. */
     int xView, yView, dxView, dyView;
   } 
   TestHelp testHelp = new TestHelp();

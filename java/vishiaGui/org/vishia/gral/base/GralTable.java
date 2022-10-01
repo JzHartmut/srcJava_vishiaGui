@@ -162,7 +162,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * <li>2013-09-15 Hartmut new: Implementation of {@link #setBackColor(GralColor, int)}  
    *   with special comments for usage of the int parameter.
    *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
-   * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImpl_ifc} without any other
+   * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImplAccess_ifc} without any other
    *   changes (was proper) and sets {@link GralWidget#_wdgImpl}. Therefore all routines which works from the
    *   GralWidget calls the methods of the implement of the GralTable immediately without special overridden methods
    *   in this class. It is the concept.
@@ -643,7 +643,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Sets the focus of the table.
    * It sets an information that the selected cell should focused while drawing ({@link GraphicImplAccess.CellData#bSetFocus}).
    * Than it invokes the overridden super.{@link GralWidget#setFocus(int, int)}. 
-   * That method asserts the visibility of the table and calls {@link GralWidgImpl_ifc#setFocusGThread()}
+   * That method asserts the visibility of the table and calls {@link GralWidgImplAccess_ifc#setFocusGThread()}
    * That method is implemented in the implementation widget layer and causes a redraw which focused
    * the correct cell. 
    * @see org.vishia.gral.base.GralWidget#setFocus(int, int)
@@ -1437,7 +1437,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * 
    */
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc, Removeable
+  implements GralWidgImplAccess_ifc, Removeable
   {
     
     public static final int chgEditableColumn = 0x00100000;
@@ -1823,7 +1823,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
 
     /**This method have to be called before the vertical scroll bar is painted
-     * in the {@link GralWidgImpl_ifc#repaintGthread()} routine..
+     * in the {@link GralWidgImplAccess_ifc#repaintGthread()} routine..
      * It checks whether the {@link GralTable#nLineCurr} and the shown number of lines
      * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#zLineUnfolded}
      * is given, e.g. >=0. If one of them is <0 or lines are countered

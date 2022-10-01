@@ -82,7 +82,7 @@ import org.vishia.util.KeyCode;
  * Then the user builds its graphic appearance with invocation of {@link GralHorizontalSelector#setToPanel(GralMngBuild_ifc)}
  * with the derived instance of {@link GralMng} as parameter. 
  * <br><br>  
- * The <code>GralWidget</code> knows the graphic implementation via the {@link GralWidgImpl_ifc} to invoke some methods
+ * The <code>GralWidget</code> knows the graphic implementation via the {@link GralWidgImplAccess_ifc} to invoke some methods
  * for the graphical appearance. The interface is independent
  * of the implementation itself. The implementor of this interface for this example 
  * is the {@link org.vishia.gral.swt.SwtHorizontalSelector} implements this methods. 
@@ -205,12 +205,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)} sets the only one or special actions,
    *   {@link #getActionChange(org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen)} selects a proper one. 
    *   All derived widgets and implementation are adapted to the new system. The user interface is nearly identical.
-   * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImpl_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
+   * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImplAccess_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
    *   The new concept is: An implementing widget is derived from its derived class of {@link GralWidget.ImplAccess}. Therefore only that base class implements the GralWidgetImpl_ifc.
    * <li>2016-07-03 Hartmut chg: handling of visible: A GralWidget is invisible by default. {@link #setVisible(boolean)} should be invoked on creation.
    *   It is possible that widgets are switched. All widgets of a non-visible tab of a tabbed panel are set to invisible, especially {@link #bVisibleState} = false.
    *   The {@link #isVisible()} is checked to decide whether a widget should be updated in the inspector. Only visible widgets should be updated.
-   *   The {@link GralWidgImpl_ifc#setVisibleGThread(boolean)} is implemented to all known widgets for the implementation layer in the kind of {@link #setFocusGThread()}.
+   *   The {@link GralWidgImplAccess_ifc#setVisibleGThread(boolean)} is implemented to all known widgets for the implementation layer in the kind of {@link #setFocusGThread()}.
    *   See documentation on the methods.   
    * <li>2015-09-20 Hartmut chg: some final methods now non final, because they have to be overridden for large widgets.
    * <li>2015-09-20 Hartmut chg: gardening for {@link DynamicData#getChanged()}, now private attribute {@link DynamicData#whatIsChanged}
@@ -1966,7 +1966,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    */
-  public abstract static class ImplAccess implements GralWidgImpl_ifc {
+  public abstract static class ImplAccess implements GralWidgImplAccess_ifc {
     
     /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
     public static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
@@ -2228,7 +2228,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Sets the implementation widget visible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   //@Override 
   public void XXXsetVisibleGThread(boolean bVisible){ 

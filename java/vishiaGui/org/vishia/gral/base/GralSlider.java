@@ -30,7 +30,7 @@ public class GralSlider extends GralWidget implements GralSlider_ifc
    * Don't use this class from user applications! It is public only because it should be seen from the graphic implementation.
    */
   public abstract class _GraphicImplAccess_ extends GralWidget.ImplAccess 
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
     
     /**Because this class is not a static one, the constructor is invoked with the following pattern:
