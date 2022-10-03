@@ -65,44 +65,44 @@ public class ViewCfg //extends GuiCfg
    */
   //private final MsgReceiver msgReceiver;
   
-  GralMng guiAccess;
+  public final GralMng gralMng;
   
-  GralWindow window;
+  public final GralWindow window;
   
-  LogMessage logCfg;
+  public final LogMessage logCfg;
   
-  GralTextBox outTextbox;
+  public final GralTextBox outTextbox;
   
-  MainCmdLogging_ifc logTextbox;
+  public final MainCmdLogging_ifc logTextbox;
   
   
-  /**The command-line-arguments may be stored in an extra class, which can arranged in any other class too. 
+  /**The command-line-arguments are stored in an extra class, which can arranged in any other class too. 
    * The separation of command line argument helps to invoke the functionality with different calls, 
-   * for example calling in a GUI, calling in a command-line-batch-process or calling from ANT 
+   * for example calling in a GUI, calling in a command-line-batch-process or JZtxtcmd. Hence the class and arguments are public.
    */
-  static class CallingArguments extends GuiCallingArgs
+  public static class CallingArguments extends GuiCallingArgs
   {
     /**Name of the config-file for the Gui-appearance. */
-    final Argument sFileGui = new Argument("-gui", ":path/to/config.gui  The gui configuration file. Syntax see ...");
+    public final Argument sFileGui = new Argument("-gui", ":path/to/config.gui  The gui configuration file. Syntax see ...");
   	
     /**Directory where sFileCfg is placed, with / on end. The current dir if sFileCfg is given without path. */
-    String sParamBin;
+    public String sParamBin;
     
-    String sFileCtrlValues;
+    public String sFileCtrlValues;
     
     /**File with values to show alternatively to UDP input. */
-    final Argument sFileOamValues = new Argument("-oamFile", ":path/to/val.bin  File with values for oam");
+    public final Argument sFileOamValues = new Argument("-oamFile", ":path/to/val.bin  File with values for oam");
     
     /**File to configure the Oam variables. */
-    final Argument sFileOamVariables = new Argument("-oamCfg", ":path/to/oam.cfg  file with oam variables");
+    public final Argument sFileOamVariables = new Argument("-oamCfg", ":path/to/oam.cfg  file with oam variables");
     
     /**UDP:0.0.0.0:60000 IP and port to listen for incomming UDP telegrams.
      * If not given, do not listen. 
      * Values back are sent to the sender.
      */
-    final Argument targetIpc = new Argument("-targetIpc", ":UDP:192.168.1.77:41234 IP for commands to the target should be given if Ethernet is used.");
+    public final Argument targetIpc = new Argument("-targetIpc", ":UDP:192.168.1.77:41234 IP for commands to the target should be given if Ethernet is used.");
     
-    CallingArguments() {
+    public CallingArguments() {
       super();
       super.aboutInfo = "Configurable Gui, made by Hartmut Schorrig, 2010, 2022-09-23";
       super.helpInfo = "see https://www.vishia.org/gral/index.html";
@@ -212,7 +212,7 @@ public class ViewCfg //extends GuiCfg
    * @param cargs The given calling arguments.
    * @param gui The GUI-organization.
    */
-  ViewCfg(CallingArguments cargs) { 
+  public ViewCfg(CallingArguments cargs) { 
     this.callingArguments = cargs;
     Appendable fLogFile = null;
     if(cargs.sFileLogCfg.val !=null) {
@@ -232,7 +232,7 @@ public class ViewCfg //extends GuiCfg
     int error = 0;    
     if(cargs.fileGuiCfg !=null) {
       GralMng gralMng = GralMng.get();
-      this.guiAccess = gralMng;
+      this.gralMng = gralMng;
 //      gralMng.registerUserAction(null, this.action_dropFilePath);
 //      gralMng.registerUserAction(null, this.action_exec);
 //      gralMng.registerUserAction(null, this.action_abortCmd);
@@ -256,13 +256,13 @@ public class ViewCfg //extends GuiCfg
     }
     cargs.graphicFactory.createGraphic(this.window, cargs.sizeShow, this.logCfg);
     this.logCfg.flush();
-    GralTextBox msgOut = (GralTextBox)this.guiAccess.getWidget("msgOut");
+    GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
     
   
   
-    this.oamShowValues = new OamShowValues(this.logTextbox, this.guiAccess);
+    this.oamShowValues = new OamShowValues(this.logTextbox, this.gralMng);
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
     if(this.callingArguments.sOwnIpcAddr !=null) {
@@ -291,7 +291,7 @@ public class ViewCfg //extends GuiCfg
     if(curveView !=null && curveView instanceof GralCurveView) {
       this.oamShowValues.setCurveView((GralCurveView)curveView);
     }
-    this.oamShowValues.setFieldsToShow(this.guiAccess.getShowFields(), this.logCfg);
+    this.oamShowValues.setFieldsToShow(this.gralMng.getShowFields(), this.logCfg);
     final VariableAccessArray_ifc varTimeShort = this.oamShowValues.accessOamVariable.getVariable("timeShort");
     if(varTimeShort !=null) {
       

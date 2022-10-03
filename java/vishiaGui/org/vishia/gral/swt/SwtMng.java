@@ -388,7 +388,10 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /**The composite of the panel in SWT.
    * @see org.vishia.gral.base.GralMng.ImplAccess#getCurrentPanel()
    */
-  @Override public Composite getCurrentPanel(){ return ((Composite)pos().parent.getImplAccess().getWidgetImplementation()); }
+  @Override public Composite getCurrentPanel(){ 
+    throw new RuntimeException("mng can not know the current panel. Use getWidgetsPanel()");
+    //return ((Composite)pos().parent.getImplAccess().getWidgetImplementation()); 
+  }
 
   public Composite getWidgetsPanel(GralWidget widg){ 
     GralPos pos = widg.pos();

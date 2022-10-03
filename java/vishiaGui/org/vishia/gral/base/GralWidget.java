@@ -750,7 +750,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Creates a widget.
    * @param currPos The position, absolute. This is either the given ready to use position
-   *   or the basic of a relative position given in the posName argument. 
+   *   or the basic of a relative position given in the posName argument.
+   *   <br>* If null then the {@link GralMng#pos()} is used. 
    *   The given position in the posName argument is written back to this given instance,
    *   also on given absolute positions. Especially for relative positions to the previous widgets this is sensible.
    *   For internal use the position info are cloned to a internal separated position instance aggregated by the widget.
@@ -758,8 +759,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   if this argument is null, the central singleton position in the GralMng is used. 
    *   Then the thread safety is not given. 
    * @param sPosName can have the form "@pos = name" then this is a combination from position string and name.
-   *   The name should be unified to indent a widget by its name.
-   *   Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
+   *   <br>* The name should be unified to indent a widget by its name for the whole application.
+   *   <br>* The position string will be applied to the given currPos.
+   *   <br>* Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
    * @param whatIs See {@link #whatIs}
    */
   public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 

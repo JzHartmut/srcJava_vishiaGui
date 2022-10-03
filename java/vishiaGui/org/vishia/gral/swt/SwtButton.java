@@ -89,7 +89,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
     //Control xx = mng.pos.panel.panelComposite;
     black = mng.propertiesGuiSwt.colorSwt(0x202020);
     white = mng.propertiesGuiSwt.colorSwt(0xffffff);
-    Composite panelSwt = mng.getCurrentPanel();
+    Composite panelSwt = mng.getWidgetsPanel(widgg);
     int styleSwt = 0;
     widgetSwt = new SwtButtonImpl(panelSwt, styleSwt);
     widgetSwt.setData(this);

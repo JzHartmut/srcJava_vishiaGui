@@ -319,8 +319,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   /**It is possible to write any message via this class to a logging system.
    * All internal methods of gral writes exceptions to that logging system instead abort the execution of the application.
+   * This is an association, can be null, should not be null while working.
+   * See {@link #GralMng(LogMessage)} and #setLog
    */
-  public final LogMessage log;
+  public LogMessage log;
   
   
   protected GralMngApplAdapter_ifc applAdapter;
@@ -607,13 +609,17 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   */
 
-  private GralMng(LogMessage log)
+  /**Creates the GralMng with a given logging output, 
+   * 
+   * @param log maybe null firstly, then use {@link #setLog(LogMessage)}
+   */
+  public GralMng(LogMessage log)
   { //this.propertiesGui = props;
       this.log = log;
     //its a user action able to use in scripts.
     userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-    GralMng.singleton = this; 
-    GralPanel_ifc theWholeScreen = new GralScreen();
+    if(GralMng.singleton ==null) { GralMng.singleton = this; } 
+    GralPanel_ifc theWholeScreen = new GralScreen();       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
     this.panels.put("screen", theWholeScreen);
   }
 
@@ -646,6 +652,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return singleton; 
   }
   
+  
+  /**Changes or sets the log output. See {@link #log()}.
+   * @param log
+   */
+  public void setLog(LogMessage log) { this.log = log; }
   
   public void setProperties(GralGridProperties props) {
     this.propertiesGui = props;
@@ -1885,7 +1896,11 @@ public GralButton addCheckButton(
     
     public void listVisiblePanels_add(GralVisibleWidgets_ifc panel){ gralMng.listVisiblePanels.add(panel); }
     
-    public abstract Object getCurrentPanel();
+    /**Forbidden. The current panel depends on the widget. 
+     * Use {@link org.vishia.gral.swt.SwtMng#getWidgetsPanel(GralWidget)}.
+     * @return
+     */
+    @Deprecated public abstract Object getCurrentPanel();
     
     protected GralWidget indexNameWidgets(String name){ return gralMng.indexNameWidgets.get(name); }
     
@@ -2091,7 +2106,7 @@ public GralButton addCheckButton(
     return slider;
   }
 
-  @Override @Deprecated public GralTable addTable(String sName, int height, int[] columnWidths)
+  @Override public GralTable addTable(String sName, int height, int[] columnWidths)
   {
     GralTable table = new GralTable<>(sName, height, columnWidths);
     return table;

@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.PrintStreamAdapter;
@@ -123,8 +124,9 @@ public class StimuliSelector
    */
   String version = "2020-07-20";
   
+  final LogMessage log;
   
-  GralMng gralMng;
+  GralMng gralMng = new GralMng(null);  //Note: log is set in the ctor of this
   
   /**The main window */
   GralWindow window;
@@ -209,9 +211,16 @@ public class StimuliSelector
       System.err.println("ERROR unexpected" + exc.getMessage());
     }
     this.jzcmd = jzcmd;
-    
+    String sTitleWindow = "Stimuli Selector"; //Todo title may depend on script
+    //
+    this.log = new LogMessageStream(System.out);
+    this.gralMng.setLog(log);
+    int windProps = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windResizeable;
+    this.window = this.gralMng.createWindow("@screen,10+80,20+125 = StimuliSelector", sTitleWindow, windProps);
     for(int iTable = 0; iTable < this.wdgTables.length; ++iTable) {
-      //String pos = "@PrimaryWindow, 6..40, " + 20 * iTable + ".." + (18 + 20 * iTable);
+      int xtable = iTable %3;
+      int ytable = iTable /3;
+      this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
       String name = "table" + iTable;
       int[] columnWidths = new int[2];
       columnWidths[0] = 15;
@@ -219,20 +228,19 @@ public class StimuliSelector
       this.wdgTables[iTable] = new GralTable<>(name, columnWidths);
       this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
       this.wdgTables[iTable].specifyActionOnLineSelected(this.actionSelectInTable);
+      StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", this.actionTouchLine);
       this.wdgTables[iTable].setData(new Integer(iTable +1));
       //, GralWidget_ifc.ActionChangeWhen.onCtrlEnter, GralWidget_ifc.ActionChangeWhen.onMouse1Double);
       //this.wdgTables[iTable].specifyContextMenu(null);
     }
     this.wdgLastSelectedTable = this.wdgTables[0]; //default
-    this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
-    this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
-    this.btnGenTestcases = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
-    this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
-    this.btnDeselectLines = new GralButton("cleanSelTable ", "clean", this.actionDeselectLines);
+    this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
     this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
-    this.btnExampleSel = new GralButton("exmpl", "show", this.actionShowSel);
-    this.btnHelp = new GralButton("help", "help", null);   //this.actionHelp);
-    //
+    this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
+    StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
+    this.btnGenTestcases = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
+    StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
+    this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
     JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
     if(sub1 !=null) {
       String btnText = sub1.formalArgs.get(0).textArg;
@@ -257,6 +265,28 @@ public class StimuliSelector
       if(btnText == null) { btnText = sub4.name; }
       this.btnExecSelection[3] = new GralButton("btnExec4", btnText, new GralUserActionButton("btnExec4"));
     }
+    StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 0, 'd');
+    this.wdgSelects = StimuliSelector.this.gralMng.addTextBox("test", true, null, 'r');
+    this.wdgSelects.setText("");
+    this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
+    this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
+    this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
+    this.btnHelp = new GralButton("help", "help", null);   //this.actionHelp);
+    this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
+    this.btnExampleSel = new GralButton("exmpl", "show", this.actionShowSel);
+    this.btnDeselectLines = new GralButton("cleanSelTable ", "clean", this.actionDeselectLines);
+    this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
+    this.output = new GralTextBox("output");
+    this.outOld = System.out; this.errOld = System.err;
+    System.setOut(this.outNew = new PrintStreamAdapter("", StimuliSelector.this.output));
+    System.setErr(this.errNew = new PrintStreamAdapter("", StimuliSelector.this.output));
+    
+    this.isTableInitialized = true;
+    this.gralMng.createHtmlInfoBoxes(null);
+    String sHelpdir = StimuliSelector.this.fileConfig.getAbsoluteFile().getParent() + "/";
+    this.gralMng.setHelpBase(sHelpdir);
+    this.gralMng.setHelpUrl("+StimuliSelector_help.html");
+    this.btnHelp.specifyActionChange("help", StimuliSelector.this.gralMng.actionHelp, null);
     
     this.selectorVariables = new TreeMap<String, DataAccess.Variable<Object>>();
     this.selectorVariables.put("soRx", this.soRxVar);
@@ -267,7 +297,6 @@ public class StimuliSelector
     this.selectorVariables.put("colorGenTestcaseInactive", new  DataAccess.Variable<Object>('O', "colorGenTestcaseInactive", GralColor.getColor("wh")));
     
     
-    this.output = new GralTextBox("output");
   }
   
   
@@ -278,6 +307,24 @@ public class StimuliSelector
   }
   
   
+  /**Initializes/creates the main window
+     * @param size
+     */
+    @SuppressWarnings("deprecation")
+    private void openWindow1(char size){
+      GralFactory gralFactory = new SwtFactory();
+      gralFactory.createGraphic(window, 'C', log);
+  
+  //    LogMessage log = new LogMessageStream(System.out);
+  //    
+  //    this.window = gralFactory.createWindow(log, "Select Stimuli", size, 100, 50, 600, 400);
+  //    this.gralMng = this.window.gralMng();
+  //    this.gralMng.gralDevice.addDispatchOrder(this.initGraphic);
+      //initGraphic.awaitExecution(1, 0);
+      
+    }
+
+
   public void waitForClosePrimaryWindow()
   {
     while(GralMng.get().gralDevice.isRunning()){
@@ -913,21 +960,6 @@ public class StimuliSelector
   
   
   
-  /**Initializes/creates the main window
-   * @param size
-   */
-  @SuppressWarnings("deprecation")
-  private void openWindow1(char size){
-    GralFactory gralFactory = new SwtFactory();
-    LogMessage log = new LogMessageStream(System.out);
-    this.window = gralFactory.createWindow(log, "Select Stimuli", size, 100, 50, 600, 400);
-    this.gralMng = this.window.gralMng();
-    this.gralMng.gralDevice.addDispatchOrder(this.initGraphic);
-    //initGraphic.awaitExecution(1, 0);
-    
-  }
-  
-  
   /**The {@link GralGraphicTimeOrder#awaitExecution(int, int)} implemented here is invoked after creation.
    * It builds the content of the main window called in the Graphic thread of the {@link GralMng}
    * This routine determines the position of all widgets using {@link GralMng#setPosition(float, float, float, float, int, char)}
@@ -941,54 +973,54 @@ public class StimuliSelector
     @Override public void executeOrder()
     { 
       // gralMng.selectPanel(window);
-      StimuliSelector.this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
-      StimuliSelector.this.btnCleanOut.createImplWidget_Gthread();
-      StimuliSelector.this.btnReadConfig.createImplWidget_Gthread();
-      
-      StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
-      StimuliSelector.this.btnGenTestcases.createImplWidget_Gthread();
-      
-      StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
-      StimuliSelector.this.btnGenSelection.createImplWidget_Gthread();
-      for(GralButton execBtn : StimuliSelector.this.btnExecSelection) {
-        if(execBtn !=null) {
-          execBtn.createImplWidget_Gthread();
-        }
-      }
-      StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 0, 'd');
-      StimuliSelector.this.wdgSelects = StimuliSelector.this.gralMng.addTextBox("test", true, null, 'r');
-      StimuliSelector.this.wdgSelects.setText("");
-      StimuliSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
-      StimuliSelector.this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
-      StimuliSelector.this.btnAddTestcase.createImplWidget_Gthread();
-      StimuliSelector.this.btnHelp.createImplWidget_Gthread();
-      StimuliSelector.this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
-      StimuliSelector.this.btnExampleSel.createImplWidget_Gthread();
-      StimuliSelector.this.btnDeselectLines.createImplWidget_Gthread();
-      //int last = 1; //tables.length
-      for(int iTable = 0; iTable < StimuliSelector.this.wdgTables.length; ++iTable) {
-        int xtable = iTable %3;
-        int ytable = iTable /3;
-        StimuliSelector.this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
-        
-        StimuliSelector.this.wdgTables[iTable].createImplWidget_Gthread();
-        StimuliSelector.this.wdgTables[iTable]._wdgImpl.repaintGthread();
-        StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", StimuliSelector.this.actionTouchLine);
-      }
-      StimuliSelector.this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
-      StimuliSelector.this.output.createImplWidget_Gthread();
-      
-      StimuliSelector.this.outOld = System.out; StimuliSelector.this.errOld = System.err;
-      System.setOut(StimuliSelector.this.outNew = new PrintStreamAdapter("", StimuliSelector.this.output));
-      System.setErr(StimuliSelector.this.errNew = new PrintStreamAdapter("", StimuliSelector.this.output));
-      StimuliSelector.this.isTableInitialized = true;
-      //
-      //GralTextField input = new GralTextField();
-      StimuliSelector.this.gralMng.createHtmlInfoBoxes(null);
-      String sHelpdir = StimuliSelector.this.fileConfig.getAbsoluteFile().getParent() + "/";
-      StimuliSelector.this.gralMng.setHelpBase(sHelpdir);
-      StimuliSelector.this.gralMng.setHelpUrl("+StimuliSelector_help.html");
-      StimuliSelector.this.btnHelp.specifyActionChange("help", StimuliSelector.this.gralMng.actionHelp, null);
+//      StimuliSelector.this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
+//      StimuliSelector.this.btnCleanOut.createImplWidget_Gthread();
+//      StimuliSelector.this.btnReadConfig.createImplWidget_Gthread();
+//      
+//      StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
+//      StimuliSelector.this.btnGenTestcases.createImplWidget_Gthread();
+//      
+//      StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
+//      StimuliSelector.this.btnGenSelection.createImplWidget_Gthread();
+//      for(GralButton execBtn : StimuliSelector.this.btnExecSelection) {
+//        if(execBtn !=null) {
+//          execBtn.createImplWidget_Gthread();
+//        }
+//      }
+//      StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 0, 'd');
+//      StimuliSelector.this.wdgSelects = StimuliSelector.this.gralMng.addTextBox("test", true, null, 'r');
+//      StimuliSelector.this.wdgSelects.setText("");
+//      StimuliSelector.this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
+//      StimuliSelector.this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
+//      StimuliSelector.this.btnAddTestcase.createImplWidget_Gthread();
+//      StimuliSelector.this.btnHelp.createImplWidget_Gthread();
+//      StimuliSelector.this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
+//      StimuliSelector.this.btnExampleSel.createImplWidget_Gthread();
+//      StimuliSelector.this.btnDeselectLines.createImplWidget_Gthread();
+//      //int last = 1; //tables.length
+//      for(int iTable = 0; iTable < StimuliSelector.this.wdgTables.length; ++iTable) {
+//        int xtable = iTable %3;
+//        int ytable = iTable /3;
+//        StimuliSelector.this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
+//        
+//        StimuliSelector.this.wdgTables[iTable].createImplWidget_Gthread();
+//        StimuliSelector.this.wdgTables[iTable]._wdgImpl.repaintGthread();
+//        StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", StimuliSelector.this.actionTouchLine);
+//      }
+//      StimuliSelector.this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
+//      StimuliSelector.this.output.createImplWidget_Gthread();
+//      
+//      StimuliSelector.this.outOld = System.out; StimuliSelector.this.errOld = System.err;
+//      System.setOut(StimuliSelector.this.outNew = new PrintStreamAdapter("", StimuliSelector.this.output));
+//      System.setErr(StimuliSelector.this.errNew = new PrintStreamAdapter("", StimuliSelector.this.output));
+//      StimuliSelector.this.isTableInitialized = true;
+//      //
+//      //GralTextField input = new GralTextField();
+//      StimuliSelector.this.gralMng.createHtmlInfoBoxes(null);
+//      String sHelpdir = StimuliSelector.this.fileConfig.getAbsoluteFile().getParent() + "/";
+//      StimuliSelector.this.gralMng.setHelpBase(sHelpdir);
+//      StimuliSelector.this.gralMng.setHelpUrl("+StimuliSelector_help.html");
+//      StimuliSelector.this.btnHelp.specifyActionChange("help", StimuliSelector.this.gralMng.actionHelp, null);
       
     }
     

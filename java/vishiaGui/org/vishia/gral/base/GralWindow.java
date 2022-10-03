@@ -157,15 +157,15 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   /**Constructs a window with an empty {@link #mainPanel}
    * @param currPos will be cloned to the widget, either ready to use or base pos with posString.
    *   The position of a window describes the size and the first position on the screen.
-   * @param posString the position relative to a given position of the parent window. "!" on top level window. 
-   * @param nameWindow
-   * @param sTitle
+   * @param refPos reference position for build a relative position
+   * @param posName possible position and name
+   * @param sTitle can be null then the name is used as title.
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
    */
-  public GralWindow(GralPos currPos, String posName, String sTitle, int windProps, GralMng gralMng)
+  public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
-    super(currPos, posName, 'w', gralMng);
-    this.dyda.displayedText = sTitle;  //maybe null
+    super(refPos, posName, 'w', gralMng);
+    this.dyda.displayedText = sTitle == null ? super.name : sTitle;  //maybe null
     this.windProps = windProps;
     GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
     this.mainPanel = new GralPanelContent(posPanel, this.name + "Panel", this.gralMng());

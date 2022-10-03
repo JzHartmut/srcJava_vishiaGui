@@ -1,8 +1,10 @@
 <?ZBNF-www.vishia.org version="1.0" encoding="iso-8859-1" ?>
 
 GuiDialogZbnfControlled::=
+[<*|==vishiaGral==?>==vishiaGral== ]      ## skip over all content till ==vishiaGral== is found, but optional.
 [ size( <#?ySize> , <#?xSize> ) ;]
-{ DataReplace: <DataReplace>
+{ ==end-vishiaGral==<*\e?>                ## skip till end of file if found. 
+| DataReplace: <DataReplace>
 | Type <Type>
 | if <Conditional> 
 | <Element>    
