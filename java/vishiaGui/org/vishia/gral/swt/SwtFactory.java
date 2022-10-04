@@ -13,7 +13,7 @@ public class SwtFactory extends GralFactory
   /**Initializes the {@link SwtGraphicThread#SwtGraphicThread(GralWindow, char, LogMessage)}
    * and waits for execution of 
    * 
-   * {@link GralGraphicThread#run()} (set a breakpoint here to step into)
+   * {@link GralMng#runGraphicThread()} (set a breakpoint here to step into)
    * 
    * till the point where the {@link GralGraphicThread#orderList}
    * is started to run. Then the {@link GralGraphicThread#waitForStart()} is fulfilled,
@@ -21,10 +21,9 @@ public class SwtFactory extends GralFactory
    * The orders are given to the GraphicThread usual by {@link GralWidget#repaint()} requested with the changed data of the widget.
    * It means nothing is necessary with the GralGraphicThread from user level.
    */
-  @Override public GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
-    SwtGraphicThread graphicThread = new SwtGraphicThread(windowg, sizeShow, log);
-    GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
-    return gralGraphicThread;
+  @Override public void createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
+    SwtMng swtMng = new SwtMng(windowg.gralMng(), sizeShow, log);
+    
   }
 
 

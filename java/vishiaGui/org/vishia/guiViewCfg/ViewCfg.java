@@ -350,7 +350,7 @@ public class ViewCfg //extends GuiCfg
   }
   
   public void doSomethinginMainthreadTillClosePrimaryWindow()
-  { while(GralMng.get().gralDevice.isRunning()){
+  { while(GralMng.get().isRunning()){
       try{ Thread.sleep(20);} 
       catch (InterruptedException e) { }
       stepMain();

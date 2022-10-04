@@ -55,7 +55,7 @@ public class GralPlotWindow
   
   public static GralPlotWindow create(String sTitle){
     GralPlotWindow obj = new GralPlotWindow(sTitle);
-    obj.gralMng.gralDevice.addDispatchOrder(obj.initGraphic);
+    obj.gralMng.addDispatchOrder(obj.initGraphic);
     obj.initGraphic.awaitExecution(1, 0);
     return obj;  
   }
@@ -70,7 +70,7 @@ public class GralPlotWindow
   }
   
   public void waitForClose(){
-    while(gralMng.gralDevice.isRunning()){
+    while(gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();

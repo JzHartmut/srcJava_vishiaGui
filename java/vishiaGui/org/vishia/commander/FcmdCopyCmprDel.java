@@ -850,7 +850,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     @SuppressWarnings("serial") 
     FileRemoteProgressTimeOrder showFilesProcessing = 
-        new FileRemoteProgressTimeOrder("showFilesProcessing", evSrc, main._gralMng.gralDevice.orderList(), 100) 
+        new FileRemoteProgressTimeOrder("showFilesProcessing", evSrc, main._gralMng.orderList(), 100) 
     {
       @Override public void executeOrder() { 
         //System.out.println("showFilesProcessing");
@@ -1577,7 +1577,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //actionShowFilesCmp.fileProcessed = file;
       //actionShowFilesCmp.zFiles +=1;
       if(bShow){
-        //actionShowFilesCmp.addToList(widgButtonShowSrc.gralMng().gralDevice.orderList(), 300);
+        //actionShowFilesCmp.addToList(widgButtonShowSrc.gralMng().orderList(), 300);
       }
       return Result.cont;
     }

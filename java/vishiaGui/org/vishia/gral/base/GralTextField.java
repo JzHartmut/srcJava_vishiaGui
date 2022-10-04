@@ -111,8 +111,6 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   protected GralTextFieldUser_ifc user;
   
-  /**It is used for some operations. */
-  protected final GralGraphicThread windowMng;
   
   final boolean bPassword;
   
@@ -141,7 +139,6 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       }
     }
     bPassword = bPassword1;
-    windowMng = null;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
   }
@@ -165,7 +162,6 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     bPassword = false;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
-    this.windowMng = mng.gralDevice;
   }
   
   

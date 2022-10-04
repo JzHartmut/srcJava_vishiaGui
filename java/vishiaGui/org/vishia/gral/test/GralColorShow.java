@@ -180,9 +180,9 @@ public class GralColorShow
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,1000, 800);
     gralMng = wind.gralMng();
-    gralMng.gralDevice.addDispatchOrder(initGraphicFullColors);
+    gralMng.addDispatchOrder(initGraphicFullColors);
     //initGraphic.awaitExecution(1, 0);
-    while(gralMng.gralDevice.isRunning()){
+    while(gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();
@@ -207,9 +207,9 @@ public class GralColorShow
     LogMessage log = new LogMessageStream(System.out);
     GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,1000, 800);
     gralMng = wind.gralMng();
-    gralMng.gralDevice.addDispatchOrder(initGraphicLessColors);
+    gralMng.addDispatchOrder(initGraphicLessColors);
     //initGraphic.awaitExecution(1, 0);
-    while(gralMng.gralDevice.isRunning()){
+    while(gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();

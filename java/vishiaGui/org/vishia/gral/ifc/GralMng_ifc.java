@@ -99,8 +99,6 @@ import org.vishia.msgDispatch.LogMessage;
   
   GralGridProperties propertiesGui();
   
-  GralGraphicThread gralDevice();
-  
   LogMessage log();
   
   /**Searches a widget by name.
@@ -306,7 +304,7 @@ import org.vishia.msgDispatch.LogMessage;
   
   /**Returns true if the current thread is the graphical thread.
    * This routine is used internally firstly. The graphical thread is that thread, which dispatches
-   * all orders for the graphic, see {@link org.vishia.gral.base.GralGraphicThread#run()}.
+   * all orders for the graphic, see {@link org.vishia.gral.base.GralGraphicThread#runGraphicThread()}.
    * @return true if this routine is called from the same thread as the graphical thread.
    */
   boolean currThreadIsGraphic();

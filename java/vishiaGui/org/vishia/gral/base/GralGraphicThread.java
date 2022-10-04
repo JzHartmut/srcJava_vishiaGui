@@ -116,95 +116,14 @@ import org.vishia.util.MinMaxTime;
  * @author Hartmut Schorrig
  *
  */
-public class GralGraphicThread implements Runnable
+public class GralGraphicThread 
 {
   
-  /**Version and history.
-   * <ul>
-   * <li>2022-09-04 in {@link #run()} set the thread ID before (!) the implementation is started. 
-   * <li>2020-02-01 in {@link #run()}: The {@link GralWindow_ifc#windHasMenu} is not forced, it is set compatible
-   *   in {@link GralArea9MainCmd#parseArgumentsAndInitGraphic(String, String, char, String)}. 
-   *   <br>Usage of {@link GralWindow#GralWindow(String, String, String, int)} 
-   *   should add {@link GralWindow_ifc#windResizeable} etc. additionally. 
-   * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows. 
-   * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
-   *   The graphical implementation extends the {@link ImplAccess}. 
-   * <li>2012-04-20 Hartmut bugfix: If a {@link GralGraphicTimeOrder} throws an exception,
-   *   it was started again because it was in the queue yet. The proplem occurs on build graphic. It
-   *   was repeated till all graphic handles are consumed. Now the {@link #queueGraphicOrders} entries
-   *   are deleted first, then executed. TODO use this class only for SWT, use the adequate given mechanism
-   *   for AWT: java.awt.EventQueue.invokeAndWait(Runnable). use Runnable instead GralDispatchCallbackWorker. 
-   * <li>2012-03-15 Hartmut chg: Message on exception.
-   * <li>2011-11-08 Hartmut new: Delayed orders to dispatch in the graphic thread: 
-   *   Some actions need some calculation time. 
-   *   If they are called in a fast repetition cycle, a follow up effect may occur. 
-   *   Therefore actions should be registered with a delayed start of execution, the start time 
-   *   should be able to putting off till all repetitions (for example key repetition) are done.
-   * <li>2011-11-00 Hartmut created: as own class from Swt widget manager.
-   * </ul>
-   * 
-   * <b>Copyright/Copyleft</b>:
-   * For this source the LGPL Lesser General Public License,
-   * published by the Free Software Foundation is valid.
-   * It means:
-   * <ol>
-   * <li> You can use this source without any restriction for any desired purpose.
-   * <li> You can redistribute copies of this source to everybody.
-   * <li> Every user of this source, also the user of redistribute copies
-   *    with or without payment, must accept this license for further using.
-   * <li> But the LPGL is not appropriate for a whole software product,
-   *    if this source is only a part of them. It means, the user
-   *    must publish this part of source,
-   *    but don't need to publish the whole source of the own product.
-   * <li> You can study and modify (improve) this source
-   *    for own using or for redistribution, but you have to license the
-   *    modified sources likewise under this LGPL Lesser General Public License.
-   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
-   * </ol>
-   * If you are indent to use this sources without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
-   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
-   */
-  public final static String sVersion = "2022-04-04";
   
   //protected GralPrimaryWindow window;
   
   //protected Runnable init;
   
-  /**The thread id of the managing thread for graphic actions. */
-  protected long graphicThreadId;
-
-  
-  boolean debugPrint = false;
-  
-  protected boolean isWakedUpOnly;
-  
-  /**True if the startup of the main window is done and the main window is visible. */
-  protected boolean bStarted = false; 
-
-  /** set to true to exit in main*/
-  protected boolean bExit = false;
-  
-  /**Instance to measure execution times.
-   * 
-   */
-  protected MinMaxTime checkTimes = new MinMaxTime();
-  
-  
-  /**Queue of orders to execute in the graphic thread before dispatching system events. 
-   * Any instance will be invoked in the dispatch-loop.
-   * See {@link #addTimeOrder(Runnable)}. 
-   * An order can be stayed in this queue for ever. It is invoked any time after the graphic thread 
-   * is woken up and before the dispatching of graphic-system-event will be started.
-   * An order may be run only one time, than it should delete itself from this queue in its run-method.
-   * */
-  private final ConcurrentLinkedQueue<GralGraphicTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicTimeOrder>();
-
-  
-  EventTimerThread orderList = new EventTimerThread("GraphicOrderTimeMng"); //this);
 
   
   private ImplAccess impl;
@@ -212,7 +131,7 @@ public class GralGraphicThread implements Runnable
   
   /**Constructs this class as superclass.
    * The constructor of the inheriting class has some more parameter to build the 
-   * primary window. Therefore the {@link #threadGuiDispatch}.start() to start the {@link #run()}
+   * primary window. Therefore the {@link #threadGuiDispatch}.start() to start the {@link #runGraphicThread()}
    * method of this class should be invoked only in the derived constructor
    * after all parameter are saved to execute the overridden {@link #initGraphic()} method.
    * @param name Name of the thread.
@@ -222,197 +141,6 @@ public class GralGraphicThread implements Runnable
   }
   
   
-  /**Stores an event in the queue, able to invoke from any thread.
-   * @param ev
-   */
-  /*package private*/ void storeEvent(EventObject ev){
-    if(ev instanceof GralGraphicTimeOrder) { 
-      queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
-      //System.out.println("storeEventPaint, wakeup");
-      impl.wakeup();
-   } else {
-      throw new IllegalArgumentException("can only store events of type GralDispatchCallbackWorker");
-    }
-  }
-
-  
-  
-  public EventTimerThread orderList(){ return orderList; }
-  
-  
-  /**Adds the order to execute in the graphic dispatching thread.
-   * It is the same like order.{@link GralGraphicTimeOrder#activate()}.
-   * @param order
-   */
-  public void addDispatchOrder(GralGraphicTimeOrder order){ 
-    order.activate();
-    //orderList.addTimeOrder(order); 
-  }
-
-  //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
-
-  
-
-  
-  public void addEvent(EventObject event) {
-    assert(event instanceof GralGraphicTimeOrder);  //should be
-    queueOrdersToExecute.add((GralGraphicTimeOrder)event);
-    impl.wakeup();
-  }
-  
-  
-  public long getThreadIdGui(){ return graphicThreadId; }
-  
-  /**This method should wake up the execution of the graphic thread because some actions are registered.. */
-  public void wakeup(){ impl.wakeup(); }
-
-
-  public void waitForStart(){
-    synchronized(this) {
-      while(!bStarted) {
-        try{ wait(1000);
-        } catch(InterruptedException exc){}
-      }
-    }
-  }
-  
-  public boolean isStarted(){ return bStarted; }
-  
-  public boolean isRunning(){ return bStarted && !bExit; }
-  
-  public boolean isTerminated(){ return bStarted && bExit; }
-
-
-  
-  /**The run method of the graphic thread. This method is started in the constructor of the derived class
-   * of this, which implements the graphic system adapter. 
-   * <ul>
-   * <li>{@link #initGraphic()} will be called firstly. It is overridden by the graphic system implementing class
-   *   and does some things necessary for the graphic system implementing level.
-   * <li>The routine runs so long as {@link #bExit} is not set to false. bExit may be set to false 
-   *   in a window close listener of the graphic system level. It means, it is set to false especially 
-   *   if the windows will be closed from the operation system. If the window is closed because the application
-   *   is terminated by any application command the window will be closed, and the close listerer sets bReady
-   *   to false then. 
-   * <li>In the loop the {@link #queueGraphicOrders} will be executed.
-   * <li>For SWT graphic this is the dispatch loop of graphic events. They are executed 
-   *   in the abstract defined here {@link #dispatchOsEvents()} method.
-   * <li>This thread should be wait if not things are to do. The wait will be executed in the here abstract defined
-   *   method {@link #graphicThreadSleep()}.    
-   * </ul>  
-   * @see java.lang.Runnable#run()
-   */
-  @Override public void run() {
-    long guiThreadId1 = Thread.currentThread().getId(); // should set firstly because in createImplWidget_Gthread it is necesarry. 
-    this.graphicThreadId = guiThreadId1;
-    impl.initGraphic();
-  //  for(GralWindow wind: this.)
-    
-    
-    //add important properties for the main window, the user should not thing about:
-    impl.mainWindow.windProps |= GralWindow.windIsMain  | GralWindow.windHasMenu;
-    if((impl.mainWindow.windProps & GralWindow_ifc.windMinimizeOnClose)==0) {
-      //it it should not be minimized, then close, never set Invisible, because it is not possible to set visible again.
-      impl.mainWindow.windProps |= GralWindow.windRemoveOnClose;
-    }
-    //creates all widgets of this primary window.
-    impl.mainWindow.createImplWidget_Gthread();
-    impl.mainWindow.setWindowVisible( true ); 
-    GralPos pos = impl.mainWindow.pos();
-    if(pos.x.p2 == 0 && pos.y.p2 == 0){
-      impl.mainWindow.setFullScreen(true);  
-    }
-    impl.mainWindow.mainPanel.createImplWidget_Gthread();
-    impl.mainWindow.mainPanel.setVisible(true);
-    
-    impl.finishInit();
-    try{ impl.reportContent(System.out);
-    } catch(IOException exc) { }
-    
-    //The last action, set the GuiThread
-    synchronized(this){
-      orderList.start();
-      bStarted = true;
-      this.notify();      //wakeup the waiting calling thread.
-    }
-    checkTimes.init();
-    checkTimes.adjust();
-    checkTimes.cyclTime();
-    while (!bExit) {
-      step();
-    }
-    orderList.close();
-    //displaySwt.dispose ();
-    //bExit = true;
-    //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
-  }
-
-  
-  
-  
-  public void closeMainWindow() {
-    this.impl.mainWindow.windProps |= GralWindow_ifc.windRemoveOnClose; //if not set till now.
-  }
-  
-
-  
-  void step()
-  {
-    boolean bContinueDispatch;
-    int ctOsEvents = 0;
-    do{
-      try{ bContinueDispatch = impl.dispatchOsEvents();
-      /*  
-      try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }*/
-      }
-      catch(Throwable exc){
-        System.out.println(exc.getMessage());
-        exc.printStackTrace(System.out);
-        bContinueDispatch = true; //false;
-      }
-      ctOsEvents +=1;
-      //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
-    } while(bContinueDispatch);
-    if(debugPrint){ System.out.println("GralGraphicThread - dispatched os events, " + ctOsEvents); }
-    checkTimes.calcTime();
-    isWakedUpOnly = false;
-    //System.out.println("dispatched");
-    if(!bExit){
-      if(isWakedUpOnly){
-        Assert.stop();
-      }
-      //it may be waked up by the operation system or by calling Display.wake().
-      //if wakeUp() is called, isWakedUpOnly is set.
-      checkTimes.cyclTime();
-      //execute stored orders.
-      GralGraphicTimeOrder order;
-      boolean bSleep = true;
-      int ctOrders = 0;
-      while( (order = queueOrdersToExecute.poll()) !=null) {
-        order.stateOfEvent = 'r';
-        try{ 
-          order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
-        } catch(Throwable exc){
-          CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
-          System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.
-        }
-        order.relinquish();
-        bSleep = false;
-        ctOrders +=1;
-      }
-      if(debugPrint){ System.out.println("GralGraphicThread - dispatched graphic orders, " + ctOrders); }
-      if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
-        //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
-        impl.graphicThreadSleep();
-      }
-    }    
-  }
-  
   
   
   /**This class is used only for the implementation level of the graphic. It is not intent to use
@@ -420,72 +148,7 @@ public class GralGraphicThread implements Runnable
    */
   public static abstract class ImplAccess
   {
-    protected final GralGraphicThread gralGraphicThread;
     
-    protected char sizeCharProperties;
-
-    /**The thread which runs all graphical activities. */
-    protected final Thread threadGuiDispatch;
-
-    protected final GralMng gralMng;
-    
-    public final GralWindow mainWindow;
-    
-    protected final LogMessage log;
-    
-
-    //protected GrapGraphicThread
-
-    protected ImplAccess(char sizeCharProperties, GralWindow mainWindow, LogMessage log) {
-      this.mainWindow = mainWindow;
-      this.gralMng = mainWindow.gralMng();
-      this.log = log;
-      this.gralGraphicThread = GralMng.get().gralDevice;
-      this.gralGraphicThread.impl = this;
-      this.sizeCharProperties = sizeCharProperties;
-      threadGuiDispatch = new Thread(gralGraphicThread, "graphic");
-
-    }
-    
-    public abstract void reportContent(Appendable out) throws IOException;
-
-    public abstract void finishInit();
-    
-    
-    protected void startThread() {
-      threadGuiDispatch.start();
-      gralGraphicThread.waitForStart();
-   }
-
-    
-    public GralGraphicThread gralGraphicThread(){ return gralGraphicThread; }
-    
-    /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
-     * and returned when finished. This routine is called as the first routine in the Graphic thread's
-     * method {@link #run()}. See {@link org.vishia.gral.swt.SwtGraphicThread}. */
-    protected abstract void initGraphic();
-    
-    /**Calls the dispatch routine of the implementation graphic.
-     * @return true if dispatching should be continued.
-     */
-    protected abstract boolean dispatchOsEvents();
-    
-    
-    /**Forces the graphic thread to sleep and wait for any events. Either this routine returns
-     * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
-    protected abstract void graphicThreadSleep();
-    
-    /**This method should be implemented by the graphical base. It should be waked up the execution 
-     * of the graphic thread because some actions are registered.. */
-    public abstract void wakeup();
-    
-    /**Terminates the run loop if val == true.
-     * @param val
-     */
-    protected void setClosed(boolean val){ gralGraphicThread.bExit = val; }
-    
-    //protected char sizeCharProperties(){ return gralGraphicThread.sizeCharProperties; }
-
   }
   
 }

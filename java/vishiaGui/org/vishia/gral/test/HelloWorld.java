@@ -58,7 +58,7 @@ public class HelloWorld
   
   public void doSomethinginMainthreadTillClosePrimaryWindow()
   { int ix = 0;
-    while(GralMng.get().gralDevice.isRunning()){
+    while(GralMng.get().isRunning()){
       try{ Thread.sleep(2000);} 
       catch (InterruptedException e) { }
       if(++ix >= helloText.length) { ix = 0; }

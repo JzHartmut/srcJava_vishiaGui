@@ -11,10 +11,10 @@ public class AwtFactory  extends GralFactory
 {
 
   
-  @Override public GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
-    AwtGraphicThread graphicThread = new AwtGraphicThread(windowg, sizeShow, windowg.gralMng().log);
-    GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
-    return gralGraphicThread;
+  @Override public void createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
+//    AwtGraphicThread graphicThread = new AwtGraphicThread(windowg, sizeShow, windowg.gralMng().log);
+//    GralGraphicThread gralGraphicThread = graphicThread.gralGraphicThread();
+//    return gralGraphicThread;
   }
 
   

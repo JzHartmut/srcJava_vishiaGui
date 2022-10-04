@@ -84,8 +84,7 @@ public class InspcCurveViewApp
       GralFactory gralFactory = new SwtFactory();
       gralFactory.createGraphic(this.curveView.windCurve, 'C', log);
 
-      GralGraphicThread gralDevice = gralMng.gralDevice();
-      gralDevice.addDispatchOrder(reportAllContentImpl);
+      gralMng.addDispatchOrder(reportAllContentImpl);
       
     
     } catch(Exception exc) {
@@ -94,7 +93,7 @@ public class InspcCurveViewApp
     }
     
     //initGraphic.awaitExecution(1, 0);
-    while(this.gralMng.gralDevice.isRunning()){
+    while(this.gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();

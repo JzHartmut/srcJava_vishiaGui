@@ -86,7 +86,7 @@ public class ExampleSimpleButton
     //The code to initialize the GUI appearance should be run in the graphic thread.
     //Therefore the code snippet which contains the functionality to set the graphic is applied to the graphic thread.
     //It is defined in this application class locally.
-    this.gui.gralMng.gralDevice.addDispatchOrder(this.initGuiCode);
+    this.gui.gralMng.addDispatchOrder(this.initGuiCode);
     this.initGuiCode.awaitExecution(1, 0);  //waits for finishing
     
   }
@@ -100,7 +100,7 @@ public class ExampleSimpleButton
     //Now do nothing because all actions are done in the graphic thread.
     //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
     //
-    while(this.gui.gralMng.gralDevice.isRunning()){
+    while(this.gui.gralMng.isRunning()){
       try{ Thread.sleep(100); } catch(InterruptedException exc){}
     }
     

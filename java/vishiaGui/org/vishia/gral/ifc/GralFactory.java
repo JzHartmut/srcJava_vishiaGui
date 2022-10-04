@@ -90,12 +90,12 @@ public abstract class GralFactory
     LogMessage log = mng.log;    
     //The graphicthread creates the Swt Window.
     //SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
-    GralGraphicThread gralGraphicThread = createGraphic(windowg, sizeShow, log);
-    synchronized(gralGraphicThread){
-      while(gralGraphicThread.getThreadIdGui() == 0){
-        try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
-      }
-    }
+//    GralGraphicThread gralGraphicThread = createGraphic(windowg, sizeShow, log);
+//    synchronized(gralGraphicThread){
+//      while(gralGraphicThread.getThreadIdGui() == 0){
+//        try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
+//      }
+//    }
   }
 
   /**This method should initialize the whole implementation graphic with the given GralWindow 
@@ -115,7 +115,7 @@ public abstract class GralFactory
    * @param log a log necessary?
    * @return the Graphic Thread can be used to add {@link GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicTimeOrder)}.
    */
-  public abstract GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log);
+  public abstract void createGraphic(GralWindow windowg, char sizeShow, LogMessage log);
   
   
   
@@ -134,14 +134,14 @@ public abstract class GralFactory
    * <br>
    * The argument "windowg" given {@link GralWindow} is used to create the whole graphic implementation
    * as all widgets are referenced from the {@link GralWindow}.
-   * This is done for SWT in {@link org.vishia.gral.swt.SwtGraphicThread#initGraphic()}.  In the graphic thread the {@link GralGraphicThread#run()} is executed which initializes the graphic, the main Window and all underlying widgets.
+   * This is done for SWT in {@link org.vishia.gral.swt.SwtGraphicThread#initGraphic()}.  In the graphic thread the {@link GralGraphicThread#runGraphicThread()} is executed which initializes the graphic, the main Window and all underlying widgets.
    * @param windowg
    * @param sizeShow
    * @param log
    * @param implementor null for "SWT", "SWT" or "AWT",
    * @return
    */
-  public static GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
+  public static GralMng createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
     GralMng mng = GralMng.get();
     mng.registerWindow(windowg); //checks whether called firstly.
     GralGraphicThread gralThread = null;
@@ -162,13 +162,13 @@ public abstract class GralFactory
       throw new RuntimeException(sError, exc);
     }
     try { //this start the GralGraphicThread, see run(). There the primaryWindow will be created.
-      gralThread = factory.createGraphic(windowg, sizeShow, log);
+      factory.createGraphic(windowg, sizeShow, log);
     } catch(Exception exc) {
       String sError = "Exception initializing graphic: " + exc.getMessage();
       System.err.println(sError);
       throw new RuntimeException(sError, exc);
     }
-    return gralThread;
+    return mng;
   }
   
   

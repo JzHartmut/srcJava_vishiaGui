@@ -20,6 +20,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.vishia.byteData.VariableContainer_ifc;
@@ -74,10 +75,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(GralMng.get(), propertiesGui);
+  { super(GralMng.get());
     //mainWindowAwt = window;
     this.propertiesGuiAwt = propertiesGui;
+    
     //mainWindowAwt.addKeyListener(mainKeyListener);
+    startThread();
+
   }
 
   
@@ -680,7 +684,50 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     return bOk;
   }
   
+  @Override protected void initGraphic()
+  {
+    AwtProperties propertiesGui = new AwtProperties(sizeCharProperties);
+    //AwtSubWindow awtWindow = new AwtSubWindow(mainWindow, true);
+    //awtMng = new AwtWidgetMng(propertiesGui, log);
+    
+  }
+
   
+  
+  @Override
+  protected boolean dispatchOsEvents()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  protected void graphicThreadSleep()
+  {
+    synchronized(this){
+      try{ wait(100);} catch(InterruptedException exc){}
+    }
+  }
+
+
+  @Override
+  public void wakeup()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void reportContent ( Appendable out )
+      throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void finishInit () {
+    // TODO Auto-generated method stub
+    
+  }
+
 
 
   KeyListener XXXXX_mainKeyListener = new KeyListener(){

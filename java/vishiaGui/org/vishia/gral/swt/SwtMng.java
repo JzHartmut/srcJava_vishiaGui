@@ -7,11 +7,17 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -67,6 +73,7 @@ import org.vishia.gral.widget.GralLabel;
 import org.vishia.gral.widget.GralPlotArea;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.CheckVs;
+import org.vishia.util.Debugutil;
 
 
 
@@ -246,10 +253,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * to the same instance, but with type {@link GralGridProperties}. Internally there are some more
    * Swt-capabilities in the derived type.
    */
-  public  final SwtProperties propertiesGuiSwt;
+  protected SwtProperties propertiesGuiSwt;
   
   
-  final Display displaySwt;
+  protected Display displaySwt;
+  
+ 
   
   //public final SwtWidgetHelper widgetHelper = new SwtWidgetHelper(this);
   
@@ -351,37 +360,23 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  protected SwtMng(GralMng gralMng, Display display /*, Composite graphicFrame */
+  protected SwtMng(GralMng gralMng
   , char displaySize//, VariableContainer_ifc variableContainer
-	, LogMessage log)
-  { //super(sTitle); 
-  	this(gralMng, display, new SwtProperties(display, displaySize), log);
-  }
-
-  /**Creates an instance.
-   * @param guiContainer The container where the elements are stored in.
-   * @param width in display-units for the window's width, the number of pixel depends from param displaySize.
-   * @param height in display-units for the window's height, the number of pixel depends from param displaySize.
-   * @param displaySize character 'A' to 'E' to determine the size of the content 
-   *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
-   */
-  public SwtMng ( GralMng gralMng
-    , Display display 
-    , SwtProperties propertiesGui
-  	//, VariableContainer_ifc variableContainer
-    , LogMessage log
-  	)
-  { super(gralMng, propertiesGui);
-    this.propertiesGuiSwt = propertiesGui;
-    //pos().x.p1 = 0; //start-position
+	, LogMessage log) { 
+    super(gralMng);
+    this.sizeCharProperties = displaySize;
+        //pos().x.p1 = 0; //start-position
     //pos().y.p1 = 4 * propertiesGui.yPixelUnit();
 
 		
-		displaySwt = display;
 		//displaySwt.addFilter(SWT.KeyDown, mainKeyListener);
     
+    startThread();
 
   }
+
+  
+  
 
   
   
@@ -1147,6 +1142,195 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   }
   
   
+  /**Instance of windowsCloseHandler. */
+  private final WindowsCloseListener windowsCloseListener = new WindowsCloseListener(); 
+  
+  
+  
+  KeyListener keyListener = new KeyListener()
+  {
+    @Override public void keyPressed(KeyEvent key)
+    {
+      // TODO Auto-generated method stub
+      stop();
+    }
+
+    @Override public void keyReleased(KeyEvent e)
+    {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  };
+  
+  
+  
+  /**Disables the ctrl-pgUp and ctrl-Pgdn as traversal key listener. It should be able to use
+   * by the application. Only Tab and sh-Tab are usual. */
+  TraverseListener XXXkeyTraverse = new TraverseListener(){
+    @Override public void keyTraversed(TraverseEvent e) {
+      stop();
+      if(  e.detail == SWT.TRAVERSE_PAGE_NEXT //|| e.keyCode == SWT.PAGE_DOWN){
+        || e.detail == SWT.TRAVERSE_PAGE_PREVIOUS
+         ) {
+        e.doit = true;
+  } } };
+  
+  
+  /**This interface routine is invoked on any key which is used as 'traverse' key to switch
+   * between widgets, panels etc. SWT uses the ctrl-pgup and ctrl-pgdn to switch between the
+   * tab cards on a TabbedPanel. This is not a standard behavior for all graphic systems.
+   * That keys should be able to use in the application. Therefore they are disabled as traversal keys.
+   * To switch between the tabs - it may be application specific to do it with keys - or the mouse
+   * can be used. 
+   * 
+   */
+  Listener traverseKeyFilter = new Listener(){
+    @Override public void handleEvent(Event event) {
+      int traverseIdent = event.detail; 
+      int key = event.keyCode;
+      int keyModifier = event.stateMask;
+      if(  traverseIdent == SWT.TRAVERSE_PAGE_NEXT         //the pg-dn key in SWT
+        || traverseIdent == SWT.TRAVERSE_PAGE_PREVIOUS   //the pg-up key in SWT
+        || key == '\t' && keyModifier == SWT.CTRL
+        ) {
+        event.doit = false;
+      }
+      stop();
+    }
+    
+  };
+  
+  
+  ShellListener mainComponentListerner = new ShellListener()
+  {
+
+        
+    @Override
+    public void shellActivated(ShellEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void shellClosed(ShellEvent e) {
+      Debugutil.stop();
+      
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void shellDeactivated(ShellEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void shellDeiconified(ShellEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    @Override
+    public void shellIconified(ShellEvent e) {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  };
+  
+  
+  
+  
+  //final String sTitle; 
+  //final int xPos, yPos, xSize, ySize;
+  
+  
+  
+  
+  
+  /**Called as first operation in the Graphic thread see {@link GralMng#runGraphicThread()}
+   */
+  @Override protected void initGraphic(){
+    this.displaySwt = new Display();
+    this.propertiesGuiSwt = new SwtProperties(this.displaySwt, this.sizeCharProperties);
+    this.gralMng.setProperties(this.propertiesGuiSwt);
+    this.displaySwt.addFilter(SWT.Close, this.windowsCloseListener);  //it sets bExit on close of windows for the graphic thread
+    this.displaySwt.addFilter(SWT.Traverse, this.traverseKeyFilter);
+    //SwtProperties propertiesGui = new SwtProperties(this.displaySwt, this.sizeCharProperties);
+    //this.swtMng = new SwtMng(super.gralMng, this.displaySwt, propertiesGui, this.log);  //sets the aggregation GralMng
+    
+  }
+
+
+  
+  @Override public void finishInit() {
+    Debugutil.stop();
+  }
+  
+  
+  @Override public void reportContent(Appendable out) throws IOException {
+    reportContent(out, (Composite)getSwtImpl(this.gralMng.getPrimaryWindow()), 0);
+  }
+  
+  static final String nl = "\n| | | | | | | | ";
+  
+  
+  void reportContent(Appendable out, Composite parent, int recursion) throws IOException {
+    Control[] children = parent.getChildren();
+    for(Control child : children) {
+      if(child !=null) {
+        Rectangle pos = child.getBounds();
+        out.append(nl.substring(0, 2*recursion+1));
+        if(child instanceof Composite) {
+          GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
+          out.append(child.toString());
+          reportContent(out, (Composite)child, recursion+1);
+        }
+        else  {
+          out.append("+-");
+          GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
+          out.append(child.toString());
+        }
+      }
+    }
+  }
+  
+  
+  
+  
+
+  
+  @Override
+  protected boolean dispatchOsEvents()
+  { return displaySwt.readAndDispatch();
+  }
+
+  @Override
+  protected void graphicThreadSleep()
+  {
+    displaySwt.sleep ();
+  }
+  
+  
+  /**Yet Experience: SWT knows the {@link Display#asyncExec(Runnable)}.
+   * @param exec
+   */
+  protected void addToGraphicImplThread(Runnable exec){
+    displaySwt.asyncExec(exec);
+  }
+  
+  @Override
+  public void wakeup(){
+    if(displaySwt == null){
+      
+    }
+    displaySwt.wake();
+    //extEventSet.set(true);
+    //isWakedUpOnly = true;
+  }
+
 
 	
 	
@@ -1218,6 +1402,21 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   /**The package private universal focus listener. */
   SwtMngMouseMenuListener mouseMenuListener = new SwtMngMouseMenuListener();
+
+  
+  /**The windows-closing event handler. It is used private only, but public set because documentation. 
+   * The close event will be fired also when a SubWindow is closed. Therefore test the Shell instance.
+   * Only if the main window is closed, bExit should be set to true.
+   * */
+  public final class WindowsCloseListener implements Listener{
+    /**Invoked when the window is closed; it sets {@link #bExit}, able to get with {@link #isRunning()}.
+     * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+     */
+    @Override public void handleEvent(Event event) {
+      setClosed( event.widget == getSwtImpl(SwtMng.this.gralMng.getPrimaryWindow())); //close if the main window was closed.
+    }
+  }
+
 
 
 	void stop(){}  //debug helper

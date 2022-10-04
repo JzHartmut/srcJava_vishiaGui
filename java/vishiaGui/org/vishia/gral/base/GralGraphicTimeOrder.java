@@ -74,7 +74,7 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
     { //the manager is known application global
       GralMng mng = GralMng.get();  //the singleton.
       if(mng !=null) {
-        mng.gralDevice().storeEvent(ev);
+        mng.storeEvent(ev);
       }
       return mEventConsumed;
     }
@@ -95,7 +95,7 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
    * @param name The name is only used for showing in debugging.
    */
   protected GralGraphicTimeOrder(String name)
-  { super(name, new EnqueueInGraphicThread(), GralMng.get().gralDevice.orderList);
+  { super(name, new EnqueueInGraphicThread(), GralMng.get().orderList);
   }
   
 
@@ -103,7 +103,7 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
   /**Activates the graphic order to execute immediately as next call in the graphic thread. */
   public void activate(){
     GralMng mng = GralMng.get();  //the singleton.
-    mng.gralDevice().storeEvent(this);
+    mng.storeEvent(this);
   }
   
 }

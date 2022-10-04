@@ -215,7 +215,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * The application should not know whether it is the primary or any secondary window.
    * That helps for applications which are started from a Gral graphic application itself without an own operation system process. 
    * <br>
-   * The new implementation graphic starts on {@link GralGraphicThread#run()}
+   * The new implementation graphic starts on {@link GralGraphicThread#runGraphicThread()}
    * <br>
    * @param awtOrSwt see {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}
    * @param size 'A'..'G', 'A' is a small size, 'G' is the largest.
@@ -228,16 +228,15 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   @Deprecated public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
     if(this._wdgImpl !=null) throw new IllegalStateException("window already created.");
     GralMng mng = GralMng.get();
-    GralGraphicThread gthread = mng.gralDevice();
-    if(gthread.isRunning()) {
-      gthread.addDispatchOrder(this.createImplWindow);
+    if(mng.isRunning()) {
+      mng.addDispatchOrder(this.createImplWindow);
     } else {
       //it is the primary window, start the graphic with it.
       if(log == null) { log = new LogMessageStream(System.out); }
-      gthread = GralFactory.createGraphic(this, size, log, awtOrSwt);
+      GralFactory.createGraphic(this, size, log, awtOrSwt);
     }
     if(initializeInGraphicThread !=null) {
-      gthread.addDispatchOrder(initializeInGraphicThread);
+      mng.addDispatchOrder(initializeInGraphicThread);
     }
   }
 

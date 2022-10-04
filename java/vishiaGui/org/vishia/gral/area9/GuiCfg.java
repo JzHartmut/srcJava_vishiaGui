@@ -335,7 +335,7 @@ protected void initMain()
 {
   //create the basic appearance of the GUI. The execution sets dlgAccess:
   System.out.println("GuiCfg.initMain() - addDispatchOrder initGraphic, wait for execution;");
-  _gralMng.gralDevice.addDispatchOrder(initGraphic);
+  this._gralMng.addDispatchOrder(initGraphic);
   
   if(!initGraphic.awaitExecution(1, 0)){
     System.out.println("GuiCfg.initMain() - initGraphic does not respond;");
@@ -363,7 +363,7 @@ protected void initMain()
         //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
         //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
         //panelBuildIfc.setCfgBuilder(cfgBuilder);
-        _gralMng.gralDevice.addDispatchOrder(configGuiWithZbnf);
+        this._gralMng.addDispatchOrder(configGuiWithZbnf);
         bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
         if(!bConfigDone){
           console.writeError("No configuration");
@@ -397,7 +397,7 @@ public final void execute()
   initMain();
   //guiAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, "Test\tMsg");
   //msgReceiver.start();
-  while(_gralMng.gralDevice.isRunning())
+  while(this._gralMng.isRunning())
   { stepMain();
     try{ Thread.sleep(100);} 
     catch (InterruptedException e)

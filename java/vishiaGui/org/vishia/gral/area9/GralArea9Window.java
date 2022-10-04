@@ -260,7 +260,7 @@ public class GralArea9Window implements GralArea9_ifc
   {
     super();
     this.mainCmd = mainCmd;
-    //this.gralDevice = guiDevice;
+    //this = guiDevice;
     this.window = window;
     for(int ix = 0; ix < 3; ++ix) for(int iy = 0; iy < 3; ++iy){
       xMinGralSize[ix] = 4;
@@ -277,9 +277,9 @@ public class GralArea9Window implements GralArea9_ifc
    */
   @Override public void initGraphic(String sOutputArea){
     this.outputArea = sOutputArea;
-    window.gralMng().gralDevice.addDispatchOrder(initGraphic); 
+    window.gralMng().addDispatchOrder(initGraphic); 
     initGraphic.awaitExecution(1, 0);
-    window.gralMng().gralDevice.addDispatchOrder(writeOutputTextDirectly);
+    window.gralMng().addDispatchOrder(writeOutputTextDirectly);
     
   }
   
@@ -692,7 +692,7 @@ public class GralArea9Window implements GralArea9_ifc
    * if it has a better way to show infos.*/
   protected void writeDirectly(String sInfo, short kind)  //##a
   { if(textAreaOutput != null){
-      if(Thread.currentThread().getId() == window.gralMng().gralDevice.getThreadIdGui()){
+      if(Thread.currentThread().getId() == window.gralMng().getThreadIdGui()){
         try{
           if((kind & MainCmd.mNewln_writeInfoDirectly) != 0)
           { textAreaOutput.append("\n");
@@ -706,7 +706,7 @@ public class GralArea9Window implements GralArea9_ifc
       } else {  
         //queue the text
         outputTexts.add(sInfo);
-        window.gralMng().gralDevice.wakeup();
+        window.gralMng().wakeup();
       }
     }  
     else mainCmd.writeDirectly(sInfo, kind);     

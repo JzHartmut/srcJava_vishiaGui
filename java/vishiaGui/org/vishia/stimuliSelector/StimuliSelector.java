@@ -327,7 +327,7 @@ public class StimuliSelector
 
   public void waitForClosePrimaryWindow()
   {
-    while(GralMng.get().gralDevice.isRunning()){
+    while(GralMng.get().isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();
