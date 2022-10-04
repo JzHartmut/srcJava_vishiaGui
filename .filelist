@@ -89,7 +89,7 @@
 2022-10-01 23:10:04  x     GralButton.java                          ::         20.827  1534883600 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
 2022-10-01 23:10:04  x     GralCurveView.java                       ::         90.627  0765814089 
-2022-09-29 09:56:29  x     GralGraphicThread.java                   ::         22.672 -1733007871 
+2022-10-04 13:07:04  x     GralGraphicThread.java                   ::         22.716  1401578718 
 2021-10-04 14:29:55  x     GralGraphicTimeOrder.java                ::          4.626  0308339593 
 2022-09-15 16:23:24  x     GralGridProperties.java                  ::         13.029 -0342778063 
 2022-10-03 11:07:13  x     GralHtmlBox.java                         ::          2.080 -0217216577 
@@ -97,7 +97,7 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-10-01 23:10:04  x     GralLed.java                             ::          5.643  1049875631 
 2022-09-25 19:48:48  x     GralMenu.java                            ::         12.586 -0766242011 
-2022-10-03 13:52:55  x     GralMng.java                             ::         84.841  0047225666 
+2022-10-04 13:02:26  x     GralMng.java                             ::         85.413  0983116106 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-10-01 21:11:17  x     GralPanelContent.java                    ::         21.330  1579378398 
@@ -106,14 +106,14 @@
 2022-08-31 20:31:40  x     GralShowMethods.java                     ::         11.732 -1383563975 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
 2022-09-29 13:20:52  x     GralTabbedPanel.java                     ::         10.836  1475394654 
-2022-10-03 09:53:08  x     GralTable.java                           ::        110.600  0058253778 
+2022-10-03 23:50:55  x     GralTable.java                           ::        110.600  0058253778 
 2022-08-28 19:46:09  x     GralTextBox.java                         ::          7.541 -1701715115 
 2022-10-02 00:25:36  x     GralTextField.java                       ::         34.219  0562797798 
 2022-10-01 23:10:04  x     GralValueBar.java                        ::          6.216 -0483513653 
 2022-10-02 00:05:26  x     GralWidgImplAccess_ifc.java              ::          5.922 -1810177720 
-2022-10-03 10:36:15  x     GralWidget.java                          ::        102.019 -1251711304 
+2022-10-04 12:54:11  x     GralWidget.java                          ::        102.047 -0560642245 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
-2022-10-02 23:06:46  x     GralWindow.java                          ::         17.299 -1391907579 
+2022-10-04 12:58:17  x     GralWindow.java                          ::         17.938  0179808890 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
 2013-07-15 11:52:00  x     package-info.java                        ::           .413  0984628564 
 
@@ -146,7 +146,7 @@
 2015-10-17 00:15:41  x     GralColor.java                           ::         18.443  0689480018 
 2021-10-04 14:29:52  x     GralCurveViewTrack_ifc.java              ::          4.578 -1455091053 
 2022-09-28 16:22:10  x     GralCurveView_ifc.java                   ::          6.191 -0611928841 
-2022-09-15 20:57:23  x     GralFactory.java                         ::          7.965  1250788506 
+2022-10-04 13:03:06  x     GralFactory.java                         ::          7.941 -0962348038 
 2021-10-04 14:29:56  x     GralFileDialog_ifc.java                  ::          2.614 -1407969796 
 2022-02-03 17:00:02  x     GralFont.java                            ::          4.116  0728527525 
 2021-10-04 14:29:58  x     GralImageBase.java                       ::          1.665  1705007261 
@@ -166,7 +166,7 @@
 2012-03-03 22:57:02  x     GralTextBox_ifc.java                     ::          1.702 -1517010727 
 2013-10-05 22:24:09  x     GralTextFieldUser_ifc.java               ::          1.984 -1959108607 
 2022-01-29 11:03:38  x     GralTextField_ifc.java                   ::          3.646  0900239116 
-2021-10-04 14:29:52  x     GralUserAction.java                      ::          8.480 -1239387646 
+2022-10-04 11:59:03  x     GralUserAction.java                      ::          8.484 -0357204153 
 2015-01-23 16:28:33  x     GralVisibleWidgets_ifc.java              ::          2.043 -1973459872 
 2021-10-04 14:29:49  x     GralWidgetCfg_ifc.java                   ::          1.684 -1306922916 
 2022-10-01 23:10:04  x     GralWidget_ifc.java                      ::         22.792 -0611814378 
@@ -186,7 +186,7 @@
 2022-10-02 00:34:44  x     SwtCurveView.java                        ::         28.071  0486348618 
 2021-10-04 14:29:52  x     SwtDragListener.java                     ::          4.215 -0163176230 
 2021-10-04 14:29:56  x     SwtDropListener.java                     ::          4.387  1572688082 
-2022-09-15 17:02:15  x     SwtFactory.java                          ::          1.219  0608525946 
+2022-10-04 13:05:00  x     SwtFactory.java                          ::          1.279  1449622612 
 2021-10-04 14:29:51  x     SwtFileDialog.java                       ::          2.599  0926614304 
 2021-10-04 14:29:57  x     SwtFocusAction.java                      ::          1.927 -1969829240 
 2021-10-04 14:29:52  x     SwtGralKey.java                          ::          6.489 -0478831585 
@@ -220,7 +220,7 @@
 
 ============================== java/vishiaGui/org/vishia/gral/test/ ================================
 2017-05-06 09:27:19  x     FqAnalyzer.java                          ::          4.507  0650199554 
-2022-08-28 19:15:46  x     GralColorShow.java                       ::         65.207 -1964989038 
+2022-10-04 13:03:39  x     GralColorShow.java                       ::         65.207 -1964989038 
 2022-08-28 18:50:11  x     GralPlotWindow.java                      ::          3.150  1768949326 
 2022-08-28 18:47:17  x     HelloWorld.java                          ::          2.524 -0689860079 
 2018-09-17 13:34:40  x     HelloWorldScript.java                    ::           .974  0896076645 
@@ -244,7 +244,7 @@
 
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2021-10-04 14:29:57  x     ButtonInspcCmd.java                      ::           .520  1765509099 
-2022-09-30 21:36:11  x     InspcCurveView.java                      ::         61.557 -0394163675 
+2022-10-04 12:03:49  x     InspcCurveView.java                      ::         62.308  1185953246 
 2022-09-30 20:40:12  x     InspcCurveViewApp.java                   ::          6.997  1696805184 
 2022-09-28 23:54:27  x     InspcFieldTable.java                     ::         25.484  1663052662 
 2022-09-19 19:07:30  x     InspcGui.java                            ::         22.660  1726505324 
@@ -254,8 +254,8 @@
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
 2022-09-23 10:23:34  x     OamOutFileReader.java                    ::          3.543  1655028191 
 2022-09-28 00:08:24  x     OamRcvValue.java                         ::         10.012  1313704107 
-2022-09-28 22:01:26  x     OamShowValues.java                       ::         23.213 -0686136891 
-2022-10-02 21:48:14  x     ViewCfg.java                             ::         16.264  0671323407 
+2022-10-04 11:10:57  x     OamShowValues.java                       ::         23.229 -0012643317 
+2022-10-04 12:09:51  x     ViewCfg.java                             ::         17.288  1699570584 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
 2022-10-03 13:57:14  x     StimuliSelector.java                     ::         42.683 -1769904483 

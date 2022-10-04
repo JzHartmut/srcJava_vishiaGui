@@ -10,15 +10,20 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactorySocket;
+import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.area9.GuiCallingArgs;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.cfg.GralCfgZbnf;
+import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
+import org.vishia.guiInspc.InspcCurveView;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -65,9 +70,11 @@ public class ViewCfg //extends GuiCfg
    */
   //private final MsgReceiver msgReceiver;
   
-  public final GralMng gralMng;
+  public final GralMng gralMng = new GralMng(null);
   
   public final GralWindow window;
+  
+  final InspcCurveView curveView;
   
   public final LogMessage logCfg;
   
@@ -224,15 +231,10 @@ public class ViewCfg //extends GuiCfg
       }
     }
     this.logCfg = new LogMessageStream(System.out, null, fLogFile, true, null);
-    
-    
-    
+    this.gralMng.setLog(this.logCfg);;
     //super(cargs, cmdgui, null, null, null);
 
-    int error = 0;    
     if(cargs.fileGuiCfg !=null) {
-      GralMng gralMng = GralMng.get();
-      this.gralMng = gralMng;
 //      gralMng.registerUserAction(null, this.action_dropFilePath);
 //      gralMng.registerUserAction(null, this.action_exec);
 //      gralMng.registerUserAction(null, this.action_abortCmd);
@@ -249,6 +251,20 @@ public class ViewCfg //extends GuiCfg
     } else {
       throw new IllegalArgumentException("argument -gui:path/to/gui.cfg is mandatory. ");
     }
+    this.oamShowValues = new OamShowValues(this.logCfg, this.gralMng);
+    //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
+    
+    this.logCfg.flush();
+    GralWidget btnCurveView = gralMng.getWidget("curveWindow");
+    if(btnCurveView !=null && btnCurveView instanceof GralButton) {
+      FileRemote dirCfg = FileRemote.fromFile(new File("T:/"));
+      FileRemote dirSave = FileRemote.fromFile(new File("T:/"));
+      this.curveView = new InspcCurveView("curveView", this.oamShowValues.accessOamVariable, this.gralMng, dirCfg, dirSave, ".", null);
+      //((GralButton)btnCurveView).set
+      btnCurveView.specifyActionChange(null, this.actionShowCurveWindow, null);
+    } else {
+      this.curveView = null;
+    }
     this.window.mainPanel.reportAllContent(this.logCfg);
     this.logCfg.flush();
     if(cargs.graphicFactory ==null) {
@@ -258,19 +274,17 @@ public class ViewCfg //extends GuiCfg
     this.logCfg.flush();
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
+    //
+    //
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
-    
-  
-  
-    this.oamShowValues = new OamShowValues(this.logTextbox, this.gralMng);
-    //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
-    
     if(this.callingArguments.sOwnIpcAddr !=null) {
       this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox, this.callingArguments);
     } else { 
       this.oamRcvUdpValue = null;
     }
-    this.logCfg.flush();
+    
+  
+  
     //msgReceiver = new MsgReceiver(console, dlgAccess, cargs.sTimeZone);
     
   
@@ -443,4 +457,12 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
     System.exit(errlev);
   } 
 
+  
+  GralUserAction actionShowCurveWindow = new GralUserAction("showCurveWindow") {
+    public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params ) {
+      ViewCfg.this.curveView.showWindow(true);
+      return true;
+    }
+  };  
+  
 }

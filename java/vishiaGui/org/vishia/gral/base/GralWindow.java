@@ -158,19 +158,32 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * @param currPos will be cloned to the widget, either ready to use or base pos with posString.
    *   The position of a window describes the size and the first position on the screen.
    * @param refPos reference position for build a relative position
-   * @param posName possible position and name
-   * @param sTitle can be null then the name is used as title.
+   * @param posName possible position and name. Syntax [@<position> =]<$?name>
+   *   If name ends with "Win" or "Window" then the panel name is the same without "Win" or "Window".
+   *   Else the panel name is the same + "Panel".
+   * @param sTitle can be null then the name is used as title without trailing "Win" or "Window".
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
    */
   public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
     super(refPos, posName, 'w', gralMng);
-    this.dyda.displayedText = sTitle == null ? super.name : sTitle;  //maybe null
+    int lenNameWindow = super.name.length();
+    final String sNamePanel;
+    final String sTitleDefault;
+    if(super.name.endsWith("Window")) {
+      sNamePanel = sTitleDefault = super.name.substring(0, lenNameWindow-6);
+    } else if(super.name.endsWith("Win")) {
+      sNamePanel = sTitleDefault = super.name.substring(0, lenNameWindow-3);
+    } else {
+      sNamePanel = super.name + "Panel";
+      sTitleDefault = super.name;
+    }
+    this.dyda.displayedText = sTitle == null ? sTitleDefault : sTitle;  //maybe null
     this.windProps = windProps;
     GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
-    this.mainPanel = new GralPanelContent(posPanel, this.name + "Panel", this.gralMng());
+    this.mainPanel = new GralPanelContent(posPanel, sNamePanel, this.gralMng());
     //                                                     // A window has anytime only one GralPanel, the mainPanel.
-    gralMng.setFirstlyThePrimaryWindow(this);
+    gralMng.registerWindow(this);
     if((windProps & windResizeable)!=0){
       this.resizeAction = new ActionResizeOnePanel();
     }

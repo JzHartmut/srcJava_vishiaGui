@@ -11,7 +11,11 @@ public class SwtFactory extends GralFactory
   
   
   /**Initializes the {@link SwtGraphicThread#SwtGraphicThread(GralWindow, char, LogMessage)}
-   * and waits for execution of {@link GralGraphicThread#run()} till the point where the {@link GralGraphicThread#orderList}
+   * and waits for execution of 
+   * 
+   * {@link GralGraphicThread#run()} (set a breakpoint here to step into)
+   * 
+   * till the point where the {@link GralGraphicThread#orderList}
    * is started to run. Then the {@link GralGraphicThread#waitForStart()} is fulfilled,
    * and this operation returns with the {@link GralGraphicThread} instance to use for further orders.
    * The orders are given to the GraphicThread usual by {@link GralWidget#repaint()} requested with the changed data of the widget.

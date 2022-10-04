@@ -765,6 +765,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param whatIs See {@link #whatIs}
    */
   public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
+    assert(gralMng !=null);
     int posName;
     this.itsMng = gralMng;
     final GralPos currPos1;

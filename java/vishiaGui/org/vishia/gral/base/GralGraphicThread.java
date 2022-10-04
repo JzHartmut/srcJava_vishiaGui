@@ -306,6 +306,9 @@ public class GralGraphicThread implements Runnable
     long guiThreadId1 = Thread.currentThread().getId(); // should set firstly because in createImplWidget_Gthread it is necesarry. 
     this.graphicThreadId = guiThreadId1;
     impl.initGraphic();
+  //  for(GralWindow wind: this.)
+    
+    
     //add important properties for the main window, the user should not thing about:
     impl.mainWindow.windProps |= GralWindow.windIsMain  | GralWindow.windHasMenu;
     if((impl.mainWindow.windProps & GralWindow_ifc.windMinimizeOnClose)==0) {

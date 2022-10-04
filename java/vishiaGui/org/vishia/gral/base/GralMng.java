@@ -7,7 +7,6 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +27,12 @@ import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -288,19 +287,27 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralGridProperties propertiesGui;
 
   /**Index of all input fields to access symbolic for all panels. */
-  protected final Map<String, GralWidget> indexNameWidgets = new TreeMap<String, GralWidget>();
+  protected final Map<String, GralWidget> idxNameWidgets = new TreeMap<String, GralWidget>();
 
   /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
    * because the set is used independently from the graphic system. */
-  protected final Map<String, GralWidget> showFields = new TreeMap<String, GralWidget>();
+  protected final Map<String, GralWidget> idxShowFields = new TreeMap<String, GralWidget>();
 
   //private final IndexMultiTable showFieldsM;
 
-  private final List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
- 
+  //public final GralWidgetHelper widgetHelper;
+  
+  /**Map of all panels. A panel may be a dialog box etc. */
+  protected final Map<String, GralPanel_ifc> idxPanels = new TreeMap<String,GralPanel_ifc>();
+
+  /**Map of all windows. One of them is the primary one */
+  protected final Map<String, GralWindow> idxWindows = new TreeMap<String,GralWindow>();
+
   /**The one instance of the primary window created in the {@link org/vishia/ifc/GralFactory#createWindow(String, String, int)} . */
   private GralWindow windPrimary;
-  
+
+  private final List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
+ 
   /**Three windows as sub window for html help, info and logging created if the primary window is created. */
   public GralInfoBox infoHelp, infoBox, infoLog;
   
@@ -375,190 +382,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   //public final GralWidgetHelper widgetHelper;
   
-	/**Creates an nee Panel Manager in a new Window.
-	 * @param graphicBaseSystem
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static GralMng createWindow(String graphicBaseSystem)
-	{ Class<GralMng> mngClass;
-		GralMng mng = null;
-		String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
-		try{ 
-			mngClass = (Class<GralMng>) Class.forName(sGraphicBaseSystem);
-		} catch(ClassNotFoundException exc){ mngClass = null; }
-		
-		if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
-		try{ 
-			Constructor<GralMng> ctor = mngClass.getConstructor();
-			mng = ctor.newInstance();
-			//mng = mngClass.newInstance();
-		
-		} catch(IllegalAccessException exc){ throw new IllegalArgumentException("Graphic base system access error: " + sGraphicBaseSystem);
-		} catch(InstantiationException exc){ throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
-		} catch (SecurityException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
-		} catch (NoSuchMethodException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
-		} catch (IllegalArgumentException exc) {throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
-		} catch (InvocationTargetException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
-		}
-		return mng;
-	}
-	
-  PosThreadSafe pos() 
-  { long threadId1 = Thread.currentThread().getId();
-    PosThreadSafe ret = posCurrent;   //thread safe: atomic access, use ret.
-    if(ret.threadId != threadId1) {   //only access to map if necessary.
-      Long threadId = new Long(threadId1);
-      ret = posThreadSafe.get(threadId);
-      if(ret == null){
-        ret = new PosThreadSafe(posCurrent.pos); //copy values from the last one 
-        posThreadSafe.put(threadId, ret);
-      }
-    }
-    posCurrent = ret;                 //store for next access, it may be faster.
-    return ret;
-  }
-  
-  
-  
-  
-  
-  /**Sets the position in a Thread safe kind. 
-   * @param pos maybe gotten from {@link #getPositionInPanel()} any slightly varied
-   */
-  public void setPos(GralPos pos) {
-    pos().pos.set(pos);
-  }
-  
-  
-  
-  /**Sets the position with a given String, see {@link GralPos#setPosition(CharSequence, GralPos)}
-   * whereby the parent is the current position value.
-   * @param sPosition
-   * @throws ParseException
-   */
-  public GralPos setPos(String sPosition) 
-  throws ParseException
-  { PosThreadSafe pos = pos();
-    pos.pos.setPosition(sPosition, null);
-    pos.posUsed = false;
-    return pos.pos;
-  }
-  
-  @Override public void setPositionSize(int line, int column, int height, int width, char direction)
-  { PosThreadSafe pos = pos();
-    if(line < 0){ line = pos.posUsed? GralPos.next: GralPos.same; }
-    if(column < 0){ column = pos.posUsed? GralPos.next: GralPos.same; }
-    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos.pos);
-  }
-
-  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction)
-  { setPosition(pos().pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
-  }
-
-
-  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction, float border)
-  { PosThreadSafe pos = pos();
-    pos.pos.setPosition(pos.pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
-    pos.posUsed = false;
-  }
-
-
-  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction)
-  { PosThreadSafe pos = pos();
-    pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
-    pos.posUsed = false;
-  }
-  
-  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction, float border)
-  { PosThreadSafe pos = pos();
-      pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
-      pos.posUsed = false;
-  }
-  
-  @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
-    , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralPos frame)
-  { PosThreadSafe pos = pos();
-    pos.pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
-    pos.posUsed = false;
-  }
-  
-  
-  @Override public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
-  { PosThreadSafe pos = pos();
-    pos.pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
-    pos.posUsed = false;
-  }
-  
-  /**Sets the size of the position and remark it as unused. 
-   * @param height
-   * @param width
-   */
-  public void setSize(float height, float width)
-  { PosThreadSafe pos = pos();
-    pos.pos.setSize(height, width, pos.pos);
-    pos.posUsed = false;
-  }
-  
-  /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
-   * See @link GralPos#setNextPosition(), {@link #posUsed}. TODO remove in AwtMng*/
-  @Deprecated public void setNextPosition()
-  { PosThreadSafe pos = pos();
-    if(pos.posUsed){
-      pos.pos.setNextPosition();
-    }
-    pos.posUsed = true;
-  }  
-  
-  /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
-   * See @link GralPos#setNextPosition(), {@link #posUsed}. */
-  public void setNextPositionUnused()
-  { PosThreadSafe pos = pos();
-    if(pos.posUsed){
-      pos.pos.setNextPosition();
-    }
-    pos.posUsed = false;
-  }  
-  
-  public void registerShowField(GralWidget widg){
-    //link the widget with is information together.
-    if(widgetsInFocus.size()==0 && widg.getDataPath() !=null) {
-      //it has not a datapath initally. Never come here.
-      widgetsInFocus.add(widg);   //add first widget.
-    }
-    if(widg.name !=null){
-      showFields.put(widg.name, widg);
-    }
-
-  }
-  
-  
-  @Override public GralPos getPositionInPanel(){ return pos().pos.clone(); }
-  
-  public GralPos getPosCheckNext(){ 
-    PosThreadSafe pos = pos();
-    if(pos.posUsed){
-      pos.pos.setNextPosition();
-      pos.posUsed = false;
-    }
-    pos.posUsed = true;
-    return pos.pos.clone(); 
-  }
-  
-  
-  /**Used for deprecated style, without independent GralWidget. TODO remove.
-   * @return Independent GralPos from the GralMng
-   */
-  public GralPos getPosOldPositioning(){ return getPosCheckNext(); }
-	
-  /**Map of all panels. A panel may be a dialog box etc. */
-  protected final Map<String, GralPanel_ifc> panels = new TreeMap<String,GralPanel_ifc>();
-  
-  /**Any kind of TabPanel for this PanelManager TODO make protected
+	/**Any kind of TabPanel for this PanelManager TODO make protected
    */
   public GralTabbedPanel XXXcurrTabPanel;
   
@@ -576,8 +400,6 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   //private String lastClickedVariable;
   
-  @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
-	
   /**Index of all user actions, which are able to use in Button etc. 
    * The user action "showWidgetInfos" defined here is added initially.
    * Some more user-actions can be add calling {@link #registerUserAction(String, GralUserAction)}. 
@@ -620,7 +442,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
     if(GralMng.singleton ==null) { GralMng.singleton = this; } 
     GralPanel_ifc theWholeScreen = new GralScreen();       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
-    this.panels.put("screen", theWholeScreen);
+    this.idxPanels.put("screen", theWholeScreen);
   }
 
   
@@ -658,15 +480,199 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public void setLog(LogMessage log) { this.log = log; }
   
+  //public final GralWidgetHelper widgetHelper;
+  
+  /**Creates an nee Panel Manager in a new Window.
+   * @param graphicBaseSystem
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public static GralMng createWindow(String graphicBaseSystem)
+  { Class<GralMng> mngClass;
+  	GralMng mng = null;
+  	String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
+  	try{ 
+  		mngClass = (Class<GralMng>) Class.forName(sGraphicBaseSystem);
+  	} catch(ClassNotFoundException exc){ mngClass = null; }
+  	
+  	if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
+  	try{ 
+  		Constructor<GralMng> ctor = mngClass.getConstructor();
+  		mng = ctor.newInstance();
+  		//mng = mngClass.newInstance();
+  	
+  	} catch(IllegalAccessException exc){ throw new IllegalArgumentException("Graphic base system access error: " + sGraphicBaseSystem);
+  	} catch(InstantiationException exc){ throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
+  	} catch (SecurityException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
+  	} catch (NoSuchMethodException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
+  	} catch (IllegalArgumentException exc) {throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
+  	} catch (InvocationTargetException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
+  	}
+  	return mng;
+  }
+
+  PosThreadSafe pos() 
+  { long threadId1 = Thread.currentThread().getId();
+    PosThreadSafe ret = posCurrent;   //thread safe: atomic access, use ret.
+    if(ret.threadId != threadId1) {   //only access to map if necessary.
+      Long threadId = new Long(threadId1);
+      ret = posThreadSafe.get(threadId);
+      if(ret == null){
+        ret = new PosThreadSafe(posCurrent.pos); //copy values from the last one 
+        posThreadSafe.put(threadId, ret);
+      }
+    }
+    posCurrent = ret;                 //store for next access, it may be faster.
+    return ret;
+  }
+
+  /**Sets the position in a Thread safe kind. 
+   * @param pos maybe gotten from {@link #getPositionInPanel()} any slightly varied
+   */
+  public void setPos(GralPos pos) {
+    pos().pos.set(pos);
+  }
+
+  /**Sets the position with a given String, see {@link GralPos#setPosition(CharSequence, GralPos)}
+   * whereby the parent is the current position value.
+   * @param sPosition
+   * @throws ParseException
+   */
+  public GralPos setPos(String sPosition) 
+  throws ParseException
+  { PosThreadSafe pos = pos();
+    pos.pos.setPosition(sPosition, null);
+    pos.posUsed = false;
+    return pos.pos;
+  }
+
+  @Override public void setPositionSize(int line, int column, int height, int width, char direction)
+  { PosThreadSafe pos = pos();
+    if(line < 0){ line = pos.posUsed? GralPos.next: GralPos.same; }
+    if(column < 0){ column = pos.posUsed? GralPos.next: GralPos.same; }
+    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos.pos);
+  }
+
+  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction)
+  { setPosition(pos().pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+  }
+
+  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction, float border)
+  { PosThreadSafe pos = pos();
+    pos.pos.setPosition(pos.pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+    pos.posUsed = false;
+  }
+
+  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction)
+  { PosThreadSafe pos = pos();
+    pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+    pos.posUsed = false;
+  }
+
+  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+    , int origin, char direction, float border)
+  { PosThreadSafe pos = pos();
+      pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+      pos.posUsed = false;
+  }
+
+  @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
+    , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralPos frame)
+  { PosThreadSafe pos = pos();
+    pos.pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
+    pos.posUsed = false;
+  }
+
+  @Override public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
+  { PosThreadSafe pos = pos();
+    pos.pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
+    pos.posUsed = false;
+  }
+
+  /**Sets the size of the position and remark it as unused. 
+   * @param height
+   * @param width
+   */
+  public void setSize(float height, float width)
+  { PosThreadSafe pos = pos();
+    pos.pos.setSize(height, width, pos.pos);
+    pos.posUsed = false;
+  }
+
+  /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
+   * See @link GralPos#setNextPosition(), {@link #posUsed}. TODO remove in AwtMng*/
+  @Deprecated public void setNextPosition()
+  { PosThreadSafe pos = pos();
+    if(pos.posUsed){
+      pos.pos.setNextPosition();
+    }
+    pos.posUsed = true;
+  }
+
+  /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
+   * See @link GralPos#setNextPosition(), {@link #posUsed}. */
+  public void setNextPositionUnused()
+  { PosThreadSafe pos = pos();
+    if(pos.posUsed){
+      pos.pos.setNextPosition();
+    }
+    pos.posUsed = false;
+  }
+
+  public void registerShowField(GralWidget widg){
+    //link the widget with is information together.
+    if(widgetsInFocus.size()==0 && widg.getDataPath() !=null) {
+      //it has not a datapath initally. Never come here.
+      widgetsInFocus.add(widg);   //add first widget.
+    }
+    if(widg.name !=null){
+      idxShowFields.put(widg.name, widg);
+    }
+  
+  }
+
+  @Override public GralPos getPositionInPanel(){ return pos().pos.clone(); }
+
+  public GralPos getPosCheckNext(){ 
+    PosThreadSafe pos = pos();
+    if(pos.posUsed){
+      pos.pos.setNextPosition();
+      pos.posUsed = false;
+    }
+    pos.posUsed = true;
+    return pos.pos.clone(); 
+  }
+
+  /**Used for deprecated style, without independent GralWidget. TODO remove.
+   * @return Independent GralPos from the GralMng
+   */
+  public GralPos getPosOldPositioning(){ return getPosCheckNext(); }
+
+  //private String lastClickedDatapath;
+  
+  //private String lastClickedVariable;
+  
+  @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
+
+
   public void setProperties(GralGridProperties props) {
     this.propertiesGui = props;
   }
   
-  public void setFirstlyThePrimaryWindow(GralWindow primaryWindow){
+  /**register a window only called in the {@link GralWindow#GralWindow(GralPos, String, String, int, GralMng)}.
+   * @since 2022-09 renamed from setFirstlyThePrimaryWindow(), and also register all windows.
+   * @param window
+   * TODO should be package private
+   */
+  public void registerWindow(GralWindow window){
     if(this.windPrimary ==null) {
-      this.windPrimary = primaryWindow; 
-      panels.put("primaryWindow", primaryWindow.mainPanel);
+      this.windPrimary = window; 
+      idxPanels.put("primaryWindow", window.mainPanel);
     }
+    this.idxWindows.put(window.name, window);
   };
   
   
@@ -853,14 +859,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   @Override public GralPanel_ifc selectPanel(String sName){ 
     PosThreadSafe pos = pos();
-    GralPanel_ifc panel = this.panels.get(sName);
+    GralPanel_ifc panel = this.idxPanels.get(sName);
     pos.pos.parent = panel;                                // the current pos in GralMng is marked with the panel as parent
     sCurrPanel = sName;
     if(pos.pos.parent == null && XXXcurrTabPanel !=null) {
       //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
       pos.pos.set(XXXcurrTabPanel.pos());  
       pos.pos.parent = XXXcurrTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
-      panels.put(sName, panel);  //TODO unnecessay, see addGridPanel
+      idxPanels.put(sName, panel);  //TODO unnecessay, see addGridPanel
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
     }
@@ -886,13 +892,13 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   @Override public GralWidget getWidget(String name)
-  { return indexNameWidgets.get(name);
+  { return idxNameWidgets.get(name);
   }
   
   
   
   public Iterable<GralWidget> getWidgetIter() {
-    return indexNameWidgets.values();
+    return idxNameWidgets.values();
   }
   
   
@@ -978,11 +984,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   void registerWidget(String name, GralWidget widgd) {
-    indexNameWidgets.put(name, widgd);
+    idxNameWidgets.put(name, widgd);
   }
   
   void removeWidget(String name) {
-    indexNameWidgets.remove(name);
+    idxNameWidgets.remove(name);
   }
   
   @Override public void registerWidget(GralWidget widgd)
@@ -990,7 +996,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 //    PosThreadSafe pos = pos();
 //    GralPanel_ifc panel = widgd.pos() !=null ? widgd.pos().panel : pos.pos.panel;
     if(widgd.name != null){
-      indexNameWidgets.put(widgd.name, widgd);
+      idxNameWidgets.put(widgd.name, widgd);
     }
     //only widgets with size from right TODO percent size too.
 //    boolean toResize = pos.pos.x.p1 < 0 || pos.pos.x.p2 <= 0 || pos.pos.y.p1< 0 || pos.pos.y.p2 <=0; 
@@ -1001,7 +1007,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public void deregisterWidgetName(GralWidget widg)
   {
     if(widg.name != null){
-      indexNameWidgets.remove(widg.name);
+      idxNameWidgets.remove(widg.name);
     }
     
   }
@@ -1019,12 +1025,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param panel The panel.
    */
   @Override public void registerPanel(GralPanel_ifc panel){
-    GralPanel_ifc exist = this.panels.get(panel.getName());
+    GralPanel_ifc exist = this.idxPanels.get(panel.getName());
     if(exist !=null){
       if(exist == panel) System.out.println("info: unnecessary registerPanel " + panel.getName());
       else System.err.println("info: faulty registerPanel " + panel.getName());
     }
-    this.panels.put(panel.getName(), panel);
+    this.idxPanels.put(panel.getName(), panel);
   }
   
   
@@ -1042,7 +1048,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     if(sCurrPanel.equals(panel.getName())) {
 //      sCurrPanel = windPrimary.name;
     }
-    panels.remove(panel.getName());
+    idxPanels.remove(panel.getName());
   }
   
   
@@ -1051,7 +1057,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public Set<Map.Entry<String, GralWidget>> getShowFields()
   {
-    Set<Map.Entry<String, GralWidget>> set =showFields.entrySet();
+    Set<Map.Entry<String, GralWidget>> set =idxShowFields.entrySet();
     return set; //(Set<Entry<String, WidgetDescriptor>>)set;
   }
 
@@ -1059,7 +1065,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public Map<String, String> getAllValues()
   {
       Map<String, String> values = new TreeMap<String, String>();
-  for(GralWidget input: indexNameWidgets.values()){
+  for(GralWidget input: idxNameWidgets.values()){
       String sValue = getValueFromWidget(input);
     values.put(input.name, sValue);
   }
@@ -1068,7 +1074,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   @Override public String getValue(String sName)
   { final String sValue;
-      GralWidget widgetDescr = indexNameWidgets.get(sName);
+      GralWidget widgetDescr = idxNameWidgets.get(sName);
       if(widgetDescr !=null){
           sValue = getValueFromWidget(widgetDescr);
       } else {
@@ -1090,7 +1096,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   public GralPanel_ifc getPanel(String name){
-    return panels.get(name);
+    return idxPanels.get(name);
   }
   
   
@@ -1115,7 +1121,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   private GralWidget findWidget(String name){
-    GralWidget widg = indexNameWidgets.get(name);
+    GralWidget widg = idxNameWidgets.get(name);
     if(widg == null){
       log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
     }
@@ -1902,7 +1908,7 @@ public GralButton addCheckButton(
      */
     @Deprecated public abstract Object getCurrentPanel();
     
-    protected GralWidget indexNameWidgets(String name){ return gralMng.indexNameWidgets.get(name); }
+    protected GralWidget indexNameWidgets(String name){ return gralMng.idxNameWidgets.get(name); }
     
     protected GralUserAction userMainKeyAction(){ return gralMng.userMainKeyAction; }
     
@@ -2106,9 +2112,9 @@ public GralButton addCheckButton(
     return slider;
   }
 
-  @Override public GralTable addTable(String sName, int height, int[] columnWidths)
+  @Override public GralTable addTable(String sPosName, int height, int[] columnWidths)
   {
-    GralTable table = new GralTable<>(sName, height, columnWidths);
+    GralTable table = new GralTable<>(sPosName, height, columnWidths);
     return table;
   }
 

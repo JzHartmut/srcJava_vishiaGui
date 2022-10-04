@@ -86,7 +86,7 @@ public abstract class GralFactory
   @Deprecated public final void createWindow(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize)
   {
     GralMng mng = GralMng.get();
-    mng.setFirstlyThePrimaryWindow(windowg); //checks whether called firstly.
+    mng.registerWindow(windowg); //checks whether called firstly.
     LogMessage log = mng.log;    
     //The graphicthread creates the Swt Window.
     //SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
@@ -143,7 +143,7 @@ public abstract class GralFactory
    */
   public static GralGraphicThread createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
     GralMng mng = GralMng.get();
-    mng.setFirstlyThePrimaryWindow(windowg); //checks whether called firstly.
+    mng.registerWindow(windowg); //checks whether called firstly.
     GralGraphicThread gralThread = null;
     final String sNameFactoryClass;
     if(implementor == null) { implementor = "SWT"; }

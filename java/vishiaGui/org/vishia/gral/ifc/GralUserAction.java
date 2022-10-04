@@ -144,7 +144,7 @@ public abstract class GralUserAction
    *   The user may be test the type of parameter for complex usage.
    * @return true if execution is succeed. false if the users application can't deal with the actionCode or the widget. 
    */
-  public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){ 
+  public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params ) { 
     bCallDeprecated = true; //prevent recursively.
     if(widgd == null || (widgd instanceof GralWidget)){ 
       return userActionGui(actionCode, (GralWidget)widgd, params);  //call this method, it may be overridden.

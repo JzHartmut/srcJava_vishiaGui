@@ -11,6 +11,7 @@ import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.byteData.VariableAccessArray_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Debugutil;
 import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralCurveView;
@@ -45,7 +46,7 @@ public class OamShowValues
    */
   public static final int version = 0x20220826;
   
-  final MainCmdLogging_ifc log;
+  final LogMessage log;
 
   /**Index (fast access) of all variable which are sent from the automation device (contained in the cfg-file). */
   protected final ByteDataSymbolicAccess accessOamVariable;
@@ -86,11 +87,7 @@ public class OamShowValues
   
   //private final float[] valueUserCurves = new float[6];  
 
-  public OamShowValues(
-    MainCmdLogging_ifc log
-  , GralMng guiAccess
-  )
-  {
+  public OamShowValues ( LogMessage log , GralMng guiAccess ) {
     this.log = log;
     this.guiAccess = guiAccess;
     this.accessOamVariable = new ByteDataSymbolicAccess();
@@ -105,9 +102,9 @@ public class OamShowValues
   public boolean readVariableCfg(ViewCfg.CallingArguments args)
   { int nrofVariable = this.cfgOamVariable.readVariableCfg(args.sFileOamVariables.val);
     if( nrofVariable>0){
-      this.log.writeInfoln("success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");
+      this.log.sendMsg(0, "success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");
     } else {
-      this.log.writeError(" variables not access-able from file \"exe/SES_oamVar.cfg\".");
+      this.log.sendMsg(0, " variables not access-able from file \"exe/SES_oamVar.cfg\".");
     }
     this.varTimeMilliSecFromBaseyear = this.accessOamVariable.getVariable("time_milliseconds1970");
     return nrofVariable >0;

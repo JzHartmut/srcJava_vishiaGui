@@ -23,7 +23,8 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveViewTrack_ifc;
 import org.vishia.gral.ifc.GralCurveView_ifc;
-import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
+import org.vishia.gral.ifc.GralFactory;
+//import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -233,25 +234,28 @@ public final class InspcCurveView
   
   GralCurveView widgCurve;
   
-  /**Creates the instance. The graphical appearance will not be created. 
-   * Call {@link #buildGraphic(GralPrimaryWindow_ifc, GralColorSelector)} to do that.
-   * @param sName Name shown in title bar
+  /**Creates the instance with all Gral Widgets. The graphical appearance will not be created. 
+   * Call {@link GralFactory#createGraphic(GralWindow, char, org.vishia.msgDispatch.LogMessage) to do that with the whole graphic definition.
+   * @param sName Name shown in title bar, can also contain a posString syntax ::=[@<position>=]<$-?name>.
+   *   The name is the name of the panel. Example "curveView" or "@screen,12+100,20+100=curveView"
    * @param variables Container to find variables
    * @param gralMng The Gral Graphic Manager
    * @param defaultDir
    * @param curveExporterClasses Class which is used to export curves.
    */
-  InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng
+  public InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng
       , FileRemote defaultDirCfg, FileRemote defaultDirSave, String sHelpDir
       , Map<String, String> curveExporterClasses){
     //this.comm = comm;
-    this.sName = sName;
     this.gralMng = gralMng;
     int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
-    this.windCurve = this.gralMng.createWindow("@screen,12+100,20+100=CurveView", "CurveView", windowProps);
+    final String sPosNameWin = sName.startsWith("@") ? sName + "Window" : "@screen,12+100,20+100=" + sName + "Window";
+    this.windCurve = this.gralMng.createWindow(sPosNameWin, null, windowProps);
+    this.sName = this.windCurve.mainPanel.getName();
+    
     this.colorSelector = new GralColorSelector("colorSelector", this.gralMng);
     //need a panel and position:
-    gralMng.selectPanel("primaryWindow");
+    gralMng.selectPanel("curveView");
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(44, 56, 94, 104, 0, '.');
     this.widgFileSelector = null;
@@ -275,7 +279,7 @@ public final class InspcCurveView
    * @param sName The name, used for menu entry too, sample "curve A"
    */
   public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common)
-  { gralMng.selectPanel("primaryWindow");
+  { gralMng.selectPanel(this.sName);
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(4, 56, 4, 104, 0, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
@@ -295,7 +299,7 @@ public final class InspcCurveView
   public void buildGraphicInCurveWindow(GralCurveView.CommonCurve common)
   {
     int posright = -20;
-    gralMng.selectPanel("primaryWindow");
+    gralMng.selectPanel(this.sName);
     
     gralMng.setPosition(0, -4, 0, posright, 0, 'd');
 //    widgFileSelector.createImplWidget_Gthread();
@@ -387,6 +391,14 @@ public final class InspcCurveView
   }
   
   
+  /**Shows the window if it is deactivated or deactivates the presentation of the Window. 
+   * The Window can be deactivated also by click on the close widget on the title bar as usual in the operation system.
+   * @param bShow false then deactivate.
+   * 
+   */
+  public void showWindow ( boolean bShow) {
+    this.windCurve.setVisible(bShow);
+  }
   
   
   void fillTableTracks() {
