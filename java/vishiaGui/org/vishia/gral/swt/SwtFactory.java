@@ -1,6 +1,7 @@
 package org.vishia.gral.swt;
 
 import org.vishia.gral.base.GralGraphicThread;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
@@ -21,8 +22,8 @@ public class SwtFactory extends GralFactory
    * The orders are given to the GraphicThread usual by {@link GralWidget#repaint()} requested with the changed data of the widget.
    * It means nothing is necessary with the GralGraphicThread from user level.
    */
-  @Override public void createGraphic(GralWindow windowg, char sizeShow, LogMessage log){
-    SwtMng swtMng = new SwtMng(windowg.gralMng(), sizeShow, log);
+  @Override public void createGraphic(GralMng gralMng, char sizeShow){
+    SwtMng swtMng = new SwtMng(gralMng, sizeShow, gralMng.log);
     
   }
 

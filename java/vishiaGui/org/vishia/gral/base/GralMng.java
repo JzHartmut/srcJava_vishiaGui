@@ -1252,24 +1252,25 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     long guiThreadId1 = Thread.currentThread().getId(); // should set firstly because in createImplWidget_Gthread it is necesarry. 
     this.graphicThreadId = guiThreadId1;
     this._mngImpl.initGraphic();
-  //  for(GralWindow wind: this.)
-    
-    
     //add important properties for the main window, the user should not thing about:
     this.windPrimary.windProps |= GralWindow.windIsMain  | GralWindow.windHasMenu;
     if((this.windPrimary.windProps & GralWindow_ifc.windMinimizeOnClose)==0) {
       //it it should not be minimized, then close, never set Invisible, because it is not possible to set visible again.
       this.windPrimary.windProps |= GralWindow.windRemoveOnClose;
     }
-    //creates all widgets of this primary window.
-    this.windPrimary.createImplWidget_Gthread();
-    this.windPrimary.setWindowVisible( true ); 
-    GralPos pos = this.windPrimary.pos();
-    if(pos.x.p2 == 0 && pos.y.p2 == 0){
-      this.windPrimary.setFullScreen(true);  
+    for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
+      GralWindow wind = ewind.getValue();
+      boolean bVisible = wind == this.windPrimary;
+      //      
+      //======>>>> 
+      wind.createImplWidget_Gthread();           // creates all widgets of the window.
+      wind.setWindowVisible( bVisible ); 
+      GralPos pos = wind.pos();
+      if(pos.x.p2 == 0 && pos.y.p2 == 0){
+        wind.setFullScreen(true);  
+      }
     }
-    this.windPrimary.mainPanel.createImplWidget_Gthread();
-    this.windPrimary.mainPanel.setVisible(true);
+    
     
     this._mngImpl.finishInit();
     try{ this._mngImpl.reportContent(System.out);
@@ -2157,6 +2158,10 @@ public GralButton addCheckButton(
    }
     
     protected GralPos pos(){ return gralMng.pos().pos; }
+    
+    protected Map<String, GralWindow> idxWindows ( ) { return gralMng.idxWindows; }
+
+    protected GralPanel_ifc getPanel ( String name ) { return gralMng.idxPanels.get(name); }
 
     protected String sCurrPanel(){ return gralMng.sCurrPanel; }
     

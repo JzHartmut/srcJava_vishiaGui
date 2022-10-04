@@ -82,7 +82,7 @@ public class InspcCurveViewApp
   
       //this.curveView.windCurve = wind;
       GralFactory gralFactory = new SwtFactory();
-      gralFactory.createGraphic(this.curveView.windCurve, 'C', log);
+      gralFactory.createGraphic(this.gralMng, 'C');
 
       gralMng.addDispatchOrder(reportAllContentImpl);
       

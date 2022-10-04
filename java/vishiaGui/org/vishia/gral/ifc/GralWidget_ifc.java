@@ -184,9 +184,11 @@ public interface GralWidget_ifc extends Removeable
   /**Sets this widget to the current panel at the current given position. 
    * This routine should be called only one time after the Gral widget was created. 
    * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
-   * This method invokes {@link GralMng#createImplWidget_Gthread(GralWidget)} which tests the type of the derived GralWidget
+   * This standard implementation invokes {@link GralMng#createImplWidget_Gthread(GralWidget)} which tests the type of the derived GralWidget
    * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}
-   * which knows the implementation graphic. 
+   * which knows the implementation graphic.
+   * <br>It is possible to have a derived implementation if the GralWidget consists of some more sub widgets.
+   * This is in GralPanelContent.  
    * <br><br><b>Instance structure</b><br>
    * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
    * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 

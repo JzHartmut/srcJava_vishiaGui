@@ -847,12 +847,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void createImplWidget_Gthread() throws IllegalStateException {
     if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
-      GralMng mngg = GralMng.get();  //The implementation should be instantiated already!
       if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-        dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos().pos.height());
+        dyda.textFont = this.itsMng.propertiesGui.getTextFont(this.itsMng.pos().pos.height());
         dyda.setChanged(ImplAccess.chgFont);
       }
-      mngg.createImplWidget_Gthread(this);
+      this.itsMng.createImplWidget_Gthread(this);  //calls Implementation manager functionality
     }
   }
 

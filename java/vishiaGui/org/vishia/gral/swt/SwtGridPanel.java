@@ -67,7 +67,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
 
   public SwtGridPanel(final GralPanelContent wdgg, final int style) {
     super(wdgg);
-    final SwtMng swtMng = (SwtMng) GralMng.get()._mngImpl;
+    final SwtMng swtMng = (SwtMng) wdgg.gralMng()._mngImpl;
     final Composite parent = SwtMng.getSwtParent(wdgg.pos());
     final Rectangle areaParent = parent.getClientArea();
     Composite swtPanel;

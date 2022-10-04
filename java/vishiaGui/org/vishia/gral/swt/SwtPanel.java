@@ -94,11 +94,14 @@ public class SwtPanel extends GralPanelContent.ImplAccess
    */
   public SwtPanel(GralPanelContent panelg, Composite panelSwt)
   { super(panelg);
-    panelSwtImpl = panelSwt;
-    if(panelSwt !=null){
-      panelSwt.addControlListener(resizeItemListener);
+    if(panelSwt ==null){
+      Composite swtParent = (Composite)SwtMng.getSwtImpl(panelg.pos().parent);
+      this.panelSwtImpl = new Composite(swtParent,0);
+    } else {
+      panelSwtImpl = panelSwt;
     }
-//    this.swtGralWindow = null;
+    panelSwt.addControlListener(resizeItemListener);
+    super.createALlImplWidgets();
   }
 
   /*

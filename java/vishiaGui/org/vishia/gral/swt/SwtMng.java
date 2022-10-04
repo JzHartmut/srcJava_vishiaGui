@@ -1271,7 +1271,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   @Override public void reportContent(Appendable out) throws IOException {
-    reportContent(out, (Composite)getSwtImpl(this.gralMng.getPrimaryWindow()), 0);
+    for(Map.Entry<String,GralWindow> ewind: this.idxWindows().entrySet()) {
+      GralWindow wind = ewind.getValue();
+      out.append("\n==== Window: ").append(wind.getName()).append("\n");
+      reportContent(out, (Composite)getSwtImpl(wind), 0);
+    }
   }
   
   static final String nl = "\n| | | | | | | | ";

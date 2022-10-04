@@ -169,10 +169,10 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
    * @param gralMng
    * @throws IOException 
    */
-  SwtSubWindow(SwtMng mng, GralWindow wdgGral) throws IOException
+  SwtSubWindow(SwtMng mng, GralWindow gralWindow) throws IOException
   //SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { //super(name, windProps, gralMng, null);
-    super(wdgGral );  //Invoke constructor of the super class, with knowledge of its outer class.
+    super(gralWindow );  //Invoke constructor of the super class, with knowledge of its outer class.
     int props = 0; ////|SWT.CLOSE;
     String sTitle = this.getTitle();
     int windProps = super.getWindowProps();
@@ -193,9 +193,9 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     //
     //create the window:
     window = new Shell(mng.displaySwt, props);
-    window.setData(wdgGral);
+    window.setData(gralWindow);
     super.wdgimpl = this.swtWidgWrapper = new SwtWidgetHelper(window, mng);
-    GralRectangle rect = mng.calcPositionOfWindow(wdgGral.pos());
+    GralRectangle rect = mng.calcPositionOfWindow(gralWindow.pos());
     window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     if(rect.dx == -1)  { //TODO
       window.setMaximized(true);
@@ -224,6 +224,12 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     this.widgg.toString(System.out);
 
     //super.checkCreateTabFolder(this.window, mng);
+    assert(gralWindow.mainPanel !=null);
+    //if(gralWindow.mainPanel.isTabbed()) {
+      gralWindow.mainPanel.createImplWidget_Gthread();  //extra panel because the Shell is only a simple Composite
+//    } else {
+//      gralWindow.mainPanel._wdgImpl = new SwtPanel(gralWindow.mainPanel, window);
+//    }
     
     
     /* test

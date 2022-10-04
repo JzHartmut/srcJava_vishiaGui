@@ -248,7 +248,7 @@ public final class InspcCurveView
       , Map<String, String> curveExporterClasses){
     //this.comm = comm;
     this.gralMng = gralMng;
-    int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
+    int windowProps = GralWindow_ifc.windResizeable;
     final String sPosNameWin = sName.startsWith("@") ? sName + "Window" : "@screen,12+100,20+100=" + sName + "Window";
     this.windCurve = this.gralMng.createWindow(sPosNameWin, null, windowProps);
     this.sName = this.windCurve.mainPanel.getName();

@@ -66,7 +66,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
    */
   protected SwtCanvasStorePanel(GralPanelContent panelg)
   {
-    super(panelg, (Composite)null);
+    super(panelg);
 //    gralPanel().canvas = new GralCanvasStorage();
   }
   

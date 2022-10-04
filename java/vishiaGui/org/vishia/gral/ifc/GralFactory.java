@@ -115,7 +115,7 @@ public abstract class GralFactory
    * @param log a log necessary?
    * @return the Graphic Thread can be used to add {@link GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicTimeOrder)}.
    */
-  public abstract void createGraphic(GralWindow windowg, char sizeShow, LogMessage log);
+  public abstract void createGraphic(GralMng gralMng, char sizeShow);
   
   
   
@@ -144,7 +144,6 @@ public abstract class GralFactory
   public static GralMng createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
     GralMng mng = GralMng.get();
     mng.registerWindow(windowg); //checks whether called firstly.
-    GralGraphicThread gralThread = null;
     final String sNameFactoryClass;
     if(implementor == null) { implementor = "SWT"; }
     if(implementor.equals("SWT")) { sNameFactoryClass = "org.vishia.gral.swt.SwtFactory"; }
@@ -162,7 +161,7 @@ public abstract class GralFactory
       throw new RuntimeException(sError, exc);
     }
     try { //this start the GralGraphicThread, see run(). There the primaryWindow will be created.
-      factory.createGraphic(windowg, sizeShow, log);
+      factory.createGraphic(mng, sizeShow);
     } catch(Exception exc) {
       String sError = "Exception initializing graphic: " + exc.getMessage();
       System.err.println(sError);

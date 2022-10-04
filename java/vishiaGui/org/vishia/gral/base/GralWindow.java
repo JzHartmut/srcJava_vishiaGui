@@ -241,6 +241,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
 
   
+
+  
   @Override public void setWindowVisible(boolean visible){
     setVisible(visible);
   }

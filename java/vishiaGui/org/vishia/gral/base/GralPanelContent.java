@@ -540,7 +540,14 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     
     protected boolean isTabbed() { return this.gralPanel._panel.pixelTab >=0; }
     
-    
+    /**Called on creation of the Panel, maybe also from a window's panel.
+     * 
+     */
+    protected void createALlImplWidgets ( ) {
+      for(GralWidget widg: this._panel.widgetList) {
+        widg.createImplWidget_Gthread();
+      }
+    }
     
   }
   

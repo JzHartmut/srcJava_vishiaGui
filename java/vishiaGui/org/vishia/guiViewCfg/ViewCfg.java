@@ -270,7 +270,7 @@ public class ViewCfg //extends GuiCfg
     if(cargs.graphicFactory ==null) {
       cargs.graphicFactory = new SwtFactory();         // default use SWT.
     }
-    cargs.graphicFactory.createGraphic(this.window, cargs.sizeShow, this.logCfg);
+    cargs.graphicFactory.createGraphic(this.gralMng, cargs.sizeShow);
     this.logCfg.flush();
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
@@ -436,9 +436,12 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
     try {
       
       new InterProcessCommFactorySocket();
+      //
+      //======>>>>
       ViewCfg main = new ViewCfg(cargs);                   // reads all config files, creates Graphic
       main.initViewCfg(cargs);
       main.logCfg.close();                                 // close the configuration log, it is done.
+      //
       //main.execute();
       main.doSomethinginMainthreadTillClosePrimaryWindow();
       if(main.oamRcvUdpValue !=null) {  
