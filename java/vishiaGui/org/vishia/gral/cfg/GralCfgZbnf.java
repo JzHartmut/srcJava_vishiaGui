@@ -596,6 +596,7 @@ public class GralCfgZbnf
       }
     } else { mouseAction = null; }
     */
+    boolean bColor0Set = false, bColor1Set = false;
     //
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
@@ -613,6 +614,7 @@ public class GralCfgZbnf
       GralLabel widg = new GralLabel(this.currPos, wText.name, wText.text, origin);
       if(color0 !=null) widg.setTextColor(color0);
       if(color1 !=null) widg.setBackColor(color1, 0);
+      bColor0Set = bColor1Set = true;
       this.widgets.add(widgd = widg);
     } 
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
@@ -672,7 +674,7 @@ public class GralCfgZbnf
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
-      GralCurveView widg = new GralCurveView(this.currPos, sName, 10000, null, null);
+      GralCurveView widg = new GralCurveView(this.currPos, sName, widgt.nrofPoints, null, null);
       widg.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.data;
@@ -765,10 +767,10 @@ public class GralCfgZbnf
       if(cfge.widgetType.help!=null){
         widgd.setHtmlHelp(cfge.widgetType.help);
       }
-      if(cfge.widgetType.color0 != null){
+      if(cfge.widgetType.color0 != null && !bColor0Set){
         widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);
       }
-      if(cfge.widgetType.color1 != null){
+      if(cfge.widgetType.color1 != null && !bColor1Set){
         widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
       }
       if(cfge.widgetType.dropFiles !=null){

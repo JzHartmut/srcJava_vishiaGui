@@ -779,10 +779,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   {
     super(refPos, sPosName, 'c');
     this.common = curveVariables == null ? new CommonCurve() : curveVariables;
-
+    int maxNrofXvaluesT = tracksValues !=null ? tracksValues.getLength() : maxNrofXvaluesP; 
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
-    while(maxNrofXvalues1 < maxNrofXvaluesP){
+    while(maxNrofXvalues1 < maxNrofXvaluesT){
       maxNrofXvalues1 <<=1;
       shIxData1 -=1;
     }

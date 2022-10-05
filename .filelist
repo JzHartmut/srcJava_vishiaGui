@@ -88,7 +88,7 @@
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2022-10-01 23:10:04  x     GralButton.java                          ::         20.827  1534883600 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
-2022-10-05 11:59:57  x     GralCurveView.java                       ::         91.956 -1965936514 
+2022-10-06 00:17:53  x     GralCurveView.java                       ::         92.048  0464304828 
 2022-10-04 16:22:22  x     GralGraphicThread.java                   ::          9.083  1072146655 
 2022-10-04 13:32:33  x     GralGraphicTimeOrder.java                ::          4.589 -1756605737 
 2022-09-15 16:23:24  x     GralGridProperties.java                  ::         13.029 -0342778063 
@@ -101,7 +101,7 @@
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-10-04 22:06:18  x     GralPanelContent.java                    ::         21.569 -1369043375 
-2022-10-01 21:08:43  x     GralPos.java                             ::         64.878 -0868917585 
+2022-10-05 22:35:19  x     GralPos.java                             ::         64.983  1060474599 
 2022-09-30 20:22:54  x     GralScreen.java                          ::          4.210  1662269645 
 2022-08-31 20:31:40  x     GralShowMethods.java                     ::         11.732 -1383563975 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
@@ -126,7 +126,7 @@
 2022-08-28 20:05:36  x     GralCfgPosition.java                     ::          5.088  0166729575 
 2022-09-19 19:00:50  x     GralCfgWindow.java                       ::          7.266 -1142317415 
 2022-08-28 20:17:41  x     GralCfgWriter.java                       ::         10.486 -0873649842 
-2022-10-04 22:51:55  x     GralCfgZbnf.java                         ::         35.263 -1688944422 
+2022-10-06 00:05:52  x     GralCfgZbnf.java                         ::         35.394 -0882870295 
 2022-10-02 10:58:13  x     Syntax.zbnf                              ::          4.959  2048561560 
 2012-03-28 07:42:16  x     package-info.java                        ::           .907  0254677754 
 
@@ -230,8 +230,8 @@
 ============================== java/vishiaGui/org/vishia/gral/widget/ ==============================
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2018-10-28 10:18:44  x     GralCommandSelector.java                 ::          8.507 -1870745650 
-2018-10-27 18:48:45  x     GralFileSelectWindow.java                ::          8.251  0842102366 
-2022-09-29 01:07:09  x     GralFileSelector.java                    ::         68.021 -0992967902 
+2022-10-05 22:49:08  x     GralFileSelectWindow.java                ::          8.252 -0610930941 
+2022-10-05 22:43:12  x     GralFileSelector.java                    ::         68.730  0447960462 
 2022-10-01 23:10:04  x     GralHorizontalSelector.java              ::         10.650  0601742095 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2022-10-03 11:04:54  x     GralInfoBox.java                         ::         15.529  0030158747 
@@ -244,7 +244,7 @@
 
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2021-10-04 14:29:57  x     ButtonInspcCmd.java                      ::           .520  1765509099 
-2022-10-04 22:56:00  x     InspcCurveView.java                      ::         62.479  2078220811 
+2022-10-05 22:57:34  x     InspcCurveView.java                      ::         62.511  1372794364 
 2022-10-04 22:57:42  x     InspcCurveViewApp.java                   ::          6.919 -0858632023 
 2022-09-28 23:54:27  x     InspcFieldTable.java                     ::         25.484  1663052662 
 2022-10-04 22:57:04  x     InspcGui.java                            ::         22.714  0685651805 

@@ -376,6 +376,11 @@ public class GralPos implements Cloneable
    */
   public GralPos(GralPos src){ set(src); }
   
+  public GralPos(String pos) throws ParseException {
+    this();
+    this.setPosition(pos, this);
+  }
+  
   /**The border to the next element. */
   //public int xyBorder, xyBorderFrac;
 

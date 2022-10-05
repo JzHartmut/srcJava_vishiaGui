@@ -2,6 +2,7 @@ package org.vishia.gral.widget;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
@@ -742,6 +744,28 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     Debugutil.stop();
   
   }
+  
+  
+  
+  /**New, not tested, instead {@link GralFileSelectWindow} ???
+   * @param posName
+   * @param mng
+   * @return
+   */
+  public static GralFileSelector createGralFileSelectorWindow(String posName, GralMng mng) {
+    GralPos pos = null;
+    try {
+      pos = new GralPos("@screen,0..0,0..0");
+    } catch(ParseException exc) { ExcUtil.throwUnexpect(exc);}
+    new GralFileSelectWindow(posName, mng);
+    int windProps = GralWindow_ifc.windResizeable;
+    GralWindow wind = new GralWindow(pos, posName, null, windProps);
+    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, null);
+    return thiz;
+  }
+  
+  
+  
   
   
   /**Creates the window to confirm search in files. This window can be created only one time

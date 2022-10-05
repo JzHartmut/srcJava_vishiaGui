@@ -150,7 +150,7 @@ public final class InspcCurveView
   GralWindow windVariables;
   
   /**Used for read/write config and for read/write data*/
-  private final GralFileSelector widgFileSelector;
+  private final GralFileSelectWindow windFileSelector;
   
   private String sWhatTodoWithFile;
   
@@ -261,8 +261,9 @@ public final class InspcCurveView
     gralMng.selectPanel("curveView");
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(44, 56, 94, 104, 0, '.');
-    this.widgFileSelector = null;
-    //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
+    //this.widgFileSelector = null;
+    this.windFileSelector = new GralFileSelectWindow("File Selection", gralMng);   //"@screen, 50+40, 50+80"
+//    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
 //    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
 //    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
@@ -289,18 +290,6 @@ public final class InspcCurveView
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop; // | GralWindow.windResizeable;
     //windVariables = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
-    buildGraphicInCurveWindow(common, tracksValues);
-    GralMenu menu = wind.getMenuBar();
-    menu.addMenuItem("&Window/open " + sName, actionOpenWindow);
-  }
-
-  
-  
-  /**Also used from Inspector
-   * @param common
-   */
-  public void buildGraphicInCurveWindow(GralCurveView.CommonCurve common, TimedValues tracksValues)
-  {
     int posright = -20;
     gralMng.selectPanel(this.sName);
     
@@ -390,6 +379,8 @@ public final class InspcCurveView
       this.gralMng.setHelpBase(this.sHelpDir);
       this.gralMng.setHelpUrl("+CurveView_help.html");
     }
+    GralMenu menu = wind.getMenuBar();
+    menu.addMenuItem("&Window/open " + sName, actionOpenWindow);
     
   }
   
@@ -639,7 +630,7 @@ public final class InspcCurveView
   GralUserAction actionOpenWindow = new GralUserAction("actionOpenWindow"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){ 
       windCurve.setVisible(true); //setWindowVisible(true);
-      widgFileSelector.setVisible(false);
+      windFileSelector.openDialog(fileCurveCfg, sBtnReadCfg, false, actionSelectFile); //setVisible(false);
       widgFilename.setVisible(false);
       widgBtnReadCfg.setVisible(true);
       widgCurve.setFocus();
@@ -1121,7 +1112,7 @@ public final class InspcCurveView
         //other button, it is esc
         sWhatTodoWithFile = null;
         widgFilename.setVisible(false);
-        widgFileSelector.setVisible(false);
+        windFileSelector.closeWindow();
         widgCurve.setVisible(true);
         widgBtnReadCfg.setBackColor(colorBtnFileInactive,0);
         widgBtnSaveCfg.setBackColor(colorBtnFileInactive,0);
@@ -1149,9 +1140,10 @@ public final class InspcCurveView
         //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), false, actionReadCfg);
         widgCurve.setVisible(false);
         widgFilename.setVisible(true);
-        widgFileSelector.setVisible(true);
-        widgFileSelector.fillIn(fileCurr, false);
-        widgFileSelector.setFocus();
+        windFileSelector.openDialog(fileCurr, "file", true, null);
+//        windFileSelector.setVisible(true);
+//        windFileSelector.fillIn(fileCurr, false);
+//        windFileSelector.setFocus();
       }
     } catch(Exception exc){
       widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
@@ -1194,7 +1186,7 @@ public final class InspcCurveView
     @SuppressWarnings("synthetic-access") @Override 
     public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){  //supress both mouse up and down reaction
-        FileRemote dir = widgFileSelector.getCurrentDir();
+        FileRemote dir = windFileSelector.fileSelector.getCurrentDir();
         String sFilename = widgFilename.getText();
         FileRemote file;
         if(sFilename.length()==0 || sFilename.equals("..")){
@@ -1220,7 +1212,7 @@ public final class InspcCurveView
         }
         sWhatTodoWithFile = null;
         widgFilename.setVisible(false);
-        widgFileSelector.setVisible(false);
+        windFileSelector.closeWindow();
         widgCurve.setVisible(true);
            
       }
