@@ -111,7 +111,6 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     gridColorStrong = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorCursor = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorBack = new Color(curveSwt.getDisplay(), 0xff, 0xff, 0xff);
-    widgg.initMenuContext();
   }
   
   

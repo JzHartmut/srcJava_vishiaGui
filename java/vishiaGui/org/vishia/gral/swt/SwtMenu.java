@@ -87,6 +87,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
     this.window = parent.getShell();
     this.menuSwt = new Menu(parent);
     parent.setMenu(menuSwt);
+    _implMenu();
   }
 
 

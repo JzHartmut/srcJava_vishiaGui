@@ -34,6 +34,7 @@ import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.util.KeyCode;
 import org.vishia.util.ReplaceAlias_ifc;
+import org.vishia.util.TimedValues;
 
 
 
@@ -621,7 +622,7 @@ public interface GralMngBuild_ifc
    * @param nrofTracks number of curves (tracks).
    * @return The Canvas Object.
    */
-  GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common);
+  GralCurveView addCurveViewY(String sPosName, int nrofXvalues, GralCurveView.CommonCurve common, TimedValues tracksValues);
   
   /**Adds a special text field to select a file. On the right side a small button [<] is arranged
    * to open the standard file select dialog. 

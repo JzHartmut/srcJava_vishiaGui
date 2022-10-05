@@ -39,6 +39,7 @@ import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
+import org.vishia.util.TimedValues;
 
 /**A curve view window inside the inspector.
  * @author hartmut Schorrig
@@ -243,7 +244,9 @@ public final class InspcCurveView
    * @param defaultDir
    * @param curveExporterClasses Class which is used to export curves.
    */
-  public InspcCurveView(String sName, VariableContainer_ifc variables, GralMng gralMng
+  public InspcCurveView(String sName, VariableContainer_ifc variables
+      , GralCurveView.CommonCurve common, TimedValues tracksValues
+      , GralMng gralMng
       , FileRemote defaultDirCfg, FileRemote defaultDirSave, String sHelpDir
       , Map<String, String> curveExporterClasses){
     //this.comm = comm;
@@ -264,7 +267,7 @@ public final class InspcCurveView
 //    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
     this.widgFilename = new GralTextField("-filename", GralTextField.Type.editable);
-    buildGraphic(this.windCurve, colorSelector, null);
+    buildGraphic(this.windCurve, colorSelector, common, tracksValues);
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.fileCurveCfg = defaultDirCfg;
@@ -278,7 +281,7 @@ public final class InspcCurveView
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
-  public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common)
+  public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common, TimedValues tracksValues)
   { gralMng.selectPanel(this.sName);
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(4, 56, 4, 104, 0, '.');
@@ -286,7 +289,7 @@ public final class InspcCurveView
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop; // | GralWindow.windResizeable;
     //windVariables = gralMng.createWindow("windMapVariables", sName, windProps);
     //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
-    buildGraphicInCurveWindow(common);
+    buildGraphicInCurveWindow(common, tracksValues);
     GralMenu menu = wind.getMenuBar();
     menu.addMenuItem("&Window/open " + sName, actionOpenWindow);
   }
@@ -296,7 +299,7 @@ public final class InspcCurveView
   /**Also used from Inspector
    * @param common
    */
-  public void buildGraphicInCurveWindow(GralCurveView.CommonCurve common)
+  public void buildGraphicInCurveWindow(GralCurveView.CommonCurve common, TimedValues tracksValues)
   {
     int posright = -20;
     gralMng.selectPanel(this.sName);
@@ -312,7 +315,7 @@ public final class InspcCurveView
     widgFilename.setVisible(false);
     widgFilename.setText("TEST xyz");
     gralMng.setPosition(0, -2, 0, posright, 0, 'd');
-    widgCurve = gralMng.addCurveViewY(sName, 15000, common);
+    widgCurve = gralMng.addCurveViewY(sName, 15000, common, tracksValues);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
     widgCurve.setActionTrackSelected(actionTrackSelectedFromGralCurveViewCtrlMousePressed);
     gralMng.setPosition(3, GralPos.size -3, posright, -6, 0, 'r', 0);

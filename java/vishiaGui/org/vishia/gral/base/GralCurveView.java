@@ -768,14 +768,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
 
   /**Constructs the CurveView comprehensive widget.
-   * @param currPos CursorPosition currently used for positioning, will be cloned for the widget.
+   * @param refPos reference position will also be changed by given position in sPosName, will be cloned for the widget.
    * @param sName widget name or also "@<position>: name" for cursor positioning relative or absolute.
    * @param maxNrofXvaluesP deepness of values, max. 16000000 (16 Mega), usual 10000 or such. This value will be increased to the next power of 2.
-   * @param curveVariables information about variable, as shared information, or null if only local.
+            Not used if tracksValues are given.
+   * @param curveVariables null or possible given Variable set for more as one curve view
+   * @param tracksValues null or possible given Track Values from another CurveView or such.
    */
-  public GralCurveView(GralPos currPos, String sName, int maxNrofXvaluesP, CommonCurve curveVariables)
+  public GralCurveView(GralPos refPos, String sPosName, int maxNrofXvaluesP, CommonCurve curveVariables, TimedValues tracksValues)
   {
-    super(currPos, sName, 'c');
+    super(refPos, sPosName, 'c');
     this.common = curveVariables == null ? new CommonCurve() : curveVariables;
 
     int maxNrofXvalues1 = 1;
@@ -790,19 +792,21 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     this.mIxData = ~(this.adIxData -1); //all bits which have to be used, mask out lower bits.
     this.mIxiData = maxNrofXValues -1;  //e.g. from 0x1000 to 0xfff
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
-    this.tracksValue = new TimedValues(this.maxNrofXValues);
+    this.tracksValue = tracksValues !=null ? tracksValues       // use given track values
+                     : new TimedValues(this.maxNrofXValues);    // create here the trackValues.
 
     cleanBuffer();
     saveOrg.nrofValuesAutoSave = (int)(maxNrofXValues * 0.75);
     //values = new float[maxNrofXvalues][nrofTracks];
     //setPanelMng(mng);
+    initMenuContext();
     setActionMouse(mouseAction, 0);
-    
+
     //mng.registerWidget(this);
   }
 
-  public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common) {
-    this((GralPos)null, sName, maxNrofXvaluesP, common);
+  @Deprecated public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common) {
+    this((GralPos)null, sName, maxNrofXvaluesP, common, null);
   }  
   
   public void cleanBuffer()

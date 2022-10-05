@@ -977,8 +977,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Control widgSwt = (Control)widg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new SwtMenu(menu, widg, widgSwt);
-    return menu;
+    GralMenu contextMenu = widg.getContextMenu();
+    new SwtMenu(contextMenu, widg, widgSwt);
+    return contextMenu;
   }
  
   

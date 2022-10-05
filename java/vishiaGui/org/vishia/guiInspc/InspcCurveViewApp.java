@@ -75,7 +75,7 @@ public class InspcCurveViewApp
       // ========== The InspcCurveView is a Sub Window on any Window-Application
       // Or it is created as main Window if it is the first one.
       VariableContainer_ifc variables = null;              // has not any variables
-      this.curveView = new InspcCurveView("curves", variables, this.gralMng
+      this.curveView = new InspcCurveView("curves", variables, null, null, this.gralMng
           , fileCfg, fileData, this.argData.dirHtmlHelp.getAbsolutePath(), null);
       this.curveView.windCurve.reportAllContent(log);
       log.flush();

@@ -206,9 +206,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       } else {
         defaultDirSave = null;
       }
-      curveA = new InspcCurveView("curve_A", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
-      curveB = new InspcCurveView("curve_B", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
-      curveC = new InspcCurveView("curve_C", variableMng, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveA = new InspcCurveView("curve_A", variableMng, null, null, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveB = new InspcCurveView("curve_B", variableMng, null, null, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveC = new InspcCurveView("curve_C", variableMng, null, null, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
     }
     fieldsA = new InspcFieldTable(variableMng);
     fieldsB = new InspcFieldTable(variableMng);
@@ -439,9 +439,9 @@ private class InspcGuiCfg extends GuiCfg
     //btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
     //btnSwitchOnLog.setActionChange(actionEnableLog);
     colorSelector = new GralColorSelector("colorSelector", super._gralMng);
-    curveA.buildGraphic(gui.mainWindow(), colorSelector, null);
-    curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());
-    curveC.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData());
+    curveA.buildGraphic(gui.mainWindow(), colorSelector, null, null);
+    curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData(), null);
+    curveC.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData(), null);
     //
     _gralMng.selectPanel("primaryWindow");
     _gralMng.setPosition(14, 84, 4, 64, 0, '.');

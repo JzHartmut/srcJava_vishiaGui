@@ -60,6 +60,7 @@ import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.MinMaxTime;
 import org.vishia.util.ReplaceAlias_ifc;
+import org.vishia.util.TimedValues;
 
 /**This is the Manager for the graphic. 
  * It contains the independent parts of graphic organization.
@@ -2441,9 +2442,9 @@ public GralButton addCheckButton(
     return new GralHtmlBox(pos().pos, name);
   }
 
-  @Override public GralCurveView addCurveViewY(String sName, int nrofXvalues, CommonCurve common)
+  @Override public GralCurveView addCurveViewY(String sPosName, int nrofXvalues, CommonCurve common, TimedValues tracksValues)
   {
-    return new GralCurveView(sName, nrofXvalues, common);
+    return new GralCurveView(this.pos().pos, sPosName, nrofXvalues, common, tracksValues);
   }
 
   @Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter,

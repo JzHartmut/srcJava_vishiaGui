@@ -332,7 +332,7 @@ public class GralCfgBuilder
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
-      GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, null);
+      GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, null, null);
       widgc.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.data;

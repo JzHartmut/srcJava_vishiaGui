@@ -30,6 +30,7 @@ import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.CheckVs;
 import org.vishia.util.FileFunctions;
+import org.vishia.util.TimedValues;
 
 /**This class can be used as Operation and Monitoring for process values. 
  * The GUI design is controlled by a script, see {@link GralCfgZbnf}.
@@ -257,9 +258,18 @@ public class ViewCfg //extends GuiCfg
     this.logCfg.flush();
     GralWidget btnCurveView = gralMng.getWidget("curveWindow");
     if(btnCurveView !=null && btnCurveView instanceof GralButton) {
+      GralWidget gralwidgetCurveView = gralMng.getWidget("userCurves");
+      final GralCurveView.CommonCurve commonCurve; 
+      final TimedValues tracksValues;
+      if(gralwidgetCurveView !=null) {
+        GralCurveView widgetCurveView = (GralCurveView)gralwidgetCurveView;
+        commonCurve = widgetCurveView.common;
+        tracksValues = widgetCurveView.tracksValue;
+      } else { commonCurve = null; tracksValues = null; }
+      
       FileRemote dirCfg = FileRemote.fromFile(new File("T:/"));
       FileRemote dirSave = FileRemote.fromFile(new File("T:/"));
-      this.curveView = new InspcCurveView("curveView", this.oamShowValues.accessOamVariable, this.gralMng, dirCfg, dirSave, ".", null);
+      this.curveView = new InspcCurveView("curveView", this.oamShowValues.accessOamVariable, commonCurve, tracksValues, this.gralMng, dirCfg, dirSave, ".", null);
       //((GralButton)btnCurveView).set
       btnCurveView.specifyActionChange(null, this.actionShowCurveWindow, null);
     } else {

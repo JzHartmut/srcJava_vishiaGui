@@ -853,6 +853,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       }
       this.itsMng.createImplWidget_Gthread(this);  //calls Implementation manager functionality
     }
+    if(this.contextMenu !=null) {
+      this.itsMng._mngImpl.createContextMenu(this);
+    }
+
   }
 
   
@@ -1309,10 +1313,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @return the context menu root for this widget.
    */
   public GralMenu getContextMenu(){
-    if(contextMenu == null){
-      contextMenu = new GralMenu(); //itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+    if( this.contextMenu == null){
+      this.contextMenu = new GralMenu(); //itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
     }
-    return contextMenu;
+    return this.contextMenu;
   }
   
   
@@ -2014,7 +2018,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
     
     
-    /**Constructs the base of the graphic implemantion widget wrapper (SWT, AWT).
+    /**Constructs the base of the graphic implementation widget wrapper (SWT, AWT).
      * Stores the reference to the GralWidget in this.{@link #widgg}
      * Stores the reference to the graphic implementation widget in {@link GralWidget#_wdgImpl}
      * Initializes the pos() from the given {@link GralMng#pos} if it is not given by construction. 
