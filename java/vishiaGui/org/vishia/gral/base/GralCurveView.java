@@ -829,6 +829,26 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   }
   
   
+  public void showAll()
+  {
+    for(int ix = 0; ix < maxNrofXValues; ++ix){
+      //timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
+    }
+    this.tracksValue.cleanSetCapacity(this.maxNrofXValues);
+    this.timeorg.calc();
+    this.timeorg.timeshortAdd = 0;
+    this.timeorg.timeshortLast = 0;
+    this.timeorg.absTime.clean();
+    if(super._wdgImpl !=null) {
+      GraphicImplAccess wdgi = (GraphicImplAccess)super._wdgImpl;
+      wdgi.ixDataDraw = this.ixDataWr =0;
+      wdgi.ixDataCursor1 = wdgi.ixDataCursor2 = 0;
+      wdgi.ixDataShowRight = 0;
+      Arrays.fill(wdgi.ixDataShown, 0);
+    }
+  }
+  
+  
   
   
   /**It will be called after construction of the implementation graphic in the derived ctor.
@@ -839,6 +859,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     //menuCurve.addMenuItemGthread("pause", "pause", null);
     menuCurve.addMenuItem("refresh", actionPaintAll);
     menuCurve.addMenuItem("go", actionGo);
+    menuCurve.addMenuItem("show All", actionShowAll);
     //menuCurve.addMenuItemGthread("zoomOut", "zoom in", null);
     menuCurve.addMenuItem("zoomBetweenCursor", "zoom between Cursors", actionZoomBetweenCursors);
     menuCurve.addMenuItem("zoomOut", "zoom out", actionZoomOut);
@@ -2184,7 +2205,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public GralUserAction actionCleanBuffer = new GralUserAction("actionCleanBuffer"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        cleanBuffer();;
+        cleanBuffer();
+      }
+      return true;
+    }
+  };
+
+  public GralUserAction actionShowAll = new GralUserAction("actionShowAll"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        showAll();
       }
       return true;
     }

@@ -1,6 +1,7 @@
 package org.vishia.guiViewCfg;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -9,9 +10,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.byteData.VariableAccessArray_ifc;
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Arguments;
 import org.vishia.util.Debugutil;
 import org.vishia.byteData.ByteDataSymbolicAccess;
 import org.vishia.gral.base.GralCurveView;
@@ -27,6 +30,12 @@ import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 
+/**This class supports dealing with values which are received with a stream channel, usual Ethernet. 
+ * It is used primary in {@link ViewCfg}, a GUI tool script programmable.
+ * 
+ * @author Hartmut Schorrig
+ *
+ */
 public class OamShowValues
 {
 
@@ -61,6 +70,8 @@ public class OamShowValues
   /**The access to the gui, to change data to show. */
   protected final GralMng guiAccess;
   
+  final OamEvalValues_ifc evalValues;
+  
   Set<Map.Entry<String, GralWidget>> fieldsToShow;
   
   GralCurveView curveView;
@@ -87,7 +98,10 @@ public class OamShowValues
   
   //private final float[] valueUserCurves = new float[6];  
 
-  public OamShowValues ( LogMessage log , GralMng guiAccess ) {
+  
+  
+  
+  public OamShowValues ( LogMessage log , GralMng guiAccess, Arguments.Argument argClassEvalRcvValues ) {
     this.log = log;
     this.guiAccess = guiAccess;
     this.accessOamVariable = new ByteDataSymbolicAccess();
@@ -97,7 +111,27 @@ public class OamShowValues
     //If data are received, this empty array isn't referenced any more.
     this.accessOamVariable.assignData(new byte[1500], System.currentTimeMillis());
     this.dataValid = true;   //it can be set because empty data are present, see above, use to test.
+    
+    OamEvalValues_ifc evalValues = null;
+    if(argClassEvalRcvValues.val !=null) {
+      try {
+        @SuppressWarnings("unchecked") Class<OamEvalValues_ifc> evalClass = (Class<OamEvalValues_ifc>)Class.forName(argClassEvalRcvValues.val);
+        @SuppressWarnings("unchecked") Constructor<OamEvalValues_ifc>[] cactor = (Constructor<OamEvalValues_ifc>[])evalClass.getConstructors();
+        Constructor<OamEvalValues_ifc> cctor = cactor[0];  // only one expected
+        evalValues = cctor.newInstance(this.accessOamVariable);
+      } catch(Exception exc) {
+        System.err.println(argClassEvalRcvValues.option + ":" + argClassEvalRcvValues.val + " is faulty: " + exc.getMessage());
+        throw new IllegalArgumentException("abort, command line error");
+      }
+    }
+    this.evalValues = evalValues;  //null if not parametrized
+
   }
+  
+  
+  
+  
+  
   
   public boolean readVariableCfg(ViewCfg.CallingArguments args)
   { int nrofVariable = this.cfgOamVariable.readVariableCfg(args.sFileOamVariables.val);
@@ -107,6 +141,7 @@ public class OamShowValues
       this.log.sendMsg(0, " variables not access-able from file \"exe/SES_oamVar.cfg\".");
     }
     this.varTimeMilliSecFromBaseyear = this.accessOamVariable.getVariable("time_milliseconds1970");
+    if(this.evalValues !=null) { this.evalValues.setVariables(); }
     return nrofVariable >0;
   }
   
@@ -169,6 +204,9 @@ public class OamShowValues
     int yMov = this.accessOamVariable.getVariable("yMov").getInt();
     if(yMov > 100) {
       Debugutil.stop();
+    }
+    if(this.evalValues !=null) { 
+      this.evalValues.calc(); 
     }
     writeValuesOfTab();   //write the values in the current tab, most of them will be received here newly.
     //TEST TODO:
@@ -256,7 +294,8 @@ public class OamShowValues
       ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = this.guiAccess.getVisiblePanels();
       if(this.curveView !=null) {
         this.curveView.bActive = true;
-        this.curveView.refreshFromVariable(this.accessOamVariable);
+        VariableContainer_ifc variables = this.evalValues !=null ? this.evalValues.getVariableContainer() : this.accessOamVariable;
+        this.curveView.refreshFromVariable(variables);
       }
       
       //GralWidget widgdRemove = null;

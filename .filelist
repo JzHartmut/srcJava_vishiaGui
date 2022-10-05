@@ -88,7 +88,7 @@
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2022-10-01 23:10:04  x     GralButton.java                          ::         20.827  1534883600 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
-2022-10-05 09:26:09  x     GralCurveView.java                       ::         90.972  0442106261 
+2022-10-05 11:59:57  x     GralCurveView.java                       ::         91.956 -1965936514 
 2022-10-04 16:22:22  x     GralGraphicThread.java                   ::          9.083  1072146655 
 2022-10-04 13:32:33  x     GralGraphicTimeOrder.java                ::          4.589 -1756605737 
 2022-09-15 16:23:24  x     GralGridProperties.java                  ::         13.029 -0342778063 
@@ -252,10 +252,11 @@
 2021-10-04 14:29:51  x     InspcViewTargetComm.java                 ::         14.819  0586218237 
 
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
+2022-10-05 17:55:12  x     OamEvalValues_ifc.java                   ::           .745  0661411213 
 2022-09-23 10:23:34  x     OamOutFileReader.java                    ::          3.543  1655028191 
-2022-09-28 00:08:24  x     OamRcvValue.java                         ::         10.012  1313704107 
-2022-10-04 11:10:57  x     OamShowValues.java                       ::         23.229 -0012643317 
-2022-10-04 23:03:42  x     ViewCfg.java                             ::         17.805 -1810499706 
+2022-10-05 17:26:45  x     OamRcvValue.java                         ::         10.007  0860862150 
+2022-10-05 17:58:04  x     OamShowValues.java                       ::         24.772  1895443324 
+2022-10-05 17:23:52  x     ViewCfg.java                             ::         18.100  2070386945 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
 2022-10-04 17:49:33  x     StimuliSelector.java                     ::         42.673 -1186890006 

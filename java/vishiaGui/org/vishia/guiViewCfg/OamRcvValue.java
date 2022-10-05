@@ -188,7 +188,7 @@ public class OamRcvValue implements Runnable
       try {  //====>>>>>>                        // evaluate the received telegram: 
         evalTelg(this.recvData, result[0]); 
       }
-      catch(ParseException exc){
+      catch(Exception exc){
         this.ctCorruptData +=1;
         if(showParam.printDotOnReceivedTelegr !=0) {
           System.out.append('x');

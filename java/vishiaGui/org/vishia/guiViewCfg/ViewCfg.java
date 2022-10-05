@@ -3,6 +3,7 @@ package org.vishia.guiViewCfg;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.text.ParseException;
 
 import org.vishia.byteData.VariableAccessArray_ifc;
@@ -104,6 +105,9 @@ public class ViewCfg //extends GuiCfg
     /**File to configure the Oam variables. */
     public final Argument sFileOamVariables = new Argument("-oamCfg", ":path/to/oam.cfg  file with oam variables");
     
+    /**File to configure the Oam variables. */
+    public final Argument argClassEvalRcvValues = new Argument("-oamEval", ":package.path.EvalClass  a class implenting");
+    
     /**UDP:0.0.0.0:60000 IP and port to listen for incomming UDP telegrams.
      * If not given, do not listen. 
      * Values back are sent to the sender.
@@ -118,6 +122,7 @@ public class ViewCfg //extends GuiCfg
       super.addArg(this.sFileOamVariables);
       super.addArg(this.targetIpc);
       super.addArg(this.sFileGui);
+      super.addArg(this.argClassEvalRcvValues);
     }
 
     
@@ -235,6 +240,10 @@ public class ViewCfg //extends GuiCfg
     this.gralMng.setLog(this.logCfg);;
     //super(cargs, cmdgui, null, null, null);
 
+    this.oamShowValues = new OamShowValues(this.logCfg, this.gralMng, cargs.argClassEvalRcvValues);
+    //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
+    
+    
     if(cargs.fileGuiCfg !=null) {
 //      gralMng.registerUserAction(null, this.action_dropFilePath);
 //      gralMng.registerUserAction(null, this.action_exec);
@@ -252,9 +261,6 @@ public class ViewCfg //extends GuiCfg
     } else {
       throw new IllegalArgumentException("argument -gui:path/to/gui.cfg is mandatory. ");
     }
-    this.oamShowValues = new OamShowValues(this.logCfg, this.gralMng);
-    //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
-    
     this.logCfg.flush();
     GralWidget btnCurveView = gralMng.getWidget("curveWindow");
     if(btnCurveView !=null && btnCurveView instanceof GralButton) {
