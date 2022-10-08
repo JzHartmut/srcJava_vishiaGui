@@ -123,7 +123,7 @@ public class GralCfgZbnf
    * It means this current position is really the current while building.
    * Note that the aggregated internal widget position is always a clone of this with the current values whilce building.  
    */
-  private GralPos currPos = new GralPos();
+  private GralPos currPos = new GralPos(this.gralMng);
   
   public GralWindow window;
   
@@ -409,7 +409,7 @@ public class GralCfgZbnf
   public String buildGui ( ) {
     String sError = null;
     this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
-    this.currPos = new GralPos();
+    this.currPos = new GralPos(this.gralMng);
     try {
       this.currPos.calcNextPos("screen, 10+100, 20+150");  //the size of the window and position on the screen
       int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;

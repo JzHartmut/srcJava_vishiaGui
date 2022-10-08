@@ -17,8 +17,15 @@ import org.vishia.gral.ifc.GralPanel_ifc;
  */
 public class GralScreen implements GralPanel_ifc {
 
+  private final GralMng gralMng;
+  
+  
+  public GralScreen(GralMng gralMng) {
+    this.gralMng = gralMng;
+  }
+
   @Override public String getName () {
-    return "TheWholeScreen";
+    return "screen";
   }
 
   @Override public String getDataPath () {
@@ -51,7 +58,7 @@ public class GralScreen implements GralPanel_ifc {
   }
 
   @Override public GralMng gralMng () {
-    return null;
+    return this.gralMng;
   }
 
   @Override public void setVisibleStateWidget ( boolean visible ) {

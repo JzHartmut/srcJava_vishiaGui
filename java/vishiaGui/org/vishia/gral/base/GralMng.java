@@ -261,9 +261,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     
     final long threadId;
     
-    PosThreadSafe() {
+    PosThreadSafe(GralMng gralMng) {
       threadId = Thread.currentThread().getId();
-      pos = new GralPos();
+      pos = new GralPos(gralMng);
     }
     
     PosThreadSafe(GralPos exists) {
@@ -279,12 +279,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**The current position as helper if it is the same thread.
    * Initialized firstly empty.
    */
-  private PosThreadSafe posCurrent = new PosThreadSafe();
+  private PosThreadSafe posCurrent;
 
-  private final Map<Long, PosThreadSafe> posThreadSafe = new TreeMap<Long, PosThreadSafe>();
-  { //part of construction: safe the first instance.
-    posThreadSafe.put(posCurrent.threadId, posCurrent);
-  }
+  private final Map<Long, PosThreadSafe> posThreadSafe;
   
   
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
@@ -368,11 +365,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
-  protected final GralPos XXXpos = new GralPos(); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
+//  protected final GralPos XXXpos = new GralPos(this); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
   
   /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
    * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
-  protected boolean XXXposUsed;
+//  protected boolean XXXposUsed;
   
 
   
@@ -501,8 +498,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     //its a user action able to use in scripts.
     userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
     if(GralMng.singleton ==null) { GralMng.singleton = this; } 
-    GralPanel_ifc theWholeScreen = new GralScreen();       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
+    GralPanel_ifc theWholeScreen = new GralScreen(this);       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
     this.idxPanels.put("screen", theWholeScreen);
+    this.posThreadSafe = new TreeMap<Long, PosThreadSafe>();
+    this.posCurrent = new PosThreadSafe(this);
+    this.posThreadSafe.put(posCurrent.threadId, posCurrent);
   }
 
   
@@ -1154,7 +1154,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   public GralPanel_ifc getPanel(String name){
-    return idxPanels.get(name);
+    return this.idxPanels.get(name);
   }
   
   

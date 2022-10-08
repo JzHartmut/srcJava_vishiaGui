@@ -733,8 +733,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {
         //mng.setNextPosition();  //deprecated, done in Widget constructor.
         char sizeFontPrompt;
-        posPrompt = new GralPos(); 
-        posField = new GralPos();
+        posPrompt = new GralPos(widgg._wdgPos.parent);     // inside same panel 
+        posField = new GralPos(widgg._wdgPos.parent);
 
         //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
         float ySize = widgg.pos().height();

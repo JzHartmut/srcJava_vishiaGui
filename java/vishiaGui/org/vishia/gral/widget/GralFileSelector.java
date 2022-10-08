@@ -755,7 +755,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   public static GralFileSelector createGralFileSelectorWindow(String posName, GralMng mng) {
     GralPos pos = null;
     try {
-      pos = new GralPos("@screen,0..0,0..0");
+      pos = new GralPos(mng, "@screen,0..0,0..0");
     } catch(ParseException exc) { ExcUtil.throwUnexpect(exc);}
     new GralFileSelectWindow(posName, mng);
     int windProps = GralWindow_ifc.windResizeable;

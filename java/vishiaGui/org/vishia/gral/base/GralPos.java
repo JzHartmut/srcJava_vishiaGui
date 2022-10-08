@@ -355,10 +355,12 @@ public class GralPos implements Cloneable
   /**The values for x and y positions. Note: should be private! Don't use in application furthermore. */
   public final Coordinate x = new Coordinate(), y = new Coordinate();
   
-  /**Creates an position with all values 0.
+  /**Creates an position with all values 0 related to the whole screen.
    * The position can be changed after them with {@link #setPosition(float, float)} etc.
    */
-  public GralPos(){}
+  public GralPos(GralMng gralMng){
+    this.parent = gralMng.getPanel("screen");              // the whole screen as pseudo panel is always available.
+  }                                                        // Note: a parent is necessary to get the gralMng() for panel selection.
   
   
   /**Set a initial GralPos for a given PanelContent (also a Window).
@@ -366,7 +368,7 @@ public class GralPos implements Cloneable
    * Because also the end values (right, bottom) are 0, it is the whole left to right and top to bottom position.
    * @param panel The given panel
    */
-  public GralPos(GralWidget parent) {
+  public GralPos(GralWidget_ifc parent) {
     this.parent = parent;
   }
   
@@ -376,8 +378,13 @@ public class GralPos implements Cloneable
    */
   public GralPos(GralPos src){ set(src); }
   
-  public GralPos(String pos) throws ParseException {
-    this();
+  public GralPos(GralMng mng, String pos) throws ParseException {
+    this(mng);
+    this.setPosition(pos, this);
+  }
+  
+  public GralPos(GralWidget_ifc panel, String pos) throws ParseException {
+    this(panel);
     this.setPosition(pos, this);
   }
   
@@ -468,11 +475,11 @@ public class GralPos implements Cloneable
         spPos.scan("@").scanStart();  //skip over a first @
         if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
           String sPanel = spPos.getLastScannedString().toString();
-          GralMng mng = GralMng.get();  //singleton.
-          GralPanel_ifc panel = mng.getPanel(sPanel);
+          GralMng mng = this.parent.gralMng();              // use the gralMng given in the parent panel. 
+          GralPanel_ifc panel = mng.getPanel(sPanel);      // search the already created existing panel.
           if(panel == null) {
             spPos.close();
-            throw new IllegalArgumentException("GralPos.setPosition - unknown panel, " + sPanel);
+            throw new ParseException("GralPos.setPosition - unknown panel, " + sPanel, 0); 
           }
           if(posParent !=null && panel == posParent.parent) {
             posParent1 = posParent;
@@ -904,7 +911,7 @@ public class GralPos implements Cloneable
   
   @Override public GralPos clone(){
     //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
-    GralPos newObj = new GralPos();
+    GralPos newObj = new GralPos(this.parent);
     newObj.x.set(x);
     newObj.y.set(y);
     newObj.parent = parent;
@@ -1406,17 +1413,4 @@ public class GralPos implements Cloneable
   }
   
   
-  public static void testScanSize(){
-    GralPos posParent = new GralPos();
-    GralPos posTest = new GralPos();
-    try{
-      posParent.setPosition("@3+2, 10+10", null);  //line 3, column 10 + 10
-      posTest.setPosition(",+12", posParent);       //line 3, column 20 + 12
-      Assert.checkMsg(posParent.y.p1 == 3 && posParent.y.p2 == 5 && posParent.x.p1 == 10 && posParent.x.p2 == 20 , "posParent failure");
-      Assert.checkMsg(posTest.y.p1 == 3   && posTest.y.p2 == 5   && posTest.x.p1 == 20   && posTest.x.p2 == 32 , "posTest failure");  //next, size=12
-    } catch(ParseException exc) {
-      System.err.println("GralPos.testScanSize - error, " + exc.getMessage());
-    }
-    
-  }
 }
