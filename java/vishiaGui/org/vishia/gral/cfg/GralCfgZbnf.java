@@ -112,7 +112,7 @@ public class GralCfgZbnf
    */
   private GralCfgData cfgData;
   
-  final GralMng gralMng = GralMng.get();
+  final GralMng gralMng;
   
   private final Map<String, String> indexAlias = new TreeMap<String, String>();
 
@@ -123,7 +123,7 @@ public class GralCfgZbnf
    * It means this current position is really the current while building.
    * Note that the aggregated internal widget position is always a clone of this with the current values whilce building.  
    */
-  private GralPos currPos = new GralPos(this.gralMng);
+  private GralPos currPos;
   
   public GralWindow window;
   
@@ -239,8 +239,10 @@ public class GralCfgZbnf
    * It is used if other files are given with relative path.*/
   File currentDir;
 
-  public GralCfgZbnf()
+  public GralCfgZbnf(GralMng gralMng)
   { this.console = MainCmd.getLogging_ifc();
+    this.gralMng = gralMng;
+    this.currPos = new GralPos(this.gralMng);
     this.fileSyntax = null;
     String syntax = getSyntaxFromJar();
     this.parser = new ZbnfParser(console);
@@ -253,9 +255,11 @@ public class GralCfgZbnf
   }
 
 
-  public GralCfgZbnf(Report log, File fileSyntax)
+  public GralCfgZbnf(Report log, File fileSyntax, GralMng gralMng)
   { this.console = log;
     this.fileSyntax = fileSyntax;
+    this.gralMng = gralMng;
+    this.currPos = new GralPos(this.gralMng);
     this.parser = new ZbnfParser(log);
     try{ 
       String syntax = FileFunctions.readFile(this.fileSyntax);
@@ -367,8 +371,8 @@ public class GralCfgZbnf
    * @return The main window of the graphic application
    * @throws ParseException on syntax error in sGui
    */
-  public static GralWindow configWithZbnf ( CharSequence sGui ) throws ParseException { 
-    GralCfgZbnf thiz = new GralCfgZbnf();                  // temporary instance of this
+  public static GralWindow configWithZbnf ( CharSequence sGui, GralMng gralMng ) throws ParseException { 
+    GralCfgZbnf thiz = new GralCfgZbnf(gralMng);                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(sGui, thiz.cfgData);
     thiz.buildGui();                                       // build only the Gral instances without implementation graphic
@@ -385,8 +389,8 @@ public class GralCfgZbnf
    * @return The main window of the graphic application
    * @throws ParseException on syntax error in sGui
    */
-  public static GralWindow configWithZbnf ( File fGui ) throws Exception { 
-    GralCfgZbnf thiz = new GralCfgZbnf();                  // temporary instance of this
+  public static GralWindow configWithZbnf ( File fGui, GralMng gralMng) throws Exception { 
+    GralCfgZbnf thiz = new GralCfgZbnf(gralMng);                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(fGui, thiz.cfgData);
     thiz.buildGui();                                       // build only the Gral instances without implementation graphic
@@ -413,7 +417,7 @@ public class GralCfgZbnf
     try {
       this.currPos.calcNextPos("screen, 10+100, 20+150");  //the size of the window and position on the screen
       int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
-      this.window = new GralWindow(this.currPos, null, "wmain", "Title", windowProps);
+      this.window = new GralWindow(this.currPos, "wmain", "Title", windowProps, this.gralMng);
       this.window.mainPanel.setGrid(2,2,5,5,-8,-30);
       this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
       Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = this.cfgData.getPanels();

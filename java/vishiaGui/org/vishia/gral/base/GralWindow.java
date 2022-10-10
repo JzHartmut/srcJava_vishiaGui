@@ -257,6 +257,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   @Override public boolean remove() {
     super.remove();
     itsMng.deregisterPanel(this.mainPanel);
+    itsMng.deregisterWindow(this);
     return true;
   }
   
@@ -417,7 +418,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   /**Code snippet for initializing the GUI area (panel). This snippet will be executed
    * in the GUI-Thread if the GUI is created. 
    */
-  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow")
+  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow", this.itsMng)
   {
     @Override public void executeOrder()
     { GralMng mng = GralMng.get();

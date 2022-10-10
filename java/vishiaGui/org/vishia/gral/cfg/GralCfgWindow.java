@@ -84,6 +84,8 @@ public class GralCfgWindow
   /**Directory for images. */
   File imgDir;
   
+  protected final GralMng gralMng = new GralMng(null);
+  
   final public GralWindow window;
   
   /**Creates a new Window or opens the existing one with given name.
@@ -105,7 +107,7 @@ public class GralCfgWindow
     char size1;
     if(size < 'a') { size1 = size; swtOrawt = "SWT"; }
     else { size1 = (char)(size - 'a'-'A'); swtOrawt = "AWT"; }
-    GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
+    GralCfgZbnf cfgZbnf = new GralCfgZbnf(GralMng.get());  //temporary instance for parsing
     cfgZbnf.configureWithZbnf(sCfg, this.guiCfgData); //
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     GralMng mng = GralMng.get();
@@ -149,7 +151,7 @@ public class GralCfgWindow
    * 
    */
   @SuppressWarnings("synthetic-access")  
-  GralGraphicTimeOrder configInGthread = new GralGraphicTimeOrder("GralCfgWindow.config")
+  GralGraphicTimeOrder configInGthread = new GralGraphicTimeOrder("GralCfgWindow.config", this.gralMng)
   {
     
     private static final long serialVersionUID = 1L;

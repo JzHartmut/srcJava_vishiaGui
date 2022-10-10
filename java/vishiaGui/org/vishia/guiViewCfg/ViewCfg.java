@@ -254,7 +254,7 @@ public class ViewCfg //extends GuiCfg
       
       try {
         File fCfg = /*new File*/(cargs.fileGuiCfg);
-        this.window = GralCfgZbnf.configWithZbnf(fCfg);         // does all, reads the config file, parses, creates Graphic Elements
+        this.window = GralCfgZbnf.configWithZbnf(fCfg, this.gralMng);         // does all, reads the config file, parses, creates Graphic Elements
       } catch (Exception e) {
         throw new IllegalArgumentException("Graphic confic error: " + e.getMessage());
       }                  
@@ -312,12 +312,13 @@ public class ViewCfg //extends GuiCfg
   //@Override 
   protected void initViewCfg ( CallingArguments cargs ) throws IOException { 
       
-    if(! this.oamShowValues.readVariableCfg(this.callingArguments)) {
+    if(   this.callingArguments.sFileOamVariables.val !=null
+      &&! this.oamShowValues.readVariableCfg(this.callingArguments)) {
       this.logCfg.sendMsg(99, "error oamShowValues.readVariableCfg()");
       System.err.println("error oamShowValues.readVariableCfg()");
     }
     
-    GralWidget curveView = GralMng.get().getWidget("userCurves");
+    GralWidget curveView = this.gralMng.getWidget("userCurves");
     if(curveView !=null && curveView instanceof GralCurveView) {
       this.oamShowValues.setCurveView((GralCurveView)curveView);
     }
@@ -366,7 +367,7 @@ public class ViewCfg //extends GuiCfg
   }
   
   public void doSomethinginMainthreadTillClosePrimaryWindow()
-  { while(GralMng.get().isRunning()){
+  { while(gralMng.isRunning()){
       try{ Thread.sleep(20);} 
       catch (InterruptedException e) { }
       stepMain();
@@ -463,7 +464,7 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
       if(main.oamRcvUdpValue !=null) {  
         main.oamRcvUdpValue.stopThread();
       }
-      GralMng.closeGral();
+      main.gralMng.closeGral();
     } catch(Exception exc) {
       System.err.println("Unexpected exception: " + exc.getMessage());
       exc.printStackTrace(System.err);

@@ -14,6 +14,7 @@ import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdFilepath;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -148,7 +149,7 @@ public class GitGui
   }
 
 
-
+  protected GralMng gralMng = new GralMng(null);
 
 
   /**Action for open the commit text. 
@@ -871,7 +872,7 @@ public class GitGui
   
   
 
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init")
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init", this.gralMng)
   { @Override protected void executeOrder() {
       wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
       wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);

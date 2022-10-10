@@ -964,7 +964,7 @@ public class StimuliSelector
    * It builds the content of the main window called in the Graphic thread of the {@link GralMng}
    * This routine determines the position of all widgets using {@link GralMng#setPosition(float, float, float, float, int, char)}
    */
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng) {
     /**
      * 
      */

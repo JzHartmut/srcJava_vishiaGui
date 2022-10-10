@@ -144,7 +144,7 @@ public class GralColorShow
     @Override public String toString(){ return co.name + ": [" + index.ixLight + ", " + index.ixCol + "]"; }
   }
   
-  GralMng gralMng = GralMng.get();
+  GralMng gralMng = new GralMng(null);
   
   GralFactory gralFactory;
   
@@ -951,7 +951,7 @@ public class GralColorShow
     }
   }
 
-  GralGraphicTimeOrder initGraphicFullColors = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphicFullColors = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng) {
     @Override public void executeOrder()
     {
       //gralMng.addTextField();
@@ -1074,7 +1074,7 @@ public class GralColorShow
   
   
   
-  GralGraphicTimeOrder initGraphicLessColors = new GralGraphicTimeOrder("initGraphicLessColors"){
+  GralGraphicTimeOrder initGraphicLessColors = new GralGraphicTimeOrder("initGraphicLessColors", this.gralMng) {
     @Override public void executeOrder()
     {
       String[][] colors = colors4;

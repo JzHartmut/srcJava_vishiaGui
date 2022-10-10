@@ -174,7 +174,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
+public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Version, history and license.
@@ -343,10 +343,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   public static final String sVersion = "2022-09-13";
 
-  
-  /**The widget manager from where the widget is organized. Most of methods need the information
-   * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected GralMng itsMng;
   
   /**The position of the widget. 
    * The GralPos contains also the reference to the parent composite panel {@link GralPanel_ifc} which contains the widget. */
@@ -743,7 +739,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public GralWidget ( GralPos currPos, String sPosName, char whatIs){
-    this(currPos, sPosName, whatIs, GralMng.get());
+    this(currPos, sPosName, whatIs, null);
   }
 
   
@@ -751,8 +747,9 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Creates a widget.
    * @param currPos The position, absolute. This is either the given ready to use position
    *   or the basic of a relative position given in the posName argument.
-   *   <br>* If null then the {@link GralMng#pos()} is used. 
-   *   The given position in the posName argument is written back to this given instance,
+   *   <br>
+   *   If null then the {@link GralMng#pos()} is used, the argument gralMng should be given.
+   *   A given position in the posName argument is written back to this given instance,
    *   also on given absolute positions. Especially for relative positions to the previous widgets this is sensible.
    *   For internal use the position info are cloned to a internal separated position instance aggregated by the widget.
    *   It means the given currPos argument can be changed afterwards, especially to calculate new positions from the current one. 
@@ -763,11 +760,13 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   <br>* The position string will be applied to the given currPos.
    *   <br>* Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
    * @param whatIs See {@link #whatIs}
+   * @param gralMng should be given if currPos is not given, to work with a dedicated GralMng, not with the singleton.
+   *   If currPos is given and valid, this argument can be null.
    */
   public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
-    assert(gralMng !=null);
+    super(currPos, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
+    assert(this.itsMng !=null);
     int posName;
-    this.itsMng = gralMng;
     final GralPos currPos1;
     if(currPos == null) { currPos1 = gralMng.pos().pos; }
     else {currPos1 = currPos;}
@@ -820,7 +819,6 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   @Deprecated public GralWidget(String sName, char whatIs, GralMng mng)
   { this((GralPos)null, sName, whatIs);
-    itsMng = GralMng.get();
     assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(mng !=null){
       assert(this.itsMng == mng);
@@ -1340,21 +1338,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Sets the GralMng.
-   * @deprecated it should be set by the MethodsCalledbackFromImplementation ctor. 
-   */
-  @Deprecated
-  public void setPanelMng(GralMng mng)
-  { this.itsMng = mng; 
-    if(this._wdgPos !=null) 
-      throw new IllegalStateException("GralWidget - setPos() is set already.");
-    this._wdgPos = mng.getPosCheckNext();
-    this.registerWidget();  //always clone it from the central pos 
-
-  }
-  
-
-  
+   
   /**Sets a variable associated to the widget to refresh with a value.
    * For refreshing call {@link #refreshFromVariable(VariableContainer_ifc)}.
    * The variable can be set independent from a given {@link #setDataPath(String)}
@@ -2164,12 +2148,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
    * till the next request of {@link #repaint(int, int)} or {@link #repaint()}.
    */
-  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ"){
+  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ", this.itsMng){
     @Override public void executeOrder() {
       if(_wdgImpl !=null) { _wdgImpl.repaintGthread(); }//Note: exception thrown in GralGraphicThread
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
+  
+  
   
   
   /**Sets the state of the widget whether it seams to be visible.
@@ -2269,3 +2255,43 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
 }
 
+
+/**This class is only be used to set the #itsMng of the GralWidget
+ * before the class level initialization stuff of the constructor are processed.
+ * The order in Java for ctor initialization is:
+ * <ul>
+ * <li>first the super class (and its super class) where this cannot be used,
+ *   but argument values can be used if there are part of the superclass argument list.
+ * <li>second all class level initialization stuff (immediately initialization of class object members)
+ *   is executed. This are also the anonymous interface implementations. Arguments of the ctor cannot be used.
+ * <li>At least the statements of the ctor are executed. Only with this statements 
+ *   a (final) class variable can be set from ctor arguments.
+ * </ul>
+ * With this class first this super ctor of GralWidget is called, it sets the {@link GralWidgetSetMng#itsMng}
+ * which is accessible in the second phase.
+ * @since 2022-10, necessary for referenced GralMng, not as singleton.
+ *
+ */
+class GralWidgetSetMng {
+  
+  /**The widget manager from where the widget is organized. Most of methods need the information
+   * stored in the panel manager. This reference is used to set values to other widgets. */
+  protected final GralMng itsMng;
+  
+    /**Either the GralMng is given, or pos should be given, then the GralMng is gotten from {@link GralPos#parent}.
+     * If both are null, the {@link GralMng#get()} is used as fallback for compatibility.
+     * @param pos
+     * @param itsMng
+     */
+    public GralWidgetSetMng(GralPos pos, GralMng gralMng) {
+      if(gralMng !=null) {
+        this.itsMng = gralMng;
+      } else if(pos !=null && pos.parent !=null) {
+        this.itsMng = pos.parent.gralMng();
+      } else {
+        this.itsMng = GralMng.get(); //deprecated approach with singleton.
+      }
+    }
+
+
+}

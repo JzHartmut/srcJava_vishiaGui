@@ -63,7 +63,7 @@ public class AwtTextBox extends GralTextBox.GraphicImplAccess
 
 
   
-  protected GralGraphicTimeOrder changeTextBoxTrail = new GralGraphicTimeOrder("AwtTextBox.changeTextBoxTrail")
+  protected GralGraphicTimeOrder changeTextBoxTrail = new GralGraphicTimeOrder("AwtTextBox.changeTextBoxTrail", widgg.gralMng())
   { @Override public void executeOrder()
     { if(newText.length() >0){
         textFieldSwt.append(newText.toString());
@@ -73,7 +73,7 @@ public class AwtTextBox extends GralTextBox.GraphicImplAccess
   };
   
   
-  protected GralGraphicTimeOrder changeText = new GralGraphicTimeOrder("AwtTextBox.changeTextB")
+  protected GralGraphicTimeOrder changeText = new GralGraphicTimeOrder("AwtTextBox.changeTextB", widgg.gralMng())
   { @Override public void executeOrder()
     { if(newText.length() >0){
         textFieldSwt.setText(newText.toString());

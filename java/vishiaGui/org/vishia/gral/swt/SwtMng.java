@@ -914,7 +914,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     GralWidget widg = new GralWidget(sName, 'V', gralMng);
     SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, control, this);
     //widg.implMethodWidget_.setWidgetImpl(widgswt);
-    widg.setPanelMng(gralMng);
     if(action != null){
   		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widg, action);
   		control.addSelectionListener(actionSlider);

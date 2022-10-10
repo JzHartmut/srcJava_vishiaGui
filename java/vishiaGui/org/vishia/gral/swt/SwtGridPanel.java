@@ -144,7 +144,8 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
     @Override public void drawBackground ( final GC g, final int x, final int y, final int dx, final int dy ) {
       // NOTE: forces stack overflow because calling of this routine recursively:
       // super.paint(g);
-      GralMng gralMng = GralMng.get();
+      
+      GralMng gralMng = this.wdgi.gralMng();
       int xPixel = gralMng.propertiesGui().xPixelUnit();   // Note: the properties are only available in the implementation
       int yPixel = gralMng.propertiesGui().yPixelUnit();
       SwtMng swtMng = SwtMng.swtMng(this.wdgi);

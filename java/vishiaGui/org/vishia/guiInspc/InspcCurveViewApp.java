@@ -103,7 +103,7 @@ public class InspcCurveViewApp
       
   }
   
-  GralGraphicTimeOrder reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl") {
+  GralGraphicTimeOrder reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl", this.gralMng) {
     
     @Override protected void executeOrder () {
       try {
@@ -201,7 +201,7 @@ public class InspcCurveViewApp
   }
   
   
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng){
     @Override public void executeOrder()
     {
       //curveView.buildGraphicInCurveWindow(null);

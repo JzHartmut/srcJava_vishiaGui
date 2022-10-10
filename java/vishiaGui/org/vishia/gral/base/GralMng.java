@@ -1110,6 +1110,16 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  void deregisterWindow(GralWindow wind) {
+    this.idxWindows.remove(wind.getName());
+    if(this.windPrimary == wind) {
+      assert(this.idxWindows.size()==0);
+      this.windPrimary = null;
+//      sCurrPanel = windPrimary.name;
+    }
+  }
+  
+  
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
@@ -2486,8 +2496,8 @@ public GralButton addCheckButton(
   
 
   /**Must only invoke from the Main window close listener. */
-  public static void closeGral() {
-    singleton.bExit = true; 
+  public void closeGral() {
+    this.bExit = true; 
   }
   
 

@@ -271,7 +271,7 @@ protected void userInit()
 /**Code snippet for initializing the GUI area (panel). This snippet will be executed
  * in the GUI-Thread if the GUI is created. 
  */
-GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GuiCfg.initGraphic")
+GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GuiCfg.initGraphic", this._gralMng)
 {
   @Override public void executeOrder()
   {
@@ -287,7 +287,7 @@ GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GuiCfg.initGraphic"
 /**Code snippet to run the ZBNF-configurator (text controlled GUI)
  * 
  */
-GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GuiCfg.configGuiWithZbnf")
+GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GuiCfg.configGuiWithZbnf", this._gralMng)
 {
   
   @Override public void executeOrder(){
@@ -353,7 +353,7 @@ protected void initMain()
     if(cargs.fileGuiCfg.exists())
     {
       File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax);
+      GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax, GralMng.get());
       System.out.println("GuiCfg - start parsing cfg file; " + cargs.fileGuiCfg.getAbsolutePath());
       String sError = "todo"; //cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
       System.out.println("GuiCfg - finish parsing cfg file; ");

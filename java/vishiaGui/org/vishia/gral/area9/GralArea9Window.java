@@ -150,7 +150,9 @@ public class GralArea9Window implements GralArea9_ifc
   
   public final MainCmd mainCmd;
   
-  //protected final GralWindowMng gralDevice;
+  protected final GralMng gralMng = new GralMng(null);
+  
+  
   
   protected final GralWindow window;
   
@@ -285,7 +287,7 @@ public class GralArea9Window implements GralArea9_ifc
   
 
   
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng) {
     @Override public void executeOrder()
     {
       window.setResizeAction(resizeAction);   //sets the resize action from this instead a standard window for the primaryWindow.
@@ -675,7 +677,7 @@ public class GralArea9Window implements GralArea9_ifc
   
   
   
-  private final GralGraphicTimeOrder writeOutputTextDirectly = new GralGraphicTimeOrder("GralArea9Window.writeOutputTextDirectly")
+  private final GralGraphicTimeOrder writeOutputTextDirectly = new GralGraphicTimeOrder("GralArea9Window.writeOutputTextDirectly", this.gralMng)
   { @Override public void executeOrder()
     { String line;
       while((line = outputTexts.poll())!=null){

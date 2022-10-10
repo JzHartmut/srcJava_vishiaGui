@@ -163,7 +163,7 @@ public class ExampleSimpleButton
   protected class InitGuiCodeSimpleButton extends GralGraphicTimeOrder
   {
     InitGuiCodeSimpleButton(){
-      super("ExampleSimpleButton.initGuiCode");
+      super("ExampleSimpleButton.initGuiCode", ExampleSimpleButton.this.gui.gralMng);
     }
     
     /**This routine is called in the graphic thread if it was added.

@@ -46,7 +46,7 @@ public class GralPlotWindow
    */
   public static final String sVersion = "2015-09-26";
 
-  final GralMng gralMng = GralMng.get();
+  final GralMng gralMng = new GralMng(null);
   
   final GralWindow window;
   
@@ -86,7 +86,7 @@ public class GralPlotWindow
     
     
     
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng) {
     @Override public void executeOrder()
     {
       //canvas.createImplWidget_Gthread();      

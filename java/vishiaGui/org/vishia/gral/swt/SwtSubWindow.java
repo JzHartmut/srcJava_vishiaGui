@@ -36,6 +36,7 @@ import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
@@ -462,7 +463,11 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     @Override
     public void widgetDisposed(DisposeEvent e)
     {
-      GralMng.closeGral();
+      Widget swtWidg = e.widget;
+      GralWidget_ifc gralWidg = (GralWidget_ifc)swtWidg.getData();
+      GralMng gralMng = gralWidg.gralMng();
+      gralWidg.remove();
+      gralMng.closeGral();
     }
   };
   
