@@ -70,24 +70,20 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
     final SwtMng swtMng = (SwtMng) wdgg.gralMng()._mngImpl;
     final Composite parent = SwtMng.getSwtParent(wdgg.pos());
     final Rectangle areaParent = parent.getClientArea();
-    Composite swtPanel;
     if (wdgg.isTabbed()) {
       final TabFolder tabFolder = new TabFolder(parent, 0);
-      swtPanel = tabFolder;
-      super.panelSwtImpl = tabFolder;
-      this.wdgimpl = tabFolder;
-      // ((GralPanelContent)this.wdgimpl)._wdgImpl = this.tabFolder;
-      swtPanel.setBounds(areaParent); // The tab folder should fill the whole area. Without the setBounds the
-                                      // TabFolder is not visible.
-      SwtMng.storeGralPixBounds(this, tabFolder); // store the pixel size in the ImplAccess level
+      super.panelSwtImpl = tabFolder;            // typed access in SwtPanel
+      super.wdgimpl = tabFolder;                 // unified access in GraLWidget
+      super.panelSwtImpl.setBounds(areaParent);  // The tab folder should fill the whole area. Without the setBounds the
+                                                 // TabFolder is not visible.
+      SwtMng.storeGralPixBounds(this, tabFolder);// store the pixel size in the ImplAccess level
       final Font fontTab = new Font(swtMng.displaySwt, "Arial", 10, SWT.ITALIC);
-      swtPanel.setFont(fontTab);
+      super.panelSwtImpl.setFont(fontTab);
     } 
     else {
       final SwtCanvasGridPanel swtCanvas = new SwtCanvasGridPanel(this, parent, style);
-      swtPanel = swtCanvas;
-      this.wdgimpl = swtPanel;
-      super.panelSwtImpl = swtCanvas;
+      super.panelSwtImpl = swtCanvas;             // typed access in SwtPanel
+      super.wdgimpl = swtCanvas;                  // unified access in GraLWidget 
       swtCanvas.addControlListener(this.resizeItemListener);
       swtCanvas.setData(this);
       swtCanvas.setLayout(null);
@@ -95,7 +91,8 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
       swtCanvas.addPaintListener(swtCanvas.paintListener);
       swtCanvas.setBackground(swtMng.getColorImpl(wdgg.getBackColor(0)));
     }
-    if (parent instanceof TabFolder) { // This panel should be used as Tab of the parent TabFolder
+    //
+    if (parent instanceof TabFolder) {                     // This panel should be used as Tab of the parent TabFolder
       final TabItem tab = new TabItem((TabFolder) parent, SWT.None);
       tab.setText(wdgg.getName());
       tab.setControl(this.panelSwtImpl);
@@ -103,22 +100,16 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
       final GralWidget_ifc parentPanelifc = wdgg.pos().parent;
       final GralPanelContent parentPanel = (GralPanelContent) parentPanelifc;
       final GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess) parentPanel.getImplAccess();
-      if (parentPanel._panel.pixelTab == 0) {
-        areaTab = swtPanel.getClientArea();
-        parentPanel._panel.pixelTab = (short) (parentImplAccess.pixBounds.dy - areaTab.height);
+      areaTab = super.panelSwtImpl.getClientArea();
+      @SuppressWarnings("unused") Rectangle boundsTab = super.panelSwtImpl.getBounds();
+      if (parentPanel._panel.pixelTab == 0) {              // on the first tab panel
+        parentPanel._panel.pixelTab = (short) (areaParent.height - areaTab.height);
+        //super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
       } else {
-        swtPanel.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dy, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
-        areaTab = swtPanel.getClientArea();
+        //super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
       }
-
-      if (parentPanel._panel.pixelTab == 0) { // the first tab:
-        areaTab = swtPanel.getClientArea();// has automatically the max. size
-        parentPanel._panel.pixelTab = (short)(parentImplAccess.pixBounds.dy - areaTab.height);
-      } else {
-      }
-      swtPanel.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
     } else {
-      swtPanel.setBounds(areaParent);
+      super.panelSwtImpl.setBounds(areaParent);
       swtMng.listVisiblePanels_add(wdgg);
     }
     this.panelSwtImpl.setVisible(true);

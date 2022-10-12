@@ -13,7 +13,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
@@ -23,7 +22,6 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
-import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
@@ -179,6 +177,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-09-13 {@link ImplAccess#setPosBounds()} now regard the tab panel on resize.
    * <li>2022-09-13 new {@link #toString(Appendable)} usable for comprehensive reports and toString() 
    * <li>2022-08 new {@link GralWidget#GralWidget(GralPos, String, char)} for the new concept, some more adaptions. 
    * <li>2016-09-30 Hartmut improved: {@link #repaint(int, int)} now the second argument can be really 0 to prevent a not required repaint from the first repaint call
@@ -2022,8 +2021,25 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
     
     
+    /**Set the bounds of the widget from the stored GralPos.
+     *
+     */
     @Override public void setPosBounds ( ) {
       GralRectangle xyPix = mngImpl.calcWidgetPosAndSize(widgg.pos(), 600, 800);
+      if(this.widgg instanceof GralPanelContent) {         // it may be a tab of a tabbed panel
+        GralWidget_ifc parent_ifc = widgg.pos().parent;    // its parent may be a tab folder
+        final int dy;
+        if(parent_ifc instanceof GralPanelContent) {       // may be a tab folder or not
+          dy = ((GralPanelContent)parent_ifc)._panel.pixelTab;  // size from top to the tab
+        } else { 
+          dy = 0; 
+        }
+        if(dy >0) {             // a tab folder has this dy or pixslTab designation
+          xyPix.y += dy;        // The panel is a little bit lower, space for the tabs.
+          xyPix.dy -= dy;
+        }
+      } //if check tab folder, pixelTab
+      //
       setBoundsPixel(xyPix.x, xyPix.y, xyPix.dx, xyPix.dy );   //the standard approach. 
     }
     

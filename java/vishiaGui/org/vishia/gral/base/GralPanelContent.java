@@ -295,7 +295,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   @Override public void createImplWidget_Gthread() throws IllegalStateException {
     super.createImplWidget_Gthread(); //from GralWidget.
     for(GralWidget widg: this._panel.widgetList) {
-      widg.createImplWidget_Gthread();
+      widg.createImplWidget_Gthread();                     // recursively call of same
     }
   }  
   

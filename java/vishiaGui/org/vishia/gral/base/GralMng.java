@@ -1284,7 +1284,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     
     
     this._mngImpl.finishInit();
-    try{ this._mngImpl.reportContent(System.out);
+    try{ this._mngImpl.reportContent(this.log);
     } catch(IOException exc) { }
     
     //The last action, set the GuiThread

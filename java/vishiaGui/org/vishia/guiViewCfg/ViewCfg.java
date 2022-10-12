@@ -230,7 +230,9 @@ public class ViewCfg //extends GuiCfg
     Appendable fLogFile = null;
     if(cargs.sFileLogCfg.val !=null) {
       try {
-        FileWriter flogCfg = new FileWriter(cargs.sFileLogCfg.val);
+        File fileLogCfg = new File(cargs.sFileLogCfg.val);
+        FileFunctions.mkDirPath(fileLogCfg);
+        FileWriter flogCfg = new FileWriter(fileLogCfg);
         fLogFile = flogCfg;
       } catch (Exception exc) {
         System.err.println("not possible to write to: " + cargs.sFileLogCfg.val + " : " + exc.getMessage());
@@ -283,11 +285,14 @@ public class ViewCfg //extends GuiCfg
     }
     this.window.mainPanel.reportAllContent(this.logCfg);
     this.logCfg.flush();
+    //
+    //==================================================== // create implementation graphic
     if(cargs.graphicFactory ==null) {
       cargs.graphicFactory = new SwtFactory();         // default use SWT.
     }
     cargs.graphicFactory.createGraphic(this.gralMng, cargs.sizeShow);
     this.logCfg.flush();
+    //
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
     //

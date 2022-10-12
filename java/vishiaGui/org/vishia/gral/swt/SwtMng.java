@@ -1273,6 +1273,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   @Override public void reportContent(Appendable out) throws IOException {
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows().entrySet()) {
       GralWindow wind = ewind.getValue();
+      
       out.append("\n==== Window: ").append(wind.getName()).append("\n");
       reportContent(out, (Composite)getSwtImpl(wind), 0);
     }
@@ -1282,14 +1283,17 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   void reportContent(Appendable out, Composite parent, int recursion) throws IOException {
+    Rectangle pos = parent.getBounds();
+    String sType = parent.getClass().getName();
+    out.append(sType).append(':');
+    GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
+    out.append(parent.toString());
     Control[] children = parent.getChildren();
     for(Control child : children) {
       if(child !=null) {
-        Rectangle pos = child.getBounds();
+        pos = child.getBounds();
         out.append(nl.substring(0, 2*recursion+1));
         if(child instanceof Composite) {
-          GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
-          out.append(child.toString());
           reportContent(out, (Composite)child, recursion+1);
         }
         else  {
