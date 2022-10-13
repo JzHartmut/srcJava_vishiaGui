@@ -788,7 +788,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     wind.widgProgression = mng.addValueBar(null, null);
     mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
     mng.addButton(null, wind.actionFileSearch, "esc", null, "esc");
-    wind.widgSubdirs = mng.addSwitchButton(null, null, "subdirs", null, "subdirs", "wh", "gn");
+    wind.widgSubdirs = mng.addSwitchButton(null, null, "subdirs", null, "subdirs", GralColor.getColor("wh"), GralColor.getColor("gn"));
     wind.widgSearch = mng.addButton(null, wind.actionFileSearch, "search", null, "search");
     wind.widgSearch.setPrimaryWidgetOfPanel();
     return wind;

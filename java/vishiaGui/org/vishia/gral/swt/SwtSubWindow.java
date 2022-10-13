@@ -582,7 +582,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
       
       
       if(SwtSubWindow.this.resizeAction() !=null){
-      SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
+        SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
       }
     }
   };

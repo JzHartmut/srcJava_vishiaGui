@@ -410,9 +410,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
-   * @param pos String given position in GralPos units.
+   * @param currPos Position used for current, maybe null
+   * @param posName String given position in GralPos units and name, see {@link GralWidget#GralWidget(GralPos, String, char)}
    * @param zLineMax maximal number of lines managed for content. It should be related to the size of viewing. 10..50 is proper.
-   * @param name to register for symbolic access
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
@@ -791,8 +791,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   
-  /* (non-Javadoc)
-   * @see org.vishia.gral.ifc.GralTable_ifc#addLine(java.lang.String, java.lang.String[], java.lang.Object)
+  /**
+   * @see GralTable_ifc#addLine(String, String[], Object)
    */
   @Override public TableLineData addLine(String lineKey, String[] lineTexts, UserData userData) {
     return rootLine.addChildLine(lineKey, lineTexts, userData);
@@ -1857,7 +1857,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     }
 
-    /**This routine will be called inside a resize listener of the implementation graphic.
+    /**This routine will be called inside the resize listener of the implementation graphic.
      * It calculates the width of the columns with the given width of the table's canvas.
      * Then {@link #setBoundsCells()} will be called. 
      * That is implemented in the underlying graphic layer and sets the bounds for each cell.

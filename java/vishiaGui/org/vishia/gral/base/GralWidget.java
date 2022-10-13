@@ -767,7 +767,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     assert(this.itsMng !=null);
     int posName;
     final GralPos currPos1;
-    if(currPos == null) { currPos1 = gralMng.pos().pos; }
+    if(currPos == null) { currPos1 = this.itsMng.pos().pos; }
     else {currPos1 = currPos;}
     if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
       String posString1 = sPosName.substring(0, posName).trim();
@@ -1466,7 +1466,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
       //standard behavior to show: call setValue or setText which may overridden by the widget type.
       if(variable !=null){
         if(sDataPath !=null && sDataPath.contains("#dEB:activeDamping.i1intg"))
-          Assert.stop();
+          Debugutil.stop();
         if(colorRefreshed !=null && colorOld !=null){
           long timeVariable = variable.getLastRefreshTime();
           long timediff = timeVariable - timeLatest;
@@ -2040,7 +2040,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
         }
       } //if check tab folder, pixelTab
       //
-      setBoundsPixel(xyPix.x, xyPix.y, xyPix.dx, xyPix.dy );   //the standard approach. 
+      setBoundsPixel(xyPix.x, xyPix.y, xyPix.dx, xyPix.dy ); //may be widget type specific, in its ImplAccess. 
     }
     
     /**Access to the GralMng from the implementation level.  */

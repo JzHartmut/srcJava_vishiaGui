@@ -541,11 +541,11 @@ public class GralCfgZbnf
 
     GralColor color0 = null;
     if(cfge.widgetType.color0 !=null) {                    // color name for main color given: 
-      color0 = GralColor.getColor(cfge.widgetType.color0.color);  //by name 
+      color0 = cfge.widgetType.color0.color;  //by name 
     }
     GralColor color1 = null;
     if(cfge.widgetType.color1 !=null) {                    // color name for main color given: 
-      color1 = GralColor.getColor(cfge.widgetType.color1.color);  //by name 
+      color1 = cfge.widgetType.color1.color;  //by name 
     }
     //char promptPosition = cfge.widgetType.promptPosition == null ? '.' : cfge.widgetType.promptPosition.charAt(0);
     String sPrompt = cfge.widgetType.prompt;
@@ -609,6 +609,15 @@ public class GralCfgZbnf
       widg.sCmd = cfge.widgetType.cmd;
       if(wButton.bSwitch) {
         widg.setSwitchMode(cfge.widgetType.color0.color, cfge.widgetType.color1.color);
+        int textSep;
+        if(cfge.widgetType.text !=null) {
+          textSep = cfge.widgetType.text.indexOf('/');
+          if(textSep>0) {
+            widg.setSwitchMode(cfge.widgetType.text.substring(0, textSep), cfge.widgetType.text.substring(textSep+1));
+          } else {
+            widg.setText(cfge.widgetType.text);
+          }
+        }
       }
       this.widgets.add(widgd = widg);
     } 
@@ -684,7 +693,7 @@ public class GralCfgZbnf
         String sDataPathLine = line.data;
         final GralColor colorLine;
         if(line.color0 !=null){
-          colorLine = GralColor.getColor(line.color0.color);
+          colorLine = line.color0.color;
         } else {
           colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
         }
@@ -723,7 +732,7 @@ public class GralCfgZbnf
             System.err.println( "GuiCfg - line: panel is not a CanvasStorePanel;");
           }
 
-          gralMng.addLine(GralColor.getColor(cfgLine.color0.color), points);
+          gralMng.addLine(cfgLine.color0.color, points);
         } break;
         default: {
           widgd = null;
@@ -772,10 +781,10 @@ public class GralCfgZbnf
         widgd.setHtmlHelp(cfge.widgetType.help);
       }
       if(cfge.widgetType.color0 != null && !bColor0Set){
-        widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);
+        widgd.setBackColor(cfge.widgetType.color0.color, 0);
       }
       if(cfge.widgetType.color1 != null && !bColor1Set){
-        widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
+        widgd.setLineColor(cfge.widgetType.color1.color, 0);
       }
       if(cfge.widgetType.dropFiles !=null){
         GralUserAction actionDrop = gralMng.getRegisteredUserAction(cfge.widgetType.dropFiles);

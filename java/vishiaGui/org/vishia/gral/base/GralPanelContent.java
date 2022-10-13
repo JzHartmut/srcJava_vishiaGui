@@ -206,6 +206,14 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   public void setPrimaryWidget(GralWidget widg){ this._panel.primaryWidget = widg; }
   
   
+  public void setPanelVisible ( boolean bVisible) {
+    this.setVisible(bVisible);
+    for(GralWidget widget: this._panel.widgetList){
+      widget.setVisible(bVisible);
+    }
+  }
+  
+  
   /**Should be set before call of {@link #addWidget(GralWidget, boolean)}.
    * Then the widgets are presented as tabs in this panel.
    * The widgets then are usual {@link GralPanelContent} by itself or a more complex {@link GralWidget}, for example a {@link GralTable}.

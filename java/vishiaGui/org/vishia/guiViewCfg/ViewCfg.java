@@ -78,6 +78,8 @@ public class ViewCfg //extends GuiCfg
   
   final InspcCurveView curveView;
   
+  final GralButton wdgbtnOnOff; 
+  
   public final LogMessage logCfg;
   
   public final GralTextBox outTextbox;
@@ -283,6 +285,8 @@ public class ViewCfg //extends GuiCfg
     } else {
       this.curveView = null;
     }
+    GralWidget wdgbtnOnOff = gralMng.getWidget("btnOnOff");
+    this.wdgbtnOnOff = wdgbtnOnOff instanceof GralButton ? (GralButton) wdgbtnOnOff : null;
     this.window.mainPanel.reportAllContent(this.logCfg);
     this.logCfg.flush();
     //
@@ -299,7 +303,7 @@ public class ViewCfg //extends GuiCfg
     //
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
     if(this.callingArguments.sOwnIpcAddr !=null) {
-      this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox, this.callingArguments);
+      this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox, this.callingArguments, this.wdgbtnOnOff);
     } else { 
       this.oamRcvUdpValue = null;
     }

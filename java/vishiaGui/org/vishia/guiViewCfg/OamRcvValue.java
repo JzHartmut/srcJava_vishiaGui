@@ -9,6 +9,7 @@ import org.vishia.communication.Address_InterProcessComm;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactory;
+import org.vishia.gral.base.GralButton;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
 
@@ -75,20 +76,22 @@ public class OamRcvValue implements Runnable
    */
   static class ShowParam {
     /**Default switchted off, used as boolean. */
-    int printDotOnReceivedTelegr = 0;
+    int printDotOnReceivedTelegr = 1;
     
     int printTime = 0;
     
     /**ctdot & mask ==0 then write dot, reduction ratio. */
-    int maskWriteDot = 0x0f; 
+    //int maskWriteDot = 0x40; 
     
     /**Newline after receiving that number of telegrams. Should be proper to maskWriteDot, but changed and hence calculated manual. */
-    int newlineOnTelgCt = 16 * 100;
+    int newlineOnTelgCt = 200;
     
     long timeLast;
   }
   ShowParam showParam = new ShowParam();
-
+  
+  int ctRxNl=0;
+  
   int ctCorruptData;
   
   int currCnt = 0;
@@ -104,6 +107,8 @@ public class OamRcvValue implements Runnable
   ByteDataAccessSimple txInfoAccess = new ByteDataAccessSimple(true);
   
   final MainCmdLogging_ifc log;
+  
+  private final GralButton wdgButtonOnOff;
 
 
   private final InterProcessComm ipc;
@@ -123,9 +128,11 @@ public class OamRcvValue implements Runnable
   
   byte[] sendData = new byte[1500];
   
-  public OamRcvValue ( OamShowValues showValues, MainCmdLogging_ifc log, ViewCfg.CallingArguments args) {
+  public OamRcvValue ( OamShowValues showValues, MainCmdLogging_ifc log
+      , ViewCfg.CallingArguments args, GralButton wdgButtonOnOff) {
     this.thread = new Thread(this, "oamRcv");
     this.log = log;
+    this.wdgButtonOnOff = wdgButtonOnOff;
     this.showValues = showValues;
     senderAddr = InterProcessCommFactory.getInstance().createAddress("UDP:127.0.0.1:0xffff");
     if(args.targetIpc.val !=null) {
@@ -165,19 +172,18 @@ public class OamRcvValue implements Runnable
   
   private void receiveAndExec() {
     int[] result = new int[1];
-    int ctnl=0;
     long time1 = System.currentTimeMillis();
     this.ipc.receiveData(result, this.recvData, this.senderAddr);
     long time2 = System.currentTimeMillis();
     if(result[0] > 0) {
       this.bTargetAddrValid = true;
-      if(showParam.printDotOnReceivedTelegr !=0) {
+      if(this.showParam.printDotOnReceivedTelegr !=0) {
         System.out.append('.');
-        if(--ctnl <0) {
-          ctnl = showParam.newlineOnTelgCt;
-          if( (ctnl & showParam.maskWriteDot) ==0) {
+        if(--this.ctRxNl <0) {
+          this.ctRxNl = this.showParam.newlineOnTelgCt;
+//          if( (ctRxNl & showParam.maskWriteDot) !=0) {
             System.out.append('\n');
-          }
+//          }
         }
       }
       int currCnt1 = (((int)this.recvData[24])<<8) | (this.recvData[25] & 0x00ff);
@@ -249,7 +255,7 @@ public class OamRcvValue implements Runnable
     catch (InterruptedException e)
     { //dialogZbnfConfigurator.terminate();
     }
-    if(this.bTargetAddrValid) {
+    if(this.bTargetAddrValid && (this.wdgButtonOnOff ==null || this.wdgButtonOnOff.isOn() )) {
       long timeAbs = System.currentTimeMillis();
       this.txInfoAccess.setIntVal(2+0, 2, 0x20);   //Position uint16 data[0] for embedded: length item
       this.txInfoAccess.setIntVal(2+2, 2, 0x65);   //Position uint16 data[4] for embedded: cmd

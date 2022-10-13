@@ -99,7 +99,7 @@ import org.vishia.util.KeyCode;
  *
  */
 public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWidgImplAccess_ifc
-, FocusListener  //for the cells
+
 //public class SwtTable  implements GralWidgImpl_ifc 
 {
 
@@ -279,7 +279,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy) {
-    // TODO Auto-generated method stub
+    SwtTable.this.swtWidgHelper.widgetSwt.setBounds(x, y, dx, dy);
     
   }
   
@@ -644,49 +644,58 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   
   
+  FocusListener focusListenerCells = new FocusListener() { //for the cells
   
-  
-  /**Focus listener implementation for all cells.
-   * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
-   * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
-   * {@link GralTable.GraphicImplAccess#bRedrawPending} is not set. That prevents invocation while
-   * {@link GralTable.GraphicImplAccess#updateGraphicCellContent()} sets the focus while updating the graphic cells.
-   * 
-   */
-  @Override public void focusLost(FocusEvent ev){ 
-    //System.out.println("Cell focus lost");
-    super.focusLostTable();
-    if(!bRedrawPending){
-      //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
-      GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
-      Text widgSwt = (Text)ev.widget;
-      if(super.bColumnEditable(celldata.ixCellColumn)){
-        String sText = widgSwt.getText();
-        super.checkAndUpdateText(sText, celldata);
+    /**Focus listener implementation for all cells.
+     * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
+     * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
+     * {@link GralTable.GraphicImplAccess#bRedrawPending} is not set. That prevents invocation while
+     * {@link GralTable.GraphicImplAccess#updateGraphicCellContent()} sets the focus while updating the graphic cells.
+     * 
+     */
+    @Override public void focusLost(FocusEvent ev){ 
+      //System.out.println("Cell focus lost");
+      SwtTable.this.focusLostTable();
+      if(!bRedrawPending){
+        //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
+        GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
+        Text widgSwt = (Text)ev.widget;
+        if(SwtTable.this.bColumnEditable(celldata.ixCellColumn)){
+          String sText = widgSwt.getText();
+          SwtTable.this.checkAndUpdateText(sText, celldata);
+        }
+        //System.out.println("SwtTableCell - focus lost;");
       }
-      //System.out.println("SwtTableCell - focus lost;");
     }
-  }
-  
-  /**Focus listener implementation for all cells.
-   * This routine is invoked especially if the mouse is landing 
-   * on a Text-field with click. Then this table line and column
-   * should be selected as currently. <br>
-   * This routine is invoked on setFocus()-call too. In this case
-   * it should not done anything. The variable #bRedrawPending guards it.
-   * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
-   */
-  @Override public void focusGained(FocusEvent ev) { 
-    SwtTable.this.focusGainedTable();
-    setFocused(widgg, true); 
-    cellInFocus = (Text)ev.getSource();
-    //System.out.println("SwtTableCell - focus gained;");
-  }
-  
+    
+    /**Focus listener implementation for all cells.
+     * This routine is invoked especially if the mouse is landing 
+     * on a Text-field with click. Then this table line and column
+     * should be selected as currently. <br>
+     * This routine is invoked on setFocus()-call too. In this case
+     * it should not done anything. The variable #bRedrawPending guards it.
+     * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+     */
+    @Override public void focusGained(FocusEvent ev) { 
+      SwtTable.this.focusGainedTable();
+      setFocused(widgg, true); 
+      cellInFocus = (Text)ev.getSource();
+      //System.out.println("SwtTableCell - focus gained;");
+    }
+  };
 
   
   
   
+  /**It creates {@link Text} for each cell of the table,
+   * and assigns the {@link #swtKeyListener}, {@link #focusListenerCells}, {@link #mousePressedListener},
+   * {@link #mouseWheelListener}, {@link #traverseListenerTable} to all cells.
+   * <br>
+   * Each cell gets {@link GralTable.CellData} as {@link Control#setData(Object)}. 
+   * @param swtTable
+   * @param zColumns
+   * @param mng
+   */
   protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
     int yPix = 0;
     Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
@@ -707,18 +716,18 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         }
         cell.setFont(font);
         cell.addKeyListener(myKeyListener);
-        cell.addFocusListener(this);
+        cell.addFocusListener(focusListenerCells);
         cell.addMouseListener(mousePressedListener);
         cell.addMouseWheelListener(mouseWheelListener);
         cell.addTraverseListener(traverseListenerTable);
         GralTable.CellData cellData = new GralTable.CellData(iRow, iCol);
         cell.setData(cellData);
-        cells[iRow][iCol] = cellData;
+        super.cells[iRow][iCol] = cellData;                // in GralTable.GraphicImplAccess
         int xdPixCol = super.columnPixel[iCol+1] - columnPixel[iCol];
         cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
         cell.setBackground(colorBackTableSwt);
         //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
-        cellsSwt[iRow][iCol] = cell;
+        cellsSwt[iRow][iCol] = cell;                       // The array of swt.Txt
       }
       yPix += linePixel;
     }
@@ -835,6 +844,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     
   };
   
+  /**The Resize listener for the whole table (a swt.Composite). 
+   * The controlResized(...) operation calls {@link #resizeTable(GralRectangle)}
+   * which calculates and sets the bounds of all swt.Text fields.
+   */
   ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.

@@ -500,7 +500,6 @@ public class GralColor
     int color = ((red << 16) & 0xff0000) | ((green << 8) & 0xff00) | (blue & 0xff);
     // name = container.colorsByValue.get(color);
     //String name = null;
-    if(name !=null) return name;
-    else return String.format("0x%06X",new Integer(color));
+    return (name !=null ? name +":" : "") + String.format("0x%06X",new Integer(color));
   }
 }

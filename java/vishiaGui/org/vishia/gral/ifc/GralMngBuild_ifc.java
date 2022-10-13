@@ -371,8 +371,8 @@ public interface GralMngBuild_ifc
   //, String sShowMethod
   , String sDataPath
   , String sButtonText
-  , String color0
-  , String color1
+  , GralColor colorOff
+  , GralColor colorOn
   );
   
   

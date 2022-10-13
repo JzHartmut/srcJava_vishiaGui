@@ -593,6 +593,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     pos().pos.set(pos);
   }
 
+  
+  /**Returns the current position of this thread to work with it.
+   * @return Will be changed on ctors of GralWidget.
+   *   The GralWidget does not store a reference to this, it stores a clone. 
+   */
+  public GralPos currPos() { return this.pos().pos; }
+  
+  
   /**Sets the position with a given String, see {@link GralPos#setPosition(CharSequence, GralPos)}
    * whereby the parent is the current position value.
    * @param sPosition
@@ -1260,9 +1268,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @see java.lang.Runnable#run()
    */
   protected void runGraphicThread() {
-    long guiThreadId1 = Thread.currentThread().getId(); // should set firstly because in createImplWidget_Gthread it is necesarry. 
+    long guiThreadId1 = Thread.currentThread().getId();    // should set firstly because in createImplWidget_Gthread it is necesarry. 
     this.graphicThreadId = guiThreadId1;
-    this._mngImpl.initGraphic();
+    this._mngImpl.initGraphic();                           // inits the basics of the Graphic only, not the GralWidgets.
     //add important properties for the main window, the user should not thing about:
     this.windPrimary.windProps |= GralWindow.windIsMain  | GralWindow.windHasMenu;
     if((this.windPrimary.windProps & GralWindow_ifc.windMinimizeOnClose)==0) {
@@ -1572,8 +1580,8 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 , String sCmd
 , String sDataPath
 , String sButtonText
-, String sColor0
-, String sColor1
+, GralColor colorOff
+, GralColor colorOn
   //, int height, int width
   //, String sCmd, String sUserAction, String sName)
 )
@@ -1584,8 +1592,6 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
   GralButton widgButton = new GralButton(sName);
-  GralColor colorOff = GralColor.getColor(sColor0);
-  GralColor colorOn = GralColor.getColor(sColor1);
   widgButton.setSwitchMode(colorOff, colorOn);
   widgButton.setActionChange(action);  //maybe null
   widgButton.setText(sButtonText);

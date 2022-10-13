@@ -97,36 +97,36 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-10-01 23:10:04  x     GralLed.java                             ::          5.643  1049875631 
 2022-09-25 19:48:48  x     GralMenu.java                            ::         12.586 -0766242011 
-2022-10-12 12:53:27  x     GralMng.java                             ::         97.825  0928645128 
+2022-10-13 18:52:07  x     GralMng.java                             ::         98.086 -1636194040 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
-2022-10-12 10:09:09  x     GralPanelContent.java                    ::         21.617  2120619200 
+2022-10-12 23:18:13  x     GralPanelContent.java                    ::         21.803 -0250261956 
 2022-10-09 00:37:52  x     GralPos.java                             ::         64.845  0040024177 
 2022-10-09 00:50:26  x     GralScreen.java                          ::          4.321  0297479445 
 2022-08-31 20:31:40  x     GralShowMethods.java                     ::         11.732 -1383563975 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
 2022-09-29 13:20:52  x     GralTabbedPanel.java                     ::         10.836  1475394654 
-2022-10-10 22:25:14  x     GralTable.java                           ::        110.616  2060904510 
+2022-10-12 22:21:19  x     GralTable.java                           ::        110.634  0463341949 
 2022-08-28 19:46:09  x     GralTextBox.java                         ::          7.541 -1701715115 
 2022-10-09 00:19:54  x     GralTextField.java                       ::         34.138  1337435052 
 2022-10-01 23:10:04  x     GralValueBar.java                        ::          6.216 -0483513653 
 2022-10-02 00:05:26  x     GralWidgImplAccess_ifc.java              ::          5.922 -1810177720 
-2022-10-12 17:25:55  x     GralWidget.java                          ::        104.414  0116954012 
+2022-10-12 22:09:35  x     GralWidget.java                          ::        104.444 -1040691346 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-10-10 22:26:53  x     GralWindow.java                          ::         17.931 -0136492814 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
 2013-07-15 11:52:00  x     package-info.java                        ::           .413  0984628564 
 
 ============================== java/vishiaGui/org/vishia/gral/cfg/ =================================
-2022-10-04 22:53:47  x     GralCfgBuilder.java                      ::         19.670 -0761819665 
-2022-09-23 21:34:18  x     GralCfgData.java                         ::         19.548 -1311027335 
+2022-10-13 18:57:32  x     GralCfgBuilder.java                      ::         19.260 -0637760796 
+2022-10-13 18:37:08  x     GralCfgData.java                         ::         20.089  1677581446 
 2022-08-28 20:17:08  x     GralCfgDesigner.java                     ::         15.580 -1911478894 
 2022-08-28 20:15:11  x     GralCfgElement.java                      ::         10.583  1606335891 
 2021-10-04 14:29:48  x     GralCfgPanel.java                        ::          2.140  1145000466 
 2022-08-28 20:05:36  x     GralCfgPosition.java                     ::          5.088  0166729575 
 2022-10-10 22:23:18  x     GralCfgWindow.java                       ::          7.351 -0742586749 
-2022-08-28 20:17:41  x     GralCfgWriter.java                       ::         10.486 -0873649842 
-2022-10-10 12:06:07  x     GralCfgZbnf.java                         ::         35.609 -2074371344 
+2022-10-13 18:52:49  x     GralCfgWriter.java                       ::         10.508  2051314654 
+2022-10-13 18:56:00  x     GralCfgZbnf.java                         ::         35.841  1646190442 
 2022-10-02 10:58:13  x     Syntax.zbnf                              ::          4.959  2048561560 
 2012-03-28 07:42:16  x     package-info.java                        ::           .907  0254677754 
 
@@ -143,15 +143,15 @@
 2021-10-04 14:29:49  x     GralButtonKeyMenu.java                   ::          3.248 -0638490188 
 2021-10-04 14:29:51  x     GralCanvasStorage.java                   ::          8.157  0821951597 
 2021-10-04 14:29:49  x     GralCanvas_ifc.java                      ::          2.487 -1032548575 
-2015-10-17 00:15:41  x     GralColor.java                           ::         18.443  0689480018 
+2022-10-13 18:37:03  x     GralColor.java                           ::         18.438 -1358590836 
 2021-10-04 14:29:52  x     GralCurveViewTrack_ifc.java              ::          4.578 -1455091053 
 2022-09-28 16:22:10  x     GralCurveView_ifc.java                   ::          6.191 -0611928841 
-2022-10-04 17:51:06  x     GralFactory.java                         ::          7.854 -0801444837 
+2022-10-12 23:02:14  x     GralFactory.java                         ::          7.968  0982853260 
 2021-10-04 14:29:56  x     GralFileDialog_ifc.java                  ::          2.614 -1407969796 
 2022-02-03 17:00:02  x     GralFont.java                            ::          4.116  0728527525 
 2021-10-04 14:29:58  x     GralImageBase.java                       ::          1.665  1705007261 
 2022-01-21 20:25:27  x     GralMngApplAdapter_ifc.java              ::          2.475 -2082089171 
-2022-10-04 22:51:08  x     GralMngBuild_ifc.java                    ::         34.629 -0095848606 
+2022-10-13 18:52:18  x     GralMngBuild_ifc.java                    ::         34.638 -0660323211 
 2022-10-04 16:22:22  x     GralMng_ifc.java                         ::         13.365 -1164317370 
 2022-09-04 20:48:36  x     GralPanel_ifc.java                       ::           .751  0240861988 
 2021-10-04 14:29:58  x     GralPlugUser2Gral_ifc.java               ::          1.562  1177481251 
@@ -206,9 +206,9 @@
 2021-10-04 14:29:58  x     SwtProperties.java                       ::          5.666 -2070296168 
 2013-10-05 22:28:54  x     SwtSetValue_ifc.java                     ::           .374  1688335866 
 2022-10-01 23:10:04  x     SwtSlider.java                           ::          1.541  1957534257 
-2022-10-09 23:37:19  x     SwtSubWindow.java                        ::         24.043  1697338324 
+2022-10-12 22:09:40  x     SwtSubWindow.java                        ::         24.045 -0373916855 
 2022-09-30 20:22:54  x     SwtTabbedPanel.java                      ::          9.780  0116164002 
-2022-10-01 23:10:04  x     SwtTable.java                            ::         40.470 -1368596091 
+2022-10-12 22:20:40  x     SwtTable.java                            ::         41.369 -0001393987 
 2022-01-31 19:48:38  x     SwtTextBox.java                          ::         14.779 -0197457034 
 2022-10-02 00:25:51  x     SwtTextFieldWrapper.java                 ::         22.525  0429072101 
 2021-10-04 14:29:50  x     SwtTransparentLabel.java                 ::          1.785  0602653326 
@@ -231,7 +231,7 @@
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2018-10-28 10:18:44  x     GralCommandSelector.java                 ::          8.507 -1870745650 
 2022-10-05 22:49:08  x     GralFileSelectWindow.java                ::          8.252 -0610930941 
-2022-10-09 00:38:14  x     GralFileSelector.java                    ::         68.735  1201467466 
+2022-10-13 18:46:23  x     GralFileSelector.java                    ::         68.775 -1714332716 
 2022-10-01 23:10:04  x     GralHorizontalSelector.java              ::         10.650  0601742095 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2022-10-03 11:04:54  x     GralInfoBox.java                         ::         15.529  0030158747 
@@ -254,9 +254,9 @@
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
 2022-10-05 17:55:12  x     OamEvalValues_ifc.java                   ::           .745  0661411213 
 2022-09-23 10:23:34  x     OamOutFileReader.java                    ::          3.543  1655028191 
-2022-10-05 17:26:45  x     OamRcvValue.java                         ::         10.007  0860862150 
+2022-10-13 17:47:30  x     OamRcvValue.java                         ::         10.264  1119506308 
 2022-10-05 17:58:04  x     OamShowValues.java                       ::         24.772  1895443324 
-2022-10-12 12:50:20  x     ViewCfg.java                             ::         18.373  0263413940 
+2022-10-13 17:49:28  x     ViewCfg.java                             ::         18.579 -0307617972 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
 2022-10-10 22:28:10  x     StimuliSelector.java                     ::         42.688  2085925228 

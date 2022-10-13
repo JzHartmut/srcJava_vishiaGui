@@ -261,8 +261,8 @@ public class GralCfgWriter
       writer.append(sep).append("dragText=\"")  .append(pp.dragText).append("\""); sep = ", "; }
     if(pp.dropFiles !=null) { writer.append(sep).append("dropFiles=\"") .append(pp.dropFiles).append("\""); sep = ", "; }
     if(pp.dropText !=null)  { writer.append(sep).append("dropText=\"")  .append(pp.dropText).append("\""); sep = ", "; }
-    if(pp.color0 !=null)    { writer.append(sep).append("color=")       .append(pp.color0.color); 
-      if(pp.color1 !=null)  { writer            .append("/")            .append(pp.color1.color); }  sep = ", "; 
+    if(pp.color0 !=null)    { writer.append(sep).append("color=")       .append(pp.color0.color.toString()); 
+      if(pp.color1 !=null)  { writer            .append("/")            .append(pp.color1.color.toString()); }  sep = ", "; 
     }
   }
 

@@ -110,6 +110,8 @@ public abstract class GralFactory
    * Examples see {@link org.vishia.guiViewCfg.ViewCfg}.
    * <br>
    * It creates the implementation graphic manager, primary window and the graphic thread.
+   * Set a breakpoint in {@link GralMng#runGraphicThread} to follow step by step what is done for creation.
+   * 
    * @param windowg
    * @param sizeShow 'A' ... 'G' for the size, pixel per grid
    * @param log a log necessary?

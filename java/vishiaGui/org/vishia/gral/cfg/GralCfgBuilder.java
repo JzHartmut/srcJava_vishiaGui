@@ -285,11 +285,6 @@ public class GralCfgBuilder
       }
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
-      final int colorValue;
-      if(wText.color0 !=null){ colorValue = gralMng.getColorValue(wText.color0.color); }
-      //else if(wText.colorName !=null){ colorValue = gralMng.getColorValue(wText.colorName.color);}
-      else{ colorValue = 0; } //black
-      cfge.widgetType.color0 = null;  //it is used, don't set background.
       widgd = gralMng.addText(cfge.widgetType.text); 
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
@@ -338,7 +333,7 @@ public class GralCfgBuilder
         String sDataPathLine = line.data;
         final GralColor colorLine;
         if(line.color0 !=null){
-          colorLine = GralColor.getColor(line.color0.color);
+          colorLine = line.color0.color;
         } else {
           colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
         }
@@ -366,7 +361,7 @@ public class GralCfgBuilder
           for(GralCfgData.GuiCfgCoord coord: cfgLine.coords){
             points.add(new GralPoint(coord.x, coord.y));
           }
-          gralMng.addLine(GralColor.getColor(cfgLine.color0.color), points);
+          gralMng.addLine(cfgLine.color0.color, points);
         } break;
         default: {
           widgd = null;
@@ -415,10 +410,10 @@ public class GralCfgBuilder
         widgd.setHtmlHelp(cfge.widgetType.help);
       }
       if(cfge.widgetType.color0 != null){
-        widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);
+        widgd.setBackColor(cfge.widgetType.color0.color, 0);
       }
       if(cfge.widgetType.color1 != null){
-        widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
+        widgd.setLineColor(cfge.widgetType.color1.color, 0);
       }
       if(cfge.widgetType.dropFiles !=null){
         GralUserAction actionDrop = gralMng.getRegisteredUserAction(cfge.widgetType.dropFiles);

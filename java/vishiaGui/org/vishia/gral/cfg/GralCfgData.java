@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 
 
@@ -121,6 +122,16 @@ public final class GralCfgData
     public GuiCfgWidget(GralCfgElement itsElement, char whatIs){ 
       this.itsElement = itsElement; 
       this.whatIs = whatIs;
+    }
+    
+    /**For Show(varx) use the text as {@link {@link #data} and #name. It is the simple form. 
+     * Also set the field {@link #text}
+     * @param val
+     */
+    public void set_text(String val) {
+      if(this.data == null) { this.data = val; }
+      if(this.name == null) { this.name = val;}
+      this.text = val;
     }
     
     public void set_data(String val){ 
@@ -270,7 +281,7 @@ public final class GralCfgData
      * Also set the field {@link #text}
      * @param val
      */
-    public void set_text(String val) {
+    @Override public void set_text(String val) {
       if(this.data == null) { this.data = val; }
       if(this.name == null) { this.name = val;}
       this.text = val;
@@ -390,10 +401,13 @@ public final class GralCfgData
   
   public final static class GuiCfgColor
   {
-    public String color;
+    public GralColor color;
     
+    public void set_color(String val) { 
+      this.color = GralColor.getColor(val);   //hint: does not throw, use magenta color on error
+    }
 
-    @Override public String toString() { return "Color: " + color; }
+    @Override public String toString() { return "Color: " + this.color.toString(); }
 
   }
   
