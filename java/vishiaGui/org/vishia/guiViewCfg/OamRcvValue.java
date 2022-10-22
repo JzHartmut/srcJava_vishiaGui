@@ -76,7 +76,7 @@ public class OamRcvValue implements Runnable
    */
   static class ShowParam {
     /**Default switchted off, used as boolean. */
-    int printDotOnReceivedTelegr = 1;
+    int printDotOnReceivedTelegr = 0;
     
     int printTime = 0;
     

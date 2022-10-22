@@ -252,7 +252,7 @@ public class InspcViewTargetComm
   GralUserAction actionOpenWindowTargetSettings = new GralUserAction("InspcGui - OpenPwd"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        InspcViewTargetComm.this.targetForSettingsWindow = widgTable.getCurrentLine().data;
+        InspcViewTargetComm.this.targetForSettingsWindow = widgTable.getCurrentLine().nd_data;
         InspcViewTargetComm.this.targetKeySettingwindow = InspcViewTargetComm.this.targetForSettingsWindow.name;
         windTargetSettings.setVisible(true);
         wdgTargetIdent.setText(InspcViewTargetComm.this.targetKeySettingwindow);

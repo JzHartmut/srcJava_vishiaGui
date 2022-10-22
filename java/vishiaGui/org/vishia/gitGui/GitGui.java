@@ -1300,7 +1300,7 @@ public class GitGui
         System.err.println("more as one line marked");
       }
     }
-    GitGui.this.currentEntry = line.data;
+    GitGui.this.currentEntry = line.nd_data;
     GitGui.this.cmpEntry = cmpLine == null ? null : cmpLine.getUserData();
     String sGitCmd = "git";
     if(! sGitDir.startsWith(sWorkingDir)) {

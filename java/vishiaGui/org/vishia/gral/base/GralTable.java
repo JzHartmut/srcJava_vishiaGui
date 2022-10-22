@@ -99,6 +99,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-22 Hartmut chg: rename variables of {@link NodeTableLine} with prefix tbl_ to distinguish from nd_ variables from node 
    * <li>2018-10-28 Hartmut chg: Now uses argument zLineMax from {@link #GralTable(String, int, int[])} instead constant 50 for number of showed lines.
    * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
    * <li>2016-09-17 Hartmut new: in {@link #mouseDouble(int, CellData)} the <code>getActionChangeStrict(ActionChangeWhen.onMouse1Double, true)</code>
@@ -155,7 +156,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   elsewhere only in the implementation layer via the text widget.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
    * <li>2013-11-02 Hartmut chg: {@link GralTable.GraphicImplAccess#resizeTable(GralRectangle)} moved from SWT implementation,
-   *   preparing tree view. {@link GralTable.TableLineData#treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
+   *   preparing tree view. {@link GralTable.TableLineData#tbl_treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
    * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(int, GralTableLine_ifc)} only if the line is changed, 
    *   not on focus without changed line.
@@ -423,9 +424,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     this.bColumnEditable = new boolean[this.zColumn];  //all false.
     
     rootLine = new NodeTableLine("", null);
-    rootLine.showChildren = true;
-    rootLine.treeDepth = -1; //children of rootline are level 0
-    rootLine.zLineUnfolded = 0;  //count added line.
+    rootLine.tbl_showChildren = true;
+    rootLine.tbl_treeDepth = -1; //children of rootline are level 0
+    rootLine.tbl_zLineUnfolded = 0;  //count added line.
     
     @SuppressWarnings("unchecked")
     TableLineData[] linesForCell1 = (TableLineData[])Array.newInstance( TableLineData.class, zLineMax );
@@ -883,8 +884,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
     
     for(TableLineData item: rootLine.iterator()){
-      if(item.data instanceof MarkMask_ifc){
-        if((((MarkMask_ifc)item.data).getMark() & mask) !=0){
+      if(item.nd_data instanceof MarkMask_ifc){
+        if((((MarkMask_ifc)item.nd_data).getMark() & mask) !=0){
           list.add(item);
         }
       }
@@ -1003,7 +1004,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   TableLineData nextLine(TableLineData lineP){
     TableLineData line = lineP;
     TableLineData linenext = null;
-    if(line.showChildren){
+    if(line.tbl_showChildren){
       linenext = line.firstChild();         //deeper to any children
     }
     if(linenext == null){ //no children found
@@ -1034,7 +1035,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     } else {
       //if(line2 !=null){ line2 = line2.prevSibling(); } //the parent is the current parent, use previous.
-      while(line2 !=null && line2.showChildren){
+      while(line2 !=null && line2.tbl_showChildren){
         //it has children
         line2 = line2.lastChild();  //last of all showing levels
       }
@@ -1309,7 +1310,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             searchChars.setLength(searchChars.length()-1);
             repaint();
           } else if(lineSelected !=null && keyCode == keyOpenChild){
-            if(lineSelected.lineCanHaveChildren){
+            if(lineSelected.tbl_lineCanHaveChildren){
               actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
             }
             if(lineSelected.hasChildren()){           //only if it has children currently really.
@@ -1319,7 +1320,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
               //repaint();
             }
           } else if(lineSelected !=null && keyCode == keyCloseChild){
-            if(lineSelected !=null && lineSelected.showChildren){
+            if(lineSelected !=null && lineSelected.tbl_showChildren){
               lineSelected.showChildren(false, false);
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
               repaint();
@@ -1474,7 +1475,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**Pixel position of the vertical scroll bar. */
     protected final GralRectangle xyVscrollbar = new GralRectangle(0,0,0,0);
     
-    /**Position of vScrollBar calculated from {@link GralTable#rootLine}. {@link NodeTableLine#zLineUnfolded} and {@link GralTable#nLineCurr}
+    /**Position of vScrollBar calculated from {@link GralTable#rootLine}. {@link NodeTableLine#tbl_zLineUnfolded} and {@link GralTable#nLineCurr}
      * written in {@link #determineSizeAndPosition()} used for painting vScrollBar. */
     protected int y1Scrollbar, y2Scrollbar;
     
@@ -1825,17 +1826,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**This method have to be called before the vertical scroll bar is painted
      * in the {@link GralWidgImplAccess_ifc#repaintGthread()} routine..
      * It checks whether the {@link GralTable#nLineCurr} and the shown number of lines
-     * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#zLineUnfolded}
+     * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#tbl_zLineUnfolded}
      * is given, e.g. >=0. If one of them is <0 or lines are countered
      * calling {@link NodeTableLine#countChildren(boolean, int)}. 
      * Therewith the {@link GralTable#nLineCurr} is set too. Anytime if the situation is not specified
      * the {@link GralTable#nLineCurr} can be set to -1. This forces new calculation.
      */
     protected void determineSizeAndPositionScrollbar(int yPixel)
-    { if(GralTable.this.nLineFirst <0 || GralTable.this.rootLine.zLineUnfolded <0) {
+    { if(GralTable.this.nLineFirst <0 || GralTable.this.rootLine.tbl_zLineUnfolded <0) {
         GralTable.this.rootLine.countChildren(true, 0);
       }
-      int zLine = Math.max(1, rootLine.zLineUnfolded);
+      int zLine = Math.max(1, rootLine.tbl_zLineUnfolded);
       int y1 = yPixel * nLineFirst / zLine;
       int zLineShow = Math.min(zLineVisible, zLine);  //less if table is shorter than visible area
       int yd = yPixel * zLineShow / zLine;   //it is <= yPixel
@@ -2033,12 +2034,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**Number of lines for this line and all visible children.
      * 
      */
-    int zLineUnfolded;
+    int tbl_zLineUnfolded;
     
     /**The deepness in the tree presentation of the data.
      * 
      */
-    int treeDepth;
+    int tbl_treeDepth;
 
     /**Lines of a children, a tree structure. null for a non-treed table.
      * null it the children are unknown or there are not children.
@@ -2048,17 +2049,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected TableLineData parentLine;
     
     /**True if it is known that the node has children. They may be unknown, then {@link #childLines} are null. */
-    boolean lineCanHaveChildren;
+    boolean tbl_lineCanHaveChildren;
 
     /**True if the children are shown in representation. */
-    boolean showChildren;
+    boolean tbl_showChildren;
 
     NodeTableLine(String key, UserData data){ super(key, data); }
     
     
     void clear() {
       rootLine.removeChildren();
-      rootLine.zLineUnfolded = 0;
+      rootLine.tbl_zLineUnfolded = 0;
     }
     
     
@@ -2071,10 +2072,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return the added line.
      */
     public TableLineData addChildLine(String lineKey, String[] lineTexts, UserData userDataP){
-      lineCanHaveChildren = true; //hasChildren();
+      tbl_lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addNode(line);
-      line.treeDepth = this.treeDepth +1;
+      line.tbl_treeDepth = this.tbl_treeDepth +1;
       line.prepareAddedLine(lineTexts);
       return line;
 
@@ -2088,7 +2089,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return the added line.
      */
     public TableLineData addPrevLine(String lineKey, String[] lineTexts, UserData userDataP){
-      lineCanHaveChildren = true; //hasChildren();
+      tbl_lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addSiblingPrev(line);  
       line.prepareAddedLine(lineTexts);
@@ -2105,7 +2106,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return the added line.
      */
     public TableLineData addNextLine(String lineKey, String[] lineTexts, UserData userDataP){
-      lineCanHaveChildren = true; //hasChildren();
+      tbl_lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addSiblingNext(line);
       line.prepareAddedLine(lineTexts);
@@ -2139,23 +2140,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     void countChildren(boolean bLeftGrandChildrenOpen, int nrParent){
       countChildren(bLeftGrandChildrenOpen, nrParent, 0);
-      adjCountChildrenInParent(this.zLineUnfolded);
+      adjCountChildrenInParent(this.tbl_zLineUnfolded);
     }
     
     
     /**Counts the children and checks whether their childs should be shown.
-     * It checks and sets {@link TableLineData#showChildren}
+     * It checks and sets {@link TableLineData#tbl_showChildren}
      * @param lineParent
-     * @param bLeftGrandChildrenOpen false then set {@link TableLineData#showChildren} = false, true: count the grand children.  
+     * @param bLeftGrandChildrenOpen false then set {@link TableLineData#tbl_showChildren} = false, true: count the grand children.  
      * @param recurs more than 100 - prevent it.
      */
     void countChildren(boolean bLeftGrandChildrenOpen, int nrParent, int recurs){
       if(recurs >100) return;
-      this.zLineUnfolded = 0;
+      this.tbl_zLineUnfolded = 0;
       int ctParent = nrParent;
       TableLineData child = this.firstChild();
       while(child !=null) {
-        this.zLineUnfolded +=1;
+        this.tbl_zLineUnfolded +=1;
         ctParent +=1;
         if(zLineCurr >=0){ 
           zLineCurr +=1; 
@@ -2163,12 +2164,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             nLineFirst = ctParent;
           }
         }
-        if(child.showChildren && bLeftGrandChildrenOpen) {
+        if(child.tbl_showChildren && bLeftGrandChildrenOpen) {
           child.countChildren(true, ctParent, recurs+1);
-          this.zLineUnfolded += child.zLineUnfolded;
+          this.tbl_zLineUnfolded += child.tbl_zLineUnfolded;
         } else {
-          child.showChildren = false; //close it.
-          child.zLineUnfolded = 0;
+          child.tbl_showChildren = false; //close it.
+          child.tbl_zLineUnfolded = 0;
         }
         child = child.nextSibling();
       }
@@ -2179,11 +2180,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     void adjCountChildrenInParent(int nCorr) {
       ////
       NodeTableLine parent1 = parent();
-      boolean showChildren1 = showChildren;
+      boolean showChildren1 = tbl_showChildren;
       while(parent1 !=null   //stop on root node. 
-          && (showChildren1 &= parent1.showChildren)   //stop count zLineUnfolded on nonvisible children.
+          && (showChildren1 &= parent1.tbl_showChildren)   //stop count zLineUnfolded on nonvisible children.
         ) {
-        zLineUnfolded += nCorr;
+        tbl_zLineUnfolded += nCorr;
         parent1 = parent1.parent();   
       }
     }
@@ -2199,7 +2200,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * The graphical representation refers this class.
    * A table line contains:
    * <ul>
-   * <li>Association to user data for application usage, unused in graphic: {@link TreeNodeBase#data}
+   * <li>Association to user data for application usage, unused in graphic: {@link TreeNodeBase#nd_data}
    * <li>Texts for all cells of the table: {@link TableLineData#cellTexts}
    * <li>background and text color for the line (all cells) {@link TableLineData#colorBackground}, {@link TableLineData#colorForeground}
    * <li>Maybe background colors for all or some cells, null if the cell have the line back color
@@ -2278,16 +2279,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       adjCountChildrenInParent(1);
       zLine += 1;
       GralTable.this.bPrepareVisibleArea = true;
-      boolean showChildren1 = this.showChildren; 
-      if(zLineUnfolded == -1){ 
-        zLineUnfolded = 0;
+      boolean showChildren1 = this.tbl_showChildren; 
+      if(tbl_zLineUnfolded == -1){ 
+        tbl_zLineUnfolded = 0;
       }
-      if(showChildren) {
-        zLineUnfolded +=1;
+      if(tbl_showChildren) {
+        tbl_zLineUnfolded +=1;
         adjCountChildrenInParent(1);
       }
       if(this == linesForCell[0]) {
-        nLineFirst = rootLine.zLineUnfolded;  //store the number of current line if given.
+        nLineFirst = rootLine.tbl_zLineUnfolded;  //store the number of current line if given.
       }
       if(showChildren1) {
         repaint();
@@ -2364,7 +2365,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public String[] getCellTexts() { return cellTexts; }
 
     
-    public int treeDepth(){ return treeDepth; }
+    public int treeDepth(){ return tbl_treeDepth; }
     
     @Override
     public String setCellText(String text, int column) {
@@ -2380,7 +2381,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     
-    @Override public UserData getUserData() { return data;  }
+    @Override public UserData getUserData() { return nd_data;  }
 
     //@Override public void setUserData(UserData data) {this.userData = data; }
 
@@ -2501,18 +2502,18 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     @Override public void showChildren(boolean show, boolean bLeftGrandChildrenOpen) {
       if(show) {
-        if(bLeftGrandChildrenOpen && showChildren) return;  //do nothing because no change
+        if(bLeftGrandChildrenOpen && tbl_showChildren) return;  //do nothing because no change
         else {
-          if(showChildren) {  //it is shown already
+          if(tbl_showChildren) {  //it is shown already
           }
-          showChildren = true;
+          tbl_showChildren = true;
           //children are closed yet, open and count it.
           countChildren(bLeftGrandChildrenOpen, nLineFirst);
         }
       } else { //switch off children
-        if(showChildren) {
-          adjCountChildrenInParent(-zLineUnfolded);  //firstly subtract because children are open
-          showChildren = false;
+        if(tbl_showChildren) {
+          adjCountChildrenInParent(-tbl_zLineUnfolded);  //firstly subtract because children are open
+          tbl_showChildren = false;
         }
         //else: don't change anything.
       }
@@ -2587,13 +2588,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public void setHtmlHelp(String url) { GralTable.this.setHtmlHelp(url); }
     
     
-    @Override public Object getContentInfo(){ return data; }
+    @Override public Object getContentInfo(){ return nd_data; }
 
     
     
     @Override public int getMark(){
-      if(data instanceof MarkMask_ifc){
-        return ((MarkMask_ifc)data).getMark();
+      if(nd_data instanceof MarkMask_ifc){
+        return ((MarkMask_ifc)nd_data).getMark();
       } else if(markMask == null){
         return 0;
       } else {
@@ -2666,7 +2667,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
     @Override public UserData getData()
-    { return data;
+    { return nd_data;
     }
 
 

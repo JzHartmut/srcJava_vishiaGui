@@ -48,7 +48,7 @@
 2013-05-27 20:43:37  x     WriteCurve_ifc.java                      ::          3.448 -0224065991 
 
 ============================== java/vishiaGui/org/vishia/gitGui/ ===================================
-2022-10-10 22:20:42  x     GitGui.java                              ::         67.193 -1152482937 
+2022-10-22 14:12:16  x     GitGui.java                              ::         67.196  1205432824 
 2022-01-23 18:57:46  x     GitGuiCmd.java                           ::          2.731  1279140084 
 2022-01-23 18:03:47  x     GitGuiPaths.java                         ::           .715  0118027708 
 
@@ -106,7 +106,7 @@
 2022-08-31 20:31:40  x     GralShowMethods.java                     ::         11.732 -1383563975 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
 2022-09-29 13:20:52  x     GralTabbedPanel.java                     ::         10.836  1475394654 
-2022-10-12 22:21:19  x     GralTable.java                           ::        110.634  0463341949 
+2022-10-22 14:22:52  x     GralTable.java                           ::        110.987  1173218544 
 2022-08-28 19:46:09  x     GralTextBox.java                         ::          7.541 -1701715115 
 2022-10-09 00:19:54  x     GralTextField.java                       ::         34.138  1337435052 
 2022-10-01 23:10:04  x     GralValueBar.java                        ::          6.216 -0483513653 
@@ -244,17 +244,17 @@
 
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2021-10-04 14:29:57  x     ButtonInspcCmd.java                      ::           .520  1765509099 
-2022-10-05 22:57:34  x     InspcCurveView.java                      ::         62.511  1372794364 
+2022-10-22 14:12:17  x     InspcCurveView.java                      ::         62.514 -1458170979 
 2022-10-10 22:27:29  x     InspcCurveViewApp.java                   ::          6.947  2111809069 
-2022-09-28 23:54:27  x     InspcFieldTable.java                     ::         25.484  1663052662 
+2022-10-22 14:12:17  x     InspcFieldTable.java                     ::         25.490  0100816495 
 2022-10-04 22:57:04  x     InspcGui.java                            ::         22.714  0685651805 
 2021-10-04 14:29:56  x     InspcGuiFieldsFromFile.java              ::          4.617 -0989852832 
-2021-10-04 14:29:51  x     InspcViewTargetComm.java                 ::         14.819  0586218237 
+2022-10-22 14:12:17  x     InspcViewTargetComm.java                 ::         14.822  1507831448 
 
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
 2022-10-05 17:55:12  x     OamEvalValues_ifc.java                   ::           .745  0661411213 
 2022-09-23 10:23:34  x     OamOutFileReader.java                    ::          3.543  1655028191 
-2022-10-13 17:47:30  x     OamRcvValue.java                         ::         10.264  1119506308 
+2022-10-20 12:55:59  x     OamRcvValue.java                         ::         10.264  1226517056 
 2022-10-05 17:58:04  x     OamShowValues.java                       ::         24.772  1895443324 
 2022-10-13 17:49:28  x     ViewCfg.java                             ::         18.579 -0307617972 
 

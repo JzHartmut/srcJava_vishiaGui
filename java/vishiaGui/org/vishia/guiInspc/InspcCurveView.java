@@ -516,7 +516,7 @@ public final class InspcCurveView
   
   
   void setDatapath(GralTable<GralCurveViewTrack_ifc>.TableLineData line, String sDatapath){
-    GralCurveViewTrack_ifc input = line.data;
+    GralCurveViewTrack_ifc input = line.nd_data;
     if(input == null){
       GralColor colorLine = GralColor.getColor("rd");
       input = widgCurve.addTrack(sName, sDatapath, colorLine, 0, 50, 5000.0f, 0.0f);

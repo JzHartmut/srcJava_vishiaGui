@@ -413,7 +413,7 @@ public class InspcFieldTable
   { String sPath = null;
     String sField1 = line.getKey();
     //sPathCurrent = line.getDataPath();
-    InspcFieldOfStruct field = line.data;
+    InspcFieldOfStruct field = line.nd_data;
     InspcVariable var = field.variableExisting();
     if(var !=null) {
       sPath = var.ds.sPathWithAlias;
@@ -580,7 +580,7 @@ public class InspcFieldTable
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
         @SuppressWarnings("unchecked")
         GralTable<InspcFieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
-        if(line !=null && line.data !=null) { setCurrentFieldInfo(line); }
+        if(line !=null && line.nd_data !=null) { setCurrentFieldInfo(line); }
         return true;
       } else { 
         return false;
