@@ -12,6 +12,7 @@ public class GralButton extends GralWidget
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-25 Hartmut new: {@link #wasPressed()} and {@link #wasReleased()} is polling request.
    * <li>2016-05-03 Hartmut chg: Now supports {@link GralWidget#setVisible(boolean)}
    * <li>2015-06-21 Hartmut chg: {@link #setSwitchMode(GralColor, GralColor, GralColor)} with null as 3. color
    *   sets to 2-times switch like {@link #setSwitchMode(GralColor, GralColor)}. 
@@ -58,7 +59,7 @@ public class GralButton extends GralWidget
   
   //final GralWindowMng_ifc mainWindow;
   
-  protected boolean pressed;
+  protected boolean XXXpressed;
   
   /**The state of switch and check button
    * 1=on 2=off 3=disabled. 0=initial, see {@link #kOn} etc.
@@ -85,6 +86,9 @@ public class GralButton extends GralWidget
   
   /**Currently pressed, show it in graphic. */
   protected boolean isPressed;
+  
+  /**Used to one time query */
+  protected boolean wasPressed, wasReleased;
   
   
   /**True if it is a switch or a check button. */
@@ -266,7 +270,9 @@ public class GralButton extends GralWidget
    * in its mouse press and release events. 
    * In the activated state the button looks like pressed.*/
   protected void setActivated(boolean value){ 
-    isPressed = value;
+    this.isPressed = value;
+    this.wasPressed = value;
+    this.wasReleased = !value;
     repaint(100, 100);
   }
   
@@ -316,6 +322,29 @@ public class GralButton extends GralWidget
   
   
   public boolean isOn(){ return switchState == State.On; }
+  
+  /**Returns the state whether is currently pressed. */
+  public boolean isPressed ( ) { return this.isPressed; }
+
+  /**Returns one time true after pressing, all next queries return false till next pressing. 
+   * This operation is for polling with an adequate rate faster than human. 
+   * It is an alternative to a existing callback operation. Maybe better usable for scripting.
+   */
+  public boolean wasPressed ( ) { 
+    boolean ret = this.wasPressed;
+    this.wasPressed = false;
+    return ret; 
+  }
+
+  /**Returns one time true after releasing the button, all next queries return false till next releasing. 
+   * This operation is for polling with an adequate rate faster than human. 
+   * It is an alternative to a existing callback operation. Maybe better usable for scripting. 
+   */
+  public boolean wasReleased ( ) { 
+    boolean ret = this.wasReleased;
+    this.wasReleased = false;
+    return ret; 
+  }
 
   /**Sets the appearance of the button
    * <ul> 

@@ -244,9 +244,6 @@ public class ViewCfg //extends GuiCfg
     this.gralMng.setLog(this.logCfg);;
     //super(cargs, cmdgui, null, null, null);
 
-    this.oamShowValues = new OamShowValues(this.logCfg, this.gralMng, cargs.argClassEvalRcvValues);
-    //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
-    
     
     if(cargs.fileGuiCfg !=null) {
 //      gralMng.registerUserAction(null, this.action_dropFilePath);
@@ -266,6 +263,11 @@ public class ViewCfg //extends GuiCfg
       throw new IllegalArgumentException("argument -gui:path/to/gui.cfg is mandatory. ");
     }
     this.logCfg.flush();
+    //=========================================  // now all Gui elements are presented.
+    //                                           // The OamShowValues needs some of the elements maybe presented in gui.cfg:
+    this.oamShowValues = new OamShowValues(this.logCfg, this.gralMng, cargs.argClassEvalRcvValues);
+    //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
+    
     GralWidget btnCurveView = gralMng.getWidget("curveWindow");
     if(btnCurveView !=null && btnCurveView instanceof GralButton) {
       GralWidget gralwidgetCurveView = gralMng.getWidget("userCurves");
@@ -322,7 +324,7 @@ public class ViewCfg //extends GuiCfg
   protected void initViewCfg ( CallingArguments cargs ) throws IOException { 
       
     if(   this.callingArguments.sFileOamVariables.val !=null
-      &&! this.oamShowValues.readVariableCfg(this.callingArguments)) {
+      &&! this.oamShowValues.readVariableCfg(this.callingArguments)) {         // read cfg oam Variables
       this.logCfg.sendMsg(99, "error oamShowValues.readVariableCfg()");
       System.err.println("error oamShowValues.readVariableCfg()");
     }
@@ -332,7 +334,7 @@ public class ViewCfg //extends GuiCfg
       this.oamShowValues.setCurveView((GralCurveView)curveView);
     }
     this.oamShowValues.setFieldsToShow(this.gralMng.getShowFields(), this.logCfg);
-    final VariableAccessArray_ifc varTimeShort = this.oamShowValues.accessOamVariable.getVariable("timeShort");
+    final VariableAccess_ifc varTimeShort = this.oamShowValues.accessOamVariable.getVariable("timeShort");
     if(varTimeShort !=null) {
       
     }

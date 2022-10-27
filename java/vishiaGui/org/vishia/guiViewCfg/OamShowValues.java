@@ -6,17 +6,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.ByteDataSymbolicAccessReadConfig;
 import org.vishia.byteData.VariableAccessArray_ifc;
+import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Arguments;
 import org.vishia.util.Debugutil;
+import org.vishia.util.StringFunctions;
+import org.vishia.util.StringFunctions_C;
 import org.vishia.byteData.ByteDataSymbolicAccess;
+import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelActivated_ifc;
@@ -42,6 +47,12 @@ public class OamShowValues
   
   /**Version and history
    * <ul>
+   * <li>2022-10-26 {@link #idxAllVariables}: Not it is a common index/Map for all variables, 
+   *   the {@link ByteDataSymbolicAccess#indexVariable} refers to the same. 
+   *   This is a common index together with the possible {@link #evalValues}: {@link OamEvalValues_ifc#getVariables()}.
+   *   The concept of plugin is improved.
+   * <li>2022-10-25: {@link #wdgBtnWrHex} can be given in the scripted config. 
+   *   If existing the button is used to write a hex output of data on pressing. Super helpful for data debugging.  
    * <li>2022-09-03 {@link #curveView} as extra reference for only one curve view if only one is used for fast access. 
    * <li>2022-08-26 Hartmut Refactored, firstly used after 10 years and detect some difficulties.
    *   The {@link ByteDataSymbolicAccess} and {@link ByteDataSymbolicAccessReadConfig} are also refactored.
@@ -68,9 +79,19 @@ public class OamShowValues
   List<GralWidget> widgetsInTab;
   
   /**The access to the gui, to change data to show. */
-  protected final GralMng guiAccess;
+  protected final GralMng gralMng;
   
+  /**If this buttons are configured, ability to write received value to console out */
+  protected final GralButton wdgBtnWrHex, wdgBtnWrVal;
+  
+  /**This is a plugin class delivered by an user application with the argument {@link ViewCfg.CallingArguments#argClassEvalRcvValues}
+   * or null if not given. The user class can contribute to the pool of variables and access to all Oam variables, see {@link #idxAllVariables} 
+   */
   final OamEvalValues_ifc evalValues;
+  
+  /**This index (map) contains all variables, both from {@link #accessOamVariable} as well as content of {@link #evalValues}. */
+  final Map<String, VariableAccess_ifc> idxAllVariables = new TreeMap<String, VariableAccess_ifc>();
+  
   
   Set<Map.Entry<String, GralWidget>> fieldsToShow;
   
@@ -80,7 +101,7 @@ public class OamShowValues
    * It is not null if that variable is contained in the received data description
    * See {@link #readVariableCfg()}.
    */
-  ByteDataSymbolicAccess.Variable varTimeMilliSecFromBaseyear;
+  VariableAccess_ifc varTimeMilliSecFromBaseyear;
   
   
   GralColor colorBackValueOk = GralColor.getColor("wh");
@@ -101,11 +122,18 @@ public class OamShowValues
   
   
   
-  public OamShowValues ( LogMessage log , GralMng guiAccess, Arguments.Argument argClassEvalRcvValues ) {
+  public OamShowValues ( LogMessage log , GralMng gralMng, Arguments.Argument argClassEvalRcvValues ) {
     this.log = log;
-    this.guiAccess = guiAccess;
-    this.accessOamVariable = new ByteDataSymbolicAccess();
+    this.gralMng = gralMng;
+    this.wdgBtnWrHex = (GralButton) gralMng.getWidget("btnWrHex");  //maybe null then not existing
+    this.wdgBtnWrVal = (GralButton) gralMng.getWidget("btnWrVal");  //maybe null then not existing
+    this.accessOamVariable = new ByteDataSymbolicAccess(this.idxAllVariables); //access to variables in a byte[]
+    //------------------------------------------------------------- // read the configuration for this byte[] accessed data.
     this.cfgOamVariable = new ByteDataSymbolicAccessReadConfig(this.accessOamVariable);
+    // Note: This creates variables in this.accessOamVariables with reference to the accessOamVariable instance.
+    // It means the variables uses this access instance to access to the given variable byte array.
+    // The variables are also stored in this.idxAllVariables because it is the same reference.
+    //--------------------------------------------------------------------------------
     //assign an empty array, it is necessary for local test or without data receive.
     //elsewhere a null-pointer-exception is thrown if the tab-pane is shown.
     //If data are received, this empty array isn't referenced any more.
@@ -118,7 +146,9 @@ public class OamShowValues
         @SuppressWarnings("unchecked") Class<OamEvalValues_ifc> evalClass = (Class<OamEvalValues_ifc>)Class.forName(argClassEvalRcvValues.val);
         @SuppressWarnings("unchecked") Constructor<OamEvalValues_ifc>[] cactor = (Constructor<OamEvalValues_ifc>[])evalClass.getConstructors();
         Constructor<OamEvalValues_ifc> cctor = cactor[0];  // only one expected
-        evalValues = cctor.newInstance(this.accessOamVariable);
+        evalValues = cctor.newInstance(this.accessOamVariable);    //plugin instance
+        this.idxAllVariables.putAll(evalValues.getVariables());
+        
       } catch(Exception exc) {
         System.err.println(argClassEvalRcvValues.option + ":" + argClassEvalRcvValues.val + " is faulty: " + exc.getMessage());
         throw new IllegalArgumentException("abort, command line error");
@@ -154,7 +184,7 @@ public class OamShowValues
       if(sData ==null) {
         log.append(widg.getName()).append(" potential Show field without dataPath ");
       } else {
-        final VariableAccessArray_ifc var = sData == null ? null : this.accessOamVariable.getVariable(sData);
+        final VariableAccess_ifc var = sData == null ? null : this.accessOamVariable.getVariable(sData);
         if(var == null) {
           log.append(widg.getName()).append(" variable not found: ").append(sData);
         } else {
@@ -189,6 +219,18 @@ public class OamShowValues
   {
     this.accessOamVariable.assignData(binData, nrofBytes, from, System.currentTimeMillis());
     this.accessOamVariable.dataAccess.setLittleEndianBig2();
+    if(this.wdgBtnWrHex !=null) {
+      if(this.wdgBtnWrHex.wasPressed()) {
+        try {
+          int[] value = new int[48];
+          for(int ix=0; ix<value.length; ++ix) {
+            value[ix] = this.accessOamVariable.dataAccess.getIntVal(2*ix, 2);
+          }
+          System.out.append('\n');
+          StringFunctions_C.appendHexLine(System.out, value, 0, 48, 4, 16, 16);
+        } catch (Exception exc) { throw new RuntimeException("unexpected: ", exc); }
+      }
+    }
     this.dataValid = true;
     //long timeAbs = this.accessOamVariable.dataAccess.getLongVal(0x0, 8);
     int timeShortAdd = 0; //this.accessOamVariable.dataAccess.getIntVal(0x8, 4);
@@ -197,7 +239,7 @@ public class OamShowValues
     //this.timeMilliSecFromBaseyear = timeAbs + (timeShort - timeShortAdd);
     if(this.varTimeMilliSecFromBaseyear !=null){
       //read the time stamp from the record:
-      this.timeMilliSecFromBaseyear = this.varTimeMilliSecFromBaseyear.getInt( 0);
+      this.timeMilliSecFromBaseyear = this.varTimeMilliSecFromBaseyear.getInt();
     } else {
       //this.timeMilliSecFromBaseyear = System.currentTimeMillis();
     }
@@ -212,7 +254,7 @@ public class OamShowValues
     //TEST TODO:
     //accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
     //current panel:
-    List<GralWidget> listWidgets = this.guiAccess.getListCurrWidgets();
+    List<GralWidget> listWidgets = this.gralMng.getListCurrWidgets();
     for(GralWidget widgetInfo : listWidgets){
       @SuppressWarnings("unused")
       String sName = widgetInfo.name;
@@ -241,14 +283,16 @@ public class OamShowValues
     final String sPathValue = posFormat <0 ? sInfo : sInfo.substring(0, posFormat);
     */
     String sFormat = widgetInfo.getFormat();
-    ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
+    VariableAccess_ifc variable = getVariableFromContentInfo(widgetInfo);
+    int ixInVariable = widgetInfo.getDataIx();
+    VariableAccessArray_ifc arrayVar = ixInVariable >=0 ? (VariableAccessArray_ifc) variable: null;
     //DBbyteMap.Variable variable = accessOamVariable.getVariable(sPathVariable);
     if(variable == null){
       sValue = "XXXXX";
     } else {
-      char varType = variable.getTypeChar();
+      char varType = variable.getType();
       if(varType == 'F'){
-        float value= variable.getFloat(widgetInfo.getDataIx());
+        float value= arrayVar !=null ? arrayVar.getFloat(ixInVariable) : variable.getFloat();
         if(sFormat ==null){
           if(value < 1.0F && value > -1.0F){ sFormat = "%1.5f"; }
           else if(value < 100.0F && value > -100.0F){ sFormat = "% 2.3f"; }
@@ -259,7 +303,7 @@ public class OamShowValues
         sValue = String.format(sFormat, value);
       } else if("JISB".indexOf(varType)>=0){
         //integer
-        int value = variable.getInt(widgetInfo.getDataIx());
+        int value = arrayVar !=null ? arrayVar.getInt(ixInVariable) : variable.getInt();
         if(sFormat ==null){
           sFormat = "%d";
         } 
@@ -268,7 +312,7 @@ public class OamShowValues
         //other format
         sValue = "?type=" + varType;
       }
-      GralWidget widg = this.guiAccess.getWidget(sName);  
+      GralWidget widg = this.gralMng.getWidget(sName);  
       widg.setText(sValue);
       //guiAccess.setText(sName, sValue);
       long timeLastRefresh = variable.getLastRefreshTime();
@@ -291,7 +335,7 @@ public class OamShowValues
   void writeValuesOfTab()
   { if(this.dataValid){
       this.timeNow = System.currentTimeMillis();
-      ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = this.guiAccess.getVisiblePanels();
+      ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listPanels = this.gralMng.getVisiblePanels();
       if(this.curveView !=null) {
         this.curveView.bActive = true;
         VariableContainer_ifc variables = this.evalValues !=null ? this.evalValues.getVariableContainer() : this.accessOamVariable;
@@ -338,10 +382,10 @@ public class OamShowValues
         String sContentInfo = widgetInfo.getDataPath();
         if(sContentInfo !=null && sContentInfo.length() >0 && widgetInfo !=null){
           stop();
-          if(!callMethod(widgetInfo)){
+          //if(!callMethod(widgetInfo)){
             //show value direct
             writeField(widgetInfo);
-          }
+          //}
           //log.reportln(3, "TAB: " + sContentInfo);
         }
       }
@@ -349,9 +393,9 @@ public class OamShowValues
   }
   
   
-  ByteDataSymbolicAccess.Variable getVariableFromContentInfo(GralSetValue_ifc widgetInfo)
+  VariableAccess_ifc getVariableFromContentInfo(GralSetValue_ifc widgetInfo)
   {
-    ByteDataSymbolicAccess.Variable variable;
+    VariableAccess_ifc variable;
     Object oContentInfo = widgetInfo.getContentInfo();
     final int[] ixArrayA = new int[1];
     if(oContentInfo == null){
@@ -359,8 +403,8 @@ public class OamShowValues
       variable = getVariable(widgetInfo.getDataPath(), ixArrayA);
       widgetInfo.setContentInfo(variable);
       widgetInfo.setDataIx(ixArrayA[0]);
-    } else if(oContentInfo instanceof ByteDataSymbolicAccess.Variable){
-      variable = (ByteDataSymbolicAccess.Variable)oContentInfo;
+    } else if(oContentInfo instanceof VariableAccess_ifc){
+      variable = (VariableAccess_ifc)oContentInfo;
     } else {
       variable = null;  //other info in widget, not a variable.
     }
@@ -369,117 +413,117 @@ public class OamShowValues
   
   
   
-  ByteDataSymbolicAccess.Variable getVariable(String sDataPath, int[] ixArrayA)
+  VariableAccess_ifc getVariable(String sDataPath, int[] ixArrayA)
   {
     final String sPathVariable = ByteDataSymbolicAccess.separateIndex(sDataPath, ixArrayA);
-    ByteDataSymbolicAccess.Variable variable = this.accessOamVariable.getVariable(sPathVariable);
+    VariableAccess_ifc variable = this.idxAllVariables.get(sPathVariable);
     return variable;
   }
   
   
-  boolean callMethod(GralWidget widgetInfo)
-  { String sName = widgetInfo.name;
-    String sInfo = widgetInfo.getDataPath();
-    final String sMethodName;
-    final String sVariablePath;
-    final String[] sParam;
-    final int posParanthesis = sInfo.indexOf('(');
-    if(posParanthesis >=0){
-      sMethodName = sInfo.substring(0, posParanthesis);
-      sParam = sInfo.substring(posParanthesis+1).split("[,)]");
-      sVariablePath = sParam[0].trim();
-    } else {
-      sMethodName = widgetInfo.getShowMethod();
-      sParam = sInfo.split(",");
-      sVariablePath = sParam[0];
-    }
-    if(sMethodName != null){
-      if(sMethodName.equals("setValue")){
-        setValue(widgetInfo);
-      }
-      if(sMethodName.equals("setBar")){
-        setBar(widgetInfo);
-      }
-      else if(sMethodName.equals("uCapMaxRed")){
-        float value= this.accessOamVariable.getFloat(sVariablePath);
-        if(value > 120.0F){
-          this.guiAccess.setBackColor(sName, 0, 0xffe0e0);
-        } else {
-          this.guiAccess.setBackColor(sName, 0, 0xffffff);
-        }
-        String sValue = "" + value;
-        this.guiAccess.setText(sName, sValue);
-      } 
-      else if(sMethodName.equals("showBinManValue")){
-        int value= this.accessOamVariable.getInt(sVariablePath);
-        int color;
-        if((value & 0x10)==0){
-          color = 0xffffff;  //white: not set
-        }
-        else { //it is set
-          int mode = value & 0x60;  //bit 6=manEnable, 5=manMode
-          switch(mode){
-          case 0: color=0xff0000; break;     //dark red: error, manual preset but not enabled
-          case 0x20: color=0xff0000; break;  //dark red: error, manual preset but not enabled
-          case 0x40: color=0xff0000; break;  //orange: set, enabled or not
-          case 0x60: color=0xff8000; break;  //orange: set and enabled.
-          default: color=0xff00ff;    //it isn't used.
-          }
-        }
-        this.guiAccess.setBackColor(widgetInfo, 0, color);
-      }
-      else if(sMethodName.equals("showBinEnable")){
-        int value= this.accessOamVariable.getInt(sVariablePath);
-        int color;
-        int mode = value & 0x60;  //bit 6=manEnable, 5=manMode
-        switch(mode){
-        case 0: color=0xffffff; break;     //white: no manual
-        case 0x20: color=0xff0000; break;  //dark red: error, manual not enabled, but on
-        case 0x40: color=0x00ff00; break; //green: manual enabled
-        case 0x60: color=0xff8000; break;  //orange: manual enabled and switched.
-        default: color=0xff00ff;    //it isn't used.
-        }
-        this.guiAccess.setBackColor(widgetInfo, 0, color);
-      }
-      else if(sMethodName.equals("xxxshowBin")){
-        int value= this.accessOamVariable.getInt(sVariablePath);
-        int color;
-        if((value & 0x06) ==0x04) color = 0x00ff00;  //green: manual enable
-        else if((value & 0x06) ==0x06) color = 0x0000ff;  //blue: manual enable and manual control
-        else color = 0xffffff;  
-        this.guiAccess.setBackColor(sName, 0, color);
-      }
-      else if(sMethodName.equals("showBool")){
-        ByteDataSymbolicAccess.Variable variable = this.accessOamVariable.getVariable(sVariablePath);
-        int color;
-        if(variable !=null){
-          int value= this.accessOamVariable.getInt(variable, -1);
-          
-          if((value & 0xff) ==0x0) color = this.guiAccess.getColorValue(sParam[1].trim());  
-          else color = this.guiAccess.getColorValue(sParam[2].trim());  
-          //guiAccess.setBackColor(sName, 0, color);
-        } else {
-          color = 0xb0b0b0;  //gray
-        }
-        if(widgetInfo.whatIs == 'D'){
-          //a LED
-           this.guiAccess.setLed(widgetInfo, color, color);
-        } else {
-          this.guiAccess.setBackColor(widgetInfo, 0, color);
-        }
-      }
-      else if(sMethodName.equals("setColor")){
-        widgetSetColor(sName, sParam, widgetInfo);
-      }
-      else if(sMethodName.equals("showBinFromByte")){
-        showBinFromByte(widgetInfo);
-      }
-      else {
-        stop();
-      }
-    }
-    return sMethodName !=null;
-  }
+//  boolean callMethod(GralWidget widgetInfo)
+//  { String sName = widgetInfo.name;
+//    String sInfo = widgetInfo.getDataPath();
+//    final String sMethodName;
+//    final String sVariablePath;
+//    final String[] sParam;
+//    final int posParanthesis = sInfo.indexOf('(');
+//    if(posParanthesis >=0){
+//      sMethodName = sInfo.substring(0, posParanthesis);
+//      sParam = sInfo.substring(posParanthesis+1).split("[,)]");
+//      sVariablePath = sParam[0].trim();
+//    } else {
+//      sMethodName = widgetInfo.getShowMethod();
+//      sParam = sInfo.split(",");
+//      sVariablePath = sParam[0];
+//    }
+//    if(sMethodName != null){
+//      if(sMethodName.equals("setValue")){
+//        setValue(widgetInfo);
+//      }
+//      if(sMethodName.equals("setBar")){
+//        setBar(widgetInfo);
+//      }
+//      else if(sMethodName.equals("uCapMaxRed")){
+//        float value= this.accessOamVariable.getFloat(sVariablePath);
+//        if(value > 120.0F){
+//          this.gralMng.setBackColor(sName, 0, 0xffe0e0);
+//        } else {
+//          this.gralMng.setBackColor(sName, 0, 0xffffff);
+//        }
+//        String sValue = "" + value;
+//        this.gralMng.setText(sName, sValue);
+//      } 
+//      else if(sMethodName.equals("showBinManValue")){
+//        int value= this.accessOamVariable.getInt(sVariablePath);
+//        int color;
+//        if((value & 0x10)==0){
+//          color = 0xffffff;  //white: not set
+//        }
+//        else { //it is set
+//          int mode = value & 0x60;  //bit 6=manEnable, 5=manMode
+//          switch(mode){
+//          case 0: color=0xff0000; break;     //dark red: error, manual preset but not enabled
+//          case 0x20: color=0xff0000; break;  //dark red: error, manual preset but not enabled
+//          case 0x40: color=0xff0000; break;  //orange: set, enabled or not
+//          case 0x60: color=0xff8000; break;  //orange: set and enabled.
+//          default: color=0xff00ff;    //it isn't used.
+//          }
+//        }
+//        this.gralMng.setBackColor(widgetInfo, 0, color);
+//      }
+//      else if(sMethodName.equals("showBinEnable")){
+//        int value= this.accessOamVariable.getInt(sVariablePath);
+//        int color;
+//        int mode = value & 0x60;  //bit 6=manEnable, 5=manMode
+//        switch(mode){
+//        case 0: color=0xffffff; break;     //white: no manual
+//        case 0x20: color=0xff0000; break;  //dark red: error, manual not enabled, but on
+//        case 0x40: color=0x00ff00; break; //green: manual enabled
+//        case 0x60: color=0xff8000; break;  //orange: manual enabled and switched.
+//        default: color=0xff00ff;    //it isn't used.
+//        }
+//        this.gralMng.setBackColor(widgetInfo, 0, color);
+//      }
+//      else if(sMethodName.equals("xxxshowBin")){
+//        int value= this.accessOamVariable.getInt(sVariablePath);
+//        int color;
+//        if((value & 0x06) ==0x04) color = 0x00ff00;  //green: manual enable
+//        else if((value & 0x06) ==0x06) color = 0x0000ff;  //blue: manual enable and manual control
+//        else color = 0xffffff;  
+//        this.gralMng.setBackColor(sName, 0, color);
+//      }
+//      else if(sMethodName.equals("showBool")){
+//        ByteDataSymbolicAccess.Variable variable = this.accessOamVariable.getVariable(sVariablePath);
+//        int color;
+//        if(variable !=null){
+//          int value= this.accessOamVariable.getInt(variable, -1);
+//          
+//          if((value & 0xff) ==0x0) color = this.gralMng.getColorValue(sParam[1].trim());  
+//          else color = this.gralMng.getColorValue(sParam[2].trim());  
+//          //guiAccess.setBackColor(sName, 0, color);
+//        } else {
+//          color = 0xb0b0b0;  //gray
+//        }
+//        if(widgetInfo.whatIs == 'D'){
+//          //a LED
+//           this.gralMng.setLed(widgetInfo, color, color);
+//        } else {
+//          this.gralMng.setBackColor(widgetInfo, 0, color);
+//        }
+//      }
+//      else if(sMethodName.equals("setColor")){
+//        widgetSetColor(sName, sParam, widgetInfo);
+//      }
+//      else if(sMethodName.equals("showBinFromByte")){
+//        showBinFromByte(widgetInfo);
+//      }
+//      else {
+//        stop();
+//      }
+//    }
+//    return sMethodName !=null;
+//  }
   
   
   static class ValueColorAssignment
@@ -536,12 +580,12 @@ public class OamShowValues
     
     ByteDataSymbolicAccess valueContainer;
     
-    ByteDataSymbolicAccess.Variable variableContainsValue;
+    VariableAccess_ifc variableContainsValue;
 
     
     
     public ColoredWidget(ValueColorAssignment valueColorAssignment, ByteDataSymbolicAccess valueContainerBbyteMap
-      , ByteDataSymbolicAccess.Variable variableContainsValue)
+      , VariableAccess_ifc variableContainsValue)
     { this.valueColorAssignment = valueColorAssignment;
       this.valueContainer = valueContainer;
       this.variableContainsValue = variableContainsValue;
@@ -556,36 +600,38 @@ public class OamShowValues
     Object oUserData = widgetInfo.getContentInfo();
     if(oUserData == null){
       //first usage:
-      ByteDataSymbolicAccess.Variable variable = this.accessOamVariable.getVariable(sParam[0]);
-      ValueColorAssignment colorAssignment = new ValueColorAssignment(sParam, this.guiAccess);
+      VariableAccess_ifc variable = this.accessOamVariable.getVariable(sParam[0]);
+      ValueColorAssignment colorAssignment = new ValueColorAssignment(sParam, this.gralMng);
       userData = new ColoredWidget(colorAssignment, this.accessOamVariable, variable);
       widgetInfo.setContentInfo(userData);
     } else {
       userData = (ColoredWidget)oUserData;
     }
     int color;
-    if(userData.valueContainer !=null){
-      int value = userData.valueContainer.getInt(userData.variableContainsValue, -1);
+//    if(userData.valueContainer !=null){
+//      int value = userData.valueContainer.getInt(userData.variableContainsValue);
+    if(userData.variableContainsValue !=null){
+      int value = userData.variableContainsValue.getInt();
       color = userData.valueColorAssignment.getColor(value);
     } else {
       color=0xaaaaaa;
     }
-    this.guiAccess.setBackColor(sName, -1, color);
+    this.gralMng.setBackColor(sName, -1, color);
     
   }
   
   
   void showBinFromByte(GralWidget widgetInfo)
-  { ByteDataSymbolicAccess.Variable variable;
+  { VariableAccess_ifc variable;
     Object oUserData = widgetInfo.getContentInfo();
     if(oUserData == null){
       //first usage:
       variable = this.accessOamVariable.getVariable(widgetInfo.getDataPath());
       widgetInfo.setContentInfo(variable);
     } else {
-      variable = (ByteDataSymbolicAccess.Variable)oUserData;
+      variable = (VariableAccess_ifc)oUserData;
     }
-    int value = variable.getInt(-1);
+    int value = variable.getInt();
     int mode = value & 0x0c;
     int colorBorder;
     int colorInner;
@@ -596,22 +642,22 @@ public class OamShowValues
     case 0x0c: colorBorder = colorInner = 0xff8000; break; 
     default: colorBorder = colorInner = 0;  //not realistic
     }
-    this.guiAccess.setLed(widgetInfo, colorBorder, colorInner);
+    this.gralMng.setLed(widgetInfo, colorBorder, colorInner);
     
   }
   
   
   void setValue(GralWidget widgetInfo)
-  { ByteDataSymbolicAccess.Variable variable;
+  { VariableAccess_ifc variable;
     Object oUserData = widgetInfo.getContentInfo();
     if(oUserData == null){
       //first usage:
       variable = this.accessOamVariable.getVariable(widgetInfo.getDataPath());
       widgetInfo.setContentInfo(variable);
     } else {
-      variable = (ByteDataSymbolicAccess.Variable)oUserData;
+      variable = (VariableAccess_ifc)oUserData;
     }
-    float value = variable.getFloat(-1);
+    float value = variable.getFloat();
     GralWidget_ifc oWidget = widgetInfo;
     if(oWidget instanceof GralSetValue_ifc){
       GralSetValue_ifc widget = (GralSetValue_ifc) oWidget;
@@ -621,11 +667,11 @@ public class OamShowValues
   
   
   void setBar(GralWidget widgetInfo)
-  { ByteDataSymbolicAccess.Variable variable = getVariableFromContentInfo(widgetInfo);
+  { VariableAccess_ifc variable = getVariableFromContentInfo(widgetInfo);
     if(variable == null){
       debugStop();
     } else {
-      float value = variable.getFloat(-1);
+      float value = variable.getFloat();
       
       GralWidget_ifc oWidget = widgetInfo;
       if(oWidget instanceof GralValueBar){
@@ -659,27 +705,27 @@ public class OamShowValues
   
 
   
-  final GralUserAction actionSetValueTestInInput = new GralUserAction("actionSetValueTestInInput")
-  { @Override
-  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
-    { 
-      final int[] ixArrayA = new int[1];
-      ByteDataSymbolicAccess.Variable variable = getVariable(widgetInfos.getDataPath(), ixArrayA);
-      int value = 0; //TODO Integer.parseInt(sParam);
-      if(variable.byteDataAccess.lengthData() == 0){
-        variable.byteDataAccess.assignData(new byte[1500], System.currentTimeMillis());
-      }
-      variable.setFloat(2.5F* value -120, -1);
-      OamShowValues.this.dataValid = true;
-      writeValuesOfTab();  //to show
-      return true;
-    }
-  };
+//  final GralUserAction actionSetValueTestInInput = new GralUserAction("actionSetValueTestInInput")
+//  { @Override
+//  public boolean userActionGui(String sCmd, GralWidget widgetInfos, Object... values)
+//    { 
+//      final int[] ixArrayA = new int[1];
+//      VariableAccess_ifc variable = getVariable(widgetInfos.getDataPath(), ixArrayA);
+//      int value = 0; //TODO Integer.parseInt(sParam);
+//      if(variable.byteDataAccess.lengthData() == 0){
+//        variable.byteDataAccess.assignData(new byte[1500], System.currentTimeMillis());
+//      }
+//      variable.setFloat(2.5F* value -120, -1);
+//      OamShowValues.this.dataValid = true;
+//      writeValuesOfTab();  //to show
+//      return true;
+//    }
+//  };
 
   
   private void redrawCurveValues()
   {
-    this.guiAccess.redrawWidget("userCurves");
+    this.gralMng.redrawWidget("userCurves");
   }
   
 

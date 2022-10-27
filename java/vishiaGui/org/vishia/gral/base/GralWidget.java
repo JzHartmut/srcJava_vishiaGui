@@ -792,7 +792,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     //this.widget = null;
     this.whatIs = whatIs;
     //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
-    this.bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
+    //this.bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
     this.itsCfgElement = null;
     assert(this.itsMng !=null);  //should be created firstly in the application, since 2015-01-18
     registerWidget();
@@ -2159,7 +2159,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    */
   public ImplAccess getImplAccess(){ return _wdgImpl; }
   
-  /**This time order calls the {@link #repaintGthread()} in the graphical thread.
+  /**This time order calls the {@link #repaintGthread()} in the graphical thread for this widget.
    * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
    * till the next request of {@link #repaint(int, int)} or {@link #repaint()}.
