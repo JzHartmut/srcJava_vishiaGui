@@ -158,6 +158,8 @@ public class GralPos implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-27 new {@link #calcWidgetPosAndSize(GralGridProperties)} without more arguments. 
+   *   If necessary this operation gets sizes from the parent pos. But it needs more time. 
    * <li>2022-08 refactored. Now also for textual configured Widgets the {@link #setPosition(CharSequence, GralPos)} is used.
    *   It means, should support all features. It is refactored and yet in test. Some bugfixes including, and more features.
    * <li>2013-05-24 Hartmut bugfix fine position can be greater 20 if positions are add and sizes are add too. 
@@ -201,7 +203,7 @@ public class GralPos implements Cloneable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120317;
+  public static final int version = 20221028;
 
   
   /**This adding value applied at any coordinate parameter of any setPosition- method means, that the value is 
@@ -428,6 +430,16 @@ public class GralPos implements Cloneable
   }
 
   
+  
+  /**Set a new position in the same panel as given maybe relative to the own position.
+   * @param sPos See {@link #setPosition(CharSequence, GralPos)}
+   * @throws ParseException
+   */
+  public void setPosition(CharSequence sPos) throws ParseException {
+    setPosition(sPos, null);
+  }
+
+  
   /**Sets the position with the given string representation.
  <pre>
  position::= [@] [<$?panel> ,] 
@@ -446,16 +458,17 @@ public class GralPos implements Cloneable
    * @param sPos The syntax of the string see description of this class, starting with "@panel, ..." etc.
    *   for example "@windowA, 3..5, 16+20" for absolute line 3 and 4 (exclusive 5) and from absolute column 16, size-x=20. 
    *   The position can be given without panel designation or relative, then the posParent argument is necessary.
-   * @param posParent necessary to build the absolute position from relative given sPos, maybe null if not necessary.
+   * @param refPos necessary to build the absolute position from relative given sPos, 
+   *   maybe null then this is used itself as reference.
    * @throws ParseException on errors of sPos or missing posParent if necessary.
    */
-  public void setPosition(CharSequence sPos, GralPos posParent) throws ParseException {
+  public void setPosition(CharSequence sPos, GralPos refPos) throws ParseException {
     GralPos posParent1;
     //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;
     Coordinate line = new Coordinate(), col = new Coordinate();
     int  origin =1;                                        // default left top
     int border =0, borderFrac =0;
-    if(posParent !=null) {
+    if(refPos !=null) {
       origin = 0;  // do not change, get from parent.
     }
     char direction = 'r';
@@ -466,7 +479,7 @@ public class GralPos implements Cloneable
       //all other values of line and col remain 0. It is default.
       col.p1 = next;
       col.p2 = samesize;
-      posParent1 = posParent; 
+      posParent1 = refPos; 
     } else {
       //position given as text
       StringPartScan spPos = new StringPartScan(sPos);
@@ -481,15 +494,15 @@ public class GralPos implements Cloneable
             spPos.close();
             throw new ParseException("GralPos.setPosition - unknown panel, " + sPanel, 0); 
           }
-          if(posParent !=null && panel == posParent.parent) {
-            posParent1 = posParent;
+          if(refPos !=null && panel == refPos.parent) {
+            posParent1 = refPos;
           } else {
             //only if it is another panel, remove the given parent.
             posParent1 = null; //new GralPos();                    // should exist formally
             this.parent = panel;
           }
         } else {
-          posParent1 = posParent;  //the parent is valid. Because no other panel. Use the current panel.
+          posParent1 = refPos;  //the parent is valid. Because no other panel. Use the current panel.
         }
         //======>>>>>>
         scanPosition(spPos, line);
@@ -736,7 +749,7 @@ public class GralPos implements Cloneable
    * @param direction
    * @param border
    * @param borderFrac
-   * @param refPos The reference position for relative coordinates 
+   * @param refPos The reference position for relative coordinates. If null use this itself. 
    */
   public void setFinePosition(int yPos, int yPosf, int ye, int yef
       , int xPos, int xPosf, int xe, int xef, int origin, char direction
@@ -959,7 +972,7 @@ public class GralPos implements Cloneable
    *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the xe-value
    * @param heightWidgetNat natural height of the component which will be positioning. 
    *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the ye-value
-   * @return A rectangle for setBounds.
+   * @return A rectangle for setBounds. It is exclusively the right and bottom pixel. dx and dy are calc -1
    */
   public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui,
       int widthParentPixel, int heightParentPixel,
@@ -993,7 +1006,44 @@ public class GralPos implements Cloneable
   }
 
 
-
+  /**Calculates the pixel from a given position. 
+   * If the given position contains negative values (from left and bottom),
+   * then the parent's position is gotten recursively till the size is known.
+   * Because of this recursive call this operation is slower than a programmed calculation  
+   * of the panels size and get it via arguments of 
+   * {@link #calcWidgetPosAndSize(GralGridProperties, int, int, int, int)}.
+   * But the operation is more simple to use.
+   * 
+   * @param propertiesGui The properties for scaling.
+   * @return rectangle with pixel position relative to the parent's pixel position,
+   *   as it is necessary in the implementation graphic.
+   * <br>  
+   * Note: To get the pixel in a implementation's data struct (for example org.eclipse.swt.graphics.Rectangle),
+   *   the implementation specific {@link GralMng.ImplAccess} should offer such one,
+   *   which uses this operation.  
+   */
+  public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui ) {
+    return calcWidgetPosAndSize(propertiesGui, 0);
+  }
+  
+  /**Recursively call for {@link #calcWidgetPosAndSize(GralGridProperties)}
+   * @param propertiesGui
+   * @param recursion
+   * @return
+   */
+  private GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui , int recursion)
+  { if(recursion >20 ) throw new RuntimeException("too many parent panels");
+    final int widthParentPixel, heightParentPixel;
+    final int widthWidgetNat = 800, heightWidgetNat = 600;
+    if(  (this.x.p1 <0 || this.x.p2 <=0 || this.y.p1 <0 || this.y.p2 <=0)   //necessary to know parent
+      && parent !=null) {
+      GralRectangle parentArea = this.parent.pos().calcWidgetPosAndSize(propertiesGui);
+      widthParentPixel = parentArea.dx; heightParentPixel = parentArea.dy;
+    } else {
+      widthParentPixel = 800; heightParentPixel = 600;
+    }
+    return calcWidgetPosAndSize(propertiesGui, widthParentPixel, heightParentPixel, widthWidgetNat, heightWidgetNat);
+  }
 
   private static void appendPos(Appendable b, int p, int pFrac) throws IOException
   {

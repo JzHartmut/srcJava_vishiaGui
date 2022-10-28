@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -22,6 +24,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-27 Hartmut new concept, one {@link PaintOrder} can contain more as one {@link PaintOrderData},
+   *   which allows one Object with several lines or areas with a common position. 
    * <li>2012-09-27 Hartmut new: {@link PolyLineFloatArray}
    * <li>2012-04-22 new {@link #drawLine(GralPos, GralColor, List)}, improved {@link PaintOrder}-derivates.
    * <li>2011-06-00 Hartmut created
@@ -52,68 +56,140 @@ public class GralCanvasStorage implements GralCanvas_ifc
    */
   public static final String version = "2015-09-26";
 
-	/**Data class to store an order.
-	 */
-	public static class PaintOrder
-	{
-		/**One of the static int of this class. Determines what to paint. 
-		 * See {@link GralCanvasStorage#paintLine}, {@link GralCanvasStorage#paintImage}, 
-		 * */
-		public final int paintWhat;
-		
-		/**Coordinates. */
-		public final int x1,y1,x2,y2;
-		
-		public final GralPos pos;
-		
-		public final GralColor color;
+  /**Data class to store an order.
+   */
+  public static class PaintOrder implements Iterable<PaintOrderData>
+  {
+    public final GralPos pos;
+    
+    public final GralColor color;
+    
+    public final PaintOrderData data;
+    
+    int dxm, dym;
+    
+    boolean hasNextOk = true;
+    
+    public final List<PaintOrderData> listData;
+    
+    
 
-		/**The implementation data are graphic-platform-specific. It may be prepared data for a defined
-		 * size appearance to support fast redrawing. */
-		private Object implData;
-		
-		public Object getImplData() { return implData; }
+    PaintOrder(GralPos pos, GralColor color, PaintOrderData data) {
+      this.pos = pos == null ? null: pos.clone();
+      this.color = color;
+      this.data = data;
+      this.listData = null;
+    }
+
+    PaintOrder(GralPos pos, GralColor color, List<PaintOrderData> data) {
+      this.pos = pos == null ? null: pos.clone();
+      this.color = color;
+      this.data = null;
+      this.listData = data;
+    }
+
+    public PaintOrder(GralPos pos, GralColor color) {
+      this.pos = pos == null ? null: pos.clone();
+      this.color = color;
+      this.data = null;
+      this.listData = new LinkedList<PaintOrderData>();
+    }
+    
+    public void addData(PaintOrderData data) {
+      this.listData.add(data);
+    }
+
+    public void move(int dx, int dy) {
+      this.dxm += dx;
+      this.dym += dy;
+    }
+    
+    
+    Iterator<PaintOrderData> iter = new Iterator<PaintOrderData>() {
+
+      @Override public boolean hasNext () {
+        // TODO Auto-generated method stub
+        return PaintOrder.this.hasNextOk;
+      }
+
+      @Override public PaintOrderData next () {
+        // TODO Auto-generated method stub
+        PaintOrder.this.hasNextOk = false;
+        return PaintOrder.this.data;
+      }
+      
+    };
+    
+    
+    @Override public Iterator<PaintOrderData> iterator () {
+      if(this.listData !=null) {
+        return this.listData.iterator();
+      }
+      else {
+        this.hasNextOk = (this.data !=null);
+        return this.iter;
+      }
+    }
+
+  }//class PaintOrder
+
+  public abstract static class PaintOrderData
+  {
+    /**One of the static int of this class. Determines what to paint. 
+     * See {@link GralCanvasStorage#paintLine}, {@link GralCanvasStorage#paintImage}, 
+     * */
+    public final int paintWhat;
+
+    /**The implementation data are graphic-platform-specific. It may be prepared data for a defined
+     * size appearance to support fast redrawing. */
+    private Object implData;
+    
+    public Object getImplData() { return implData; }
 
     public void setImplData(Object implData) { this.implData = implData; }
 
-    PaintOrder(int paintWhat, int x1, int y1, int x2, int y2, GralColor color) {
+    
+    public PaintOrderData(int paintWhat) {
       this.paintWhat = paintWhat;
+    }
+
+    
+    
+  }
+  
+  public static class SimpleLine extends PaintOrderData
+  {
+    /**Coordinates. */
+    public final int x1,y1,x2,y2;
+
+    public boolean bPointsAreGralPosUnits = true;
+    
+    SimpleLine ( int x1, int y1, int x2, int y2){
+      super(paintPolyline);
       this.x1 = x1;
       this.y1 = y1;
       this.x2 = x2;
       this.y2 = y2;
-      this.color = color;
-      this.pos = null;
     }
-
-    PaintOrder(int paintWhat, GralPos pos, GralColor color) {
-      this.paintWhat = paintWhat;
-      this.pos = pos == null ? null: pos.clone();
-      this.x1 = -1;
-      this.y1 = -1;
-      this.x2 = -1;
-      this.y2 = -1;
-      this.color = color;
-    }
-
-	}//class PaintOrder
-
-	
-  public static class PolyLine extends PaintOrder
+  }
+  
+  
+  
+  public static class PolyLine extends PaintOrderData
   {
     public final List<GralPoint> points;
     
     public boolean bPointsAreGralPosUnits = true;
     
-    PolyLine(GralPos pos, GralColor color, List<GralPoint> points){
-      super(paintPolyline, pos, color);
+    public PolyLine(List<GralPoint> points){
+      super(paintPolyline);
       this.points = points;
     }
   }
   
   
   
-  public static class PolyLineFloatArray extends PaintOrder
+  public static class PolyLineFloatArray extends PaintOrderData
   {
     private final float[][] points;
     
@@ -128,8 +204,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * @param userUnits
      * @param points The elements[...][0] contains the x-value. The elements[...][iy] contains the y-value.
      */
-    public PolyLineFloatArray(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points, int iy){
-      super(paintPolyline, null, color);
+    public PolyLineFloatArray(GralPlotArea.UserUnits userUnits, float[][] points, int iy){
+      super(paintPolyline);
       this.userUnits = userUnits;
       this.points = points;
       this.iy = iy;
@@ -161,30 +237,44 @@ public class GralCanvasStorage implements GralCanvas_ifc
   }
   
   
+  public static class Fillin extends PaintOrderData
+  {
+    
+    Fillin(){
+      super(paintFillin);
+    }
+  }
   
-	public static class PaintOrderImage extends PaintOrder
-	{
-	  public final GralImageBase image;
-	  public final int dxImage, dyImage;
-	  PaintOrderImage(GralImageBase image, int line, int column, int heigth, int width, GralRectangle pixelImage)
-	  { super(paintImage, line, column, heigth, width, null);
-	    this.image = image;
+  
+  public static class PaintOrderImage extends PaintOrderData
+  {
+    public final GralImageBase image;
+    public final int dxImage, dyImage;
+    /**Coordinates. */
+    public final int x1,y1,x2,y2;
+    
+    PaintOrderImage(GralImageBase image, int line, int column, int heigth, int width, GralRectangle pixelImage)
+    { super(paintImage);
+      y1 = line; y2 = heigth; x1 = column; x2 = width;  
+      this.image = image;
       this.dxImage = pixelImage.dx;
       this.dyImage = pixelImage.dy;
-	  }
-	}//class PaintOrderImage
-	
-	public final static int paintLine = 0xee, paintImage = 0x1ae;
-	
-	public final static int paintPolyline = 'y';
-	
-	/**List of all orders to paint in {@link #drawBackground(GC, int, int, int, int)}.
-	 * 
-	 */
-	public final ConcurrentLinkedQueue<PaintOrder> paintOrders = new ConcurrentLinkedQueue<PaintOrder>();
-	
-	
-	
+    }
+  }//class PaintOrderImage
+  
+  public final static int paintLine = 0xee, paintImage = 0x1ae;
+  
+  public final static int paintFillin = 'f';
+  
+  public final static int paintPolyline = 'y';
+  
+  /**List of all orders to paint in {@link #drawBackground(GC, int, int, int, int)}.
+   * 
+   */
+  public final ConcurrentLinkedQueue<PaintOrder> paintOrders = new ConcurrentLinkedQueue<PaintOrder>();
+  
+  
+  
   /**Accepts a order to draw a line. The coordinates are stored only. 
    * This method can be called in any thread. It is thread-safe.
    * @param color
@@ -193,9 +283,11 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * @param x2
    * @param y2
    */
-  public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
-    PaintOrder order = new PaintOrder(paintLine, x1,y1,x2,y2, color);
-    paintOrders.add(order);  //paint it when drawBackground is invoked.
+  @Override public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
+    
+    PaintOrderData data = new SimpleLine(x1,y1,x2,y2);
+    PaintOrder order = new PaintOrder(null, color, data);
+    this.paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
   
 
@@ -204,8 +296,9 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * @param color
    */
   public void drawLine(GralPos pos, GralColor color, List<GralPoint> points){
-    PaintOrder order = new PolyLine(pos, color, points);
-    paintOrders.add(order);  //paint it when drawBackground is invoked.
+    PaintOrderData data = new PolyLine(points);
+    PaintOrder order = new PaintOrder(pos, color, data);
+    this.paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
   
 
@@ -214,16 +307,25 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * @param color
    */
   public void drawLine(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points, int iy){
-    PolyLineFloatArray order = new PolyLineFloatArray(color, userUnits, points, iy);
+    PolyLineFloatArray data = new PolyLineFloatArray(userUnits, points, iy);
+    PaintOrder order = new PaintOrder(null, color, data);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
   
+  
+  public void drawFillin(GralPos pos, GralColor color) {
+    PaintOrderData data = new Fillin();
+    PaintOrder order = new PaintOrder(pos, color, data);
+    this.paintOrders.add(order);  //paint it when drawBackground is invoked.
+    
+  }
 
-	public void drawImage(GralImageBase image, int x, int y, int dx, int dy, GralRectangle imagePixelSize)
-	{
-    PaintOrder order = new PaintOrderImage(image, x, y, dx, dy, imagePixelSize);
+  public void drawImage(GralImageBase image, int x, int y, int dx, int dy, GralRectangle imagePixelSize)
+  {
+    PaintOrderData data = new PaintOrderImage(image, x, y, dx, dy, imagePixelSize);
+    PaintOrder order = new PaintOrder(null, null, data);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
-	}
+  }
 
 
   @Override
@@ -240,8 +342,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
     // TODO Auto-generated method stub
     
   }
-	
-	
-	//public abstract void redraw();
-	
+  
+  
+  //public abstract void redraw();
+  
 }

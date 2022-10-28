@@ -46,11 +46,11 @@ public class GralPlotWindow
    */
   public static final String sVersion = "2015-09-26";
 
-  final GralMng gralMng = new GralMng(null);
+  public final GralMng gralMng = new GralMng(null);
   
-  final GralWindow window;
+  public final GralWindow window;
   
-  final GralPlotArea canvas;
+  public final GralPlotArea canvas;
   
   
   public static GralPlotWindow create(String sTitle){
@@ -62,10 +62,11 @@ public class GralPlotWindow
 
   
   GralPlotWindow(String sTitle)
-  { window = new GralWindow("10+120, 10+200", "window", sTitle, GralWindow.windResizeable);
-    canvas = new GralPlotArea((GralPos)null, "@0..0,0..0=canvas");
+  { this.window = new GralWindow(null, "@screen, 10+120, 10+200=canvasWindow", sTitle, GralWindow.windResizeable, this.gralMng);
+    this.canvas = new GralPlotArea((GralPos)null, "@0..0,0..0=plot");
     LogMessage log = new LogMessageStream(System.out);
-    window.create("SWT", 'B', log, initGraphic);
+    this.gralMng.createGraphic("SWT", 'B', log);
+    //window.create("SWT", 'B', log, initGraphic);
     
   }
   

@@ -43,7 +43,10 @@ public class GralPlotArea extends GralWidget
    */
   public static final String sVersion = "2015-09-26";
 
-  protected final GralCanvasStorage canvasStore = new GralCanvasStorage();
+  /**The Store for the figures. Immediately writable.
+   * 
+   */
+  final GralCanvasStorage canvasStore = new GralCanvasStorage();
   
   /**Constructs
    * @param currPos may be null, then use the singleton pos in GralMng, else basic and current position
@@ -57,6 +60,14 @@ public class GralPlotArea extends GralWidget
   public UserUnits userUnitsPerGrid(float x0, float y0, float xSize, float ySize) {
     return new UserUnits(x0, y0, xSize, ySize, true);
   }
+  
+  
+  /**Gets one of the Canvas Storages.
+   * @param ix yet not used. Possible more as one TODO.
+   * @return
+   */
+  public GralCanvasStorage getCanvasStore ( int ix ) { return canvasStore; }
+  
   
   
   public void drawLine(GralColor color, UserUnits userUnits, float[][] points, int iy) {
@@ -114,12 +125,6 @@ public class GralPlotArea extends GralWidget
     }
 
     @Override public void removeWidgetImplementation()
-    {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override public void repaintGthread()
     {
       // TODO Auto-generated method stub
       

@@ -80,6 +80,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-27 Hartmut new {@link #createGraphic(String, char, LogMessage)} is now localized here (where else!). 
    * <li>2020-02-01 Hartmut new {@link #actionClose} sets the property to close a main Window.
    * <li>2016-11-04 Hartmut chg: {@link #notifyFocus(GralWidget)}: Only widgets with datapath. It is only for the inspector etc. TODO: Is there a list necessary? Store only the last widget in focus!
    * <li>2016-09-02 Hartmut new: {@link #setPosPanel(GralPanelContent)} now invoked especially from ctor of {@link GralPanelContent}
@@ -194,7 +195,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static String sVersion = "2015-10-30";
+  public final static String sVersion = "2022-10-27";
   
 	/**This class is used for a selection field for file names and paths. */
   public static class FileSelectInfo
@@ -505,6 +506,31 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     this.posThreadSafe.put(posCurrent.threadId, posCurrent);
   }
 
+  
+  
+  /**Creates the whole graphically representation with all given widgets on Gral level.
+   * This operation creates the proper Factory with {@link GralFactory#getFactory},
+   * then calls {@link GralFactory#createGraphic(GralMng, char)}.
+   * Only the {@link GralFactory} needs dependencies to the implementation graphic,
+   * there only to the specific Factory. Whereby the specific factory can be called also via String:
+   * {@link Class#forName(String)}. 
+   * This class remains independent of any implementation. 
+   * @param implementor "SWT" or "AWT" or (TODO) the class path of the implementor's factory class.
+   * @param sizeShow 'A' .. 'G' for the size
+   * @param log null if a log is already given for the GralMng,
+   *   else the log from yet. A given log will be removed. 
+   */
+  public void createGraphic(String implementor, char sizeShow, LogMessage log) {
+    if(log != null) { this.log = log; }
+    GralFactory factory = GralFactory.getFactory(implementor);
+    if(factory !=null) {
+      factory.createGraphic(this, sizeShow);
+    } else {
+      System.out.println("no Gral implementor, faulty String: " + implementor);
+    }
+    this.windPrimary.repaint();
+  }
+  
   
   /**Creates the singleton instance of the GralMng. If this routine is invoked more as one time, the first invocation
    * is the correct one. The more-time-invocation is supported because an application may not invoke this routine.
@@ -1292,9 +1318,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     
     
     this._mngImpl.finishInit();
-    try{ this._mngImpl.reportContent(this.log);
-    } catch(IOException exc) { }
-    
+    if(this.log !=null) {
+      try{ this._mngImpl.reportContent(this.log);
+      } catch(IOException exc) { }
+    }
     //The last action, set the GuiThread
     synchronized(this){
       orderList.start();

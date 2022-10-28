@@ -119,6 +119,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	/**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
 	 * Changes:
 	 * <ul>
+   * <li>2022-10-27 new {@link #getPixelPos(GralPos)} and {@link #getPixelPosInner(GralPos)}.
    * <li>2022-09-24 new {@link #swtMng(org.vishia.gral.base.GralWidget.ImplAccess)} 
    * <li>2022-09-04 {@link #storeGralPixBounds(org.vishia.gral.base.GralWidget.ImplAccess, Control)} general usable.
    * <li>2022-08 {@link #createImplWidget_Gthread(GralWidget)} enhanced.
@@ -171,7 +172,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
 	 */
   //@SuppressWarnings("hiding")
-  public final static String version = "2022-09-04";
+  public final static String version = "2022-10-27";
   
   
   /**Gets the SwtMng instance for the given implementation Widget from the {@link GralWidget#itsMng}.
@@ -376,7 +377,26 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   }
 
   
+  /**Converts a GralPos to pixel.
+   * @param src
+   * @return
+   */
+  Rectangle getPixelPos(GralPos src) {
+    GralRectangle gralPix = src.calcWidgetPosAndSize(propertiesGuiSwt);
+    Rectangle rect = new Rectangle(gralPix.x, gralPix.y, gralPix.dx, gralPix.dy);
+    return rect;
+  }
+
   
+  /**Gets a rectangle as 'inner' coordinates for filling a drawn rectangle
+   * @param src
+   * @return
+   */
+  Rectangle getPixelPosInner(GralPos src) {
+    GralRectangle gralPix = src.calcWidgetPosAndSize(propertiesGuiSwt);
+    Rectangle rect = new Rectangle(gralPix.x+1, gralPix.y+1, gralPix.dx, gralPix.dy-1);
+    return rect;
+  }
 
   
   

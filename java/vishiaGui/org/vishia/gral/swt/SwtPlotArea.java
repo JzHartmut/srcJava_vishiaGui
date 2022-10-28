@@ -2,8 +2,10 @@ package org.vishia.gral.swt;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralPanelContent;
@@ -69,34 +71,44 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   }
   
   
+  
+  
+  @Override public void repaintGthread ( ) {
+    this.swtCanvas.redraw();
+  }
+
+
+  
   private void paintRoutine(PaintEvent ev) {
     GC g = ev.gc;  
     for(GralCanvasStorage.PaintOrder order: super.canvasStore().paintOrders){
-        switch(order.paintWhat){
+      for(GralCanvasStorage.PaintOrderData orderData: order){
+        
+         switch(orderData.paintWhat){
           case GralCanvasStorage.paintLine: {
-            g.setForeground(mng.getColorImpl(order.color));
-            g.drawLine(order.x1, order.y1, order.x2, order.y2);
-          
+            g.setForeground(this.mng.getColorImpl(order.color));
+            GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
+            g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
           } break;
           case GralCanvasStorage.paintImage: {
-            GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) order;
+            GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
             Image image = (Image)orderImage.image.getImage();
             //int dx1 = (int)(orderImage.zoom * order.x2);
             //int dy1 = (int)(orderImage.zoom * order.y2);
-            g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, order.x1, order.y1, order.x2, order.y2);
+            g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
           } break;
           case GralCanvasStorage.paintPolyline: {
-            if(order instanceof GralCanvasStorage.PolyLineFloatArray) {
-              GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) order;
-              int[] points = ((GralCanvasStorage.PolyLineFloatArray) order).getImplStoreInt1Array();
-              g.setForeground(mng.getColorImpl(order.color));
+            g.setForeground(this.mng.getColorImpl(order.color));
+            if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
+              GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
+              int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
               g.drawPolyline(points);
             } else {
-              GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) order;
+              GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
               SwtCanvasStorePanel.SwtPolyLine swtLine;
               { Object oImpl = line.getImplData();
                 if(oImpl == null){
-                  swtLine = new SwtCanvasStorePanel.SwtPolyLine(line, mng);
+                  swtLine = new SwtCanvasStorePanel.SwtPolyLine(order, line, mng);
                   line.setImplData(swtLine);
                 } else {
                   swtLine = (SwtCanvasStorePanel.SwtPolyLine) oImpl;
@@ -105,10 +117,16 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
               g.drawPolyline(swtLine.points);
             }
           } break;
+          case GralCanvasStorage.paintFillin: {
+            Color swtColor = this.mng.getColorImpl(order.color);
+            g.setBackground(swtColor);
+            Rectangle posSwt = this.mng.getPixelPosInner(order.pos);
+            g.fillRectangle(posSwt);
+          } break;
           default: throw new IllegalArgumentException("unknown order");
         }
       }
-  
+    }
   }
   
   

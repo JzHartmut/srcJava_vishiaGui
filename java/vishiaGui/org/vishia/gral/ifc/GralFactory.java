@@ -1,10 +1,12 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 
 /**This is the super class for a factory class which allows usage of any graphical base system
@@ -143,7 +145,8 @@ public abstract class GralFactory
    * @param implementor null for "SWT", "SWT" or "AWT",
    * @return
    */
-  public static GralMng createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
+  @Deprecated public static GralMng createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
+    assert(false);
     GralMng mng = GralMng.get();
     mng.registerWindow(windowg); //checks whether called firstly.
     final String sNameFactoryClass;
@@ -174,7 +177,19 @@ public abstract class GralFactory
   
   
   
-  
+  /**Returns a proper factory due to the implementor String
+   * @param implementor "SWT" or "AWT"
+   * @return null on faulty implementor string
+   */
+  public static GralFactory getFactory(String implementor) {
+    GralFactory factory = null;
+    if(implementor.equals("SWT")){
+      factory = new SwtFactory();
+    } else if(implementor.equals("AWT")){
+      factory = new AwtFactory();
+    }
+    return factory;  //null on faulty factory
+  }
   
   
   
