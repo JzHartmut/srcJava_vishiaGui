@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import org.vishia.gral.base.GralCanvasStorage;
+
 /**This interface is used to free-draw on a canvas area. It is implemented by the 
  * {@link GralCanvasStorage} and by implementation classes.
  * @author Hartmut Schorrig

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralWidget.ImplAccess;
-import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;

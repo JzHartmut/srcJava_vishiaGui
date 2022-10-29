@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import java.util.List;
 
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;

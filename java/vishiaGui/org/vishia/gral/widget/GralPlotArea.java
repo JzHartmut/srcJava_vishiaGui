@@ -1,8 +1,8 @@
 package org.vishia.gral.widget;
 
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 

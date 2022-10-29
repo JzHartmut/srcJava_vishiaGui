@@ -8,9 +8,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -81,8 +81,8 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   
   private void paintRoutine(PaintEvent ev) {
     GC g = ev.gc;  
-    for(GralCanvasStorage.PaintOrder order: super.canvasStore().paintOrders){
-      for(GralCanvasStorage.PaintOrderData orderData: order){
+    for(GralCanvasStorage.Figure order: super.canvasStore().paintOrders){
+      for(GralCanvasStorage.FigureData orderData: order){
         
          switch(orderData.paintWhat){
           case GralCanvasStorage.paintLine: {

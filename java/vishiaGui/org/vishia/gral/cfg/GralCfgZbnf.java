@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMng;
@@ -28,7 +29,6 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPoint;

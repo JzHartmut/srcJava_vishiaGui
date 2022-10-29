@@ -1,9 +1,9 @@
 package org.vishia.gral.swt;
 
 
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralRectangle;
@@ -97,8 +97,8 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
       if(storeMng.gralPanel().canvas() == null){
         stop();
       } else 
-      for(GralCanvasStorage.PaintOrder order: storeMng.gralPanel().canvas().paintOrders){
-        for(GralCanvasStorage.PaintOrderData orderData: order){
+      for(GralCanvasStorage.Figure order: storeMng.gralPanel().canvas().paintOrders){
+        for(GralCanvasStorage.FigureData orderData: order){
             
           switch(orderData.paintWhat){
             case GralCanvasStorage.paintLine: {
@@ -168,7 +168,7 @@ public class SwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     int nrofPoints;
     Color color;
     
-    SwtPolyLine(GralCanvasStorage.PaintOrder order, GralCanvasStorage.PolyLine line, SwtMng gralMng){
+    SwtPolyLine(GralCanvasStorage.Figure order, GralCanvasStorage.PolyLine line, SwtMng gralMng){
       nrofPoints = line.points.size();
       points = new int[2 * nrofPoints];
       GralRectangle rr = order.pos.calcWidgetPosAndSize(gralMng.gralMng.propertiesGui, 0, 0, 800, 600);
