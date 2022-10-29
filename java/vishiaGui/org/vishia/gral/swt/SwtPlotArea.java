@@ -2,19 +2,9 @@ package org.vishia.gral.swt;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.vishia.gral.base.GralCanvasStorage;
-import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.swt.SwtCanvasStorePanel.SwtCanvas;
 import org.vishia.gral.widget.GralPlotArea;
 
 /**Implementation of GralPlotArea to SET

@@ -514,7 +514,7 @@ public interface GralMngBuild_ifc
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * {@link XXXSwtCanvasStorePanel}. This class stores the line coordinates and conditions 
    * and draws it as background if drawing is invoked.
    * 
    * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.
@@ -530,7 +530,7 @@ public interface GralMngBuild_ifc
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * {@link XXXSwtCanvasStorePanel}. This class stores the line coordinates and conditions 
    * and draws it as background if drawing is invoked.
    * 
    * @param color

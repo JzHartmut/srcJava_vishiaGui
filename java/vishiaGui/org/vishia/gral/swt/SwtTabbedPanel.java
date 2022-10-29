@@ -93,10 +93,11 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  TabItem tabItem = new TabItem(widgetSwt, SWT.None);
 	  tabItem.setText(sLabel);
 	  //tabItem.addFocusListener(SWT.FocusIn, focusTabListener);
-	  SwtCanvasStorePanel panel;
+	  //XXXSwtCanvasStorePanel 
+	  SwtPanel panel;
 	  Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
 	  if(yGrid <0 || xGrid <0){
-	    panel = new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng);
+	    panel = new XXXSwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng);
 	  } else {
 	    panel = new SwtGridPanel(panelg, 0);
 	  }
@@ -119,7 +120,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	   TabItem tabItemOperation = new TabItem(widgetSwt, SWT.None);
 	   tabItemOperation.setText(sLabel);
 	   Color colorBackground = mng.propertiesGuiSwt.colorSwt(0xeeeeee);
-	   SwtCanvasStorePanel swtPanel = (new SwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng));
+	   XXXSwtCanvasStorePanel swtPanel = (new XXXSwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng));
 	   GralPanelContent panel = swtPanel.gralPanel();
 	   //mng.mng.registerPanel(panel);
 //	   tabItemOperation.setControl(swtPanel.swtCanvas);

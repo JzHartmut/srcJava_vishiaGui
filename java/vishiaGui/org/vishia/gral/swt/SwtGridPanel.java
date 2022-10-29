@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
@@ -25,7 +26,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
  * @author Hartmut Schorrig
  *
  */
-public class SwtGridPanel extends SwtCanvasStorePanel {
+public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
 
   /**Version, history and license.
    * <ul>
@@ -81,15 +82,23 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
       super.panelSwtImpl.setFont(fontTab);
     } 
     else {
-      final SwtCanvasGridPanel swtCanvas = new SwtCanvasGridPanel(this, parent, style);
-      super.panelSwtImpl = swtCanvas;             // typed access in SwtPanel
-      super.wdgimpl = swtCanvas;                  // unified access in GraLWidget 
-      swtCanvas.addControlListener(this.resizeItemListener);
-      swtCanvas.setData(this);
-      swtCanvas.setLayout(null);
-      this.XXXcurrColor = swtCanvas.getForeground();
-      swtCanvas.addPaintListener(swtCanvas.paintListener);
-      swtCanvas.setBackground(swtMng.getColorImpl(wdgg.getBackColor(0)));
+      GralCanvasStorage canvasStore = wdgg.canvas();
+      Composite panel;
+      if(canvasStore !=null) {
+        final SwtCanvas swtCanvas = new SwtCanvas(swtMng, canvasStore, parent, style);
+        panel = swtCanvas;
+        swtCanvas.addPaintListener(swtCanvas.paintListener);
+      } else {
+        panel = new Composite(parent, style);
+      }
+      super.panelSwtImpl = panel;             // typed access in SwtPanel
+      super.wdgimpl = panel;                  // unified access in GraLWidget 
+      panel.addControlListener(this.resizeItemListener);
+      panel.setData(this);
+      panel.setLayout(null);
+    
+      //this.XXXcurrColor = panel.getForeground();
+      panel.setBackground(swtMng.getColorImpl(wdgg.getBackColor(0)));
     }
     //
     if (parent instanceof TabFolder) {                     // This panel should be used as Tab of the parent TabFolder
@@ -119,14 +128,14 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
   /**The derived class from {@link org.eclipse.swt.widgets.Canvas} contains
    * specific overridden operations. Combination of Canvas and Grid.
    */
-  protected static class SwtCanvasGridPanel extends SwtCanvas {
+  protected static class XXXSwtCanvasGridPanel extends SwtCanvas {
     /**
      * Reference to the GralWidget implementation class, which's SwtGridPanel#w
      *
      */
     private final SwtGridPanel wdgi;
 
-    SwtCanvasGridPanel(final SwtGridPanel storeMng, final Composite parent, final int style) {
+    XXXSwtCanvasGridPanel(final SwtGridPanel storeMng, final Composite parent, final int style) {
       super((SwtMng)storeMng.mngImpl, storeMng.gralPanel().canvas(), parent, style);
       this.wdgi = storeMng;
 
@@ -174,7 +183,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
     }
   }
 
-  @Override void stop () {
+  void stop () {
   } // debug
 
 }
