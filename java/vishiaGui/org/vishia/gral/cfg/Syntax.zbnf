@@ -137,7 +137,7 @@ Imagefile::= Imagefile
 
 
 
-Line::= Line ( {<colorName> | color = <#x?colorValue> |<?coord> <#f?x> , <#f?y> ? , } ) ;.
+Line::= Line ( {<colorName> | color = <#x?colorValue> |<?coord> <#f?x> , <#f?y> ? , | ; } ) ;.
 
 ?en:Line/xCoord::="There may be at least 2, but more possible pairs of x,y for polygons.".
 

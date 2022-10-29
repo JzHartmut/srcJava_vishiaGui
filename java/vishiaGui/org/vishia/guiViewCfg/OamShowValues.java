@@ -93,6 +93,12 @@ public class OamShowValues
   final Map<String, VariableAccess_ifc> idxAllVariables = new TreeMap<String, VariableAccess_ifc>();
   
   
+  /**Test variable used for values only if no communication is selected,
+   * that is cmd line argument -ownIpc: is not given. 
+   * The variables are filled with values in a range -100..100 to demonstrate values. 
+   */
+  VariableAccess_ifc testVar1, testVar2;
+  
   Set<Map.Entry<String, GralWidget>> fieldsToShow;
   
   GralCurveView curveView;
@@ -203,6 +209,37 @@ public class OamShowValues
     this.curveView = curveView;
   }
   
+  
+  
+  /**Operation is only called if no communication is switched on.
+   * 
+   */
+  void testChgVariable() {
+    if(this.testVar1 ==null) {
+      for(Map.Entry<String, VariableAccess_ifc> e: this.idxAllVariables.entrySet()) {
+        VariableAccess_ifc var = e.getValue();
+        if("SIFD".indexOf(var.getType()) >=0) {
+          if(this.testVar1 ==null) { this.testVar1 = var; }
+          else if(this.testVar2 ==null) { this.testVar2 = var; }
+          else break;   //enough variables
+        }
+      }
+    }
+    float val1 = 0.0f;
+    if(this.testVar1 !=null) {
+      val1 = this.testVar1.getFloat();
+      val1 +=1.0;
+      if(val1 >100.0f) {val1 = -100.0f;}
+      this.testVar1.setFloat(val1);
+    }
+    if(this.testVar2 !=null) {
+      this.testVar2.setFloat(val1 / 3.14f);
+    }
+    writeValuesOfTab();
+  }
+  
+  
+
   
   /**This routine presents the new received values at the GUI
    * or saves values in traces.

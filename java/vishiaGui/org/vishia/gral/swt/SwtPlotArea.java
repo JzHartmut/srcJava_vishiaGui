@@ -14,6 +14,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.swt.SwtCanvasStorePanel.SwtCanvas;
 import org.vishia.gral.widget.GralPlotArea;
 
 /**Implementation of GralPlotArea to SET
@@ -53,21 +54,22 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
    */
   public static final String sVersion = "2015-09-26";
 
-  private final Canvas swtCanvas;
+  /**This is the Swt widget of this GralWidget. It is a Composite. */
+  private final SwtCanvas swtCanvas;
   
   private final SwtMng mng;
   
   protected SwtPlotArea(GralPlotArea gralPlotArea, SwtMng mng)
   {
-    gralPlotArea.super(gralPlotArea);
+    gralPlotArea.super(gralPlotArea, mng);
     this.mng = mng;
     GralWidget_ifc panel = gralPlotArea.pos().parent;
     Object swtPanel = panel.getImplAccess().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
-    swtCanvas = new Canvas(panelSwt, 0);
-    swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));
-    mng.setPosAndSizeSwt( gralPlotArea.pos(), swtCanvas, 800, 600);
-    swtCanvas.addPaintListener(paintListener);
+    this.swtCanvas = new SwtCanvas(mng, gralPlotArea.getCanvasStore(0) , panelSwt, 0);
+    this.swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));
+    mng.setPosAndSizeSwt( gralPlotArea.pos(), this.swtCanvas, 800, 600);
+    this.swtCanvas.addPaintListener(this.paintListener);
   }
   
   
@@ -79,65 +81,14 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
 
 
   
-  private void paintRoutine(PaintEvent ev) {
-    GC g = ev.gc;  
-    for(GralCanvasStorage.Figure order: super.canvasStore().paintOrders){
-      for(GralCanvasStorage.FigureData orderData: order){
-        
-         switch(orderData.paintWhat){
-          case GralCanvasStorage.paintLine: {
-            g.setForeground(this.mng.getColorImpl(order.color));
-            GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
-            g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
-          } break;
-          case GralCanvasStorage.paintImage: {
-            GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
-            Image image = (Image)orderImage.image.getImage();
-            //int dx1 = (int)(orderImage.zoom * order.x2);
-            //int dy1 = (int)(orderImage.zoom * order.y2);
-            g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
-          } break;
-          case GralCanvasStorage.paintPolyline: {
-            g.setForeground(this.mng.getColorImpl(order.color));
-            if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
-              GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
-              int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
-              g.drawPolyline(points);
-            } else {
-              GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
-              SwtCanvasStorePanel.SwtPolyLine swtLine;
-              { Object oImpl = line.getImplData();
-                if(oImpl == null){
-                  swtLine = new SwtCanvasStorePanel.SwtPolyLine(order, line, mng);
-                  line.setImplData(swtLine);
-                } else {
-                  swtLine = (SwtCanvasStorePanel.SwtPolyLine) oImpl;
-                }
-              }
-              g.drawPolyline(swtLine.points);
-            }
-          } break;
-          case GralCanvasStorage.paintFillin: {
-            Color swtColor = this.mng.getColorImpl(order.color);
-            g.setBackground(swtColor);
-            Rectangle posSwt = this.mng.getPixelPosInner(order.pos);
-            g.fillRectangle(posSwt);
-          } break;
-          default: throw new IllegalArgumentException("unknown order");
-        }
-      }
-    }
-  }
-  
-  
-  
   @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); swtCanvas.setVisible(bVisible); }
 
   
   @SuppressWarnings("synthetic-access") 
   PaintListener paintListener = new PaintListener(){
     @Override public void paintControl(PaintEvent ev) {
-      SwtPlotArea.this.paintRoutine( ev);
+      SwtPlotArea.this.swtCanvas.drawBackground(ev.gc, ev.x, ev.y, ev.width, ev.height);
+      //SwtPlotArea.this.paintRoutine( ev);
     }
   };
 

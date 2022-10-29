@@ -378,11 +378,13 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 
   
   /**Converts a GralPos to pixel.
+   * It calls (see also) {@link #calcWidgetPosAndSize(GralPos, int, int)}.
+   * Note: The size of the panel is gotten from the current size. 
    * @param src
    * @return
    */
   Rectangle getPixelPos(GralPos src) {
-    GralRectangle gralPix = src.calcWidgetPosAndSize(propertiesGuiSwt);
+    GralRectangle gralPix = calcWidgetPosAndSize(src, 0, 0);
     Rectangle rect = new Rectangle(gralPix.x, gralPix.y, gralPix.dx, gralPix.dy);
     return rect;
   }
@@ -393,7 +395,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @return
    */
   Rectangle getPixelPosInner(GralPos src) {
-    GralRectangle gralPix = src.calcWidgetPosAndSize(propertiesGuiSwt);
+    GralRectangle gralPix = calcWidgetPosAndSize(src, 0, 0);
     Rectangle rect = new Rectangle(gralPix.x+1, gralPix.y+1, gralPix.dx, gralPix.dy-1);
     return rect;
   }
@@ -455,8 +457,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     else if(widgg instanceof GralPanelContent) {
       GralPanelContent widgp = (GralPanelContent)widgg;
       SwtPanel tab;
-      if(widgp.canvas() !=null) { tab = new SwtCanvasStorePanel(widgp); }
-      else { tab = new SwtGridPanel(widgp, 0); }
+//      if(widgp.canvas() !=null) { tab = new SwtCanvasStorePanel(widgp); }
+//      else 
+      { tab = new SwtGridPanel(widgp, 0); }  // an SwtGridPanel is always also a SwtCanvasStrorePanel
       GralWidget_ifc parent = widgg.pos().parent;
       if(parent instanceof GralTabbedPanel) {
         SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
@@ -745,14 +748,17 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 
   
   
-  /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
+  /**Calculates the bounds of a widget with a given pos inside the implementation panel following {@link GralPos#parent}.
+   * Note: The size of the panel is gotten from the current one (maybe resize has had occured). 
+   * It means coordinates from right and bottom should be correct.
+   * <br> 
    * This method is a part of the implementing GralMng because the GralPos is not implemented for
    * any underlying graphic system and the {@link #propertiesGuiSwt} are used.
    * It is possible to tune the bounds after calculation, for example to enhance the width if a text
    * is larger then the intended position. 
    * @param pos The position.
-   * @param widthwidgetNat The natural size of the component.
-   * @param heigthWidgetNat The natural size of the component.
+   * @param widthwidgetNat The natural size of the component given if necessary.
+   * @param heigthWidgetNat The natural size of the component given if necessary.
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){

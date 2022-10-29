@@ -87,7 +87,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
       swtCanvas.addControlListener(this.resizeItemListener);
       swtCanvas.setData(this);
       swtCanvas.setLayout(null);
-      this.currColor = swtCanvas.getForeground();
+      this.XXXcurrColor = swtCanvas.getForeground();
       swtCanvas.addPaintListener(swtCanvas.paintListener);
       swtCanvas.setBackground(swtMng.getColorImpl(wdgg.getBackColor(0)));
     }
@@ -127,7 +127,7 @@ public class SwtGridPanel extends SwtCanvasStorePanel {
     private final SwtGridPanel wdgi;
 
     SwtCanvasGridPanel(final SwtGridPanel storeMng, final Composite parent, final int style) {
-      super(storeMng, parent, style);
+      super((SwtMng)storeMng.mngImpl, storeMng.gralPanel().canvas(), parent, style);
       this.wdgi = storeMng;
 
     }

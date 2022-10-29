@@ -352,6 +352,17 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   @Override public GralCanvasStorage canvas() { return this._panel.canvas; }
 
+  /**Returns the GralCanvasStorage for this panel, creates one if not given yet.
+   * This operation is intended to use for adding a Figure to the panel's canvas.
+   * @return The composite instance of the canvas storage.
+   */
+  public GralCanvasStorage getCreateCanvas() { 
+    if(this._panel.canvas == null) {
+      this._panel.canvas = new GralCanvasStorage(); 
+    }
+    return this._panel.canvas; 
+  }
+
   public boolean isTabbed() { return this._panel.pixelTab >=0; }
 
   

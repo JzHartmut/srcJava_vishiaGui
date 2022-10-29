@@ -346,16 +346,6 @@ public class ViewCfg //extends GuiCfg
   
   
 
-  void testChgVariable() {
-    VariableAccess_ifc var1 = this.oamShowValues.getVariable("var1", null);
-    float val1 = var1.getFloat();
-    val1 +=0.01;
-    if(val1 >1.0f) {val1 = -1.0f;}
-    var1.setFloat(val1);
-    this.oamShowValues.writeValuesOfTab();
-  }
-  
-  
 
   //@Override 
   protected void stepMain()
@@ -367,7 +357,7 @@ public class ViewCfg //extends GuiCfg
       if(this.oamRcvUdpValue !=null) {
         this.oamRcvUdpValue.sendRequest();
       } else {
-        testChgVariable();
+        this.oamShowValues.testChgVariable();
       }
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);

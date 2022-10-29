@@ -1,6 +1,7 @@
 package org.vishia.gral.widget;
 
 import org.vishia.gral.base.GralCanvasStorage;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
@@ -111,9 +112,9 @@ public class GralPlotArea extends GralWidget
    */
   public abstract class _GraphicImplAccess_ extends GralWidget.ImplAccess {
 
-    protected _GraphicImplAccess_(GralWidget widgg)
+    protected _GraphicImplAccess_(GralWidget widgg, GralMng.ImplAccess mngImpl)
     {
-      super(widgg);
+      super(widgg, mngImpl);
     }
 
     protected GralCanvasStorage canvasStore(){ return GralPlotArea.this.canvasStore; }

@@ -1006,44 +1006,44 @@ public class GralPos implements Cloneable
   }
 
 
-  /**Calculates the pixel from a given position. 
-   * If the given position contains negative values (from left and bottom),
-   * then the parent's position is gotten recursively till the size is known.
-   * Because of this recursive call this operation is slower than a programmed calculation  
-   * of the panels size and get it via arguments of 
-   * {@link #calcWidgetPosAndSize(GralGridProperties, int, int, int, int)}.
-   * But the operation is more simple to use.
-   * 
-   * @param propertiesGui The properties for scaling.
-   * @return rectangle with pixel position relative to the parent's pixel position,
-   *   as it is necessary in the implementation graphic.
-   * <br>  
-   * Note: To get the pixel in a implementation's data struct (for example org.eclipse.swt.graphics.Rectangle),
-   *   the implementation specific {@link GralMng.ImplAccess} should offer such one,
-   *   which uses this operation.  
-   */
-  public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui ) {
-    return calcWidgetPosAndSize(propertiesGui, 0);
-  }
-  
-  /**Recursively call for {@link #calcWidgetPosAndSize(GralGridProperties)}
-   * @param propertiesGui
-   * @param recursion
-   * @return
-   */
-  private GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui , int recursion)
-  { if(recursion >20 ) throw new RuntimeException("too many parent panels");
-    final int widthParentPixel, heightParentPixel;
-    final int widthWidgetNat = 800, heightWidgetNat = 600;
-    if(  (this.x.p1 <0 || this.x.p2 <=0 || this.y.p1 <0 || this.y.p2 <=0)   //necessary to know parent
-      && parent !=null) {
-      GralRectangle parentArea = this.parent.pos().calcWidgetPosAndSize(propertiesGui);
-      widthParentPixel = parentArea.dx; heightParentPixel = parentArea.dy;
-    } else {
-      widthParentPixel = 800; heightParentPixel = 600;
-    }
-    return calcWidgetPosAndSize(propertiesGui, widthParentPixel, heightParentPixel, widthWidgetNat, heightWidgetNat);
-  }
+//  /**Calculates the pixel from a given position. 
+//   * If the given position contains negative values (from left and bottom),
+//   * then the parent's position is gotten recursively till the size is known.
+//   * Because of this recursive call this operation is slower than a programmed calculation  
+//   * of the panels size and get it via arguments of 
+//   * {@link #calcWidgetPosAndSize(GralGridProperties, int, int, int, int)}.
+//   * But the operation is more simple to use.
+//   * 
+//   * @param propertiesGui The properties for scaling.
+//   * @return rectangle with pixel position relative to the parent's pixel position,
+//   *   as it is necessary in the implementation graphic.
+//   * <br>  
+//   * Note: To get the pixel in a implementation's data struct (for example org.eclipse.swt.graphics.Rectangle),
+//   *   the implementation specific {@link GralMng.ImplAccess} should offer such one,
+//   *   which uses this operation.  
+//   */
+//  public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui ) {
+//    return calcWidgetPosAndSize(propertiesGui, 0);
+//  }
+//  
+//  /**Recursively call for {@link #calcWidgetPosAndSize(GralGridProperties)}
+//   * @param propertiesGui
+//   * @param recursion
+//   * @return
+//   */
+//  private GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui , int recursion)
+//  { if(recursion >20 ) throw new RuntimeException("too many parent panels");
+//    final int widthParentPixel, heightParentPixel;
+//    final int widthWidgetNat = 800, heightWidgetNat = 600;
+//    if(  (this.x.p1 <0 || this.x.p2 <=0 || this.y.p1 <0 || this.y.p2 <=0)   //necessary to know parent
+//      && parent !=null) {
+//      GralRectangle parentArea = this.parent.pos().calcWidgetPosAndSize(propertiesGui, recursion +1);
+//      widthParentPixel = parentArea.dx; heightParentPixel = parentArea.dy;
+//    } else {
+//      widthParentPixel = 800; heightParentPixel = 600;
+//    }
+//    return calcWidgetPosAndSize(propertiesGui, widthParentPixel, heightParentPixel, widthWidgetNat, heightWidgetNat);
+//  }
 
   private static void appendPos(Appendable b, int p, int pFrac) throws IOException
   {

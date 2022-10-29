@@ -421,10 +421,9 @@ public class GralCfgZbnf
       this.window.mainPanel.setGrid(2,2,5,5,-8,-30);
       this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
       Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = this.cfgData.getPanels();
-      if(setIdxPanels.size()==0){                            // no more panels, it means all is on level of the window
-        //gralMng.selectPanel(cfgData.actPanel);
-        //==================>
-        sError = buildPanel(this.cfgData.actPanel);  
+      if(setIdxPanels.size()==0){                          // no more panels, it means all is on level of the window
+        //========>>>>>                                    // widgets on main panel
+        sError = buildPanel(this.cfgData.actPanel, this.window.mainPanel);  
       } else {                                               //some panels are given, hence selects given panels by name or create tabbed panels.
         //GralTabbedPanel tabs = new GralTabbedPanel(this.currPos, null, this.window.getName() + "_tabs", null, 0, '@');
         //this.window.addWidget(tabs, false);
@@ -435,8 +434,8 @@ public class GralCfgZbnf
           GralPanelContent panel = new GralPanelContent(this.currPos, cfgPanel.name, '@', this.gralMng);
           panel.setGrid(2,2,5,5,-12,-20);
           //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
-          this.currPos = new GralPos(panel);
-          sError = buildPanel(cfgPanel);  
+          this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.
+          sError = buildPanel(cfgPanel, panel);  
           
         }
       }
@@ -453,7 +452,7 @@ public class GralCfgZbnf
    * @param cfgDataPanel
    * @return null if ok, elsewhere the error hints, one per line.
    */
-  public String buildPanel(GralCfgPanel cfgDataPanel)
+  public String buildPanel(GralCfgPanel cfgDataPanel, GralPanelContent currPanel)
   {
     String sError = null;
     for(GralCfgElement cfge: cfgDataPanel.listElements){
@@ -461,7 +460,7 @@ public class GralCfgZbnf
       String sErrorWidgd;
       try{
         //======>>>>
-        sErrorWidgd = buildWidget(cfge); 
+        sErrorWidgd = buildWidget(cfge, currPanel); 
       }
       catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
       if(sErrorWidgd !=null){
@@ -475,7 +474,7 @@ public class GralCfgZbnf
 
   
   
-  /**Builds the instance of {@link GralWidget} and register it in the GralMng.
+  /**Builds the instance of one of the {@link GralWidget} from the read ZBNF data.
    * This operation does nothing with the Graphic Implementation (SWT, AWT,...). 
    * Hence it can run in the main thread (or any other thread).
    * <br>
@@ -494,7 +493,7 @@ public class GralCfgZbnf
    *         It is possible that a named user action is not found etc. 
    * <br>
    */
-  public String buildWidget(GralCfgElement cfge)
+  public String buildWidget(GralCfgElement cfge, GralPanelContent currPanel)
   throws ParseException {
     String sError = null;
     
@@ -717,22 +716,15 @@ public class GralCfgZbnf
           widgd = new GralValueBar(this.currPos, sName);
           this.widgets.add(widgd);
         } break;
-        case 'I':{
+        case 'I':{                                         // L= Line
           GralCfgData.GuiCfgLine cfgLine = (GralCfgData.GuiCfgLine)cfge.widgetType;
           //copy the points from the type GuiCfgCoord to GralPoint
           List<GralPoint> points = new LinkedList<GralPoint>();
           for(GralCfgData.GuiCfgCoord coord: cfgLine.coords){
             points.add(new GralPoint(coord.x, coord.y));
           }
-          GralCanvasStorage canvas = this.gralMng.getCurrentPanel().canvas();
-          if(canvas !=null){
-            GralPos pos = this.gralMng.getPositionInPanel();
-            canvas.drawLine(this.currPos, color0, points);
-          } else {
-            System.err.println( "GuiCfg - line: panel is not a CanvasStorePanel;");
-          }
-
-          gralMng.addLine(cfgLine.color0.color, points);
+          GralCanvasStorage canvas = currPanel.getCreateCanvas();
+          canvas.drawLine(this.currPos, color0, points);
         } break;
         default: {
           widgd = null;

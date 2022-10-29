@@ -1205,7 +1205,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralWindow getPrimaryWindow(){ return windPrimary; }
   
   
-  public GralPanel_ifc getCurrentPanel(){ return (GralPanelContent)pos().pos.parent; }
+  public GralPanelContent getCurrentPanel(){ return (GralPanelContent)pos().pos.parent; }
   
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
   { @Override public void panelActivatedGui(List<GralWidget> widgetsP)
