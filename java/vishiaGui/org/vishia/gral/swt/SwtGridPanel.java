@@ -85,7 +85,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       GralCanvasStorage canvasStore = wdgg.canvas();
       Composite panel;
       if(canvasStore !=null) {
-        final SwtCanvas swtCanvas = new SwtCanvas(swtMng, canvasStore, parent, style);
+        final SwtWdgCanvas swtCanvas = new SwtWdgCanvas(swtMng, canvasStore, parent, style);
         panel = swtCanvas;
         swtCanvas.addPaintListener(swtCanvas.paintListener);
       } else {
@@ -128,7 +128,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
   /**The derived class from {@link org.eclipse.swt.widgets.Canvas} contains
    * specific overridden operations. Combination of Canvas and Grid.
    */
-  protected static class XXXSwtCanvasGridPanel extends SwtCanvas {
+  protected static class XXXSwtCanvasGridPanel extends SwtWdgCanvas {
     /**
      * Reference to the GralWidget implementation class, which's SwtGridPanel#w
      *

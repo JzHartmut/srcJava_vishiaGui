@@ -45,7 +45,7 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   public static final String sVersion = "2015-09-26";
 
   /**This is the Swt widget of this GralWidget. It is a Composite. */
-  private final SwtCanvas swtCanvas;
+  private final SwtWdgCanvas swtCanvas;
   
   private final SwtMng mng;
   
@@ -56,7 +56,7 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
     GralWidget_ifc panel = gralPlotArea.pos().parent;
     Object swtPanel = panel.getImplAccess().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
-    this.swtCanvas = new SwtCanvas(mng, gralPlotArea.getCanvasStore(0) , panelSwt, 0);
+    this.swtCanvas = new SwtWdgCanvas(mng, gralPlotArea.getCanvasStore(0) , panelSwt, 0);
     this.swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));
     mng.setPosAndSizeSwt( gralPlotArea.pos(), this.swtCanvas, 800, 600);
     this.swtCanvas.addPaintListener(this.paintListener);

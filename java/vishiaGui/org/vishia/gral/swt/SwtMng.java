@@ -396,7 +396,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   Rectangle getPixelPosInner(GralPos src) {
     GralRectangle gralPix = calcWidgetPosAndSize(src, 0, 0);
-    Rectangle rect = new Rectangle(gralPix.x+1, gralPix.y+1, gralPix.dx, gralPix.dy-1);
+    Rectangle rect = new Rectangle(gralPix.x+1, gralPix.y, gralPix.dx, gralPix.dy);
     return rect;
   }
 

@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-/**Class to store some graphical figures to draw it in its {@link SwtCanvas#drawBackground(GC, int, int, int, int)}-routine.
+/**Class to store some graphical figures to draw it in its {@link SwtWdgCanvas#drawBackground(GC, int, int, int, int)}-routine.
  * The figures are stored with its coordinates and it are drawn if necessary. 
  * <br><br>
  * It can contain some GUI-Elements like Button, Text, Label, Table etc from org.eclipse.swt.widgets.
@@ -51,7 +51,7 @@ public class XXXSwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   public XXXSwtCanvasStorePanel(GralPanelContent panelg, Composite parent, int style, Color backGround, GralMng gralMng)
   { super(panelg, (Composite)null);
     //gralPanel().panel.canvas = new GralCanvasStorage();
-    SwtCanvas swtCanvas = new SwtCanvas((SwtMng)gralMng._mngImpl, this._panel.canvas, parent, style);
+    SwtWdgCanvas swtCanvas = new SwtWdgCanvas((SwtMng)gralMng._mngImpl, this._panel.canvas, parent, style);
     super.panelSwtImpl = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);

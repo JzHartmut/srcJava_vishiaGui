@@ -12,13 +12,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.util.Debugutil;
 
-public class SwtCanvas  extends Canvas
+/**This class enhances the swt widget Canvas with some operations,
+ * especially the drawBackground from {@link GralCanvasStorage}.
+ * @author Hartmut Schorrig
+ *
+ */
+public class SwtWdgCanvas  extends Canvas
 {
   private final GralCanvasStorage canvasStore;
   private final SwtMng swtMng;
   
-  SwtCanvas(SwtMng swtMng, GralCanvasStorage canvasStore, Composite parent, int style)
+  SwtWdgCanvas(SwtMng swtMng, GralCanvasStorage canvasStore, Composite parent, int style)
   {
     super(parent, style);    //The SWT Canvas itself, it is a composite
     this.swtMng = swtMng;
@@ -27,14 +33,14 @@ public class SwtCanvas  extends Canvas
   
   @Override
   public void drawBackground(GC g, int x, int y, int dx, int dy) {
-    //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
     if(this.canvasStore !=null) {
-      for(GralCanvasStorage.Figure order: this.canvasStore.paintOrders){
+      GralCanvasStorage store = this.canvasStore;
+      for(GralCanvasStorage.Figure order: store.paintOrders){
+        Debugutil.stop();
         for(GralCanvasStorage.FigureData orderData: order){
-          
            switch(orderData.paintWhat){
             case GralCanvasStorage.paintLine: {
-              g.setForeground(this.swtMng.getColorImpl(order.color));
+              g.setForeground(this.swtMng.getColorImpl(orderData.color));
               GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
               g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
             } break;
@@ -46,27 +52,18 @@ public class SwtCanvas  extends Canvas
               g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
             } break;
             case GralCanvasStorage.paintPolyline: {
-              g.setForeground(this.swtMng.getColorImpl(order.color));
+              g.setForeground(this.swtMng.getColorImpl(orderData.color));
               if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
                 GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
                 int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
                 g.drawPolyline(points);
               } else {
                 GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
-                SwtPolyLine swtLine;
-                { Object oImpl = line.getImplData();
-                  if(oImpl == null){
-                    swtLine = new SwtPolyLine(order, line, this.swtMng);
-                    line.setImplData(swtLine);
-                  } else {
-                    swtLine = (SwtPolyLine) oImpl;
-                  }
-                }
-                g.drawPolyline(swtLine.points);
+                drawPolyline(g, order, line);
               }
             } break;
             case GralCanvasStorage.paintFillin: {
-              Color swtColor = this.swtMng.getColorImpl(order.color);
+              Color swtColor = this.swtMng.getColorImpl(orderData.color);
               g.setBackground(swtColor);
               Rectangle posSwt = this.swtMng.getPixelPosInner(order.pos);
               g.fillRectangle(posSwt);
@@ -78,52 +75,41 @@ public class SwtCanvas  extends Canvas
     }
   }  
 
-  /**The listener for paint events. It is called whenever the window is shown newly. */
-  protected PaintListener paintListener = new PaintListener()
-  {
-
-    @Override
-    public void paintControl(PaintEvent e) {
-      // TODO Auto-generated method stub
-      GC gc = e.gc;
-      drawBackground(e.gc, e.x, e.y, e.width, e.height);
-      //stop();
+  
+  
+  private void drawPolyline(GC g, GralCanvasStorage.Figure order, GralCanvasStorage.PolyLine line) {
+    GralRectangle rr = this.swtMng.calcWidgetPosAndSize(order.pos, 0,0);  // base position as given in the figure
+    int xf, yf;
+    if(line.bPointsAreGralPosUnits){
+      xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
+      yf = this.swtMng.gralMng.propertiesGui.xPixelUnit();
+    } else {
+      xf = rr.dx;  //0.0..1.0 is the size given in pos in both directions.
+      yf = rr.dy;
     }
-    
-  };
-  
-  void stop(){}
-
-  
-  
-  public static class SwtPolyLine // extends GralCanvasStorage.PolyLine
-  {
-    int[] points;
-    int nrofPoints;
-    Color color;
-    
-    SwtPolyLine(GralCanvasStorage.Figure order, GralCanvasStorage.PolyLine line, SwtMng swtMng){
-      nrofPoints = line.points.size();
-      points = new int[2 * nrofPoints];
-      GralRectangle rr = swtMng.calcWidgetPosAndSize(order.pos, 0,0);
-      int ix = -1;
-      int xf, yf;
-      if(line.bPointsAreGralPosUnits){
-        xf = swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-        yf = swtMng.gralMng.propertiesGui.xPixelUnit();
-      } else {
-        xf = rr.dx;  //0.0..1.0 is size of line.pos
-        yf = rr.dy;
+    int x1 = -1, y1 = -1, x2, y2;
+    for(GralPoint point: line.points){
+      x2 = rr.x + (int)(point.x * xf + 0.5f);              // the src points counts from bottom left of the coord. to top-right
+      y2 = rr.y + rr.dy - (int)(point.y * yf + 0.5f);      //position from button, in direction top
+      if(x1 >=0) {
+        g.drawLine(x1, y1, x2, y2);                        //The pixels counts from top left to bottom-right
       }
-      for(GralPoint point: line.points){
-        int x = rr.x + (int)(point.x * xf + 0.5f);         // the src points counts from bottom left of the coord. to top-right
-        int y = rr.y + rr.dy - (int)(point.y * yf + 0.5f); //position from button, in direction top
-        points[++ix] = x;           //The pixels counts from top left to bottom-right
-        points[++ix] = y;
-      }
-      color = swtMng.getColorImpl(order.color);
+      x1 = x2; y1 = y2;
     }
   }
+  
+  
+  
+  /**The listener for paint events. It is called whenever the window is shown newly. 
+   * It is used as PaintListener in the using SwtAccessGral classes to inform this SWT widget
+   * */
+  protected PaintListener paintListener = new PaintListener() {    
+    @Override public void paintControl(PaintEvent e) {
+      drawBackground(e.gc, e.x, e.y, e.width, e.height);
+    }
+  };
+  
+  
   
 
   

@@ -435,8 +435,9 @@ public class GralPos implements Cloneable
    * @param sPos See {@link #setPosition(CharSequence, GralPos)}
    * @throws ParseException
    */
-  public void setPosition(CharSequence sPos) throws ParseException {
+  public GralPos setPosition(CharSequence sPos) throws ParseException {
     setPosition(sPos, null);
+    return this;
   }
 
   
@@ -893,7 +894,9 @@ public class GralPos implements Cloneable
   }
   
   
-  
+  public float xGrid() {
+    return x.p1 + x.p1Frac / 10.0f;
+  }
   
   
   public float height()
@@ -1221,7 +1224,7 @@ public class GralPos implements Cloneable
         }//switch direction     
       } break;
       default:
-          throw new IllegalArgumentException("GralPos coord set, start value case missing: 0x" + Integer.toHexString(zType));  
+        throw new IllegalArgumentException("GralPos coord set, start value faulty case: 0x" + Integer.toHexString(zType));  
       } //switch for z coord
       //
       switch(zeType) {
