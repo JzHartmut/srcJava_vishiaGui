@@ -1,5 +1,6 @@
 package org.vishia.gral.swt;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Composite;
@@ -56,7 +57,7 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
     GralWidget_ifc panel = gralPlotArea.pos().parent;
     Object swtPanel = panel.getImplAccess().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
-    this.swtCanvas = new SwtWdgCanvas(mng, gralPlotArea.getCanvasStore(0) , panelSwt, 0);
+    this.swtCanvas = new SwtWdgCanvas(this, mng, gralPlotArea.getCanvasStore(0) , panelSwt, SWT.NO_BACKGROUND);
     this.swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));
     mng.setPosAndSizeSwt( gralPlotArea.pos(), this.swtCanvas, 800, 600);
     this.swtCanvas.addPaintListener(this.paintListener);

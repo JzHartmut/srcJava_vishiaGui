@@ -135,7 +135,7 @@ public class GralLed extends GralWidget
       super(widgg, mng);
     }
     
-    protected GralWidget.DynamicData dyda(){ return dyda; }
+    protected GralWidget.DynamicData xxxdyda(){ return dyda; }
   }    
 
 }

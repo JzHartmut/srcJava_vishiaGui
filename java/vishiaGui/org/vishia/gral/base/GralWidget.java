@@ -177,6 +177,9 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-01 new very important: {@link #redraw(int, int, boolean)} and {@link #redrawOnlyDynamics(int, int)}.
+   *   The concept of dynamics in the widget positions is introduced with the {@link GralCanvasStorage}.
+   *   Generally: repaint and redraw are synonymous, also in SWT. I want to use better wording redraw if possible.   
    * <li>2022-09-13 {@link ImplAccess#setPosBounds()} now regard the tab panel on resize.
    * <li>2022-09-13 new {@link #toString(Appendable)} usable for comprehensive reports and toString() 
    * <li>2022-08 new {@link GralWidget#GralWidget(GralPos, String, char)} for the new concept, some more adaptions. 
@@ -1879,12 +1882,21 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   }
   
   
-  /**The Implementation of repaint calls {@link #repaintGthread()} if it is the graphic thread and the delay is 0.
+  /**The Implementation of redraw calls {@link #repaintGthread()} if it is the graphic thread and the delay is 0.
    * Elsewhere the {@link #repaintRequ} is added as request to the graphic thread. 
    * @see org.vishia.gral.ifc.GralWidget_ifc#repaint(int, int)
+   *
+   * @param delay in ms to prevent too much calls of the graphic system
+   * @param latest in ms to prevent to much procrastination on repeated calls with delay.
+   *   The current time of the first call of this redraw + latest is the latest time to activate the redraw event
+   *   though delay was given by newer calls.
+   * @param onlyDynamics true then only some appearances of the widget are redrawn, due to specified marker.
+   *   Especially the background is not drawn newly as first action. 
+   *   The value of the latest call of this operation is valid if the redraw event is delayed.
    */
-  @Override public void repaint(int delay, int latest){
+  public void redraw ( int delay, int latest, boolean onlyDynamics ){
     if(itsMng !=null && itsMng._mngImpl !=null ){ //NOTE: set of changes is possible before setToPanel was called. 
+      this._wdgImpl.bRedrawOnlyDynamics = onlyDynamics;
       if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
         _wdgImpl.repaintGthread();
       } else {
@@ -1894,8 +1906,17 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
   }
   
-  
-  
+  public void redrawOnlyDynamics ( int delay, int latest ) {
+    redraw(delay, latest, true);
+  }
+
+  public void redraw ( int delay, int latest ) {
+    redraw(delay, latest, false);
+  }
+
+  @Override public void repaint(int delay, int latest){
+    redraw(delay, latest, false);
+  }
   /**Removes the widget from the lists in its panel and from the graphical representation.
    * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
    */
@@ -1951,7 +1972,10 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   
   
-  /**Methods which should be called back by events of the implementation layer.
+  /**This is the super class of all GralWidget access classes of the implementation layer.
+   * The protected final operations are called usual from the implementation graphic classes.
+   * The non final operations can be overridden and they are called from GralWidget itself.
+   * Methods which should be called back by events of the implementation layer.
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    */
@@ -1990,6 +2014,8 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     @Deprecated protected ImplAccess(GralWidget widgg, GralMng mng){
       this(widgg);
     }
+
+    protected boolean bRedrawOnlyDynamics;
     
     
     /**
@@ -2022,7 +2048,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     
     
     /**Set the bounds of the widget from the stored GralPos.
-     *
+     * It can be overridden for special widgets, for example for depending bounds from content. 
      */
     @Override public void setPosBounds ( ) {
       GralRectangle xyPix = mngImpl.calcWidgetPosAndSize(widgg.pos(), 600, 800);
@@ -2044,7 +2070,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
     
     /**Access to the GralMng from the implementation level.  */
-    public GralMng gralMng() { return this.widgg.itsMng; }
+    public final GralMng gralMng() { return this.widgg.itsMng; }
 
 
     /**This method is not intent to call by user. It may be called from all widget implementation 
@@ -2054,7 +2080,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
      * Don't override this method in the graphic implementation!
      * It should be overridden only in a Gral widget inheritance only if necessary.
      */
-    public void XXXfocusGained(){
+    public final void XXXfocusGained(){
       //System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
       if(widgg.htmlHelp !=null){
         widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
@@ -2065,30 +2091,32 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
     
     /**Sets the state of the widget whether it seams to be visible.
-     * This method should not be invoked by the application. It is 
+     * This method should not be invoked by the application. It is
+     * It can be override if more as one widget is part of a comprehensive widget. 
      * @param visible
      */
-    public void setVisibleState(boolean visible){
+    protected void setVisibleState(boolean visible){
       widgg.setVisibleState(visible);
     }
 
     /**Access method to GralWidget's method. */
-    protected GralUserAction actionShow(){ return widgg.cfg.actionShow; }
+    protected final GralUserAction actionShow(){ return widgg.cfg.actionShow; }
     
     /**Access method to GralWidget's method. */
     //protected GralUserAction actionChanging(){ return widgg.cfg.actionChanging; }
     
     
     /**Access method to {@link GralWidget#dyda}. */
-    protected GralWidget.DynamicData dyda(){ return widgg.dyda; }
+    protected final GralWidget.DynamicData dyda(){ return widgg.dyda; }
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
     /**Notify that the text is changed in {@link GralWidget.DynamicData#bTextChanged} */
-    protected void setTextChanged(){ widgg.dyda.bTextChanged = true; }
+    protected final void setTextChanged(){ widgg.dyda.bTextChanged = true; }
     
     /**Invoked on touching a widget. */
     //protected void setTouched(){ widgg.dyda.bTouchedField = true; }
+    
     
     
     /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.
@@ -2116,12 +2144,12 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
      * starting with chg in this class. {@link #chgText} etc.
      * @return
      */
-    public int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
+    protected final int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
     
-    public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
+    protected final void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
     
     
-    protected ActionChange getActionChange(ActionChangeWhen when){ return widgg.getActionChange(when); }
+    protected final ActionChange getActionChange(ActionChangeWhen when){ return widgg.getActionChange(when); }
     
     public static GralWidget gralWidgetFromImplData(Object data){
       if(data instanceof GralWidget) return (GralWidget)data;
@@ -2131,6 +2159,8 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
     
     
+    public boolean redrawOnlyDynamics ( ) { return this.bRedrawOnlyDynamics; }
+    
     /**This routine does not change the focus state in the implementation widget,
      * it denotes only that the GralWidget has the focus or not.
      * The method is static because it gets the widgg instance. 
@@ -2139,7 +2169,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
      * @param widgg the GralWidget instance
      * @param focus true on focus gained, false on focus lost.
      */
-    public static void setFocused(GralWidget widgg, boolean focus){
+    protected static void setFocused(GralWidget widgg, boolean focus){
       widgg.bHasFocus = focus;
       if(focus == false) { widgg.dyda.bTouchedField = false; }
     }

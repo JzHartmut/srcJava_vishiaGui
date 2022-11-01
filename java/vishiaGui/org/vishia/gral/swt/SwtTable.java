@@ -288,13 +288,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   @Override public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
 
   
-  //@Override 
-  public boolean XXXsetVisible(boolean visible){
-    boolean ret = swtWidgHelper.widgetSwt.isVisible();
-    swtWidgHelper.widgetSwt.setVisible(visible);
-    ((GralWidget.ImplAccess)this).setVisibleState(visible);
-    return ret;
-  }
   
 
 

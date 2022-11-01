@@ -51,7 +51,7 @@ public class XXXSwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
   public XXXSwtCanvasStorePanel(GralPanelContent panelg, Composite parent, int style, Color backGround, GralMng gralMng)
   { super(panelg, (Composite)null);
     //gralPanel().panel.canvas = new GralCanvasStorage();
-    SwtWdgCanvas swtCanvas = new SwtWdgCanvas((SwtMng)gralMng._mngImpl, this._panel.canvas, parent, style);
+    SwtWdgCanvas swtCanvas = new SwtWdgCanvas(this, (SwtMng)gralMng._mngImpl, this._panel.canvas, parent, style);
     super.panelSwtImpl = swtCanvas;
     swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);

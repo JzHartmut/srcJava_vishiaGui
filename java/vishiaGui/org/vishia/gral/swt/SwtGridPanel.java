@@ -85,7 +85,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       GralCanvasStorage canvasStore = wdgg.canvas();
       Composite panel;
       if(canvasStore !=null) {
-        final SwtWdgCanvas swtCanvas = new SwtWdgCanvas(swtMng, canvasStore, parent, style);
+        final SwtWdgCanvas swtCanvas = new SwtWdgCanvas(this, swtMng, canvasStore, parent, style);
         panel = swtCanvas;
         swtCanvas.addPaintListener(swtCanvas.paintListener);
       } else {
@@ -136,7 +136,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
     private final SwtGridPanel wdgi;
 
     XXXSwtCanvasGridPanel(final SwtGridPanel storeMng, final Composite parent, final int style) {
-      super((SwtMng)storeMng.mngImpl, storeMng.gralPanel().canvas(), parent, style);
+      super(null, (SwtMng)storeMng.mngImpl, storeMng.gralPanel().canvas(), parent, style);
       this.wdgi = storeMng;
 
     }

@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,9 +92,18 @@ public class GralCanvasStorage implements GralCanvas_ifc
      */
     public final boolean dynamic;
     
+    /**True on a new position, then calculate points newly. */
+    public boolean bNewPos;
+    
     /**It this rectangle is given (not a null reference),
      * then this figure is dynamically and a back image is stored in the implementing level. */
     public GralRectangle backPositions;
+    
+    /**Used from implementing graphics on #dynamic to store the background for restore. 
+     */
+    public Object storageBackground;
+    
+    public GralRectangle pixelPos;
     
     int dxm, dym;
     
@@ -136,10 +146,21 @@ public class GralCanvasStorage implements GralCanvas_ifc
      */
     public FigureDataSet data() { return this.dataSet; }
     
-    public void move(int dx, int dy) {
+    public void XXXmove(int dx, int dy) {
       this.dxm += dx;
       this.dym += dy;
     }
+    
+    public void setNewPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize) {
+      this.pos.setPosition(this.pos, line, lineEndOrSize, column, columnEndOrSize);
+      this.bNewPos = true;
+    }
+    
+    public void setNewPosition ( String posString) throws ParseException {
+      this.pos.setPosition(posString, this.pos);
+      this.bNewPos = true;
+    }
+    
     
     
     Iterator<FigureData> iter = new Iterator<FigureData>() {
@@ -174,7 +195,6 @@ public class GralCanvasStorage implements GralCanvas_ifc
   
   public static class FigureDataSet {
     
-    public final String name;
     
     
     /**Or the figure consists of more elements,
@@ -183,8 +203,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
     
     
     
-    public FigureDataSet(String name) {
-      this.name = name;
+    public FigureDataSet() {
     }
 
 
@@ -194,19 +213,19 @@ public class GralCanvasStorage implements GralCanvas_ifc
 
     
     public PolyLine addPolyline(GralColor color) {
-      PolyLine line = new GralCanvasStorage.PolyLine(color);
+      PolyLine line = new GralCanvasStorage.PolyLine("" + this.listData.size(), color);
       this.listData.add(line);
       return line;
     }
     
     public Fillin addFillin(GralColor color) {
-      Fillin data = new GralCanvasStorage.Fillin(color);
+      Fillin data = new GralCanvasStorage.Fillin("" + this.listData.size(), color);
       this.listData.add(data);
       return data;
     }
     
     
-    @Override public String toString() { return this.name; }
+    @Override public String toString() { return this.listData.toString(); }
     
 
   }
@@ -219,6 +238,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
    */
   public abstract static class FigureData
   {
+    public final String name;
+    
     /**One of the static int of this class. Determines what to paint. 
      * See {@link GralCanvasStorage#paintLine}, {@link GralCanvasStorage#paintImage}, 
      * */
@@ -236,7 +257,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
     public void setImplData(Object implData) { this.implData = implData; }
 
     
-    public FigureData(int paintWhat, GralColor color) {
+    public FigureData(String name, int paintWhat, GralColor color) {
+      this.name = name;
       this.paintWhat = paintWhat;
       this.color = color;
     }
@@ -252,8 +274,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
 
     public boolean bPointsAreGralPosUnits = true;
     
-    SimpleLine ( int x1, int y1, int x2, int y2, GralColor color){
-      super(paintPolyline, color);
+    SimpleLine ( String name, int x1, int y1, int x2, int y2, GralColor color){
+      super(name, paintPolyline, color);
       this.x1 = x1;
       this.y1 = y1;
       this.x2 = x2;
@@ -269,13 +291,13 @@ public class GralCanvasStorage implements GralCanvas_ifc
     
     public boolean bPointsAreGralPosUnits = true;
     
-    public PolyLine(List<GralPoint> points, GralColor color){
-      super(paintPolyline, color);
+    public PolyLine(String name, List<GralPoint> points, GralColor color){
+      super(name, paintPolyline, color);
       this.points = points;
     }
 
-    public PolyLine(GralColor color){
-      super(paintPolyline, color);
+    public PolyLine(String name, GralColor color){
+      super(name, paintPolyline, color);
       this.points = new LinkedList<GralPoint>();
     }
     
@@ -302,8 +324,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * @param userUnits
      * @param points The elements[...][0] contains the x-value. The elements[...][iy] contains the y-value.
      */
-    public PolyLineFloatArray(GralPlotArea.UserUnits userUnits, float[][] points, int iy, GralColor color){
-      super(paintPolyline, color);
+    public PolyLineFloatArray(String name, GralPlotArea.UserUnits userUnits, float[][] points, int iy, GralColor color){
+      super(name, paintPolyline, color);
       this.userUnits = userUnits;
       this.points = points;
       this.iy = iy;
@@ -338,8 +360,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
   public static class Fillin extends FigureData
   {
     
-    public Fillin(GralColor color){
-      super(paintFillin, color);
+    public Fillin(String name, GralColor color){
+      super(name, paintFillin, color);
     }
   }
   
@@ -351,8 +373,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
     /**Coordinates. */
     public final int x1,y1,x2,y2;
     
-    PaintOrderImage(GralImageBase image, int line, int column, int heigth, int width, GralRectangle pixelImage)
-    { super(paintImage, null);
+    PaintOrderImage(String name, GralImageBase image, int line, int column, int heigth, int width, GralRectangle pixelImage)
+    { super(name, paintImage, null);
       y1 = line; y2 = heigth; x1 = column; x2 = width;  
       this.image = image;
       this.dxImage = pixelImage.dx;
@@ -419,7 +441,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
    */
   @Override public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
     
-    FigureData data = new SimpleLine(x1,y1,x2,y2, color);
+    FigureData data = new SimpleLine("0", x1,y1,x2,y2, color);
     Figure order = new Figure("", null, data, false);
     this.paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
@@ -430,7 +452,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * @param color
    */
   public void drawLine(GralPos pos, GralColor color, List<GralPoint> points){
-    FigureData data = new PolyLine(points, color);
+    FigureData data = new PolyLine("0", points, color);
     Figure order = new Figure("", pos, data, false);
     this.paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
@@ -441,14 +463,14 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * @param color
    */
   public void drawLine(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points, int iy){
-    PolyLineFloatArray data = new PolyLineFloatArray(userUnits, points, iy, color);
+    PolyLineFloatArray data = new PolyLineFloatArray("0", userUnits, points, iy, color);
     Figure order = new Figure("", null, data, false);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
   }
   
   
   public void drawFillin(GralPos pos, GralColor color) {
-    FigureData data = new Fillin(color);
+    FigureData data = new Fillin("0", color);
     Figure order = new Figure("", pos, data, false);
     this.paintOrders.add(order);  //paint it when drawBackground is invoked.
     
@@ -456,7 +478,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
 
   public void drawImage(GralImageBase image, int x, int y, int dx, int dy, GralRectangle imagePixelSize)
   {
-    FigureData data = new PaintOrderImage(image, x, y, dx, dy, imagePixelSize);
+    FigureData data = new PaintOrderImage("0", image, x, y, dx, dy, imagePixelSize);
     Figure order = new Figure("", null, data, false);
     paintOrders.add(order);  //paint it when drawBackground is invoked.
   }

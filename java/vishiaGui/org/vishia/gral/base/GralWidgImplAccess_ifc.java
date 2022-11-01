@@ -94,7 +94,7 @@ public interface GralWidgImplAccess_ifc
    * See {@link #repaintRequ}
    * 
    */
-  void repaintGthread();
+  void repaintGthread ( );
 
   
   /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
