@@ -4,11 +4,11 @@ import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.widget.GralPlotArea;
+import org.vishia.gral.widget.GralCanvasArea;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 
-/**A window which contains a {@link GralPlotArea} for simple plot in a window for example able to use in JZcmd.
+/**A window which contains a {@link GralCanvasArea} for simple plot in a window for example able to use in JZcmd.
  * @author Hartmut Schorrig
  *
  */
@@ -50,7 +50,7 @@ public class GralPlotWindow
   
   public final GralWindow window;
   
-  public final GralPlotArea canvas;
+  public final GralCanvasArea canvas;
   
   
   public static GralPlotWindow create(String sTitle){
@@ -63,7 +63,7 @@ public class GralPlotWindow
   
   GralPlotWindow(String sTitle)
   { this.window = new GralWindow(null, "@screen, 10+120, 10+200=canvasWindow", sTitle, GralWindow.windResizeable, this.gralMng);
-    this.canvas = new GralPlotArea((GralPos)null, "@0..0,0..0=plot");
+    this.canvas = new GralCanvasArea((GralPos)null, "@0..0,0..0=plot");
     LogMessage log = new LogMessageStream(System.out);
     this.gralMng.createGraphic("SWT", 'B', log);
     //window.create("SWT", 'B', log, initGraphic);
@@ -83,7 +83,7 @@ public class GralPlotWindow
   
   /**To use all methods of GralCanvasArea.
    */
-  public GralPlotArea canvas(){ return canvas; }
+  public GralCanvasArea canvas(){ return canvas; }
     
     
     

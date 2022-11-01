@@ -70,7 +70,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
-import org.vishia.gral.widget.GralPlotArea;
+import org.vishia.gral.widget.GralCanvasArea;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.CheckVs;
 import org.vishia.util.Debugutil;
@@ -446,8 +446,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       new SwtLed((GralLed)widgg, this);
       gralMng.registerWidget(widgg);
     }
-    else if(widgg instanceof GralPlotArea){
-      new SwtPlotArea((GralPlotArea)widgg, this);
+    else if(widgg instanceof GralCanvasArea){
+      new SwtCanvasArea((GralCanvasArea)widgg, this);
     }
     else if(widgg instanceof GralTabbedPanel) {            // GralTabbedPanel should be checked before GralPanelContent, its derived
       GralTabbedPanel widgp = (GralTabbedPanel)widgg;

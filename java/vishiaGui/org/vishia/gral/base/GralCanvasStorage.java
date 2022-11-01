@@ -12,7 +12,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralImageBase;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralRectangle;
-import org.vishia.gral.widget.GralPlotArea;
+import org.vishia.gral.widget.GralCanvasArea;
 
 
 
@@ -315,7 +315,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
     
     private final int iy;
     
-    final GralPlotArea.UserUnits userUnits;
+    final GralCanvasArea.UserUnits userUnits;
     
     private Object implStore;
     
@@ -324,7 +324,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * @param userUnits
      * @param points The elements[...][0] contains the x-value. The elements[...][iy] contains the y-value.
      */
-    public PolyLineFloatArray(String name, GralPlotArea.UserUnits userUnits, float[][] points, int iy, GralColor color){
+    public PolyLineFloatArray(String name, GralCanvasArea.UserUnits userUnits, float[][] points, int iy, GralColor color){
       super(name, paintPolyline, color);
       this.userUnits = userUnits;
       this.points = points;
@@ -462,7 +462,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
    * This method can be called in any thread. It is thread-safe.
    * @param color
    */
-  public void drawLine(GralColor color, GralPlotArea.UserUnits userUnits, float[][] points, int iy){
+  public void drawLine(GralColor color, GralCanvasArea.UserUnits userUnits, float[][] points, int iy){
     PolyLineFloatArray data = new PolyLineFloatArray("0", userUnits, points, iy, color);
     Figure order = new Figure("", null, data, false);
     paintOrders.add(order);  //paint it when drawBackground is invoked.

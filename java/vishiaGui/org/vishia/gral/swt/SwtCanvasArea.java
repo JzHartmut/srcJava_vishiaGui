@@ -6,13 +6,13 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.gral.widget.GralPlotArea;
+import org.vishia.gral.widget.GralCanvasArea;
 
 /**Implementation of GralPlotArea to SET
  * @author Hartmut Schorrig
  *
  */
-public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
+public class SwtCanvasArea extends GralCanvasArea._GraphicImplAccess_
 {
   /**Version, history and license.
    * <ul>
@@ -50,7 +50,7 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   
   private final SwtMng mng;
   
-  protected SwtPlotArea(GralPlotArea gralPlotArea, SwtMng mng)
+  protected SwtCanvasArea(GralCanvasArea gralPlotArea, SwtMng mng)
   {
     gralPlotArea.super(gralPlotArea, mng);
     this.mng = mng;
@@ -78,7 +78,7 @@ public class SwtPlotArea extends GralPlotArea._GraphicImplAccess_
   @SuppressWarnings("synthetic-access") 
   PaintListener paintListener = new PaintListener(){
     @Override public void paintControl(PaintEvent ev) {
-      SwtPlotArea.this.swtCanvas.drawBackground(ev.gc, ev.x, ev.y, ev.width, ev.height);
+      SwtCanvasArea.this.swtCanvas.drawBackground(ev.gc, ev.x, ev.y, ev.width, ev.height);
       //SwtPlotArea.this.paintRoutine( ev);
     }
   };

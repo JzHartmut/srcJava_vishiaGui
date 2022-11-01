@@ -7,11 +7,11 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
-/**A widget which is a canvas to plot something.
+/**A widget which is a canvas to draw something.
  * @author hartmut Schorrig
  *
  */
-public class GralPlotArea extends GralWidget
+public class GralCanvasArea extends GralWidget
 {
   /**Version, history and license.
    * <ul>
@@ -53,7 +53,7 @@ public class GralPlotArea extends GralWidget
    * @param currPos may be null, then use the singleton pos in GralMng, else basic and current position
    * @param posname
    */
-  public GralPlotArea(GralPos currPos, String posname) {
+  public GralCanvasArea(GralPos currPos, String posname) {
     super(currPos, posname, 'P' );
   }
   
@@ -91,7 +91,7 @@ public class GralPlotArea extends GralWidget
      */
     protected UserUnits(float x0, float y0, float x1, float y1, boolean perGridPos){
       this.x0 = x0; this.y0 = y0; this.xmax = x1; this.ymax = y1;
-      GralPos pos = GralPlotArea.super.pos();
+      GralPos pos = GralCanvasArea.super.pos();
       float height, width;
       if(perGridPos){
         height= width = 1; 
@@ -117,7 +117,7 @@ public class GralPlotArea extends GralWidget
       super(widgg, mngImpl);
     }
 
-    protected GralCanvasStorage canvasStore(){ return GralPlotArea.this.canvasStore; }
+    protected GralCanvasStorage canvasStore(){ return GralCanvasArea.this.canvasStore; }
     
     @Override public boolean setFocusGThread()
     {
