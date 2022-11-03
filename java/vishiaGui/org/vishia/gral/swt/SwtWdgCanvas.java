@@ -21,6 +21,7 @@ import org.vishia.util.Debugutil;
 /**This class enhances the swt widget Canvas with some operations,
  * especially the drawBackground from {@link GralCanvasStorage}.
  * @author Hartmut Schorrig
+ * @see https://www.eclipse.org/articles/Article-SWT-graphics/SWT_graphics.html
  *
  */
 public class SwtWdgCanvas  extends Canvas
@@ -30,6 +31,15 @@ public class SwtWdgCanvas  extends Canvas
   private final GralWidget.ImplAccess wdggaccess;
   
   private Map<String, SwtFigureData> swtFigures = new TreeMap<String, SwtFigureData>();
+
+  static private class AccessFigure extends GralCanvasStorage.Figure.Access {
+    void set(GralCanvasStorage.Figure fig) { super.setFigure(fig); }
+    @Override protected boolean dynamic() { return super.dynamic(); }
+    @Override protected boolean newPos() { return super.newPos(); }
+    @Override protected GralRectangle backPositions() { return super.backPositions(); }
+  }
+  
+  AccessFigure figAccess = new AccessFigure();
   
   SwtWdgCanvas(GralWidget.ImplAccess wdggaccess, SwtMng swtMng, GralCanvasStorage canvasStore, Composite parent, int style)
   {
@@ -43,19 +53,25 @@ public class SwtWdgCanvas  extends Canvas
   public void drawBackground(GC g, int x, int y, int dx, int dy) {
     if(this.canvasStore !=null) {
       GralCanvasStorage store = this.canvasStore;
+      boolean bOnlyDynamics = this.wdggaccess.redrawOnlyDynamics();
+      if(!bOnlyDynamics) {
+        super.drawBackground(g, x, y, dx, dy);             // filles the background
+      }
       for(GralCanvasStorage.Figure order: store.paintOrders) {
+        if(order.name.equals("txSlave2Switch"))
+          Debugutil.stop();
+        this.figAccess.set(order);
         Debugutil.stop();
-        if(order.storageBackground !=null) {
+        if(order.storageBackground !=null) {               // if a background was stored at last time.
           Image img = (Image)order.storageBackground;
-          g.drawImage(img, order.backPositions.x, order.backPositions.y);
+          g.drawImage(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
         }
-        if(order.dynamic || ! this.wdggaccess.redrawOnlyDynamics()) {
-          if(order.bNewPos || order.pixelPos == null) {
+        if(this.figAccess.dynamic() || ! bOnlyDynamics) {
+          if(this.figAccess.newPos() || order.pixelPos == null) {
             order.pixelPos = this.swtMng.calcWidgetPosAndSize(order.pos, 0,0);  // base position as given in the figure
-            if(order.dynamic) {
-              if(order.backPositions == null) { order.backPositions = new GralRectangle(0,0,0,0); }
-              order.backPositions.x = order.backPositions.y = Integer.MAX_VALUE;
-              order.backPositions.dx = order.backPositions.dy = -1;       // initialize it with values to search min/max
+            if(this.figAccess.dynamic()) {
+              this.figAccess.backPositions().x = this.figAccess.backPositions().y = Integer.MAX_VALUE;
+              this.figAccess.backPositions().dx = this.figAccess.backPositions().dy = -1;       // initialize it with values to search min/max
             }
           }
           for(GralCanvasStorage.FigureData orderData: order) {
@@ -75,55 +91,69 @@ public class SwtWdgCanvas  extends Canvas
                   preparePolyline(g, order, line);
                 }
               } break;
+              case GralCanvasStorage.drawArg: {
+                GralCanvasStorage.Arcus arc = (GralCanvasStorage.Arcus) orderData;
+                prepareArc(g, order, arc);
+              } break;
               case GralCanvasStorage.paintFillin: {
               } break;
               default: throw new IllegalArgumentException("unknown order");
             } //switch
           } //for orderData
-          if(order.dynamic && order.backPositions.dx >0) {
-            if(order.storageBackground == null) { order.storageBackground = new Image(getDisplay(), order.backPositions.dx, order.backPositions.dy); }
+          //============================================== // store the backgorund if dynamic
+          if(this.figAccess.dynamic() && this.figAccess.backPositions().dx >0) {
+            if(order.storageBackground == null) { order.storageBackground = new Image(getDisplay(), this.figAccess.backPositions().dx, this.figAccess.backPositions().dy); }
             Image img = (Image)order.storageBackground;
             Rectangle bounds = img.getBounds();            // check, new image necessary if too less.
-            if(bounds.height < order.backPositions.dy || bounds.width < order.backPositions.dx) {
-              order.storageBackground = img = new Image(getDisplay(), order.backPositions.dx, order.backPositions.dy);
+            if(bounds.height < this.figAccess.backPositions().dy || bounds.width < this.figAccess.backPositions().dx) {
+              order.storageBackground = img = new Image(getDisplay(), this.figAccess.backPositions().dx, this.figAccess.backPositions().dy);
             }
-            g.copyArea(img, order.backPositions.x, order.backPositions.y);
+            g.copyArea(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
           }
-          for(GralCanvasStorage.FigureData orderData: order) {
-            switch(orderData.paintWhat){
-             case GralCanvasStorage.paintLine: {
-               g.setForeground(this.swtMng.getColorImpl(orderData.color));
-               GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
-               g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
-             } break;
-             case GralCanvasStorage.paintImage: {
-               GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
-               Image image = (Image)orderImage.image.getImage();
-               //int dx1 = (int)(orderImage.zoom * order.x2);
-               //int dy1 = (int)(orderImage.zoom * order.y2);
-               g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
-             } break;
-             case GralCanvasStorage.paintPolyline: {
-               g.setForeground(this.swtMng.getColorImpl(orderData.color));
-               if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
-                 GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
-                 int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
-                 g.drawPolyline(points);
-               } else {
-                 GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
-                 drawPolyline(g, order, line);
-               }
-             } break;
-             case GralCanvasStorage.paintFillin: {
-               Color swtColor = this.swtMng.getColorImpl(orderData.color);
-               g.setBackground(swtColor);
-               Rectangle posSwt = this.swtMng.getPixelPosInner(order.pos);
-               g.fillRectangle(posSwt);
-             } break;
-             default: throw new IllegalArgumentException("unknown order");
-           } //switch
-         } //for orderData
-         
+          //
+          if(order.bShow) {
+            for(GralCanvasStorage.FigureData orderData: order) {
+              if(orderData.checkVariant(order.getVariant())) {
+                 switch(orderData.paintWhat){
+                 case GralCanvasStorage.paintLine: {
+                   g.setForeground(this.swtMng.getColorImpl(orderData.color));
+                   GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
+                   g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
+                 } break;
+                 case GralCanvasStorage.paintImage: {
+                   GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
+                   Image image = (Image)orderImage.image.getImage();
+                   //int dx1 = (int)(orderImage.zoom * order.x2);
+                   //int dy1 = (int)(orderImage.zoom * order.y2);
+                   g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
+                 } break;
+                 case GralCanvasStorage.paintPolyline: {
+                   g.setForeground(this.swtMng.getColorImpl(orderData.color));
+                   if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
+                     GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
+                     int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
+                     g.drawPolyline(points);
+                   } else {
+                     GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
+                     drawPolyline(g, order, line);
+                   }
+                 } break;
+                 case GralCanvasStorage.drawArg: {
+                   g.setForeground(this.swtMng.getColorImpl(orderData.color));
+                   GralCanvasStorage.Arcus arc = (GralCanvasStorage.Arcus) orderData;
+                   drawArc(g, order, arc);
+                 } break;
+                 case GralCanvasStorage.paintFillin: {
+                   Color swtColor = this.swtMng.getColorImpl(orderData.color);
+                   g.setBackground(swtColor);
+                   Rectangle posSwt = this.swtMng.getPixelPosInner(order.pos);
+                   g.fillRectangle(posSwt);
+                 } break;
+                 default: throw new IllegalArgumentException("unknown order");
+               } //switch
+              }// if variant
+           } //for orderData
+         } // if bShow 
         } // dynamic
       }  //for
       Debugutil.stop();
@@ -132,57 +162,96 @@ public class SwtWdgCanvas  extends Canvas
 
   
   
-  private void preparePolyline(GC g, GralCanvasStorage.Figure order, GralCanvasStorage.PolyLine line) {
-    SwtFigureData swtfig = this.swtFigures.get(order.name + line.name);
+  private SwtFigureData getSwtFigureData ( String name, int size ) {
+    SwtFigureData swtfig = this.swtFigures.get(name);
     if(swtfig == null) {
-      swtfig = new SwtFigureData(line.points.size());
-      this.swtFigures.put(order.name + line.name, swtfig);
+      swtfig = new SwtFigureData(size);
+      this.swtFigures.put(name, swtfig);
     }
+    return swtfig;
+  }
+  
+  
+  private GralPoint getPixelScaling(GralCanvasStorage.Figure order) {
     int xf, yf;
-    if(order.bNewPos || ! order.dynamic  ) { //swtfig.pixelPoints == null) {
-      if(line.bPointsAreGralPosUnits){
-        xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-        yf = this.swtMng.gralMng.propertiesGui.xPixelUnit();
-      } else {
-        xf = order.pixelPos.dx;  //0.0..1.0 is the size given in pos in both directions.
-        yf = order.pixelPos.dy;
-      }
-      int x1 = -1, y1 = -1, x2, y2;
+    if(order.bPointsAreGralPosUnits){
+      xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
+      yf = this.swtMng.gralMng.propertiesGui.xPixelUnit();
+    } else {
+      xf = order.pixelPos.dx;  //0.0..1.0 is the size given in pos in both directions.
+      yf = order.pixelPos.dy;
+    }
+    return new GralPoint(xf, yf, 0);
+  }
+
+  
+  
+  private void enhanceArea(int xmin, int ymin, int dx, int dy) {
+    if(this.figAccess.dynamic()) {                       // adjust the min/max of the positions of the Figure
+      if(this.figAccess.backPositions().x > xmin) { this.figAccess.backPositions().x = xmin; }
+      if(this.figAccess.backPositions().y > ymin) { this.figAccess.backPositions().y = ymin; }
+      if(this.figAccess.backPositions().dx < dx) { this.figAccess.backPositions().dx = dx; }
+      if(this.figAccess.backPositions().dy < dy) { this.figAccess.backPositions().dy = dy; }
+    }
+  }
+  
+  private void preparePolyline(GC g, GralCanvasStorage.Figure order, GralCanvasStorage.PolyLine line) {
+    SwtFigureData swtfig = getSwtFigureData(order.name + line.name, line.points.size());
+    if(this.figAccess.newPos() || ! this.figAccess.dynamic()  ) { //swtfig.pixelPoints == null) {
+      GralPoint scale = getPixelScaling(order);
+      int x2, y2;
       int ixP = 0;
       int xmin = 77777, xmax = -1, ymin = 77777, ymax = -1; 
       for(GralPoint point: line.points){
-        x2 = order.pixelPos.x + (int)(point.x * xf + 0.5f);              // the src points counts from bottom left of the coord. to top-right
-        y2 = order.pixelPos.y + order.pixelPos.dy - (int)(point.y * yf + 0.5f);      //position from button, in direction top
+        x2 = order.pixelPos.x + (int)(point.x * scale.x + 0.5f);              // the src points counts from bottom left of the coord. to top-right
+        y2 = order.pixelPos.y + order.pixelPos.dy - (int)(point.y * scale.y + 0.5f);      //position from button, in direction top
         swtfig.pixelPoints[ixP++] = x2;
         swtfig.pixelPoints[ixP++] = y2;
-        if(order.dynamic) {
+        if(this.figAccess.dynamic()) {
           if(x2 < xmin) { xmin = x2; }
           if(x2 > xmax) { xmax = x2; }
-          if(y2 < xmin) { ymin = y2; }
-          if(y2 > xmax) { ymax = y2; }
+          if(y2 < ymin) { ymin = y2; }
+          if(y2 > ymax) { ymax = y2; }
         }
-  //      if(x1 >=0) {
-  //        g.drawLine(x1, y1, x2, y2);                        //The pixels counts from top left to bottom-right
-  //      }
-  //      x1 = x2; y1 = y2;
-      }
-      if(order.dynamic) {                                  // adjust the min/max of the positions of the Figure
-        if(order.backPositions.x > xmin) { order.backPositions.x = xmin; }
-        if(order.backPositions.y > ymin) { order.backPositions.y = ymin; }
-        int dx = xmax - order.backPositions.x +1; int dy = ymax - order.backPositions.y +1; 
-        if(order.backPositions.dx < dx) { order.backPositions.dx = dx; }
-        if(order.backPositions.dy < dy) { order.backPositions.dy = dy; }
+      }                                                    //The pixels counts from top left to bottom-right
+      if(this.figAccess.dynamic()) {                       // adjust the min/max of the positions of the Figure
+        int dx = xmax - this.figAccess.backPositions().x +1; int dy = ymax - this.figAccess.backPositions().y +1; 
+        enhanceArea(xmin, ymin, dx, dy);
       }
     }
   }
 
   
-  
-  
   private void drawPolyline(GC g, GralCanvasStorage.Figure order, GralCanvasStorage.PolyLine line) {
+    g.setLineWidth(line.width);
     SwtFigureData swtfig = this.swtFigures.get(order.name + line.name);
     if(swtfig != null) {
       g.drawPolyline(swtfig.pixelPoints);
+    }
+  }
+  
+  
+  private void prepareArc(GC g, GralCanvasStorage.Figure order, GralCanvasStorage.Arcus arc) {
+    SwtFigureData swtfig = getSwtFigureData(order.name + arc.name, 6);
+    if(this.figAccess.newPos() || ! this.figAccess.dynamic()  ) {
+      GralPoint scale = getPixelScaling(order);
+      int x,y, dx, dy;
+      swtfig.pixelPoints[2] = (dx = (int)(2 * arc.dxy.x * scale.x + 0.5f));
+      swtfig.pixelPoints[3] = (dy = (int)(2 * arc.dxy.y * scale.y + 0.5f));
+      swtfig.pixelPoints[0] = x = order.pixelPos.x + (int)((arc.center.x - arc.dxy.x) * scale.x + 0.5f);
+      swtfig.pixelPoints[1] = y = order.pixelPos.y + order.pixelPos.dy - (int)((arc.center.y + arc.dxy.y) * scale.y + 0.5f);
+      if(this.figAccess.dynamic()) {
+        enhanceArea(x-dx-1, y-dy-1, 2*dx +2, 2*dy +2);
+      }
+    }
+  }
+  
+  
+  
+  private void drawArc(GC g, GralCanvasStorage.Figure order, GralCanvasStorage.Arcus arc) {
+    SwtFigureData swtfig = this.swtFigures.get(order.name + arc.name);
+    if(swtfig != null) {
+      g.drawArc(swtfig.pixelPoints[0], swtfig.pixelPoints[1], swtfig.pixelPoints[2], swtfig.pixelPoints[3], arc.angleStart, arc.angleEnd );
     }
   }
   

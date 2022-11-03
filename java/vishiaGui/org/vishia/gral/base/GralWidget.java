@@ -2159,7 +2159,15 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
     
     
-    public boolean redrawOnlyDynamics ( ) { return this.bRedrawOnlyDynamics; }
+    /**Query once in the redraw handler, reset after them see {@link GralWidget#redraw(int, int, boolean)} 
+     * @return one time true after {@link GralWidget#redraw(int, int, boolean) with true as last argument.
+     */
+    public boolean redrawOnlyDynamics ( ) { 
+      
+      boolean ret = this.bRedrawOnlyDynamics;
+      this.bRedrawOnlyDynamics = false;
+      return ret;
+    }
     
     /**This routine does not change the focus state in the implementation widget,
      * it denotes only that the GralWidget has the focus or not.

@@ -19,9 +19,58 @@ import org.vishia.gral.widget.GralCanvasArea;
 /**The canvas storage is a storage, which stores orders to draw. 
  * It is also possible to say: It stores figures to draw.
  * This orders are drawn if the redraw-routine from the window-system is invoked. 
- * An application can call for ex the {@link #drawLine(Color, int, int, int, int)}-routine to draw a line. This line
- * will be drawn immediately, if the graphical window or widget gets the redraw-request.
- * Firstly the line will be stored only. 
+ * <br><br>
+ * A canvas is organized in {@link Figure}. A figure as one position ({@link GralPos}) 
+ * and only one or some {@link FigureData}. 
+ * For more as one FigureData per Figure the container {@link FigureDataSet} is used.
+ * <br><br>
+ * {@link FigureData} and {@link FigureDataSet} can be created independent of a {@link Figure}
+ * and used in more as one figure on different positions, with similar presentation: <pre>
+  /**Dataset of the border of the data words in memory:
+   * <pre>
+   * +--+--+
+   * |  |  |
+   * +--+--+ </pre>
+   * It is used for all Mem presentation (Master and Slave).
+   * /
+  final GralCanvasStorage.FigureDataSet figData_Words = new GralCanvasStorage.FigureDataSet(); { 
+    GralColor color = GralColor.getColor("bk");
+    this.figData_Words.addPolyline(color).point(0, 0).point(0,2);  // |
+    for(int ix = 0; ix <20; ++ix) {
+      this.figData_Words.addPolyline(color)
+      .point(ix,2)
+      .point(ix+1,2)  // --+    20 times gives rectangles for each word.
+      .point(ix+1,0)  //   |
+      .point(ix,0);   // --+
+    }
+  }
+  </pre>
+ * Above it is an example to define the apearance of a figure as FigureDataSet on construction inside a class.
+ * To use it in two figures, the application should call in an initialization phase before establishing the graphic: <pre>
+  void init() throws ParseException {
+    //
+    this.pos.setPosition("10-2,10+1++");
+    this.canvas.addFigure("dataWordsMaster", this.pos, this.figData_Words, false);
+    
+    this.pos.setPosition("10-2,40+1++");
+    this.canvas.addFigure("dataWordsSlave1", this.pos, this.figData_Words, false);
+   </pre>
+ * <b>Dynamic figures</b><br>
+ * You can mark a figure as dynamic (last argument of {@link #addFigure(String, GralPos, FigureDataSet, boolean)} above).
+ * If you invoke {@link GralWidget#redrawOnlyDynamics(int, int)} or {@link GralWidget#redraw(int, int, boolean)} 
+ * with true as last argument then only these figures are drawn, the background of the canvas will not be deleted.
+ * You can change properties of the figures before the redraw(...) invocation, especially the position and the color.
+ * Then this new appearance is showing. <br>
+ * Of course the given presentation of the figure should be removed before new drawing. 
+ * Note that the canvas will not be cleaned, all is remained. 
+ * The cleanup is organized in the implementation graphic without user programming effort:
+ * <br>
+ * The coordinates of the area of a figure are calculated. Before drawing the figure the canvas content is stored in the heap,
+ * using a proper container such as {@link org.eclipse.swt.graphics.Image}. 
+ * Before redraw the figure this canvas content is restored. 
+ * This process should be well organized, meaningful if more as one figures overlap. 
+ * But this is done in the implementation level of the library {@link org.vishia.gral.swt.SwtWdgCanvas} for the SWT implementation.
+ 
  * @author Hartmut Schorrig
  *
  */
@@ -62,7 +111,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
   public static final String version = "2015-09-26";
 
   /**Data class to store some representation data of a figure.
-   * It is seen as 'PaintOrder' for the repaint or redraw request.
+   * It is seen as 'draw order' for the repaint or redraw request.
    * It has either only one or a list of {@link FigureData},
    * a {@link GralPos} as position, a common {@link GralColor}
    * and a possible background storage. 
@@ -87,17 +136,26 @@ public class GralCanvasStorage implements GralCanvas_ifc
     
     public final GralPos pos;
     
+    public boolean bPointsAreGralPosUnits = true;
+
+    
     /**If set to true, this figure is dynamically. 
      * It is drawn by the dynamic refresh.
      */
-    public final boolean dynamic;
+    protected final boolean dynamic;
     
-    /**True on a new position, then calculate points newly. */
-    public boolean bNewPos;
+    /**false then don't show the figure (for the next redraw on dynamic) 
+     * This flag can be changed immediately from outside. */
+    public boolean bShow = true;
+    
+    /**True on a new position or default, then calculate points newly. */
+    protected boolean bNewPos = true;
     
     /**It this rectangle is given (not a null reference),
      * then this figure is dynamically and a back image is stored in the implementing level. */
-    public GralRectangle backPositions;
+    protected GralRectangle backPositions;
+    
+    protected int variant;
     
     /**Used from implementing graphics on #dynamic to store the background for restore. 
      */
@@ -105,7 +163,7 @@ public class GralCanvasStorage implements GralCanvas_ifc
     
     public GralRectangle pixelPos;
     
-    int dxm, dym;
+    //int dxm, dym;
     
     boolean hasNextOk = true;
     
@@ -146,11 +204,6 @@ public class GralCanvasStorage implements GralCanvas_ifc
      */
     public FigureDataSet data() { return this.dataSet; }
     
-    public void XXXmove(int dx, int dy) {
-      this.dxm += dx;
-      this.dym += dy;
-    }
-    
     public void setNewPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize) {
       this.pos.setPosition(this.pos, line, lineEndOrSize, column, columnEndOrSize);
       this.bNewPos = true;
@@ -161,7 +214,9 @@ public class GralCanvasStorage implements GralCanvas_ifc
       this.bNewPos = true;
     }
     
+    public void setVariant(int variant) { this.variant = variant; }
     
+    public int getVariant() { return this.variant; }
     
     Iterator<FigureData> iter = new Iterator<FigureData>() {
 
@@ -187,7 +242,22 @@ public class GralCanvasStorage implements GralCanvas_ifc
       }
     }
 
-    @Override public String toString() { return name + " @" + pos.toString(); }
+    @Override public String toString() { return this.name + " @" + this.pos.toString(); }
+    
+    
+    /**To access protected members from the package of the implementing layer, use this as base class.
+     */
+    public static class Access {
+      Figure mthis;
+      protected void setFigure(Figure fig) { this.mthis = fig; }
+      protected boolean dynamic() { return this.mthis.dynamic; }
+      protected boolean newPos() { return this.mthis.bNewPos; }
+      protected GralRectangle backPositions() { 
+        if(this.mthis.backPositions == null) { this.mthis.backPositions = new GralRectangle(0,0,0,0); }
+        return this.mthis.backPositions; 
+      }
+      protected int variant() { return this.mthis.variant; }
+    }
     
   }//class PaintOrder
 
@@ -211,11 +281,29 @@ public class GralCanvasStorage implements GralCanvas_ifc
       this.listData.add(data);
     }
 
+
+    public PolyLine addPolyline(GralColor color, int width) {
+      return addPolyline(color, width, 0xffffffff);
+    }
+
     
-    public PolyLine addPolyline(GralColor color) {
-      PolyLine line = new GralCanvasStorage.PolyLine("" + this.listData.size(), color);
+    /**Adds a line with some points. Usage pattern:<pre>
+     * myFigureData.addPolyline(myColor, 1).point(0,0).point(1.5, -2.5);
+     * @param color
+     * @param width
+     * @return the line to add points.
+     */
+    public PolyLine addPolyline(GralColor color, int width, int variantMask) {
+      PolyLine line = new GralCanvasStorage.PolyLine("" + this.listData.size(), color, width);
+      line.setVariantMask(variantMask);
       this.listData.add(line);
       return line;
+    }
+    
+    public Arcus addArcline(GralColor color, float x, float y, float dx, float dy, int gStart, int gEnd) {
+      Arcus arcline = new Arcus("" + this.listData.size(), color, x, y, dx, dy, gStart, gEnd);
+      this.listData.add(arcline);
+      return arcline;
     }
     
     public Fillin addFillin(GralColor color) {
@@ -245,7 +333,11 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * */
     public final int paintWhat;
 
+    /**Color for this simple element, foreground. */
     public GralColor color;
+    
+    /**Supports 32 variants, each bit for one, default: all. */
+    protected int variantMask;
 
     /**The implementation data are graphic-platform-specific. It may be prepared data for a defined
      * size appearance to support fast redrawing. */
@@ -261,10 +353,23 @@ public class GralCanvasStorage implements GralCanvas_ifc
       this.name = name;
       this.paintWhat = paintWhat;
       this.color = color;
+      this.variantMask = 0xffffffff;
     }
 
+    public FigureData(String name, int paintWhat, GralColor color, int variantMask) {
+      this.name = name;
+      this.paintWhat = paintWhat;
+      this.color = color;
+      this.variantMask = variantMask;
+    }
+
+    public void setVariantMask(int mask) { this.variantMask = mask; }
     
-    
+    /**True if the FigureData should be drawn in this variant.
+     * @param variant number 0..31
+     * @return true if this bit is set.
+     */
+    public boolean checkVariant(int variant) { return ((1<<variant) & this.variantMask) !=0; }
   }
   
   public static class SimpleLine extends FigureData
@@ -272,7 +377,6 @@ public class GralCanvasStorage implements GralCanvas_ifc
     /**Coordinates. */
     public final int x1,y1,x2,y2;
 
-    public boolean bPointsAreGralPosUnits = true;
     
     SimpleLine ( String name, int x1, int y1, int x2, int y2, GralColor color){
       super(name, paintPolyline, color);
@@ -289,25 +393,51 @@ public class GralCanvasStorage implements GralCanvas_ifc
   {
     public final List<GralPoint> points;
     
-    public boolean bPointsAreGralPosUnits = true;
+    public final int width;
     
     public PolyLine(String name, List<GralPoint> points, GralColor color){
       super(name, paintPolyline, color);
       this.points = points;
+      this.width = 1;
     }
 
-    public PolyLine(String name, GralColor color){
+    /**Constructor for free points add with {@link #point(float, float)}
+     * Hint: use {@link GralCanvasStorage.FigureDataSet#addPolyline(GralColor)} instead this ctor.
+     * @param name
+     * @param color
+     */
+    public PolyLine(String name, GralColor color, int width){
       super(name, paintPolyline, color);
       this.points = new LinkedList<GralPoint>();
+      this.width = width;
     }
     
+    /**Adds a point, can be called as concatenation.
+     * @param x Depending on setting on Figure it is grid unit, or relative inside the postion.
+     * @param y y counts from bottom to top, as for mathematically diagrams.
+     *   The point(0,0) is bottom left from a given {@link GralPos}. 
+     * @return this for concatenation
+     */
     public PolyLine point(float x, float y) {
       this.points.add(new GralPoint(x, y));
       return this;
     }
   }
   
-  
+  public static class Arcus extends FigureData
+  {
+    public final GralPoint center, dxy;
+    public final int angleStart, angleEnd;
+
+    public Arcus(String name, GralColor color, float x, float y, float dx, float dy, int gStart, int gEnd) {
+      super(name, drawArg, color);
+      this.center = new GralPoint(x,y);
+      this.dxy = new GralPoint(dx, dy);
+      this.angleStart = gStart; this.angleEnd = gEnd;
+    }
+    
+    
+  }  
   
   public static class PolyLineFloatArray extends FigureData
   {
@@ -387,6 +517,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
   public final static int paintFillin = 'f';
   
   public final static int paintPolyline = 'y';
+  
+  public final static int drawArg = 'a';
   
   /**List of all orders to paint in {@link #drawBackground(GC, int, int, int, int)}.
    * 
