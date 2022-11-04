@@ -32,11 +32,13 @@ public class SwtWdgCanvas  extends Canvas
   
   private Map<String, SwtFigureData> swtFigures = new TreeMap<String, SwtFigureData>();
 
+  /**Inherited class only for protected access to {@link GralCanvasStorage.Figure} data. */
   static private class AccessFigure extends GralCanvasStorage.Figure.Access {
     void set(GralCanvasStorage.Figure fig) { super.setFigure(fig); }
     @Override protected boolean dynamic() { return super.dynamic(); }
     @Override protected boolean newPos() { return super.newPos(); }
     @Override protected GralRectangle backPositions() { return super.backPositions(); }
+    @Override protected GralCanvasStorage.FigureDataSet dataSet() { return super.dataSet(); }
   }
   
   AccessFigure figAccess = new AccessFigure();
@@ -66,14 +68,33 @@ public class SwtWdgCanvas  extends Canvas
           Image img = (Image)order.storageBackground;
           g.drawImage(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
         }
-        if(this.figAccess.dynamic() || ! bOnlyDynamics) {
+        boolean bDynamic = this.figAccess.dynamic();
+        if( bDynamic|| ! bOnlyDynamics) {
           if(this.figAccess.newPos() || order.pixelPos == null) {
             order.pixelPos = this.swtMng.calcWidgetPosAndSize(order.pos, 0,0);  // base position as given in the figure
             if(this.figAccess.dynamic()) {
-              this.figAccess.backPositions().x = this.figAccess.backPositions().y = Integer.MAX_VALUE;
-              this.figAccess.backPositions().dx = this.figAccess.backPositions().dy = -1;       // initialize it with values to search min/max
+              float xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
+              float yf = this.swtMng.gralMng.propertiesGui.yPixelUnit();
+              GralCanvasStorage.FigureDataSet dataSet = this.figAccess.dataSet();
+              if(dataSet !=null) {
+                this.figAccess.backPositions().dx = (int)(dataSet.dx * xf + 0.5f);
+                this.figAccess.backPositions().dy = (int)(dataSet.dy * xf + 0.5f);
+                this.figAccess.backPositions().x = order.pixelPos.x + (int)(dataSet.x * xf) ;
+                this.figAccess.backPositions().y = order.pixelPos.y + order.pixelPos.dy + 1 
+                                                 - (int)((dataSet.y + dataSet.dy)* yf) ;
+              } else { // use the whole position
+                this.figAccess.backPositions().x = order.pixelPos.x ;
+                this.figAccess.backPositions().y = order.pixelPos.y ;
+                this.figAccess.backPositions().dx = order.pixelPos.dx;
+                this.figAccess.backPositions().dy = order.pixelPos.dy;
+              }
+//              this.figAccess.backPositions().x = this.figAccess.backPositions().y = Integer.MAX_VALUE;
+//              this.figAccess.backPositions().dx = this.figAccess.backPositions().dy = -1;       // initialize it with values to search min/max
             }
           }
+          
+          
+          
           for(GralCanvasStorage.FigureData orderData: order) {
              switch(orderData.paintWhat){
               case GralCanvasStorage.paintLine: {
@@ -176,7 +197,7 @@ public class SwtWdgCanvas  extends Canvas
     int xf, yf;
     if(order.bPointsAreGralPosUnits){
       xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-      yf = this.swtMng.gralMng.propertiesGui.xPixelUnit();
+      yf = this.swtMng.gralMng.propertiesGui.yPixelUnit();
     } else {
       xf = order.pixelPos.dx;  //0.0..1.0 is the size given in pos in both directions.
       yf = order.pixelPos.dy;
@@ -216,7 +237,7 @@ public class SwtWdgCanvas  extends Canvas
       }                                                    //The pixels counts from top left to bottom-right
       if(this.figAccess.dynamic()) {                       // adjust the min/max of the positions of the Figure
         int dx = xmax - this.figAccess.backPositions().x +1; int dy = ymax - this.figAccess.backPositions().y +1; 
-        enhanceArea(xmin, ymin, dx, dy);
+        //enhanceArea(xmin, ymin, dx, dy);
       }
     }
   }
@@ -241,7 +262,7 @@ public class SwtWdgCanvas  extends Canvas
       swtfig.pixelPoints[0] = x = order.pixelPos.x + (int)((arc.center.x - arc.dxy.x) * scale.x + 0.5f);
       swtfig.pixelPoints[1] = y = order.pixelPos.y + order.pixelPos.dy - (int)((arc.center.y + arc.dxy.y) * scale.y + 0.5f);
       if(this.figAccess.dynamic()) {
-        enhanceArea(x-dx-1, y-dy-1, 2*dx +2, 2*dy +2);
+        //enhanceArea(x-dx-1, y-dy-1, 2*dx +2, 2*dy +2);
       }
     }
   }

@@ -87,7 +87,7 @@
 ============================== java/vishiaGui/org/vishia/gral/base/ ================================
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2022-10-27 11:22:35  x     GralButton.java                          ::         21.996 -1719037379 
-2022-11-03 21:30:30  x     GralCanvasStorage.java                   ::         22.083  1343777381 
+2022-11-04 22:10:26  x     GralCanvasStorage.java                   ::         23.599  0054227803 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
 2022-10-06 00:17:53  x     GralCurveView.java                       ::         92.048  0464304828 
 2022-10-04 16:22:22  x     GralGraphicThread.java                   ::          9.083  1072146655 
@@ -156,7 +156,7 @@
 2022-10-29 10:29:42  x     GralPanel_ifc.java                       ::           .798 -0413679427 
 2021-10-04 14:29:58  x     GralPlugUser2Gral_ifc.java               ::          1.562  1177481251 
 2021-10-04 14:29:51  x     GralPlugUser_ifc.java                    ::          3.483  0047863744 
-2021-10-04 14:29:49  x     GralPoint.java                           ::          2.221  0557814703 
+2022-11-04 22:10:47  x     GralPoint.java                           ::          2.221  0557814703 
 2021-10-04 14:29:50  x     GralPrimaryWindow_ifc.java               ::          2.732  1831694793 
 2022-10-12 13:21:17  x     GralRectangle.java                       ::          2.296 -1384931018 
 2015-04-24 15:52:15  x     GralSetValue_ifc.java                    ::          3.577  0882759316 
@@ -213,7 +213,7 @@
 2021-10-04 14:29:50  x     SwtTransparentLabel.java                 ::          1.785  0602653326 
 2021-10-04 14:29:49  x     SwtTraverseListener.java                 ::          1.382 -0922202695 
 2022-10-01 23:10:04  x     SwtValueBar.java                         ::          6.148  0121278190 
-2022-11-03 22:08:35  x     SwtWdgCanvas.java                        ::         13.750 -0573396673 
+2022-11-03 23:48:08  x     SwtWdgCanvas.java                        ::         15.093 -1252917070 
 2022-10-01 23:10:04  x     SwtWidgetHelper.java                     ::          7.437 -0031353032 
 2022-10-02 00:04:01  x     SwtWidgetSimpleWrapper.java              ::          2.640 -1696132855 
 2022-11-01 12:53:08  x     XXXSwtCanvasStorePanel.java              ::          2.895  1659465107 

@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.gral.ifc.GralCanvas_ifc;
@@ -256,6 +258,10 @@ public class GralCanvasStorage implements GralCanvas_ifc
         if(this.mthis.backPositions == null) { this.mthis.backPositions = new GralRectangle(0,0,0,0); }
         return this.mthis.backPositions; 
       }
+      protected GralCanvasStorage.FigureDataSet dataSet() { 
+        return this.mthis.dataSet; 
+      }
+
       protected int variant() { return this.mthis.variant; }
     }
     
@@ -271,18 +277,27 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * then {@link #data} is null. */
     public final List<FigureData> listData = new LinkedList<FigureData>();
     
-    
+    /**If not null then this figuredata can be used for dynamic figures.
+     * It describes the spread of the figure.
+     */
+    public float x,y,dx,dy;
     
     public FigureDataSet() {
+      init();
     }
 
+    public void init() {}
+    
+    public final void setSpread(float x, float y, float dx, float dy) {
+      this.x = x; this.y = y; this.dx = dx; this.dy = dy;
+    }
 
-    public void addData(FigureData data) {
+    public final void addData(FigureData data) {
       this.listData.add(data);
     }
 
 
-    public PolyLine addPolyline(GralColor color, int width) {
+    public final PolyLine addPolyline(GralColor color, int width) {
       return addPolyline(color, width, 0xffffffff);
     }
 
@@ -293,20 +308,20 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * @param width
      * @return the line to add points.
      */
-    public PolyLine addPolyline(GralColor color, int width, int variantMask) {
+    public final PolyLine addPolyline(GralColor color, int width, int variantMask) {
       PolyLine line = new GralCanvasStorage.PolyLine("" + this.listData.size(), color, width);
       line.setVariantMask(variantMask);
       this.listData.add(line);
       return line;
     }
     
-    public Arcus addArcline(GralColor color, float x, float y, float dx, float dy, int gStart, int gEnd) {
+    public final Arcus addArcline(GralColor color, float x, float y, float dx, float dy, int gStart, int gEnd) {
       Arcus arcline = new Arcus("" + this.listData.size(), color, x, y, dx, dy, gStart, gEnd);
       this.listData.add(arcline);
       return arcline;
     }
     
-    public Fillin addFillin(GralColor color) {
+    public final Fillin addFillin(GralColor color) {
       Fillin data = new GralCanvasStorage.Fillin("" + this.listData.size(), color);
       this.listData.add(data);
       return data;
@@ -395,6 +410,8 @@ public class GralCanvasStorage implements GralCanvas_ifc
     
     public final int width;
     
+    GralPoint lastPoint;
+    
     public PolyLine(String name, List<GralPoint> points, GralColor color){
       super(name, paintPolyline, color);
       this.points = points;
@@ -419,9 +436,22 @@ public class GralCanvasStorage implements GralCanvas_ifc
      * @return this for concatenation
      */
     public PolyLine point(float x, float y) {
-      this.points.add(new GralPoint(x, y));
+      this.points.add(this.lastPoint = new GralPoint(x, y));
       return this;
     }
+
+    public PolyLine dx(float dx) {
+      this.lastPoint = new GralPoint(this.lastPoint.x + dx, this.lastPoint.y);
+      this.points.add(this.lastPoint);
+      return this;
+    }
+    
+    public PolyLine dy(float dy) {
+      this.lastPoint = new GralPoint(this.lastPoint.x, this.lastPoint.y + dy);
+      this.points.add(this.lastPoint);
+      return this;
+    }
+    
   }
   
   public static class Arcus extends FigureData
@@ -525,6 +555,9 @@ public class GralCanvasStorage implements GralCanvas_ifc
    */
   public final ConcurrentLinkedQueue<Figure> paintOrders = new ConcurrentLinkedQueue<Figure>();
   
+  /**Only used to prevent and check name clashes between figures. */
+  public final Map<String, Figure> idxFigure = new TreeMap<String, Figure>();
+  
   /**If dynamic figures are available, this list contains the draw order. 
    * On restoring the static context the reverse order is used.
    * 
@@ -541,6 +574,9 @@ public class GralCanvasStorage implements GralCanvas_ifc
   public Figure addFigure(String name, GralPos pos, FigureData data, boolean isDynamic) {
     Figure figure = new Figure(name, pos, data, isDynamic);
     this.paintOrders.add(figure);
+    Figure exist = this.idxFigure.get(name);
+    assert(exist == null);
+    this.idxFigure.put(name, figure);
     return figure;
   }
   
@@ -554,6 +590,10 @@ public class GralCanvasStorage implements GralCanvas_ifc
   public Figure addFigure(String name, GralPos pos, FigureDataSet data, boolean isDynamic) {
     Figure figure = new Figure(name, pos, data, isDynamic);
     this.paintOrders.add(figure);
+    Figure exist = this.idxFigure.get(name);
+    assert(exist == null);
+    this.idxFigure.put(name, figure);
+    assert( ! isDynamic || data.dx >0 && data.dy >0);
     return figure;
   }
   
@@ -574,8 +614,12 @@ public class GralCanvasStorage implements GralCanvas_ifc
   @Override public void drawLine(GralColor color, int x1, int y1, int x2, int y2){
     
     FigureData data = new SimpleLine("0", x1,y1,x2,y2, color);
-    Figure order = new Figure("", null, data, false);
+    String name = "line" + this.paintOrders.size();
+    Figure order = new Figure(name, null, data, false);
     this.paintOrders.add(order);  //paint it when drawBackground is invoked.
+    Figure exist = this.idxFigure.get(name);
+    assert(exist == null);
+    this.idxFigure.put(name, order);
   }
   
 
