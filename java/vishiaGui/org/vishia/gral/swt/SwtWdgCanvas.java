@@ -60,16 +60,18 @@ public class SwtWdgCanvas  extends Canvas
         super.drawBackground(g, x, y, dx, dy);             // filles the background
       }
       for(GralCanvasStorage.Figure order: store.paintOrders) {
+        //================================================ // figure
         if(order.name.equals("txSlave2Switch"))
           Debugutil.stop();
         this.figAccess.set(order);
         Debugutil.stop();
-        if(order.storageBackground !=null) {               // if a background was stored at last time.
-          Image img = (Image)order.storageBackground;
-          g.drawImage(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
-        }
         boolean bDynamic = this.figAccess.dynamic();
-        if( bDynamic|| ! bOnlyDynamics) {
+        if( bDynamic && this.figAccess.hasChanged() || ! bOnlyDynamics) {
+          if(order.storageBackground !=null) {               // if a background was stored at last time.
+            Image img = (Image)order.storageBackground;
+            g.drawImage(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
+            Debugutil.stop();
+          }
           if(this.figAccess.newPos() || order.pixelPos == null) {
             order.pixelPos = this.swtMng.calcWidgetPosAndSize(order.pos, 0,0);  // base position as given in the figure
             if(this.figAccess.dynamic()) {
@@ -165,10 +167,12 @@ public class SwtWdgCanvas  extends Canvas
                    drawArc(g, order, arc);
                  } break;
                  case GralCanvasStorage.paintFillin: {
-                   Color swtColor = this.swtMng.getColorImpl(orderData.color);
-                   g.setBackground(swtColor);
-                   Rectangle posSwt = this.swtMng.getPixelPosInner(order.pos);
-                   g.fillRectangle(posSwt);
+                   if(orderData.color !=null) {
+                     Color swtColor = this.swtMng.getColorImpl(orderData.color);
+                     g.setBackground(swtColor);
+                     Rectangle posSwt = this.swtMng.getPixelPosInner(order.pos);
+                     g.fillRectangle(posSwt);
+                   }
                  } break;
                  default: throw new IllegalArgumentException("unknown order");
                } //switch

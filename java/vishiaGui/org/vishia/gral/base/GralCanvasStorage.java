@@ -146,6 +146,12 @@ public class GralCanvasStorage implements GralCanvas_ifc
      */
     protected final boolean dynamic;
     
+    
+    /**True if the figure is changed, for dynamic show. */
+    protected boolean bChanged;
+    
+    
+    
     /**false then don't show the figure (for the next redraw on dynamic) 
      * This flag can be changed immediately from outside. */
     public boolean bShow = true;
@@ -209,14 +215,35 @@ public class GralCanvasStorage implements GralCanvas_ifc
     public void setNewPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize) {
       this.pos.setPosition(this.pos, line, lineEndOrSize, column, columnEndOrSize);
       this.bNewPos = true;
+      this.bChanged = true;
     }
     
     public void setNewPosition ( String posString) throws ParseException {
       this.pos.setPosition(posString, this.pos);
+      this.bChanged = true;
       this.bNewPos = true;
     }
     
-    public void setVariant(int variant) { this.variant = variant; }
+    public Figure setVariant(int variant) { this.variant = variant; this.bChanged = true; return this; }
+    
+    /**Set any what, recommended with concatenation.
+     * It sets the {@link #bChanged} flag.
+     * @return this for concatenation.
+     */
+    public Figure set() { this.bChanged = true; return this; }
+    
+    
+    /**Set whether the figure should be dynamically shown or not.
+     * If it is invoked, also {@link #set()} is executed.
+     * It sets the #bShow{@code} with given argument and the {@link #bChanged} flag.
+     * @param show false then the next {@link GralWidget#redrawOnlyDynamics(int, int)} 
+     *        refreshes the background with the stored content and hides the figure. 
+     *        true then refreshes the background and shows the figure.
+     * @return this for concatenation.
+     */
+    public Figure show(boolean show) { this.bChanged = true; this.bShow = show; return this; }
+    
+    
     
     public int getVariant() { return this.variant; }
     
@@ -254,10 +281,21 @@ public class GralCanvasStorage implements GralCanvas_ifc
       protected void setFigure(Figure fig) { this.mthis = fig; }
       protected boolean dynamic() { return this.mthis.dynamic; }
       protected boolean newPos() { return this.mthis.bNewPos; }
+      
+      /**Ask one time for changed.
+       * @return only one time after set {@link Figure#bChanged}
+       */
+      public boolean hasChanged() { 
+        boolean ret = this.mthis.bChanged;
+        this.mthis.bChanged = false;
+        return ret; 
+      }
+      
       protected GralRectangle backPositions() { 
         if(this.mthis.backPositions == null) { this.mthis.backPositions = new GralRectangle(0,0,0,0); }
         return this.mthis.backPositions; 
       }
+      
       protected GralCanvasStorage.FigureDataSet dataSet() { 
         return this.mthis.dataSet; 
       }
@@ -451,6 +489,25 @@ public class GralCanvasStorage implements GralCanvas_ifc
       this.points.add(this.lastPoint);
       return this;
     }
+    
+    public PolyLine dxy(float dx, float dy) {
+      this.lastPoint = new GralPoint(this.lastPoint.x + dx, this.lastPoint.y + dy);
+      this.points.add(this.lastPoint);
+      return this;
+    }
+    
+    
+    public PolyLine dxyg(float dxy, int degree) {
+      float rad = (float)Math.PI * degree / 180.0f;
+      float dx = dxy * (float)Math.cos(rad);
+      float dy = dxy * (float)Math.sin(rad);
+      this.lastPoint = new GralPoint(this.lastPoint.x + dx, this.lastPoint.y + dy);
+      this.points.add(this.lastPoint);
+      return this;
+    }
+    
+    
+    public GralPoint lastPoint() { return lastPoint;}
     
   }
   
