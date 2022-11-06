@@ -282,12 +282,13 @@ public class GralCanvasStorage implements GralCanvas_ifc
       protected boolean dynamic() { return this.mthis.dynamic; }
       protected boolean newPos() { return this.mthis.bNewPos; }
       
-      /**Ask one time for changed.
+      /**Ask for changed, optional reset the change state
+       * @param reset true on the last query of hasChanged(true)
        * @return only one time after set {@link Figure#bChanged}
        */
-      public boolean hasChanged() { 
+      public boolean hasChanged(boolean reset) { 
         boolean ret = this.mthis.bChanged;
-        this.mthis.bChanged = false;
+        if(reset) { this.mthis.bChanged = false; }
         return ret; 
       }
       

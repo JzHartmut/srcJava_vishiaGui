@@ -59,126 +59,116 @@ public class SwtWdgCanvas  extends Canvas
       if(!bOnlyDynamics) {
         super.drawBackground(g, x, y, dx, dy);             // filles the background
       }
-      for(GralCanvasStorage.Figure order: store.paintOrders) {
+      //================================================== // restore the backfroung of figures to draw.
+      for(GralCanvasStorage.Figure figure: store.paintOrders) {
+        this.figAccess.set(figure);
         //================================================ // figure
-        if(order.name.equals("txSlave2Switch"))
-          Debugutil.stop();
-        this.figAccess.set(order);
-        Debugutil.stop();
         boolean bDynamic = this.figAccess.dynamic();
-        if( bDynamic && this.figAccess.hasChanged() || ! bOnlyDynamics) {
-          if(order.storageBackground !=null) {               // if a background was stored at last time.
-            Image img = (Image)order.storageBackground;
+        if( bDynamic && this.figAccess.hasChanged(false) && !figure.bShow) {
+          if(figure.storageBackground !=null) {            // if a background was stored at last time, restore it.
+            Image img = (Image)figure.storageBackground;
             g.drawImage(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
             Debugutil.stop();
           }
-          if(this.figAccess.newPos() || order.pixelPos == null) {
-            order.pixelPos = this.swtMng.calcWidgetPosAndSize(order.pos, 0,0);  // base position as given in the figure
-            if(this.figAccess.dynamic()) {
+        }
+      }// for
+      //================================================== // all back positions are restored from figures which should be changed
+      //
+      for(GralCanvasStorage.Figure figure: store.paintOrders) {
+        this.figAccess.set(figure);
+      }
+      //================================================== // now paint the figure
+      for(GralCanvasStorage.Figure figure: store.paintOrders) { 
+        //================================================ // figure
+        if(figure.name.equals("txSlave2Switch"))
+          Debugutil.stop();
+        this.figAccess.set(figure);
+        Debugutil.stop();
+        boolean bDynamic = this.figAccess.dynamic();
+        //==============================================   // restore the backgorund if dynamic
+        if( (bDynamic && this.figAccess.hasChanged(true) || ! bOnlyDynamics) && figure.bShow) {
+          if(figure.storageBackground !=null) {            // if a background was stored at last time, restore it.
+            Image img = (Image)figure.storageBackground;
+            g.drawImage(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
+            Debugutil.stop();
+          }
+            //---------------------------------------------- // calc the position of the figure if new position
+          if(this.figAccess.newPos() || figure.pixelPos == null) { 
+            figure.pixelPos = this.swtMng.calcWidgetPosAndSize(figure.pos, 0,0);  // base position as given in the figure
+            if(this.figAccess.dynamic()) {                 // dynamic, then calc the new backPositon
               float xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
               float yf = this.swtMng.gralMng.propertiesGui.yPixelUnit();
               GralCanvasStorage.FigureDataSet dataSet = this.figAccess.dataSet();
               if(dataSet !=null) {
                 this.figAccess.backPositions().dx = (int)(dataSet.dx * xf + 0.5f);
                 this.figAccess.backPositions().dy = (int)(dataSet.dy * xf + 0.5f);
-                this.figAccess.backPositions().x = order.pixelPos.x + (int)(dataSet.x * xf) ;
-                this.figAccess.backPositions().y = order.pixelPos.y + order.pixelPos.dy + 1 
-                                                 - (int)((dataSet.y + dataSet.dy)* yf) ;
+                this.figAccess.backPositions().x = figure.pixelPos.x + (int)(dataSet.x * xf) ;
+                this.figAccess.backPositions().y = figure.pixelPos.y + figure.pixelPos.dy + 1 
+                    - (int)((dataSet.y + dataSet.dy)* yf) ;
               } else { // use the whole position
-                this.figAccess.backPositions().x = order.pixelPos.x ;
-                this.figAccess.backPositions().y = order.pixelPos.y ;
-                this.figAccess.backPositions().dx = order.pixelPos.dx;
-                this.figAccess.backPositions().dy = order.pixelPos.dy;
+                this.figAccess.backPositions().x = figure.pixelPos.x ;
+                this.figAccess.backPositions().y = figure.pixelPos.y ;
+                this.figAccess.backPositions().dx = figure.pixelPos.dx;
+                this.figAccess.backPositions().dy = figure.pixelPos.dy;
               }
-//              this.figAccess.backPositions().x = this.figAccess.backPositions().y = Integer.MAX_VALUE;
-//              this.figAccess.backPositions().dx = this.figAccess.backPositions().dy = -1;       // initialize it with values to search min/max
             }
           }
-          
-          
-          
-          for(GralCanvasStorage.FigureData orderData: order) {
-             switch(orderData.paintWhat){
+          if( bDynamic ) {
+            if(this.figAccess.backPositions().dx >0) {
+              if(figure.storageBackground == null) { figure.storageBackground = new Image(getDisplay(), this.figAccess.backPositions().dx, this.figAccess.backPositions().dy); }
+              Image img = (Image)figure.storageBackground;
+              Rectangle bounds = img.getBounds();            // check, new image necessary if too less.
+              if(bounds.height < this.figAccess.backPositions().dy || bounds.width < this.figAccess.backPositions().dx) {
+                figure.storageBackground = img = new Image(getDisplay(), this.figAccess.backPositions().dx, this.figAccess.backPositions().dy);
+              }
+              g.copyArea(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
+            }
+          }
+          for(GralCanvasStorage.FigureData orderData: figure) {
+            if(orderData.checkVariant(figure.getVariant())) {
+              switch(orderData.paintWhat){
               case GralCanvasStorage.paintLine: {
+                g.setForeground(this.swtMng.getColorImpl(orderData.color));
+                GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
+                g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
               } break;
               case GralCanvasStorage.paintImage: {
                 GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
+                Image image = (Image)orderImage.image.getImage();
+                //int dx1 = (int)(orderImage.zoom * order.x2);
+                //int dy1 = (int)(orderImage.zoom * order.y2);
+                g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
               } break;
               case GralCanvasStorage.paintPolyline: {
+                g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
                   GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
                   int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
-                  //g.drawPolyline(points);
+                  g.drawPolyline(points);
                 } else {
                   GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
-                  preparePolyline(g, order, line);
+                  preparePolyline(g, figure, line);
+                  drawPolyline(g, figure, line);
                 }
               } break;
               case GralCanvasStorage.drawArg: {
+                g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 GralCanvasStorage.Arcus arc = (GralCanvasStorage.Arcus) orderData;
-                prepareArc(g, order, arc);
+                prepareArc(g, figure, arc);
+                drawArc(g, figure, arc);
               } break;
               case GralCanvasStorage.paintFillin: {
+                if(orderData.color !=null) {
+                  Color swtColor = this.swtMng.getColorImpl(orderData.color);
+                  g.setBackground(swtColor);
+                  Rectangle posSwt = this.swtMng.getPixelPosInner(figure.pos);
+                  g.fillRectangle(posSwt);
+                }
               } break;
               default: throw new IllegalArgumentException("unknown order");
-            } //switch
+              } //switch
+            }// if variant
           } //for orderData
-          //============================================== // store the backgorund if dynamic
-          if(this.figAccess.dynamic() && this.figAccess.backPositions().dx >0) {
-            if(order.storageBackground == null) { order.storageBackground = new Image(getDisplay(), this.figAccess.backPositions().dx, this.figAccess.backPositions().dy); }
-            Image img = (Image)order.storageBackground;
-            Rectangle bounds = img.getBounds();            // check, new image necessary if too less.
-            if(bounds.height < this.figAccess.backPositions().dy || bounds.width < this.figAccess.backPositions().dx) {
-              order.storageBackground = img = new Image(getDisplay(), this.figAccess.backPositions().dx, this.figAccess.backPositions().dy);
-            }
-            g.copyArea(img, this.figAccess.backPositions().x, this.figAccess.backPositions().y);
-          }
-          //
-          if(order.bShow) {
-            for(GralCanvasStorage.FigureData orderData: order) {
-              if(orderData.checkVariant(order.getVariant())) {
-                 switch(orderData.paintWhat){
-                 case GralCanvasStorage.paintLine: {
-                   g.setForeground(this.swtMng.getColorImpl(orderData.color));
-                   GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
-                   g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
-                 } break;
-                 case GralCanvasStorage.paintImage: {
-                   GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
-                   Image image = (Image)orderImage.image.getImage();
-                   //int dx1 = (int)(orderImage.zoom * order.x2);
-                   //int dy1 = (int)(orderImage.zoom * order.y2);
-                   g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
-                 } break;
-                 case GralCanvasStorage.paintPolyline: {
-                   g.setForeground(this.swtMng.getColorImpl(orderData.color));
-                   if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
-                     GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
-                     int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
-                     g.drawPolyline(points);
-                   } else {
-                     GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
-                     drawPolyline(g, order, line);
-                   }
-                 } break;
-                 case GralCanvasStorage.drawArg: {
-                   g.setForeground(this.swtMng.getColorImpl(orderData.color));
-                   GralCanvasStorage.Arcus arc = (GralCanvasStorage.Arcus) orderData;
-                   drawArc(g, order, arc);
-                 } break;
-                 case GralCanvasStorage.paintFillin: {
-                   if(orderData.color !=null) {
-                     Color swtColor = this.swtMng.getColorImpl(orderData.color);
-                     g.setBackground(swtColor);
-                     Rectangle posSwt = this.swtMng.getPixelPosInner(order.pos);
-                     g.fillRectangle(posSwt);
-                   }
-                 } break;
-                 default: throw new IllegalArgumentException("unknown order");
-               } //switch
-              }// if variant
-           } //for orderData
-         } // if bShow 
         } // dynamic
       }  //for
       Debugutil.stop();
