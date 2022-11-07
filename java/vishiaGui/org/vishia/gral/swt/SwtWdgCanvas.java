@@ -4,9 +4,12 @@ package org.vishia.gral.swt;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -127,19 +130,19 @@ public class SwtWdgCanvas  extends Canvas
           for(GralCanvasStorage.FigureData orderData: figure) {
             if(orderData.checkVariant(figure.getVariant())) {
               switch(orderData.paintWhat){
-              case GralCanvasStorage.paintLine: {
+              case drawLine: {
                 g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 GralCanvasStorage.SimpleLine data2 = (GralCanvasStorage.SimpleLine)orderData;
                 g.drawLine(data2.x1, data2.y1, data2.x2, data2.y2);
               } break;
-              case GralCanvasStorage.paintImage: {
+              case drawImage: {
                 GralCanvasStorage.PaintOrderImage orderImage = (GralCanvasStorage.PaintOrderImage) orderData;
                 Image image = (Image)orderImage.image.getImage();
                 //int dx1 = (int)(orderImage.zoom * order.x2);
                 //int dy1 = (int)(orderImage.zoom * order.y2);
                 g.drawImage(image, 0, 0, orderImage.dxImage, orderImage.dyImage, orderImage.x1, orderImage.y1, orderImage.x2, orderImage.y2);
               } break;
-              case GralCanvasStorage.paintPolyline: {
+              case drawPolyline: {
                 g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
                   GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
@@ -151,19 +154,24 @@ public class SwtWdgCanvas  extends Canvas
                   drawPolyline(g, figure, line);
                 }
               } break;
-              case GralCanvasStorage.drawArg: {
+              case drawArc: {
                 g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 GralCanvasStorage.Arcus arc = (GralCanvasStorage.Arcus) orderData;
                 prepareArc(g, figure, arc);
                 drawArc(g, figure, arc);
               } break;
-              case GralCanvasStorage.paintFillin: {
+              case drawFillin: {
                 if(orderData.color !=null) {
                   Color swtColor = this.swtMng.getColorImpl(orderData.color);
                   g.setBackground(swtColor);
                   Rectangle posSwt = this.swtMng.getPixelPosInner(figure.pos);
                   g.fillRectangle(posSwt);
                 }
+              } break;
+              case drawText: {
+                g.setForeground(this.swtMng.getColorImpl(orderData.color));
+                GralCanvasStorage.FigureText text = (GralCanvasStorage.FigureText) orderData;
+                drawText(g, figure, text);
               } break;
               default: throw new IllegalArgumentException("unknown order");
               } //switch
@@ -267,6 +275,24 @@ public class SwtWdgCanvas  extends Canvas
     SwtFigureData swtfig = this.swtFigures.get(order.name + arc.name);
     if(swtfig != null) {
       g.drawArc(swtfig.pixelPoints[0], swtfig.pixelPoints[1], swtfig.pixelPoints[2], swtfig.pixelPoints[3], arc.angleStart, arc.angleEnd );
+    }
+  }
+  
+  
+  private void drawText(GC g, GralCanvasStorage.Figure figure, GralCanvasStorage.FigureText text) {
+    Font font = this.swtMng.propertiesGuiSwt.fontSwt(text.font);
+    g.setFont(font);
+    FontMetrics fontMetric = g.getFontMetrics();
+    int ytext = fontMetric.getHeight();
+    GralPoint scale = getPixelScaling(figure);
+    int x = (int)(text.x * scale.x + 0.5f) + figure.pixelPos.x;
+    int y = (int)(text.y * scale.y + 0.5f) + figure.pixelPos.y - ytext;  //oriented to the bottom line of the first line
+    if(text.text.indexOf('\n') >=0) {
+      int flags = SWT.DRAW_TRANSPARENT | SWT.DRAW_DELIMITER;   //delimiter necessary, elsewhere \n is not regarded. 
+      g.drawText(text.text, x, y, flags);
+    } else {
+      //SWT docu says: drawString is faster. But it does not support a \n character.
+      g.drawString(text.text, x, y, true);
     }
   }
   

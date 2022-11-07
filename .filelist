@@ -87,7 +87,7 @@
 ============================== java/vishiaGui/org/vishia/gral/base/ ================================
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
 2022-10-27 11:22:35  x     GralButton.java                          ::         21.996 -1719037379 
-2022-11-06 13:14:47  x     GralCanvasStorage.java                   ::         25.635  0210503987 
+2022-11-06 20:59:57  x     GralCanvasStorage.java                   ::         29.288  1273504993 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
 2022-10-06 00:17:53  x     GralCurveView.java                       ::         92.048  0464304828 
 2022-10-04 16:22:22  x     GralGraphicThread.java                   ::          9.083  1072146655 
@@ -213,7 +213,7 @@
 2021-10-04 14:29:50  x     SwtTransparentLabel.java                 ::          1.785  0602653326 
 2021-10-04 14:29:49  x     SwtTraverseListener.java                 ::          1.382 -0922202695 
 2022-10-01 23:10:04  x     SwtValueBar.java                         ::          6.148  0121278190 
-2022-11-06 13:45:35  x     SwtWdgCanvas.java                        ::         14.866 -2122500675 
+2022-11-06 20:15:28  x     SwtWdgCanvas.java                        ::         16.011  1823669164 
 2022-10-01 23:10:04  x     SwtWidgetHelper.java                     ::          7.437 -0031353032 
 2022-10-02 00:04:01  x     SwtWidgetSimpleWrapper.java              ::          2.640 -1696132855 
 2022-11-01 12:53:08  x     XXXSwtCanvasStorePanel.java              ::          2.895  1659465107 
