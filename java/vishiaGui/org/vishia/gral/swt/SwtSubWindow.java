@@ -226,7 +226,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     //super.checkCreateTabFolder(this.window, mng);
     assert(gralWindow.mainPanel !=null);
     //if(gralWindow.mainPanel.isTabbed()) {
-      gralWindow.mainPanel.createImplWidget_Gthread();  //extra panel because the Shell is only a simple Composite
+    //  gralWindow.mainPanel.createImplWidget_Gthread();  //extra panel because the Shell is only a simple Composite
 //    } else {
 //      gralWindow.mainPanel._wdgImpl = new SwtPanel(gralWindow.mainPanel, window);
 //    }

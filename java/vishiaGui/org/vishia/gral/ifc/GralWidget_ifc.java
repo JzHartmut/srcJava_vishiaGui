@@ -181,35 +181,6 @@ public interface GralWidget_ifc extends Removeable
   
   ActionChange getActionChange(ActionChangeWhen when);
   
-  /**Sets this widget to the current panel at the current given position. 
-   * This routine should be called only one time after the Gral widget was created. 
-   * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
-   * This standard implementation invokes {@link GralMng#createImplWidget_Gthread(GralWidget)} which tests the type of the derived GralWidget
-   * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}
-   * which knows the implementation graphic.
-   * <br>It is possible to have a derived implementation if the GralWidget consists of some more sub widgets.
-   * This is in GralPanelContent.  
-   * <br><br><b>Instance structure</b><br>
-   * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
-   * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 
-   * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
-   * consists of two implementation widgets, the text field and a label for the prompt.
-   * <br><br>
-   * <b>Positioning and Registering the widget:</b>
-   * The registering of a widget is done in {@link GralWidget#initPosAndRegisterWidget(GralPos)} which is called either
-   * on construction of a widget with a String-given position, before it appears on graphic, or on construction of the 
-   * graphic widget. It calls the package private {@link GralWidget#initPosAndRegisterWidget(GralPos)}, which takes the 
-   * given position, stores it in the {@link GralWidget#pos()} and adds the widget both to its panel which is given
-   * with the pos and registers the widget in the GralMng for simple global access. 
-   * If the name of the widget starts with "@" its name in the panel is the part after "@" whereby the global name 
-   * is the "panelname.widgetname". If a widget's position is given from left and from right or with percent, it is resized
-   * on resizing the window and the panel.
-   * <br><br>
-   * 
-   * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
-   *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
-   *   was called. 
-   */
   //void createImplWidget_Gthread();
   
   /**Deprecated. Use {@link #createImplWidget_Gthread()}.
