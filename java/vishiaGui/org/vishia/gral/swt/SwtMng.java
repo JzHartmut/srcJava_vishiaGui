@@ -365,7 +365,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   , char displaySize//, VariableContainer_ifc variableContainer
 	, LogMessage log) { 
     super(gralMng);
-    this.sizeCharProperties = displaySize;
+    super.sizeCharProperties = displaySize;
         //pos().x.p1 = 0; //start-position
     //pos().y.p1 = 4 * propertiesGui.yPixelUnit();
 
@@ -420,46 +420,56 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   private Composite getCurrentPanel(GralWidget widgg){ return ((Composite)widgg.pos().parent.getImplAccess().getWidgetImplementation()); }
   
   
+  
+  
+  /**This is the core operation to create all implementation widgets from given {@link GralWidget}.
+   * It knows all types of widgets, selects it and calls the proper swt counterpart.
+   * See definition on {@link GralMng#createImplWidget_Gthread(GralWidget)}
+   * @param widgg the existing GralWidget derived type
+   */
   @Override public void createImplWidget_Gthread(GralWidget widgg){
+    final GralWidget.ImplAccess wdga;
     if(widgg instanceof GralHtmlBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
-      SwtHtmlBox.createHtmlBox((GralHtmlBox)widgg, this);  //This may be the best variant.
+      wdga = SwtHtmlBox.createHtmlBox((GralHtmlBox)widgg, this);  //This may be the best variant.
     } else if(widgg instanceof GralTextBox) {  //NOTE: before GralTextField because a GralTextBox is a GralTextField (derived)
-      SwtTextFieldWrapper.createTextBox((GralTextBox)widgg, gralMng);  //This may be the best variant.
+      wdga = SwtTextFieldWrapper.createTextBox((GralTextBox)widgg, gralMng);  //This may be the best variant.
     } else if(widgg instanceof GralTextField){
-      SwtTextFieldWrapper.createTextField((GralTextField)widgg, gralMng);  //This may be the best variant.
+      wdga = SwtTextFieldWrapper.createTextField((GralTextField)widgg, gralMng);  //This may be the best variant.
     } else if(widgg instanceof GralHorizontalSelector<?>){
-      SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
-      gralMng.registerWidget(widgg);
+      wdga = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
     } else if(widgg instanceof GralTable<?>){
-      SwtTable.createTable((GralTable<?>)widgg, this);  //This may be the best variant.
+      wdga = SwtTable.createTable((GralTable<?>)widgg, this);  //This may be the best variant.
     } else if(widgg instanceof GralButton){
-      new SwtButton((GralButton)widgg, this);
-      gralMng.registerWidget(widgg);
+      wdga = new SwtButton((GralButton)widgg, this);
+//      gralMng.registerWidget(widgg);
     } 
     else if(widgg instanceof GralLabel){
-      new SwtLabel((GralLabel)widgg, this);
+      wdga = new SwtLabel((GralLabel)widgg, this);
     }
     else if(widgg instanceof GralValueBar){
-      new SwtValueBar((GralValueBar)widgg, this);
+      wdga = new SwtValueBar((GralValueBar)widgg, this);
     }
     else if(widgg instanceof GralLed){
-      new SwtLed((GralLed)widgg, this);
-      gralMng.registerWidget(widgg);
+      wdga = new SwtLed((GralLed)widgg, this);
+//      gralMng.registerWidget(widgg);
     }
     else if(widgg instanceof GralCanvasArea){
-      new SwtCanvasArea((GralCanvasArea)widgg, this);
+      wdga = new SwtCanvasArea((GralCanvasArea)widgg, this);
     }
-    else if(widgg instanceof GralTabbedPanel) {            // GralTabbedPanel should be checked before GralPanelContent, its derived
-      GralTabbedPanel widgp = (GralTabbedPanel)widgg;
-      GralPanelActivated_ifc user = widgp.notifyingUserInstanceWhileSelectingTab;
-      new SwtTabbedPanel(widgp, this, user, 0);
+//    else if(widgg instanceof GralTabbedPanel) {            // GralTabbedPanel should be checked before GralPanelContent, its derived
+//      GralTabbedPanel widgp = (GralTabbedPanel)widgg;
+//      GralPanelActivated_ifc user = widgp.notifyingUserInstanceWhileSelectingTab;
+//      new SwtTabbedPanel(widgp, this, user, 0);
+//    }
+    else if(widgg instanceof GralWindow) {
+      wdga = new SwtSubWindow(this, (GralWindow)widgg);
     }
     else if(widgg instanceof GralPanelContent) {
       GralPanelContent widgp = (GralPanelContent)widgg;
-      SwtPanel tab;
+//      SwtPanel tab;
 //      if(widgp.canvas() !=null) { tab = new SwtCanvasStorePanel(widgp); }
 //      else 
-      { tab = new SwtGridPanel(widgp, 0); }  // an SwtGridPanel is always also a SwtCanvasStrorePanel
+      wdga = new SwtGridPanel(widgp, 0);   // an SwtGridPanel is always also a SwtCanvasStrorePanel
       GralWidget_ifc parent = widgg.pos().parent;
       if(parent instanceof GralTabbedPanel) {
         SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
@@ -468,12 +478,14 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     }
     else if(widgg instanceof GralCurveView) {
       GralCurveView widgp = (GralCurveView)widgg;
-      new SwtCurveView(widgp, this); 
+      wdga = new SwtCurveView(widgp, this); 
       
     }
     else {
       throw new IllegalArgumentException("missing Widget type: " + widgg.toString());
     }
+    //-------------------------------- // It should be always possible to access GralWidget from the implementation Swt-Control
+    ((Control)wdga.getWidgetImplementation()).setData(widgg);        
   }
   
 
@@ -540,11 +552,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(org.vishia.gral.base.GralWindow)
    */
-  @Override public void createSubWindow(GralWindow windowGral) throws IOException {
+  @Deprecated @Override public void createSubWindow(GralWindow windowGral) throws IOException {
     SwtSubWindow windowSwt = new SwtSubWindow(this, windowGral);
     //GralRectangle rect = calcPositionOfWindow(windowGral.pos());
     //windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    windowGral._wdgImpl = windowSwt;
+//    windowGral._wdgImpl = windowSwt;
   }
 
   

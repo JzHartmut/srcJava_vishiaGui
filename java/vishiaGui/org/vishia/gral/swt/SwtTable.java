@@ -237,15 +237,15 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       
       
   /*package private*/ 
-  static void createTable(GralTable<?> gralTable, SwtMng mng) {
+  static GralWidget.ImplAccess createTable(GralTable<?> gralTable, SwtMng mng) {
     
     Composite parent = mng.getWidgetsPanel(gralTable);
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);
-    mng.gralMng.registerWidget(gralTable);
+    //mng.gralMng.registerWidget(gralTable);
     //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
-
+    return table;
   }
       
       

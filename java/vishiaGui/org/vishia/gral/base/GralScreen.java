@@ -49,12 +49,6 @@ public class GralScreen implements GralPanel_ifc {
     return null;
   }
 
-  @Override public void createImplWidget_Gthread () {
-  }
-
-  @Override public void setToPanel ( GralMngBuild_ifc mng ) {
-    
-  }
 
   @Override public GralMng gralMng () {
     return this.gralMng;

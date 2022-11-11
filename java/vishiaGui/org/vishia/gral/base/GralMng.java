@@ -68,7 +68,7 @@ import org.vishia.util.TimedValues;
  * The inner class {@link ImplAccess} is implemented by the several graphic-system-supporting classes.
  * <ul>
  * <li>{@link org.vishia.gral.swt.SwtMng}
- * <li>{@link org.vishia.gral.awt.AwtWidgetMng}
+ * <li>{@link org.vishia.gral.awt.AwtMng}
  * </ul>
  * <br><br>
  * 
@@ -804,7 +804,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   @Override public void createImplWidget_Gthread(GralWidget widgg){ 
     try {
-      if(widgg instanceof GralWindow){
+      if(false && widgg instanceof GralWindow){
         GralWindow wind1 = (GralWindow)widgg;
         this._mngImpl.createSubWindow(wind1);
   //      for(Map.Entry<String, GralPanelContent> e: wind1.panels.entrySet()) {
@@ -2224,7 +2224,7 @@ public GralButton addCheckButton(
     
     /**This operation creates the proper implementation widgets due to the underlying Graphic system.
      * It is implemented by the specific GralMngXyz, see {@link org.vishia.gral.swt.SwtMng}.
-     * @param widgg The given instantiated Gral Widget but without implementation instace yet.
+     * @param widgg The given instantiated GralWidget but without implementation instacne yet.
      */
     public abstract void createImplWidget_Gthread(GralWidget widgg);
     
@@ -2274,9 +2274,9 @@ public GralButton addCheckButton(
     @Deprecated public abstract GralWindow createWindow(String name, String title, int windProps);
     
     
-    protected abstract void createSubWindow(GralWindow windowGral) throws IOException;
+    @Deprecated protected abstract void createSubWindow(GralWindow windowGral) throws IOException;
     
-    public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
+    @Deprecated public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
     
     @Deprecated public abstract GralWidget addText(String sText, char size, int color);
     

@@ -70,7 +70,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
 
   
   //public AwtButton(String sName, AwtWidgetMng mng, Container parent, int styleSwt, char size)
-  AwtButton(GralButton widgg, AwtWidgetMng mng)
+  AwtButton(GralButton widgg, AwtMng mng)
   {
     widgg.super(widgg, mng.gralMng);
     mouseListener = new AwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction);
@@ -99,7 +99,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
   @Override public GralRectangle getPixelPositionSize(){ return helper.getPixelPositionSize(); }
 
   
-  void setBoundsGraphic(AwtWidgetMng mng)
+  void setBoundsGraphic(AwtMng mng)
   {
     //widgetSwt.setSize(mng.propertiesGui.xPixelUnit() * xSize -2, mng.propertiesGui.yPixelUnit() * ySize -2);
     mng.setBounds_(widgg.pos(), widgetSwt);

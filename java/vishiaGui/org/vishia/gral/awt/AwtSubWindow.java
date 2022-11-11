@@ -1,5 +1,6 @@
 package org.vishia.gral.awt;
 
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
@@ -34,7 +35,9 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   public AwtSubWindow(GralWindow wdgGral)
   { super(wdgGral);
     int windProps = super.getWindowProps();
-    window = new Frame(getTitle());
+    this.window = new Frame(getTitle());
+    Component wdgc = window;
+    
     int xPos = 100; int yPos = 50; int xSize = 640; int ySize = 480;
     window.setBounds(xPos, yPos, xSize, ySize);
     window.setVisible(true);
@@ -54,7 +57,10 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     //window.addWindowListener(windowClosingAdapter);
     //window.addWindowListener(windowListener);
     //window.add
-    
+    assert(gralWindow.mainPanel !=null);
+    super.wdgimpl = this.window;                 // in GralWidget.ImplAccess
+    //gralWindow.mainPanel.createImplWidget_Gthread();  //extra panel because the Shell is only a simple Composite
+
   }
 
 

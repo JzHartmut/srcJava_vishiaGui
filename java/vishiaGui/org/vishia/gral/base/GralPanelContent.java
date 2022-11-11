@@ -297,10 +297,9 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   
   
-  /**Overridden implementation of {@link GralWidget#createImplWidget_Gthread()} for instantiation of all widgets of this panel.
+  /**Organizes the creation of all instantiation of all widgets of this panel, only called in this package from {@link GralWidget#createImplWidget_Gthread()}
    */
-  @Override public void createImplWidget_Gthread() throws IllegalStateException {
-    super.createImplWidget_Gthread(); //from GralWidget.
+  void createChildrensImplWidget_Gthread() throws IllegalStateException {
     for(GralWidget widg: this._panel.widgetList) {
       widg.createImplWidget_Gthread();                     // recursively call of same
     }

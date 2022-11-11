@@ -2642,13 +2642,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     @Override public GralMng gralMng(){ return GralTable.this.gralMng(); }
     
-    @Override public void setToPanel(GralMngBuild_ifc mng){
-      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
-    }
-
-    @Override public void createImplWidget_Gthread(){
-      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
-    }
+ 
+//    @Override public void createImplWidget_Gthread(){
+//      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
+//    }
 
     @Override public String toString(){ 
       StringBuilder u = new StringBuilder();

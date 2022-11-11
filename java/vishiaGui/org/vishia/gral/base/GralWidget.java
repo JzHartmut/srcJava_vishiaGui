@@ -177,6 +177,9 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-11 chg: {@link #createImplWidget_Gthread()} is now only existing in this class, 
+   *   works together with the derived {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}.
+   *   Necessities of {@link GralWindow#mainPanel} and children of {@link GralPanelContent} are regarded here. 
    * <li>2022-11-01 new very important: {@link #redraw(int, int, boolean)} and {@link #redrawOnlyDynamics(int, int)}.
    *   The concept of dynamics in the widget positions is introduced with the {@link GralCanvasStorage}.
    *   Generally: repaint and redraw are synonymous, also in SWT. I want to use better wording redraw if possible.   
@@ -508,6 +511,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    * <li>$: Any Panel (composite)
    * <li>+: A canvas panel
    * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
+   * <li>9: GralArea9Panel
    * </ul>
    * */
   public final char whatIs;
@@ -839,34 +843,63 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   
   
-  /**Standard implementation of  @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel()
-   * Only large widgets (contains more as one GralWidget) should override this method.
-   * If the _wdgImpl is initialized already, this method does nothing. It is possible to invoke this for all existing widgets
-   * of a panel, only new widgets are initialized with them. 
-   * @before 2016-07 it has thrown an exception on repeated invocation.
+  /**Sets this widget to the current panel at the current given position. 
+   * This routine should be called only one time after the Gral widget was created. 
+   * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
+   * This operation invokes the abstract operation {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)} 
+   * which is implemented in the derived Mng instances for the implementation graphic.
+   * It tests the type of the derived GralWidget to create the correct graphical implementation widget. 
+   * <br>
+   * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
+   * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 
+   * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
+   * consists of two implementation widgets, the text field and a label for the prompt.
+   * <br><br>
+   * <b>Positioning and Registering the widget:</b>
+   * This is done on creation of the derived GralWidget, see ...
+   * on construction of a widget with a String-given position, before it appears on graphic, or on construction of the 
+   * graphic widget. It calls the package private {@link GralWidget#initPosAndRegisterWidget(GralPos)}, which takes the 
+   * given position, stores it in the {@link GralWidget#pos()} and adds the widget both to its panel which is given
+   * with the pos and registers the widget in the GralMng for simple global access. 
+   * If the name of the widget starts with "@" its name in the panel is the part after "@" whereby the global name 
+   * is the "panelname.widgetname". If a widget's position is given from left and from right or with percent, it is resized
+   * on resizing the window and the panel.
+   * <br><br>
+   * 
+   * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
+   *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
+   *   was called. 
    */
-  @Override public void createImplWidget_Gthread() throws IllegalStateException {
+  public void createImplWidget_Gthread() throws IllegalStateException {
     if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
       if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
         dyda.textFont = this.itsMng.propertiesGui.getTextFont(this.itsMng.pos().pos.height());
         dyda.setChanged(ImplAccess.chgFont);
       }
-      this.itsMng.createImplWidget_Gthread(this);  //calls Implementation manager functionality
-    }
-    if(this.contextMenu !=null) {
-      this.itsMng._mngImpl.createContextMenu(this);
+      this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
+      if(this instanceof GralWindow) {
+        //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
+        //the implementation can decide whether the same implementation widget is used
+        //also for the GralPanelContent or create an own one.
+        ((GralWindow)this).mainPanel.createImplWidget_Gthread();
+      }
+      else if(this instanceof GralPanelContent) {
+        //------------------------------------------------ // a panel contains children, create it.
+        ((GralPanelContent)this).createChildrensImplWidget_Gthread();
+       }
+      if(this.contextMenu !=null) {
+        this.itsMng._mngImpl.createContextMenu(this);
+      }
+    } else {
+      throw new IllegalStateException("widget implementation already given. ");
     }
 
   }
 
+  public void setToPanel(GralMng gralMng) {
+    createImplWidget_Gthread();
+  }
   
-  
-  /**
-   * @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel(org.vishia.gral.ifc.GralMngBuild_ifc)
-   * @deprecated use {@link #createImplWidget_Gthread()}
-   */
-  @Override @Deprecated public final void setToPanel(GralMngBuild_ifc mngUnused) throws IllegalStateException { createImplWidget_Gthread(); }
-
   
   public GralPos pos(){ return _wdgPos; } 
   
@@ -1937,35 +1970,37 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    */
   @Override public String toString ( ) { 
     StringBuilder u = new StringBuilder(240);
-    try { 
-      toString(u);
-    } catch(IOException exc) { throw new RuntimeException("unexpected: ", exc); };
+    toString(u);
     return u.toString();
   }
 
   
   
-  public Appendable toString(Appendable u) throws IOException {
-    u.append(whatIs);
-    if(this instanceof GralLabel)
-      Debugutil.stop();
-    if(this.name !=null) { u.append(":").append(name);}
-    if(sDataPath !=null) { u.append(", data=").append(sDataPath);}
-    if(this.dyda.displayedText !=null) { u.append(", text=").append('\"').append(this.dyda.displayedText).append('\"');}
-    if(_wdgPos !=null){
-      this._wdgPos.toString(u, true);
-    } else {
-      u.append("@?");
-    }
-    if(this._wdgImpl !=null) {
-    u.append( " pixel:").append(Integer.toString(this._wdgImpl.pixBounds.x)).append(',')
-                     .append(Integer.toString(this._wdgImpl.pixBounds.y)).append("+(")
-                     .append(Integer.toString(this._wdgImpl.pixBounds.dx)).append('*')
-                     .append(Integer.toString(this._wdgImpl.pixBounds.dy)).append(") ");
-    }
-    if(variable !=null){
-      String vString = variable.toString();
-      u.append(" var=").append(vString);
+  public Appendable toString(Appendable u) {
+    try {
+      u.append(whatIs);
+      if(this instanceof GralLabel)
+        Debugutil.stop();
+      if(this.name !=null) { u.append(":").append(name);}
+      if(sDataPath !=null) { u.append(", data=").append(sDataPath);}
+      if(this.dyda.displayedText !=null) { u.append(", text=").append('\"').append(this.dyda.displayedText).append('\"');}
+      if(_wdgPos !=null){
+        this._wdgPos.toString(u, true);
+      } else {
+        u.append("@?");
+      }
+      if(this._wdgImpl !=null) {
+      u.append( " pixel:").append(Integer.toString(this._wdgImpl.pixBounds.x)).append(',')
+                       .append(Integer.toString(this._wdgImpl.pixBounds.y)).append("+(")
+                       .append(Integer.toString(this._wdgImpl.pixBounds.dx)).append('*')
+                       .append(Integer.toString(this._wdgImpl.pixBounds.dy)).append(") ");
+      }
+      if(variable !=null){
+        String vString = variable.toString();
+        u.append(" var=").append(vString);
+      }
+    } catch(IOException exc) {
+      throw new RuntimeException("unexpected", exc);
     }
     return u;
   }
@@ -2150,6 +2185,8 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     
     
     protected final ActionChange getActionChange(ActionChangeWhen when){ return widgg.getActionChange(when); }
+    
+    public Object getWidgetImplementation() { return this.wdgimpl; }
     
     public static GralWidget gralWidgetFromImplData(Object data){
       if(data instanceof GralWidget) return (GralWidget)data;

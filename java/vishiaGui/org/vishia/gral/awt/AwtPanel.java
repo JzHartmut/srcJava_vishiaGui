@@ -10,11 +10,20 @@ import java.awt.event.ComponentListener;
 
 import org.eclipse.swt.widgets.Control;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
-public class AwtPanel  extends GralPanelContent
+/**
+ * Note: a tabbed panel does not exist in AWT. 
+ * https://coderanch.com/t/330446/java/Tabbed-panel-AWT says: Use Card Layout and small buttons for the tab.
+ * @author hartmut Schorrig
+ *
+ */
+public class AwtPanel  extends GralPanelContent.ImplAccess
 {
   
   /**Version history:
@@ -46,24 +55,29 @@ public class AwtPanel  extends GralPanelContent
 
   //protected Composite panelSwt;
   
-  private AwtPanel(String name, GralMng mng)
-  {
-    super(name, mng, null);
-  }
-
   /**Constructs a panel
    * @param name of panel.
    * @param mng The widget manager
    * @param panelSwt may be null, then the {@link GralPanelContent#panelSwtImpl} should be set 
    *   after construction of a derived class.
    */
-  public AwtPanel(String name, GralMng mng, Container panelAwt)
+  public AwtPanel(GralPanelContent wdgg)
   {
-    super(name, mng, panelAwt);
-    if(panelAwt !=null){
-      panelAwt.addComponentListener(resizeItemListener);
+    super(wdgg);
+    GralWidget_ifc wdgp =  wdgg.pos().parent;
+    final Component awdgp = AwtMng.getAwtImpl(wdgp); 
+    assert awdgp instanceof Container;
+    final Container awdgparent = (Container) awdgp;
+    final Container awdg;
+    if(wdgp instanceof GralWindow) { //the main panel of the window
+      awdg = awdgparent;
+    } else {
+      awdg = new Container();
+      awdgparent.add(awdg);
     }
+    this.wdgimpl = awdg;
   }
+
 
   /*@Override public Container getPanelImpl()
   {
@@ -71,21 +85,7 @@ public class AwtPanel  extends GralPanelContent
   }*/
   
 
-  @Override
-  public GralColor setBackgroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public GralColor setForegroundColor(GralColor color)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-
+ 
   
   /*@Override public GralRectangle getPixelPositionSize(){
     Rectangle r = ((Component)panelComposite).getBounds();
@@ -117,15 +117,15 @@ public class AwtPanel  extends GralPanelContent
 
 
 
-  @Override public boolean remove(){
-    super.remove();
-    if(itsTabAwt !=null){
-      //itsTabAwt.dispose();
-      itsTabAwt = null;
-    }
-    return true;
-  }
-  
+//  @Override public boolean remove(){
+//    super.remove();
+//    if(itsTabAwt !=null){
+//      //itsTabAwt.dispose();
+//      itsTabAwt = null;
+//    }
+//    return true;
+//  }
+//  
   
   protected ComponentListener resizeItemListener = new ComponentListener()
   {
@@ -174,6 +174,37 @@ public class AwtPanel  extends GralPanelContent
     */
     
   };
+
+  @Override public boolean setFocusGThread () {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override public void setVisibleGThread ( boolean bVisible ) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void removeWidgetImplementation () {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void repaintGthread () {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override public GralRectangle getPixelPositionSize () {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override public void updateValuesForAction () {
+    // TODO Auto-generated method stub
+    
+  }
 
 
   

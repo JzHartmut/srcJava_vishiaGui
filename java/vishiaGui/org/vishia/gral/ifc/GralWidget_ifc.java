@@ -210,12 +210,12 @@ public interface GralWidget_ifc extends Removeable
    *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
    */
-  void createImplWidget_Gthread();
+  //void createImplWidget_Gthread();
   
   /**Deprecated. Use {@link #createImplWidget_Gthread()}.
    * @param mng not used. It is known as singleton. Use null as argument.
    */
-  void setToPanel(GralMngBuild_ifc mng);
+  //void setToPanel(GralMngBuild_ifc mng);
   
   /**Returns the associated singleton GralMng. The GralMng is associated only if the widget is setToPanel,
    * see {@link #setToPanel(GralMngBuild_ifc)}.

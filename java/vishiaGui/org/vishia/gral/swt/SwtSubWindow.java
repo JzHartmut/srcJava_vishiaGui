@@ -170,7 +170,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
    * @param gralMng
    * @throws IOException 
    */
-  SwtSubWindow(SwtMng mng, GralWindow gralWindow) throws IOException
+  SwtSubWindow(SwtMng mng, GralWindow gralWindow) //throws IOException
   //SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { //super(name, windProps, gralMng, null);
     super(gralWindow );  //Invoke constructor of the super class, with knowledge of its outer class.
@@ -194,7 +194,6 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     //
     //create the window:
     window = new Shell(mng.displaySwt, props);
-    window.setData(gralWindow);
     super.wdgimpl = this.swtWidgWrapper = new SwtWidgetHelper(window, mng);
     GralRectangle rect = mng.calcPositionOfWindow(gralWindow.pos());
     window.setBounds(rect.x, rect.y, rect.dx, rect.dy );

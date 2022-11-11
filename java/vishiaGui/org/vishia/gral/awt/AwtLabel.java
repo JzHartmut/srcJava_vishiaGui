@@ -55,7 +55,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
   private Font fontAwt;
   
   
-  AwtLabel(GralLabel widgg, AwtWidgetMng mng)
+  AwtLabel(GralLabel widgg, AwtMng mng)
   {
     widgg.super(widgg, mng.gralMng);
     //Container panelSwt = mng.getCurrentPanel();

@@ -122,15 +122,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   }
   
   
-  @Override public void setToPanel(GralMngBuild_ifc mng){
-    throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
-  }
 
-
-  @Override public void createImplWidget_Gthread(){
-    throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
-  }
-
+ 
 
   
   /**Creates a sub window for showing html content.

@@ -25,7 +25,7 @@ public class AwtTextBox extends GralTextBox.GraphicImplAccess
   StringBuffer newText = new StringBuffer();
   
   
-  public AwtTextBox(GralTextBox widgg, Container parent, int style, AwtWidgetMng mng)
+  public AwtTextBox(GralTextBox widgg, Container parent, int style, AwtMng mng)
   { widgg.super(widgg);
     textFieldSwt = new AwtTextAreaImpl();
     parent.add(textFieldSwt);

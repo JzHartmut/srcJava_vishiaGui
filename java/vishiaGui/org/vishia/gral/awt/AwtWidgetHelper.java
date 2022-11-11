@@ -18,11 +18,11 @@ import org.vishia.gral.ifc.GralRectangle;
 public class AwtWidgetHelper
 {
   
-  protected AwtWidgetMng mng;
+  protected AwtMng mng;
   
   protected Component widga;  
   
-  protected AwtWidgetHelper(Component widga, AwtWidgetMng mng)
+  protected AwtWidgetHelper(Component widga, AwtMng mng)
   { this.widga = widga;
     this.mng = mng;
   }

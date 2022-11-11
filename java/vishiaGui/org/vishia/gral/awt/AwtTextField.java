@@ -80,16 +80,17 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   StringBuilder editBuffer;
   
   
-  public AwtTextField(GralTextField widgg, AwtWidgetMng mng)
+  public AwtTextField(GralTextField widgg, AwtMng mng)
   { widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
     if(widgg.isEditable()){
-      editBuffer = new StringBuilder(20); 
+      editBuffer = new StringBuilder(30); 
       editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
     }
     GralPos pos = widgg.pos();
     Container panelAwt = (Container)pos.parent.getImplAccess().getWidgetImplementation();
     
-    widgetAwt = new TextCanvas(); //TextField();
+    widgetAwt = new TextCanvas(); 
+    //Component c = new TextField();
     widgetAwt.setData(widgg);
     widgetAwt.addFocusListener(mng.focusListener);
     widgetAwt.addMouseListener(mng.mouseStdAction);

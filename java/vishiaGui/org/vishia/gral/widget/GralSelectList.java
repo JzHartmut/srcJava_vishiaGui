@@ -119,11 +119,10 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * @param columns
    * @param size
    */
-  public void XXXsetToPanel(GralMngBuild_ifc gralMng)
+  public void XXXXsetToPanel(GralMngBuild_ifc gralMng)
   {
-    wdgdTable.setToPanel(gralMng);
-    //wdgdTable = gralMng.addTable(name, rows, columns);
-    wdgdTable.setActionChange(actionTable);
+    //wdgdTable.setToPanel(gralMng);
+    //wdgdTable.setActionChange(actionTable);
   }
   
  

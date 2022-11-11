@@ -118,6 +118,11 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
   
   
+  /**Note: use {@link #createTextBox(GralTextField, GralMng)} or {@link #createTextField(GralTextField, GralMng)}
+   * @param widgg
+   * @param swtMng
+   * @param bbox
+   */
   private SwtTextFieldWrapper(GralTextField widgg, SwtMng swtMng, boolean bbox)
   {
     widgg.super(widgg, swtMng); //NOTE: superclass is a non static inner class of GralTextField. 
@@ -194,12 +199,12 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * @param promptStylePosition maybe null, prompt position
    * @param mng
    */
-  static void createTextField(GralTextField widgg, GralMng mng){
-    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng._mngImpl, false);
+  static GralWidget.ImplAccess createTextField(GralTextField widgg, GralMng mng){
+    return new SwtTextFieldWrapper(widgg, (SwtMng)mng._mngImpl, false);
   }
   
-  static void createTextBox(GralTextField widgg, GralMng mng){
-    SwtTextFieldWrapper widgswt = new SwtTextFieldWrapper(widgg, (SwtMng)mng._mngImpl, true);
+  static GralWidget.ImplAccess createTextBox(GralTextField widgg, GralMng mng){
+    return new SwtTextFieldWrapper(widgg, (SwtMng)mng._mngImpl, true);
   }
   
   

@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
@@ -52,8 +53,9 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Debugutil;
 
-public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, GralMng_ifc
+public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, GralMng_ifc
 {
   
   final AwtProperties propertiesGuiAwt; 
@@ -64,6 +66,10 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   /**The standard listener or action for mouse events, able to assign to all widgets which does not need an extra mouse behaviour. */
   final AwtGralMouseListener.MouseListenerGralAction mouseStdAction = new AwtGralMouseListener.MouseListenerGralAction(null);
   
+  
+  private static final HashMap<Component, GralWidget> gralWidgetFromComponent = new HashMap<Component, GralWidget>();;
+  
+  
   /**Creates an instance.
    * @param guiContainer The container where the elements are stored in.
    * @param width in display-units for the window's width, the number of pixel depends from param displaySize.
@@ -71,20 +77,46 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public AwtWidgetMng(AwtProperties propertiesGui
+  public AwtMng(GralMng gralMng, char displaySize
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(GralMng.get());
+  { super(gralMng);
+    super.sizeCharProperties = displaySize;
     //mainWindowAwt = window;
-    this.propertiesGuiAwt = propertiesGui;
+    this.propertiesGuiAwt = new AwtProperties(displaySize);
+    this.gralMng.setProperties(this.propertiesGuiAwt);
     
+       
     //mainWindowAwt.addKeyListener(mainKeyListener);
     startThread();
 
   }
 
   
+  
+  /**Returns the Swt widget which implements the given GralWidget.
+   * It calls {@link GralWidget_ifc#getImplWidget()} and then checks,
+   * whether the Swt impl Widget is immediately an Control, 
+   * or it istype of {@link SwtWidgetHelper}. 
+   * In the last case {@link SwtWidgetHelper#widgetSwt} is returned.
+   * <br>
+   * New since 2022-09. The approach is, only the {@link GralWidget.ImplAccess#wdgimpl} should be used
+   * to store the aggregation to the implementation widget, so simple as possible. 
+   *  
+   * @param widgg
+   * @return null if a implementation is not available.
+   */
+  public static Component getAwtImpl ( GralWidget_ifc widgg) {
+    Object oImpl = widgg.getImplWidget();
+    if(oImpl instanceof Component) return (Component) oImpl;
+    else if(oImpl instanceof AwtWidgetHelper) {
+      return ((AwtWidgetHelper)oImpl).widga;
+    }
+    else return null;
+  }
+
+
   
   @Override public Container getCurrentPanel(){ return (Container)pos().parent.getImplAccess().getWidgetImplementation(); }
 
@@ -97,18 +129,44 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
 
 
+  /**This is the core operation to create all implementation widgets from given {@link GralWidget}.
+   * It knows all types of widgets, selects it and calls the proper swt counterpart.
+   * See definition on {@link GralMng#createImplWidget_Gthread(GralWidget)}
+   * @param widgg the existing GralWidget derived type
+   */
   @Override public void createImplWidget_Gthread(GralWidget widgg){
+    Debugutil.stop();
+    //Note: the new AwtAccess instance is always stored in the widgg inside the constructor due to protected access possibilities.
+    final GralWidget.ImplAccess wdga; 
     if(widgg instanceof GralLabel){
-      new AwtLabel((GralLabel)widgg, this);
+      wdga = new AwtLabel((GralLabel)widgg, this);
     } else if(widgg instanceof GralTextField){
-      new AwtTextField((GralTextField)widgg, this);
-    } else if(widgg instanceof GralHorizontalSelector<?>){
-      //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
-      gralMng.registerWidget(widgg);
-    } else if(widgg instanceof GralTable<?>){
+      wdga = new AwtTextField((GralTextField)widgg, this);
+//    } else if(widgg instanceof GralHorizontalSelector<?>){
+//      //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
+//      gralMng.registerWidget(widgg);
+//    } else if(widgg instanceof GralTable<?>){
       //AwtTable.addTable((GralTable<?>)widgg, this);
     } else if(widgg instanceof GralButton){
-      new AwtButton((GralButton)widgg, this);
+      wdga = new AwtButton((GralButton)widgg, this);
+    } else if(widgg instanceof GralWindow) {
+      wdga = new AwtSubWindow((GralWindow)widgg);
+      
+    } else if(widgg instanceof GralPanelContent) {
+      wdga = new AwtPanel((GralPanelContent)widgg);
+    } else {
+      wdga = null;
+      throw new IllegalArgumentException("missing Widget type: " + widgg.toString());
+    }
+    if(wdga !=null) {                                      // should be always possible to access GralWidget from the implementation Swt-Control
+      Component awtImpl = (Component)widgg.getImplWidget();
+      GralWidget exist = gralWidgetFromComponent.get(awtImpl);
+      if(exist !=null) {
+        assert(exist instanceof GralWindow);               // use the same also for GralPanelContent
+        assert(widgg instanceof GralPanelContent);
+      } else {
+        gralWidgetFromComponent.put(awtImpl, widgg);
+      }
     }
   }
   
@@ -342,8 +400,8 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     Component widgSwt = (Component)widg._wdgImpl.getWidgetImplementation();
     GralMenu menu = new GralMenu(); new AwtMenu(widg, widgSwt, gralMng);  //TODO
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
-    widgSwt.add(menuAwt);
-    menuAwt.show(widgSwt, 10, 10);
+//    widgSwt.add(menuAwt);
+//    menuAwt.show(widgSwt, 10, 10);
     return menu;
   }
  
@@ -407,14 +465,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   @Override public void createSubWindow(GralWindow windowGral){
-    AwtSubWindow windowSwt = new AwtSubWindow(windowGral);
-    //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
-    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
-    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    //window.window.redraw();
-    //window.window.update();
-    windowGral._wdgImpl = windowSwt;
-
+    AwtSubWindow windowAwt = new AwtSubWindow(windowGral);
+    gralWidgetFromComponent.put(windowAwt.window, windowGral);
+    //    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
+//    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+//    //window.window.redraw();
+//    //window.window.update();
+   
   }
   
   /**Calculates the position as absolute value on screen from a given position inside a panel.
@@ -686,7 +743,6 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   @Override protected void initGraphic()
   {
-    AwtProperties propertiesGui = new AwtProperties(sizeCharProperties);
     //AwtSubWindow awtWindow = new AwtSubWindow(mainWindow, true);
     //awtMng = new AwtWidgetMng(propertiesGui, log);
     
