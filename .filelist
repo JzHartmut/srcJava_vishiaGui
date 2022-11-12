@@ -86,7 +86,7 @@
 
 ============================== java/vishiaGui/org/vishia/gral/base/ ================================
 2012-05-20 12:38:56  x     GetGralWidget_ifc.java                   ::          2.072 -2006934492 
-2022-11-11 23:21:19  x     GralArea9Panel.java                      ::          7.978 -1317928840 
+2022-11-12 20:08:48  x     GralArea9Panel.java                      ::         11.410 -1016776102 
 2022-10-27 11:22:35  x     GralButton.java                          ::         21.996 -1719037379 
 2022-11-06 20:59:57  x     GralCanvasStorage.java                   ::         29.288  1273504993 
 2021-10-04 14:29:58  x     GralColorConv.java                       ::         14.175  2106827533 
@@ -99,11 +99,11 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-11-01 12:15:21  x     GralLed.java                             ::          5.646 -0450864146 
 2022-09-25 19:48:48  x     GralMenu.java                            ::         12.586 -0766242011 
-2022-11-12 11:58:18  x     GralMng.java                             ::        100.102  0089863742 
+2022-11-12 19:53:04  x     GralMng.java                             ::        101.477  0685787343 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-11-12 12:27:40  x     GralPanelContent.java                    ::         22.877  1539200531 
-2022-11-12 12:25:17  x     GralPos.java                             ::         68.899 -0306645225 
+2022-11-12 19:40:15  x     GralPos.java                             ::         70.422  1390175679 
 2022-11-11 19:40:42  x     GralScreen.java                          ::          4.145  1840193462 
 2022-08-31 20:31:40  x     GralShowMethods.java                     ::         11.732 -1383563975 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
@@ -113,7 +113,7 @@
 2022-10-09 00:19:54  x     GralTextField.java                       ::         34.138  1337435052 
 2022-10-01 23:10:04  x     GralValueBar.java                        ::          6.216 -0483513653 
 2022-11-11 17:43:57  x     GralWidgImplAccess_ifc.java              ::          5.924  0960638258 
-2022-11-11 21:52:58  x     GralWidget.java                          ::        109.419  2003374414 
+2022-11-12 14:25:39  x     GralWidget.java                          ::        109.678  0571751768 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-11-12 11:54:11  x     GralWindow.java                          ::         18.249 -1102775151 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
@@ -196,7 +196,7 @@
 2021-10-04 14:29:52  x     SwtGralKey.java                          ::          6.489 -0478831585 
 2021-10-04 14:29:49  x     SwtGralMouseListener.java                ::         17.620 -0785504835 
 2022-10-04 14:30:34  x     SwtGraphicThread.java                    ::          3.646 -1614326393 
-2022-11-01 12:52:29  x     SwtGridPanel.java                        ::          8.511 -0797686638 
+2022-11-12 13:16:33  x     SwtGridPanel.java                        ::          8.565 -0252542421 
 2022-10-01 23:10:04  x     SwtHorizontalSelector.java               ::          8.288 -1047718984 
 2022-09-30 20:22:54  x     SwtHtmlBox.java                          ::          4.297  0543390833 
 2021-10-04 14:29:49  x     SwtImage.java                            ::           .517  1695986428 
@@ -204,13 +204,14 @@
 2022-10-01 23:10:04  x     SwtLabel.java                            ::          6.626 -1050513706 
 2022-10-01 23:10:04  x     SwtLed.java                              ::          6.421 -0672261290 
 2022-10-05 09:53:38  x     SwtMenu.java                             ::          6.248  0475466137 
-2022-11-12 10:52:48  x     SwtMng.java                              ::         55.146  0253744645 
-2022-10-04 22:25:56  x     SwtPanel.java                            ::         10.885 -1416947797 
+2022-11-12 13:21:01  x     SwtMng.java                              ::         55.303 -2108183509 
+2022-11-12 13:12:37  x     SwtPanel.java                            ::         10.886  1999132379 
+2022-11-12 14:43:11  x     SwtPanelArea9.java                       ::          1.265 -1367296154 
 2021-10-04 14:29:58  x     SwtProperties.java                       ::          5.666 -2070296168 
 2013-10-05 22:28:54  x     SwtSetValue_ifc.java                     ::           .374  1688335866 
 2022-10-01 23:10:04  x     SwtSlider.java                           ::          1.541  1957534257 
 2022-11-11 20:10:44  x     SwtSubWindow.java                        ::         24.017 -1500009239 
-2022-10-30 00:32:49  x     SwtTabbedPanel.java                      ::          9.807  0347731731 
+2022-11-12 13:17:35  x     SwtTabbedPanel.java                      ::          9.812 -0293831428 
 2022-11-11 12:09:32  x     SwtTable.java                            ::         41.157 -0329193749 
 2022-01-31 19:48:38  x     SwtTextBox.java                          ::         14.779 -0197457034 
 2022-11-11 12:07:27  x     SwtTextFieldWrapper.java                 ::         22.687  0915982355 

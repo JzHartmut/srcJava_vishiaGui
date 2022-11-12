@@ -66,7 +66,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
 
   private static final long serialVersionUID = 6448419343757106982L;
 
-  public SwtGridPanel(final GralPanelContent wdgg, final int style) {
+  public SwtGridPanel(final GralPanelContent wdgg, final char whatis, final int style) {
     super(wdgg);
     final SwtMng swtMng = (SwtMng) wdgg.gralMng()._mngImpl;
     final Composite parent = SwtMng.getSwtParent(wdgg.pos());
@@ -93,7 +93,9 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       }
       super.panelSwtImpl = panel;             // typed access in SwtPanel
       super.wdgimpl = panel;                  // unified access in GraLWidget 
-      panel.addControlListener(this.resizeItemListener);
+      if(whatis !='9') {
+        panel.addControlListener(this.resizeItemListener);
+      }
       panel.setData(this);
       panel.setLayout(null);
     

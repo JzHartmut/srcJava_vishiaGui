@@ -2,11 +2,83 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralRectangle;
 
+/**This is a special panel, enhances the {@link GralPanelContent}, with up to 9 areas for other panels or widgets.
+ * <pre>
+ * +=======+===============+===========+
+ * |  A1   |       A2      |    A3     | 
+ * +-------+---------------+-----------+ 
+ * |  B1   |       B2      |    B3     | 
+ * |       |               |           | 
+ * +-------+---------------+-----------+ 
+ * |  C1   |       C2      |    C3     | 
+ * |       |               |           | 
+ * +=======+===============+===========+
+ * </pre>
+ * The areas can be combined for one widget (usual a {@link GralTextBox} or a sub panel) for example in the form:
+ * <pre>
+ * +=======+===========================+
+ * |       |                           | 
+ * | tree  |     edit area,            | 
+ * | view  |     tables, etc           | 
+ * |       |                           | 
+ * +-------+---------------------------+ 
+ * |    output console text            | 
+ * |                                   | 
+ * +=======+===============+===========+
+ * </pre>
+ * The separation lines between the areas are movable with mouse.
+ * <br>
+ * To place widgets the {@link GralPos} for contents should be set with <code>"@area9,A1A2"</code> for example for the tree view area.
+ * or alternatively (here for the edit area) via <code>pos.setPositionSize(0, 1, 2, 2, 'r', pos)</code> 
+ * with numeric values 0..2 for the areas.
+ * @author Hartmut Schorrig
+ *
+ */
 public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc, GralWidget_ifc, GralVisibleWidgets_ifc{
 {
 
+  
+  /**Version, history and license.
+   * <ul>
+   * <li>2022-11-12 created following the concept idea of the older {@link org.vishia.gral.area9.GralArea9MainCmd}.
+   *   The last one should be removed in future. <br>
+   *   Why this is better: <ul>
+   *   <li>This class can used whenever a panel with areas are necessary also as sub panel, not only for the whole window.
+   *   <li>The GralArea9MainCmd is over-engineered, contains to much, especially the older {@link org.vishia.mainCmd.MainCmd}
+   *     which was one of the first ideas in my Java programming.
+   *   </ul>
+   *   This GralArea9Panel is more simple and lightweight. 
+   * </ul>
+   * 
+   * <b>Copyright/Copyleft</b>:<br>
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL is not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but doesn't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you intent to use this source without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   */
+  public static final in version = 20221112;
+
+  
+  
   /**All main components of the Display in each FrameArea. */
-  protected GralWidget[][] componentFrameArea = new GralPanelContent[3][3];
+  //protected GralWidget[][] componentFrameArea = new GralPanelContent[3][3];
 
   
   /**A little control to capture the mouse position for movement of area borders. */
@@ -18,15 +90,15 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    * [0] is always 0, [1] and [2] are the given borders, [3] is always 100.
    * It is because lower and higher bound should be accessed always without tests.
    * Use area +1, because it is a Off-by-one problem */
-  protected byte xpFrameArea[] = new byte[4],
-               ypFrameArea[] = new byte[4];
+  protected short xpFrameArea[] = new short[4],
+               ypFrameArea[] = new short[4];
   
   /**spread of each frame area in x direction.
    * It it is -1, than the area is occupied by another area.
    * If it is 0, the area is free.
    * 1..3 are the number of areas in horizontal direction.
    */
-  protected byte[][][] dxyFrameArea = new byte[3][3][2]; 
+  //protected byte[][][] dxyFrameArea = new byte[3][3][2]; 
   
   /**requested minimal size of each window area in GralPos units. If the minimal value is 0, 
    * the size is calculated from percent always. If the minimal value of percent calculation is lesser
@@ -42,15 +114,15 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    */
   private final short[] xMaxGralSize = new short[3], yMaxGralSize = new short[3];
 
-  public GralArea9Panel ( String name, GralPanelContent parent ) {
-    super(parent.pos(), "@0..0,0..0=" + name, '9', parent.itsMng);
+  public GralArea9Panel ( GralPos currPos, String posName, GralMng gralMng ) {
+    super(currPos, posName, gralMng);
     for(int ix = 0; ix < 3; ++ix) for(int iy = 0; iy < 3; ++iy){
       this.xMinGralSize[ix] = 4;
       this.yMinGralSize[iy] = 4;
       this.xMaxGralSize[ix] = Short.MAX_VALUE;
       this.yMaxGralSize[iy] = Short.MAX_VALUE;
     }
-    parent.addWidget(this, true);
+    setFrameAreaBorders(30,70,100, 30, 70, 100);
   }
 
   
@@ -58,12 +130,12 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    * where two horizontal and two vertical lines built them:
    * <pre>
    * +=======+===============+===========+
-   * |  A1   |       B1      |    C1     | 
+   * |  A1   |       A2      |    A3     | 
    * +-------+---------------+-----------+ 
-   * |  A2   |       B2      |    C2     | 
+   * |  B1   |       B2      |    B3     | 
    * |       |               |           | 
    * +-------+---------------+-----------+ 
-   * |  A3   |       B3      |    C3     | 
+   * |  C1   |       C2      |    C3     | 
    * |       |               |           | 
    * +=======+===============+===========+
    * </pre>
@@ -73,15 +145,15 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    * @param y1p percent from left for first horizontal divide line.
    * @param y2p percent from left for first horizontal divide line.
    */
-  public void setFrameAreaBorders(int x1p, int x2p, int y1p, int y2p)
+  public void setFrameAreaBorders(int x1p, int x2p, int xRange, int y1p, int y2p, int yRange)
   { this.xpFrameArea[0] = 0;
-    this.xpFrameArea[1] = (byte)x1p;
-    this.xpFrameArea[2] = (byte)x2p;
-    this.xpFrameArea[3] = 100;
+    this.xpFrameArea[1] = (short)x1p;
+    this.xpFrameArea[2] = (short)x2p;
+    this.xpFrameArea[3] = (short)xRange;
     this.ypFrameArea[0] = 0;
-    this.ypFrameArea[1] = (byte)y1p;
-    this.ypFrameArea[2] = (byte)y2p;
-    this.ypFrameArea[3] = 100;
+    this.ypFrameArea[1] = (short)y1p;
+    this.ypFrameArea[2] = (short)y2p;
+    this.ypFrameArea[3] = (short)yRange;
     validateFrameAreas();
   }
   

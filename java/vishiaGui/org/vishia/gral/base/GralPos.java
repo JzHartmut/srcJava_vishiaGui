@@ -518,12 +518,14 @@ public class GralPos implements Cloneable
           line.p1 = cc - 'A' + GralPos.areaNr;
           col.p1 = spPos.seekPos(1).getCurrentChar() - '1' +  + GralPos.areaNr;
           if(spPos.seekPos(1).scan().scanAnyChar("ABC").scanOk()) {
-            line.p2 = spPos.getLastScannedString().charAt(0) - 'A'  + GralPos.areaNr;
-            col.p2 = spPos.getCurrentChar() - '1'  + GralPos.areaNr;
+            line.p2 = spPos.getLastScannedString().charAt(0) - 'A' + 1  + GralPos.areaNr;
+            col.p2 = spPos.getCurrentChar() - '1' + 1 + GralPos.areaNr;
           } else {
-            line.p2 = line.p1;
-            col.p2 = col.p1;
+            line.p2 = line.p1+1;
+            col.p2 = col.p1+1;
           }
+          this.x.n2 = this.x.n2 = GralPos.areaNr;          // mark as area designation
+          this.y.n1 = -1; this.y.n1 = -1;                  // not a percent value, but resize.
         } else {
           //======>>>>>>
           scanPosition(spPos, line);
@@ -714,7 +716,7 @@ public class GralPos implements Cloneable
   
   /**Returns true if this position is from right or bottom, so that a resize of the parent needs new positions for this widget.
    */
-  public boolean toResize(){ return x.p1 < 0 || x.p2 <= 0 || y.p1< 0 || y.p2 <=0; }
+  public boolean toResize(){ return x.p1 < 0 || x.p2 <= 0 || y.p1< 0 || y.p2 <=0 || x.n1 >=0 || x.n2 >=0 || y.n1 >=0 || y.n2 >=0; }
   
   private void frac(float v, int[] pos, int ix){
     int i, f;
@@ -1008,22 +1010,38 @@ public class GralPos implements Cloneable
     //calculate pixel
     final int x1,y1, x2, y2;
     ///
-    
-    x1 = xPixelUnit * this.x.p1 + propertiesGui.xPixelFrac(this.x.p1Frac)  //negative if from right
-       + (this.x.p1 < 0 ? widthParentPixel : 0);  //from right
-    y1 = yPixelUnit * this.y.p1 + propertiesGui.yPixelFrac(this.y.p1Frac)  //negative if from right
-       + (this.y.p1 < 0 ? heightParentPixel : 0);  //from right
-    if(this.x.p2 == GralPos.useNatSize){
-      x2 = x1 + widthWidgetNat; 
+    if(this.x.n2 == areaNr) {                              // position as area number
+      if(! (this.parent instanceof GralArea9Panel)) {
+        throw new IllegalArgumentException("position is an area designation, outside of an area panel");
+      }
+      GralArea9Panel area9 = (GralArea9Panel)this.parent;
+      //-------------------------------------------------  calculate the pixel bounds from the area bounds
+      //..FrameArea[3] = nominal 100 for percent. FrameArea[0] is 0, FrameArea[1..2] are the middle lines in percent.
+      //Position values are 1, 2 or 3
+      assert(  this.x.p1 >=0 && this.x.p1 <=2 && this.x.p2 >=1 && this.x.p2 <=3
+            && this.y.p1 >=0 && this.y.p1 <=2 && this.y.p2 >=1 && this.y.p2 <=3);
+      x1 = (int)((float)area9.xpFrameArea[this.x.p1] / area9.xpFrameArea[3] * widthParentPixel);
+      x2 = (int)((float)area9.xpFrameArea[this.x.p2] / area9.xpFrameArea[3] * widthParentPixel);
+      y1 = (int)((float)area9.ypFrameArea[this.y.p1] / area9.ypFrameArea[3] * heightParentPixel);
+      y2 = (int)((float)area9.ypFrameArea[this.y.p2] / area9.ypFrameArea[3] * heightParentPixel);
+      
     } else {
-      x2 = xPixelUnit * this.x.p2 + propertiesGui.xPixelFrac(this.x.p2Frac)  //negative if from right
-         + (this.x.p2 < 0 || this.x.p2 == 0 && this.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
-    }
-    if(this.x.p2 == GralPos.useNatSize){
-      y2 = y1 + heightWidgetNat; 
-    } else {
-      y2 = yPixelUnit * this.y.p2 + propertiesGui.yPixelFrac(this.y.p2Frac)  //negative if from right
-         + (this.y.p2 < 0  || this.y.p2 == 0 && this.y.p2Frac == 0 ? heightParentPixel : 0);  //from right
+      x1 = xPixelUnit * this.x.p1 + propertiesGui.xPixelFrac(this.x.p1Frac)  //negative if from right
+         + (this.x.p1 < 0 ? widthParentPixel : 0);  //from right
+      y1 = yPixelUnit * this.y.p1 + propertiesGui.yPixelFrac(this.y.p1Frac)  //negative if from right
+         + (this.y.p1 < 0 ? heightParentPixel : 0);  //from right
+      if(this.x.p2 == GralPos.useNatSize){
+        x2 = x1 + widthWidgetNat; 
+      } else {
+        x2 = xPixelUnit * this.x.p2 + propertiesGui.xPixelFrac(this.x.p2Frac)  //negative if from right
+           + (this.x.p2 < 0 || this.x.p2 == 0 && this.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
+      }
+      if(this.x.p2 == GralPos.useNatSize){
+        y2 = y1 + heightWidgetNat; 
+      } else {
+        y2 = yPixelUnit * this.y.p2 + propertiesGui.yPixelFrac(this.y.p2Frac)  //negative if from right
+           + (this.y.p2 < 0  || this.y.p2 == 0 && this.y.p2Frac == 0 ? heightParentPixel : 0);  //from right
+      }
     }
     GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
     return rectangle;
@@ -1162,8 +1180,8 @@ public class GralPos implements Cloneable
      */
     int n1 = -1;
     ///
-    /**End Position in percent. */
-    int n2;
+    /**End Position in percent. If 0 and n1 ==-1 then p1, p2 are indices to grid values */
+    int n2 = -1;
     
     /**Fractional parts of position. Use 0..9 only. 
      * The fractional part counts from left to right respectively top to bottom 
@@ -1456,6 +1474,7 @@ public class GralPos implements Cloneable
     void set(Coordinate src){
       this.p1 = src.p1; this.p1Frac = src.p1Frac; this.p2 = src.p2; this.p2Frac = src.p2Frac;
       this.pb = src.pb; this.pbf = src.pbf;  
+      this.n1 = src.n1; this.n2 = src.n2;
       this.origin = src.origin; this.dirNext = Character.toLowerCase(src.dirNext);
     }
     

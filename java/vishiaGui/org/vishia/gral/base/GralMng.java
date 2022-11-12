@@ -1476,27 +1476,45 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  /**Add a standard window remove on close, resizeable.
+   * If it is the first call, this is the main window.
+   * @param posName Position at the screen or related to another window
+   * @param sTitle Title bar
+   * @return The GralWindow to add some more via concatenation.
+   */
   public GralWindow addWindow(String posName, String sTitle) {
     GralWindow wdgg = new GralWindow(this.currPos(), posName
-        , "sTitle"
+        , sTitle
         , GralWindow.windRemoveOnClose | GralWindow.windResizeable);
     return wdgg;
   }
  
   
+  /**Add a panel to any other panel or window.
+   * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
+   * @return GralPanelContent to set some more.
+   */
   public GralPanelContent addPanel(String posName) {
     GralPanelContent wdgg = new GralPanelContent(this.currPos(), posName, this);
     return wdgg;
   }
   
   
+  /**Add a panel with 9 areas to any other panel or window.
+   * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
+   * @return GralArea9Panel to set some more.
+   */
   public GralArea9Panel addArea9Panel(String posName) {
-    GralArea9Panel wdgg = new GralArea9Panel(posName, null);
+    GralArea9Panel wdgg = new GralArea9Panel(this.currPos(),posName, this);
     return wdgg;
   }
   
   
-  @Override public void addText(String name, CharSequence text){
+  /**Adds a text to a named widget.
+   * @deprecated, use the widget itself to add or call {@link #getWidget(String)} to search it.
+   *   It is over-engineered to offer all operations also in the GralMng. 
+   */
+  @Deprecated @Override public void addText(String name, CharSequence text){
     GralWidget widg;
     if( (widg = findWidget(name)) !=null){
       if(widg instanceof GralTextBox_ifc){
@@ -1510,6 +1528,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
 
   
+  /**Adds a text to a named widget.
+   * @deprecated, use the widget itself to add or call {@link #getWidget(String)} to search it.
+   *   It is over-engineered to offer all operations also in the GralMng. 
+   */
   @Override public GralWidget addText(String sText, int origin, GralColor textColor, GralColor backColor)
   {
     GralLabel widgg = new GralLabel(null, sText, origin);
@@ -1728,6 +1750,9 @@ public GralButton addCheckButton(
 }
 
 
+  /**@deprecated, use the widget itself to add or call {@link #getWidget(String)} to search it.
+   *   It is over-engineered to offer all operations also in the GralMng. 
+   */
   @Deprecated @Override public void setBackColor(GralWidget widg, int ix, int color)
   { widg.setBackColor(GralColor.getColor(color), ix);
   } 
@@ -1777,7 +1802,7 @@ public GralButton addCheckButton(
   }
   
   
-  @Override public void addLine(GralColor color, List<GralPoint> points){
+  @Deprecated @Override public void addLine(GralColor color, List<GralPoint> points){
     GralPanelContent panel = (GralPanelContent)pos().pos.parent;
     if(panel.canvas() !=null){
       panel.canvas().drawLine(pos().pos, color, points);
@@ -1788,7 +1813,7 @@ public GralButton addCheckButton(
   
 
   
-  @Override public void setLed(GralWidget widg, int colorBorder, int colorInner)
+  @Deprecated @Override public void setLed(GralWidget widg, int colorBorder, int colorInner)
   {
     ((GralLed)widg).setColor(GralColor.getColor(colorBorder), GralColor.getColor(colorInner));
   }
@@ -1806,12 +1831,12 @@ public GralButton addCheckButton(
 
   
   
-  @Override public void setFocus(GralWidget widgd)
+  @Deprecated @Override public void setFocus(GralWidget widgd)
   {
     widgd.setFocus();
   }
   
-  @Override public void notifyFocus(GralWidget widgd)
+  @Deprecated @Override public void notifyFocus(GralWidget widgd)
   {
     if(widgd.getDataPath() !=null) {  
       //regard only widgets with datapath, all other are not used.

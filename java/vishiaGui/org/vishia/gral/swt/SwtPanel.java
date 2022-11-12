@@ -277,6 +277,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   };
 
 
+
   public SelectionListener tabItemSelectListener = new SelectionListener(){
 
     @Override

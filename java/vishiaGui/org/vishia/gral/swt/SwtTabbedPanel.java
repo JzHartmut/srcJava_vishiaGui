@@ -99,7 +99,7 @@ public class SwtTabbedPanel extends GralTabbedPanel.ImplAccess
 	  if(yGrid <0 || xGrid <0){
 	    panel = new XXXSwtCanvasStorePanel(panelg, widgetSwt, 0, colorBackground, mng.gralMng);
 	  } else {
-	    panel = new SwtGridPanel(panelg, 0);
+	    panel = new SwtGridPanel(panelg, '9', 0);
 	  }
 //	  panel.swtCanvas.setBounds(sizeTabFolder);
 //	  panel.itsTabSwt = tabItem;

@@ -22,7 +22,9 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
+import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
 
 
@@ -872,26 +874,30 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    */
   public void createImplWidget_Gthread() throws IllegalStateException {
     if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
-      if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-        dyda.textFont = this.itsMng.propertiesGui.getTextFont(this.itsMng.pos().pos.height());
-        dyda.setChanged(ImplAccess.chgFont);
-      }
-      this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
-      if(this instanceof GralWindow) {
-        //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
-        //the implementation can decide whether the same implementation widget is used
-        //also for the GralPanelContent or create an own one.
-        ((GralWindow)this).mainPanel.createImplWidget_Gthread();
-      }
-      else if(this instanceof GralPanelContent) {
-        //------------------------------------------------ // a panel contains children, create it.
-        ((GralPanelContent)this).createChildrensImplWidget_Gthread();
-       }
-      if(this.contextMenu !=null) {
-        this.itsMng._mngImpl.createContextMenu(this);
+      try {
+        if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
+          dyda.textFont = this.itsMng.propertiesGui.getTextFont(this.itsMng.pos().pos.height());
+          dyda.setChanged(ImplAccess.chgFont);
+        }
+        this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
+        if(this instanceof GralWindow) {
+          //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
+          //the implementation can decide whether the same implementation widget is used
+          //also for the GralPanelContent or create an own one.
+          ((GralWindow)this).mainPanel.createImplWidget_Gthread();
+        }
+        else if(this instanceof GralPanelContent) {
+          //------------------------------------------------ // a panel contains children, create it.
+          ((GralPanelContent)this).createChildrensImplWidget_Gthread();
+         }
+        if(this.contextMenu !=null) {
+          this.itsMng._mngImpl.createContextMenu(this);
+        }
+      } catch(Throwable exc) {
+        System.err.println(ExcUtil.exceptionInfo("\nERROR: implementing widget " + this.name +": ", exc, 0,10));
       }
     } else {
-      throw new IllegalStateException("widget implementation already given. ");
+      System.err.println("\nERROR: widget implementation already given. ");
     }
 
   }

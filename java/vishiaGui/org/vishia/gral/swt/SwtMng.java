@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.vishia.gral.base.GralArea9Panel;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralCurveView;
@@ -464,12 +465,15 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     else if(widgg instanceof GralWindow) {
       wdga = new SwtSubWindow(this, (GralWindow)widgg);
     }
+    else if(widgg instanceof GralArea9Panel) {
+      wdga = new SwtPanelArea9((GralArea9Panel)widgg);
+    }
     else if(widgg instanceof GralPanelContent) {
       GralPanelContent widgp = (GralPanelContent)widgg;
 //      SwtPanel tab;
 //      if(widgp.canvas() !=null) { tab = new SwtCanvasStorePanel(widgp); }
 //      else 
-      wdga = new SwtGridPanel(widgp, 0);   // an SwtGridPanel is always also a SwtCanvasStrorePanel
+      wdga = new SwtGridPanel(widgp, '$', 0);   // an SwtGridPanel is always also a SwtCanvasStrorePanel
       GralWidget_ifc parent = widgg.pos().parent;
       if(parent instanceof GralTabbedPanel) {
         SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
