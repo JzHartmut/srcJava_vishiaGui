@@ -158,6 +158,8 @@ public class GralPos implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-12 accepts also a GralWindow instead a GralPanel to replace the {@link GralWindow#mainPanel}  
+   * <li>2022-11-11 accepts positions A1C3 for Area9 
    * <li>2022-10-27 new {@link #calcWidgetPosAndSize(GralGridProperties)} without more arguments. 
    *   If necessary this operation gets sizes from the parent pos. But it needs more time. 
    * <li>2022-08 refactored. Now also for textual configured Widgets the {@link #setPosition(CharSequence, GralPos)} is used.
@@ -265,6 +267,9 @@ public class GralPos implements Cloneable
    */
   public final static int samesize = 0x6000;
   
+  
+  /**Values 0ex001..0xe003 as number of a {@link GralArea9Panel} A..C for columns, 1..3 for rows */
+  public final static int areaNr = 0xe000;
 
   /**Bits in an integer position value for range and size.
    * of relative position values for size, percent and refer. The mask for the value is 0x1fff.
@@ -490,7 +495,10 @@ public class GralPos implements Cloneable
         if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
           String sPanel = spPos.getLastScannedString().toString();
           GralMng mng = this.parent.gralMng();              // use the gralMng given in the parent panel. 
-          GralPanel_ifc panel = mng.getPanel(sPanel);      // search the already created existing panel.
+          GralWidget_ifc panel = mng.getPanel(sPanel);      // search the already created existing panel.
+          if(panel == null) {
+            panel = mng.getWindow(sPanel);
+          }  
           if(panel == null) {
             spPos.close();
             throw new ParseException("GralPos.setPosition - unknown panel, " + sPanel, 0); 
@@ -505,14 +513,27 @@ public class GralPos implements Cloneable
         } else {
           posParent1 = refPos;  //the parent is valid. Because no other panel. Use the current panel.
         }
-        //======>>>>>>
-        scanPosition(spPos, line);
-        if(spPos.scan(",").scanOk()) {
-          //======>>>>>>
-          scanPosition(spPos, col);
+        char cc = spPos.getCurrentChar();
+        if(cc >='A' && cc <='C') {                         // positioning in a GralArea9Panel
+          line.p1 = cc - 'A' + GralPos.areaNr;
+          col.p1 = spPos.seekPos(1).getCurrentChar() - '1' +  + GralPos.areaNr;
+          if(spPos.seekPos(1).scan().scanAnyChar("ABC").scanOk()) {
+            line.p2 = spPos.getLastScannedString().charAt(0) - 'A'  + GralPos.areaNr;
+            col.p2 = spPos.getCurrentChar() - '1'  + GralPos.areaNr;
+          } else {
+            line.p2 = line.p1;
+            col.p2 = col.p1;
+          }
         } else {
-          col.p1 = line.p1 == next ? next : refer;         // line.next is set if nothing is scanned on line.
-          col.p2 = samesize;
+          //======>>>>>>
+          scanPosition(spPos, line);
+          if(spPos.scan(",").scanOk()) {
+            //======>>>>>>
+            scanPosition(spPos, col);
+          } else {
+            col.p1 = line.p1 == next ? next : refer;         // line.next is set if nothing is scanned on line.
+            col.p2 = samesize;
+          }
         }
       } finally {
         spPos.close();
@@ -1223,6 +1244,10 @@ public class GralPos implements Cloneable
           q1 = refCoord.p1; q1f = refCoord.p1Frac;             // don't change this coordinate. It may be the other one.              
         }//switch direction     
       } break;
+      case areaNr:
+        q1 = z - areaNr;
+        if(q1 <0 || q1 >3) { throw new IllegalArgumentException("area should be A1..C3"); }
+        break;
       default:
         throw new IllegalArgumentException("GralPos coord set, start value faulty case: 0x" + Integer.toHexString(zType));  
       } //switch for z coord
@@ -1254,6 +1279,10 @@ public class GralPos implements Cloneable
       case samesize:
         q2 = q1 + (refCoord.p2 - refCoord.p1);                 // use size of parent to calculate q2 from q1
         q2f = q1f + (refCoord.p2Frac - refCoord.p1Frac);       // same frac, note: the coord ready to use are absolutely.
+        break;
+      case areaNr:
+        q2 = ze - areaNr;
+        if(q2 <0 || q2 >3) { throw new IllegalArgumentException("area should be A1..C3"); }
         break;
       default:                                              
         throw new IllegalArgumentException("GralPos coord set, end value case missing: 0x" + Integer.toHexString(zeType));  

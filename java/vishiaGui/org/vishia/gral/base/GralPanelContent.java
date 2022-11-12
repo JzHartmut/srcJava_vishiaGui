@@ -30,6 +30,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   /**Version history:
    * 
    * <ul>
+   * <li>2022-11-12: can replace the {@link GralWindow#mainPanel} now. See {@link GralPanelContent#GralPanelContent(GralPos, String, char, GralMng)}.
    * <li>2022-09-25: own colors for grid lines used in implementation. 
    * <li>2022-09-14: new {@link #reportAllContent(Appendable)}
    * <li>2022-08: {@link Data#bTabbed} as designation, this is a tabbed panel.
@@ -73,7 +74,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20220915;
+  public final static int version = 20221112;
 
   //public GralPrimaryWindow_ifc mainWindow;
   
@@ -98,7 +99,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
     public List<GralWidget> widgetsToResize = new LinkedList<GralWidget>();
   
-    private final Map<String, GralWidget> idxWidgets = new TreeMap<String, GralWidget>();
+    protected final Map<String, GralWidget> idxWidgets = new TreeMap<String, GralWidget>();
   
     
     /*final*/ public GralPanelActivated_ifc notifyingUserInstanceWhileSelectingTab;
@@ -171,7 +172,22 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   //public PanelContent(CanvasStorePanel panelComposite)
   { super(currPos, posName, whatIsit, gralMng);
     gralMng.registerPanel(this);
-    if( pos()!=null) {
+    if(super._wdgPos.parent instanceof GralWindow) {       // replaces the main panel of the window:
+      GralWindow window = (GralWindow) super._wdgPos.parent;
+      GralPanelContent mainPanel = window.mainPanel;
+      if(mainPanel !=null) {
+        if(mainPanel._panel.idxWidgets.size() >0) {
+          throw new IllegalStateException("association of a main panel not possible, mainPanel " + mainPanel.name + " of window: " + window.name + " has already content." );
+        } else {
+          gralMng.deregisterPanel(mainPanel);
+        }
+      }
+      window.mainPanel = this;
+    } else {
+      GralPanelContent parentPanel = (GralPanelContent) super._wdgPos.parent;
+      parentPanel._panel.idxWidgets.put(this.name, this);
+    }
+    if( pos()!=null) {                                     // set the panel pos for gralMng
       gralMng.setPosPanel(this);
     }
     int property = 0; //TODO parameter
@@ -458,19 +474,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    */
   //public abstract Object getPanelImpl();
   
-  public void reportAllContent(Appendable out){
-    try {
-      reportAllContent(out, 0);
-      out.append("\n");
-    } catch(Exception exc) {
-      System.err.println("unexpected exception on reportAllContent: " + exc.getMessage());
-    }
-  }
-  
-  public void reportAllContent(Appendable out, int level) throws IOException {
+  void reportAllContent(Appendable out, int level) throws IOException {
     if(level < 20) {
       final String nl = "\n| | | |                               ";
-      out.append(nl.substring(0, 2*level+1)).append("Panel: ").append(this.name);
+      if(level >0) {
+        out.append(nl.substring(0, 2*level+1));
+      }
+      out.append("Panel: ").append(this.name);
       for(GralWidget widg: this._panel.widgetList) {
         if(widg instanceof GralPanelContent) {
           ((GralPanelContent)widg).reportAllContent(out, level+1);

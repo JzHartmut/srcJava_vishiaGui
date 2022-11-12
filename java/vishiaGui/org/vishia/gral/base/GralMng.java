@@ -1197,11 +1197,18 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  public GralWidget_ifc getWindow(String name){
+    return this.idxWindows.get(name);
+  }
+  
+  
+  
   public GralPanel_ifc getPanel(String name){
     return this.idxPanels.get(name);
   }
   
   
+
   public GralWindow getPrimaryWindow(){ return windPrimary; }
   
   
@@ -1222,7 +1229,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       //System.out.println("storeEventPaint, wakeup");
       this._mngImpl.wakeup();
    } else {
-      throw new IllegalArgumentException("can only store events of type GralDispatchCallbackWorker");
+      throw new IllegalArgumentException("can only store events of type GralGraphicTimeOrder");
     }
   }
 
@@ -1467,6 +1474,27 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     
   }
+  
+  
+  public GralWindow addWindow(String posName, String sTitle) {
+    GralWindow wdgg = new GralWindow(this.currPos(), posName
+        , "sTitle"
+        , GralWindow.windRemoveOnClose | GralWindow.windResizeable);
+    return wdgg;
+  }
+ 
+  
+  public GralPanelContent addPanel(String posName) {
+    GralPanelContent wdgg = new GralPanelContent(this.currPos(), posName, this);
+    return wdgg;
+  }
+  
+  
+  public GralArea9Panel addArea9Panel(String posName) {
+    GralArea9Panel wdgg = new GralArea9Panel(posName, null);
+    return wdgg;
+  }
+  
   
   @Override public void addText(String name, CharSequence text){
     GralWidget widg;

@@ -6,6 +6,7 @@ import java.text.ParseException;
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -343,9 +344,17 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
   
   
-  public void reportAllContent(Appendable out) throws IOException {
-    this.mainPanel.reportAllContent(out);
+  public void reportAllContent(Appendable out) {
+    try {
+      out.append("==== GralWindow.reportAllContent():\n");
+      out.append("Window: ").append(this.name).append(", main");
+      this.mainPanel.reportAllContent(out,0);
+      out.append("\n====\n");
+    } catch(Exception exc) {
+      System.err.println("unexpected exception on reportAllContent: " + exc.getMessage());
+    }
   }
+
   
   public void reportAllContentImpl(Appendable out) throws IOException {
     GralWindow.WindowImplAccess wdga = (GralWindow.WindowImplAccess)getImplAccess();

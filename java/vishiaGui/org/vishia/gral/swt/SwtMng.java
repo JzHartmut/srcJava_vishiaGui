@@ -1312,8 +1312,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows().entrySet()) {
       GralWindow wind = ewind.getValue();
       
-      out.append("\n==== Window: ").append(wind.getName()).append("\n");
+      out.append("\n==== SwtMng.reportContent: Window: ").append(wind.getName()).append("\n");
       reportContent(out, (Composite)getSwtImpl(wind), 0);
+      out.append("\n====\n");
     }
   }
   
@@ -1350,7 +1351,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override
   protected boolean dispatchOsEvents()
-  { return displaySwt.readAndDispatch();
+  { return this.displaySwt.readAndDispatch();
   }
 
   @Override

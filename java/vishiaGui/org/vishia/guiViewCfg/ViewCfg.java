@@ -289,7 +289,7 @@ public class ViewCfg //extends GuiCfg
     }
     GralWidget wdgbtnOnOff = gralMng.getWidget("btnOnOff");
     this.wdgbtnOnOff = wdgbtnOnOff instanceof GralButton ? (GralButton) wdgbtnOnOff : null;
-    this.window.mainPanel.reportAllContent(this.logCfg);
+    this.window.reportAllContent(this.logCfg);
     this.logCfg.flush();
     //
     //==================================================== // create implementation graphic

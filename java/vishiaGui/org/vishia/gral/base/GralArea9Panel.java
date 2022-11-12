@@ -2,7 +2,7 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralRectangle;
 
-public class GralArea9Panel  extends GralWidget //implements GralPanel_ifc, GralWidget_ifc, GralVisibleWidgets_ifc{
+public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc, GralWidget_ifc, GralVisibleWidgets_ifc{
 {
 
   /**All main components of the Display in each FrameArea. */
@@ -43,8 +43,7 @@ public class GralArea9Panel  extends GralWidget //implements GralPanel_ifc, Gral
   private final short[] xMaxGralSize = new short[3], yMaxGralSize = new short[3];
 
   public GralArea9Panel ( String name, GralPanelContent parent ) {
-    
-    super(parent.pos(), "@0..0,0..0=" + name, '9');
+    super(parent.pos(), "@0..0,0..0=" + name, '9', parent.itsMng);
     for(int ix = 0; ix < 3; ++ix) for(int iy = 0; iy < 3; ++iy){
       this.xMinGralSize[ix] = 4;
       this.yMinGralSize[iy] = 4;
@@ -59,12 +58,12 @@ public class GralArea9Panel  extends GralWidget //implements GralPanel_ifc, Gral
    * where two horizontal and two vertical lines built them:
    * <pre>
    * +=======+===============+===========+
+   * |  A1   |       B1      |    C1     | 
+   * +-------+---------------+-----------+ 
+   * |  A2   |       B2      |    C2     | 
    * |       |               |           | 
    * +-------+---------------+-----------+ 
-   * |       |               |           | 
-   * |       |               |           | 
-   * +-------+---------------+-----------+ 
-   * |       |               |           | 
+   * |  A3   |       B3      |    C3     | 
    * |       |               |           | 
    * +=======+===============+===========+
    * </pre>

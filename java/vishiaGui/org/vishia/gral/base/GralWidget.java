@@ -2234,10 +2234,11 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    */
   public ImplAccess getImplAccess(){ return _wdgImpl; }
   
+  //tag::repaintRequ[]
   /**This time order calls the {@link #repaintGthread()} in the graphical thread for this widget.
-   * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
+   * It is used with delay and wind up whenever {@link #redraw(int, int)} with an delay is called.
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
-   * till the next request of {@link #repaint(int, int)} or {@link #repaint()}.
+   * till the next request of {@link #redraw(int, int)} or {@link #redraw()}.
    */
   private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ", this.itsMng){
     @Override public void executeOrder() {
@@ -2245,6 +2246,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
+  //end::repaintRequ[]
   
   
   
