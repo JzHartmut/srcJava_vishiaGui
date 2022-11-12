@@ -65,14 +65,14 @@ public class FcmdStatus
   /**Builds the content of the file property window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindow()
-  { main._gralMng.selectPanel("primaryWindow");
-    main._gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+  { main.gui.gralMng.selectPanel("primaryWindow");
+    main.gui.gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
-    GralWindow window =  main._gralMng.createWindow("windStatus", "Status - The.file.Commander", windProps);
+    GralWindow window =  main.gui.gralMng.createWindow("windStatus", "Status - The.file.Commander", windProps);
     windStatus = window; 
-    main._gralMng.setPosition(3.5f, GralPos.size -3, 1, GralPos.size +5, 0, 'd');
-    widgCopy = main._gralMng.addButton("sCopy", main.copyCmd.actionConfirmCopy, "copy");
-    widgEsc = main._gralMng.addButton("dirBytes", actionButton, "esc");
+    main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, GralPos.size +5, 0, 'd');
+    widgCopy = main.gui.gralMng.addButton("sCopy", main.copyCmd.actionConfirmCopy, "copy");
+    widgEsc = main.gui.gralMng.addButton("dirBytes", actionButton, "esc");
   }
 
   /**Opens the view window and fills its content.

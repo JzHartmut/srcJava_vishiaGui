@@ -111,7 +111,7 @@ public class FcmdLeftMidRightPanel
    */
   void buildInitialTabs()
   {
-    GralMng mng = main._gralMng;
+    GralMng mng = main.gui.gralMng;
     String sName = "Sel" + cNr;
     //inside the left/mid/right tabbed panel: create the panel which contains a tabbed panel for selection
     String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;

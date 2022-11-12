@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.vishia.commander.Fcmd;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;

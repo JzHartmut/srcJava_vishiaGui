@@ -16,6 +16,7 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageBase;
 import org.vishia.util.Assert;
 
 /**This class supports output of messages in a GralTable to view and scroll.
@@ -26,7 +27,7 @@ import org.vishia.util.Assert;
  * @author Hartmut Schorrig
  *
  */
-public class GralMsgOutputList  implements LogMessage
+public class GralMsgOutputList  extends LogMessageBase
 {
 
   /**Version, history and license.

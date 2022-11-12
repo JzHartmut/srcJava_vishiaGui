@@ -416,6 +416,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     public GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }
 
     
+    protected final GralMenu getMenubar() { return this.gralWindow.menuBarGral; }
+    
     abstract public void reportAllContentImpl(Appendable out) throws IOException;
 
     

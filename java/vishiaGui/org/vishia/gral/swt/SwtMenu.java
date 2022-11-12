@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.Assert;
@@ -85,6 +86,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
   {
     gralMenu.super(widgg);
     this.window = parent.getShell();
+    
     this.menuSwt = new Menu(parent);
     parent.setMenu(menuSwt);
     _implMenu();
@@ -96,7 +98,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
    * @param window
    * @param mng
    */
-  protected SwtMenu(GralMenu gralMenu, GralWidget widgg, Shell window)
+  protected SwtMenu(GralWindow widgg, GralMenu gralMenu, Shell window)
   {
     gralMenu.super(widgg);
     this.window = window;
@@ -106,7 +108,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
       window.setMenuBar(menuWindow);
     }
     this.menuSwt = menuWindow;
-    
+    _implMenu();
   }
 
   

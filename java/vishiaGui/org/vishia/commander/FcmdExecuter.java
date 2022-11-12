@@ -24,6 +24,7 @@ import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.DataAccess;
 import org.vishia.util.KeyCode;
 
@@ -67,7 +68,7 @@ public class FcmdExecuter
   
   
   /**For output messages. */
-  final MainCmd_ifc console;
+  final LogMessage console;
 
   private final Fcmd main;
   
@@ -103,7 +104,7 @@ public class FcmdExecuter
 
 
   
-  FcmdExecuter(MainCmd_ifc console, Appendable outStatus, Fcmd main)
+  FcmdExecuter(LogMessage console, Appendable outStatus, Fcmd main)
   { this.main = main;
     this.console = console;
     //this.cmdQueue = new CmdQueue(outStatus);

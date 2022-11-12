@@ -73,7 +73,7 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final in version = 20221112;
+  @SuppressWarnings("hiding") public static final int version = 20221112;
 
   
   
@@ -160,11 +160,13 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
   
 
   
-  public void addFrameArea(String sArea, GralWidget component)
-  throws IndexOutOfBoundsException {
-    GralRectangle r = convertArea(sArea);
-    addFrameArea(r.x, r.y, r.dx, r.dy, component);
+  public void XXXaddFrameArea(String sArea, GralWidget component) {
+    
   }
+//  throws IndexOutOfBoundsException {
+//    GralRectangle r = convertArea(sArea);
+//    addFrameArea(r.x, r.y, r.dx, r.dy, component);
+//  }
  
   
   /**Sets a Component into a defined area. See {@link #setFrameAreaBorders(int, int, int, int)}.
@@ -176,48 +178,48 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    * @param component The component.
    * @throws IndexOutOfBoundsException if the arguments are false or the area is occupied already.
    */
-  public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralWidget component)
-  throws IndexOutOfBoundsException
-  { //int idxArea = (x -1) + 3 * (y -1);
-    //Composite component = new Composite(swtWindow.graphicThreadSwt, SWT.NONE);
-    if(  xArea <1 || xArea > componentFrameArea[0].length
-      || dxArea < 1
-      || xArea+dxArea-2 > componentFrameArea[0].length
-      || yArea <1 || yArea > componentFrameArea.length
-      || dyArea < 1
-      || yArea+dyArea-1 > componentFrameArea.length
-      ) 
-      throw new IndexOutOfBoundsException("failed argument");
-    for(int idxArea = xArea-1; idxArea <= xArea + dxArea -2; idxArea++)
-    { for(int idyArea = yArea-1; idyArea <= yArea + dyArea -2; idyArea++)
-      { if(dxyFrameArea[idyArea][idxArea][0] != 0) throw new IndexOutOfBoundsException("area occupied already");
-      }
-    }
-    for(int idxArea = xArea-1; idxArea <= xArea + dxArea -2; idxArea++)
-    { for(int idyArea = yArea-1; idyArea <= yArea + dyArea -2; idyArea++)
-      { dxyFrameArea[idyArea][idxArea][0] = -1; //ocuupy it.
-      }
-    }
-    dxyFrameArea[yArea-1][xArea-1][0] = (byte)dxArea;
-    dxyFrameArea[yArea-1][xArea-1][1] = (byte)dyArea;
-    //JScrollPane scrollPane = new JScrollPane(component);
-    //scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-    //scrollPane.setViewportView(component);
-    componentFrameArea[yArea-1][xArea-1] = component; //scrollPane;
-    //setBoundsForFrameArea(xArea-1, yArea-1);
-    //scrollPane.validate();
-    //swtWindow.graphicThreadSwt.add(component); //scrollPane);
-    /*TODO
-      ((Control)component.getWidgetImplementation()).addMouseListener(mouseListener);
-      if(yAreaMover[1] == null){
-        yAreaMover[1] = new Canvas(swtWindow.graphicThreadSwt.windowSwt, SWT.None);
-        yAreaMover[1].setSize(10,10);
-        yAreaMover[1].setBackground(swtWindow.graphicThreadSwt.displaySwt.getSystemColor(SWT.COLOR_GREEN));
-      }
-    */
-    validateFrameAreas();
-    //return component;
-  }
+//  public final void addFrameArea(int xArea, int yArea, int dxArea, int dyArea, GralWidget component)
+//  throws IndexOutOfBoundsException
+//  { //int idxArea = (x -1) + 3 * (y -1);
+//    //Composite component = new Composite(swtWindow.graphicThreadSwt, SWT.NONE);
+//    if(  xArea <1 || xArea > componentFrameArea[0].length
+//      || dxArea < 1
+//      || xArea+dxArea-2 > componentFrameArea[0].length
+//      || yArea <1 || yArea > componentFrameArea.length
+//      || dyArea < 1
+//      || yArea+dyArea-1 > componentFrameArea.length
+//      ) 
+//      throw new IndexOutOfBoundsException("failed argument");
+//    for(int idxArea = xArea-1; idxArea <= xArea + dxArea -2; idxArea++)
+//    { for(int idyArea = yArea-1; idyArea <= yArea + dyArea -2; idyArea++)
+//      { if(dxyFrameArea[idyArea][idxArea][0] != 0) throw new IndexOutOfBoundsException("area occupied already");
+//      }
+//    }
+//    for(int idxArea = xArea-1; idxArea <= xArea + dxArea -2; idxArea++)
+//    { for(int idyArea = yArea-1; idyArea <= yArea + dyArea -2; idyArea++)
+//      { dxyFrameArea[idyArea][idxArea][0] = -1; //ocuupy it.
+//      }
+//    }
+//    dxyFrameArea[yArea-1][xArea-1][0] = (byte)dxArea;
+//    dxyFrameArea[yArea-1][xArea-1][1] = (byte)dyArea;
+//    //JScrollPane scrollPane = new JScrollPane(component);
+//    //scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//    //scrollPane.setViewportView(component);
+//    componentFrameArea[yArea-1][xArea-1] = component; //scrollPane;
+//    //setBoundsForFrameArea(xArea-1, yArea-1);
+//    //scrollPane.validate();
+//    //swtWindow.graphicThreadSwt.add(component); //scrollPane);
+//    /*TODO
+//      ((Control)component.getWidgetImplementation()).addMouseListener(mouseListener);
+//      if(yAreaMover[1] == null){
+//        yAreaMover[1] = new Canvas(swtWindow.graphicThreadSwt.windowSwt, SWT.None);
+//        yAreaMover[1].setSize(10,10);
+//        yAreaMover[1].setBackground(swtWindow.graphicThreadSwt.displaySwt.getSystemColor(SWT.COLOR_GREEN));
+//      }
+//    */
+//    validateFrameAreas();
+//    //return component;
+//  }
 
   
   

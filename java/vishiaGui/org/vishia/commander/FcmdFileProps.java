@@ -130,21 +130,21 @@ public class FcmdFileProps
     } else {
       bUnixSystem = System.getenv("WINDIR") == null;
     }
-    main._gralMng.selectPanel("primaryWindow");
-    main._gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gui.gralMng.selectPanel("primaryWindow");
+    main.gui.gralMng.setPosition(-30, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
-    GralWindow window =  main._gralMng.createWindow("windProp", "file properties - The.file.Commander", windProps);
+    GralWindow window =  main.gui.gralMng.createWindow("windProp", "file properties - The.file.Commander", windProps);
     windFileProps = window; 
-    main._gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
-    widgLink = main._gralMng.addTextField("link", false, "symbolic link", "t");
-    widgDir = main._gralMng.addTextField("dir", false, "directory path", "t");
-    main._gralMng.setPosition(10, GralPos.size -4, 1, -1, 0, 'd');
-    widgName = main._gralMng.addTextField("name", true, "filename", "t");
-    main._gralMng.setPosition(14, GralPos.size -3.5f, 1, 24, 0, 'r');
-    widgLength = main._gralMng.addTextField("length", false, "file-length", "t");
-    main._gralMng.setPosition(14, GralPos.size -3.5f, 25, -1, 0, 'r');
-    widgDate = main._gralMng.addTextField("data", true, "last modified", "t");
-    GralColor colorBack = main._gralMng.propertiesGui.colorBackground_;
+    main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
+    widgLink = main.gui.gralMng.addTextField("link", false, "symbolic link", "t");
+    widgDir = main.gui.gralMng.addTextField("dir", false, "directory path", "t");
+    main.gui.gralMng.setPosition(10, GralPos.size -4, 1, -1, 0, 'd');
+    widgName = main.gui.gralMng.addTextField("name", true, "filename", "t");
+    main.gui.gralMng.setPosition(14, GralPos.size -3.5f, 1, 24, 0, 'r');
+    widgLength = main.gui.gralMng.addTextField("length", false, "file-length", "t");
+    main.gui.gralMng.setPosition(14, GralPos.size -3.5f, 25, -1, 0, 'r');
+    widgDate = main.gui.gralMng.addTextField("data", true, "last modified", "t");
+    GralColor colorBack = main.gui.gralMng.propertiesGui.colorBackground_;
     GralColor colorText = GralColor.getColor("bk");
     int ii;
     GralColor colorOn = GralColor.getColor("lgn");
@@ -152,71 +152,71 @@ public class FcmdFileProps
     GralColor colorDis = GralColor.getColor("gr");
     String textOn = "X", textOff = " ", textDis = "?";
     
-    main._gralMng.setPosition(17, GralPos.size -2, 1, 20, 0, 'r', 0.2f);
-    widgBtnDirBytes = main._gralMng.addButton("dirBytes", actionBtnCntLen, "dirBytes", null, main.idents.buttonFilePropsCntLen);
+    main.gui.gralMng.setPosition(17, GralPos.size -2, 1, 20, 0, 'r', 0.2f);
+    widgBtnDirBytes = main.gui.gralMng.addButton("dirBytes", actionBtnCntLen, "dirBytes", null, main.idents.buttonFilePropsCntLen);
     widgBtnDirBytes.setDisableColorText(colorDis, " (file) ");
     //widgDirectory = main.gralMng.addCheckButton("FileProp:btndir", textOn, textOff, textDis, colorOn, colorOff, colorDis);
     //main.gralMng.addText("directory"); 
-    main._gralMng.setPosition(17, GralPos.size -2, 22, GralPos.size +2, 0, 'r', 0.2f);
-    widgHidden = main._gralMng.addCheckButton("FileProp:btnhidden", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-    main._gralMng.addText("hidden"); 
+    main.gui.gralMng.setPosition(17, GralPos.size -2, 22, GralPos.size +2, 0, 'r', 0.2f);
+    widgHidden = main.gui.gralMng.addCheckButton("FileProp:btnhidden", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+    main.gui.gralMng.addText("hidden"); 
     
     //bUnixSystem = true;
     if(bUnixSystem){
-      main._gralMng.setPosition(20, GralPos.size -2, 10, 28, 0, 'd');
-      widGetAllProps = main._gralMng.addButton("buttonFilePropsGetAll", actionButton, "getAll", null, main.idents.buttonFilePropsGetAll);
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 10, 28, 0, 'd');
+      widGetAllProps = main.gui.gralMng.addButton("buttonFilePropsGetAll", actionButton, "getAll", null, main.idents.buttonFilePropsGetAll);
 
-      main._gralMng.setPosition(20, GralPos.size -2, 1, GralPos.size +2, 0, 'd');
-      main._gralMng.addText("rd");
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 1, GralPos.size +2, 0, 'd');
+      main.gui.gralMng.addText("rd");
       widgRd = new GralButton[3];
       for(ii=0; ii < 3; ++ii){
-        widgRd[ii] = main._gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+        widgRd[ii] = main.gui.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
         //widgReadonly[ii] = main.gralMng.addSwitchButton("FileProp:btnro", "X", " ", GralColor.getColor("wh"), GralColor.getColor("lgn"));
       }
-      main._gralMng.setPosition(20, GralPos.size -2, 4, GralPos.size +2, 0, 'd');
-      main._gralMng.addText("wr"); 
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 4, GralPos.size +2, 0, 'd');
+      main.gui.gralMng.addText("wr"); 
       widgWr = new GralButton[3];
       for(ii=0; ii < 3; ++ii){
-        widgWr[ii] = main._gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+        widgWr[ii] = main.gui.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
       }
-      main._gralMng.setPosition(20, GralPos.size -2, 7, GralPos.size +2, 0, 'd');
-      main._gralMng.addText("ex");
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 7, GralPos.size +2, 0, 'd');
+      main.gui.gralMng.addText("ex");
       widgEx = new GralButton[3];
       for(ii=0; ii < 3; ++ii){
-        widgEx[ii] = main._gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+        widgEx[ii] = main.gui.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
       }
-      main._gralMng.setPosition(22, GralPos.size -2, 10, GralPos.size +6, 0, 'd');
-      main._gralMng.addText("owner");
-      main._gralMng.addText("group");
-      main._gralMng.addText("all");
-      main._gralMng.setPosition(22, GralPos.size -2, 18, GralPos.size +2, 0, 'r', 0.2f);
-      widgUID = main._gralMng.addCheckButton("FileProp:btnUID", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      main._gralMng.addText("UID"); 
-      main._gralMng.setPosition(24, GralPos.size -2, 18, GralPos.size +2, 0, 'r', 0.2f);
-      widgGID = main._gralMng.addCheckButton("FileProp:btnGID", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      main._gralMng.addText("GID"); 
-      main._gralMng.setPosition(26, GralPos.size -2, 18, GralPos.size +2, 0, 'r', 0.2f);
-      widgSticky = main._gralMng.addCheckButton("FileProp:btnSticky", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      main._gralMng.addText("sticky"); 
+      main.gui.gralMng.setPosition(22, GralPos.size -2, 10, GralPos.size +6, 0, 'd');
+      main.gui.gralMng.addText("owner");
+      main.gui.gralMng.addText("group");
+      main.gui.gralMng.addText("all");
+      main.gui.gralMng.setPosition(22, GralPos.size -2, 18, GralPos.size +2, 0, 'r', 0.2f);
+      widgUID = main.gui.gralMng.addCheckButton("FileProp:btnUID", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      main.gui.gralMng.addText("UID"); 
+      main.gui.gralMng.setPosition(24, GralPos.size -2, 18, GralPos.size +2, 0, 'r', 0.2f);
+      widgGID = main.gui.gralMng.addCheckButton("FileProp:btnGID", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      main.gui.gralMng.addText("GID"); 
+      main.gui.gralMng.setPosition(26, GralPos.size -2, 18, GralPos.size +2, 0, 'r', 0.2f);
+      widgSticky = main.gui.gralMng.addCheckButton("FileProp:btnSticky", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      main.gui.gralMng.addText("sticky"); 
     } else {
-      main._gralMng.setPosition(20, GralPos.size -2, 1, GralPos.size +2, 0, 'd');
-      main._gralMng.addText("rd");
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 1, GralPos.size +2, 0, 'd');
+      main.gui.gralMng.addText("rd");
       widgRd = new GralButton[1];
-      widgRd[0] = main._gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      main._gralMng.setPosition(20, GralPos.size -2, 4, GralPos.size +2, 0, 'd');
-      main._gralMng.addText("wr"); 
+      widgRd[0] = main.gui.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 4, GralPos.size +2, 0, 'd');
+      main.gui.gralMng.addText("wr"); 
       widgWr = new GralButton[1];
-      widgWr[0] = main._gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      main._gralMng.setPosition(20, GralPos.size -2, 7, GralPos.size +2, 0, 'd');
-      main._gralMng.addText("ex");
+      widgWr[0] = main.gui.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      main.gui.gralMng.setPosition(20, GralPos.size -2, 7, GralPos.size +2, 0, 'd');
+      main.gui.gralMng.addText("ex");
       widgEx = new GralButton[1];
-      widgEx[0] = main._gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      widgEx[0] = main.gui.gralMng.addCheckButton("FileProp:btnro", textOn, textOff, textDis, colorOn, colorOff, colorDis);
       
     }
-    main._gralMng.setPosition(-12, GralPos.size +3, -16, -1, 0, 'd',1);
-    widgCopyFile =  main._gralMng.addButton("buttonFilePropsCopy", actionButton, sCmdCopy, null,  main.idents.buttonFilePropsCopy);
-    widgChrRecurs =   main._gralMng.addButton("buttonFilePropsChgRecursive", actionButton, sCmdChgRecurs, null,  main.idents.buttonFilePropsChgRecurisve);
-    widgChgFile = main._gralMng.addButton("buttonFilePropsChg", actionButton, sCmdChg, null,  main.idents.buttonFilePropsChg);
+    main.gui.gralMng.setPosition(-12, GralPos.size +3, -16, -1, 0, 'd',1);
+    widgCopyFile =  main.gui.gralMng.addButton("buttonFilePropsCopy", actionButton, sCmdCopy, null,  main.idents.buttonFilePropsCopy);
+    widgChrRecurs =   main.gui.gralMng.addButton("buttonFilePropsChgRecursive", actionButton, sCmdChgRecurs, null,  main.idents.buttonFilePropsChgRecurisve);
+    widgChgFile = main.gui.gralMng.addButton("buttonFilePropsChg", actionButton, sCmdChg, null,  main.idents.buttonFilePropsChg);
   }
   
   

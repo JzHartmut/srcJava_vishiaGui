@@ -69,23 +69,23 @@ public class FcmdStatusLine
   
   
   void buildGraphic(){
-    this.main._gralMng.setPosition(0, 2, 0, 0, 1, 'r');
-    this.widgFilePath = this.main._gralMng.addTextField(this.main.nameTextFieldFilePath, false, null, null);
+    this.main.gui.gralMng.setPosition(0, 2, 0, 0, 1, 'r');
+    this.widgFilePath = this.main.gui.gralMng.addTextField(this.main.nameTextFieldFilePath, false, null, null);
     this.widgFilePath.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.pathCurr.");
     this.widgFilePath.setDragEnable(this.main.actionDragFileFromStatusLine, KeyCode.dragFiles);
     GralMenu menuWidg = this.widgFilePath.getContextMenu();
     menuWidg.addMenuItem("menuContextShowBackslash", this.main.idents.menuContextShowBackslash, this.actionShowBackslash);
     menuWidg.addMenuItem("menuContextShowSlash", this.main.idents.menuContextShowSlash, this.actionShowSlash);
-    this.main._gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
-    this.widgRunInfo = this.main._gralMng.addTextField(this.main.nameTextFieldRunInfo, false, null, null);
+    this.main.gui.gralMng.setPosition(2, 4, 0, 9.8f, 1, 'r');
+    this.widgRunInfo = this.main.gui.gralMng.addTextField(this.main.nameTextFieldRunInfo, false, null, null);
     this.widgRunInfo.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.runInfo.");
-    this.main._gralMng.setPosition(2, 4, 10, -8, 1, 'r');
-    this.widgFileInfo = this.main._gralMng.addTextField(this.main.nameTextFieldInfo, false, null, null);
+    this.main.gui.gralMng.setPosition(2, 4, 10, -8, 1, 'r');
+    this.widgFileInfo = this.main.gui.gralMng.addTextField(this.main.nameTextFieldInfo, false, null, null);
     this.widgFileInfo.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.fileInfo.");
-    this.main._gralMng.setPosition(2, 4, -8, -5, 1, 'r', 1);
-    this.widgSyncInfoLeft = this.main._gralMng.addTextField(this.main.nameTextFieldInfo, false, null, null);
+    this.main.gui.gralMng.setPosition(2, 4, -8, -5, 1, 'r', 1);
+    this.widgSyncInfoLeft = this.main.gui.gralMng.addTextField(this.main.nameTextFieldInfo, false, null, null);
     this.widgSyncInfoLeft.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.syncInfo.");
-    this.widgSyncInfoRight = this.main._gralMng.addTextField("syncInforRight", false, null, null);
+    this.widgSyncInfoRight = this.main.gui.gralMng.addTextField("syncInforRight", false, null, null);
     this.widgSyncInfoRight.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.syncInfo.");
 
   }

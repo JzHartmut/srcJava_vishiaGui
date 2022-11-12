@@ -61,7 +61,7 @@ public class FcmdButtons
 
   FcmdButtons(Fcmd main){
     this.main = main;
-    main._gralMng.setMainKeyAction(actionMainKeys);
+    main.gui.gralMng.setMainKeyAction(actionMainKeys);
   }
   
   static class ButtonAction{
@@ -170,7 +170,7 @@ public class FcmdButtons
    */
   private void addButton(int idx, Iterator<Map.Entry<String, ButtonAction>> iterButtonAction){
     ButtonAction button = getNext(idx, iterButtonAction);
-    GralButton gralButton = main._gralMng.addButton(button.button, button.action, button.text);
+    GralButton gralButton = main.gui.gralMng.addButton(button.button, button.action, button.text);
     gralButton.setHtmlHelp(":Fcmd.html#Topic.FcmdHelp.Button." + button.text + ".");
     //keyAction[idx] = button.action;
   }
@@ -245,44 +245,44 @@ public class FcmdButtons
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     
-    main._gralMng.selectPanel("Buttons");
+    main.gui.gralMng.selectPanel("Buttons");
     main.statusLine.buildGraphic();
     
-    main._gralMng.setPosition(4, GralPos.size + 1, 10, 20, 1, 'r');
-    main._gralMng.addText("F1");
-    main._gralMng.addText("F2");
-    main._gralMng.addText("F3");
-    main._gralMng.addText("F4");
-    main._gralMng.addText("F5");
-    main._gralMng.addText("F6");
-    main._gralMng.addText("F7");
-    main._gralMng.addText("F8");
-    main._gralMng.addText("F9");
-    main._gralMng.addText("F10");
-    main._gralMng.setPosition(7, GralPos.size +2, 0, 4, 1, 'd');
-    main._gralMng.addText("alt -");
-    main._gralMng.addText("ctr -");
-    main._gralMng.addText("shctr-");
-    main._gralMng.addText("sh  -");
+    main.gui.gralMng.setPosition(4, GralPos.size + 1, 10, 20, 1, 'r');
+    main.gui.gralMng.addText("F1");
+    main.gui.gralMng.addText("F2");
+    main.gui.gralMng.addText("F3");
+    main.gui.gralMng.addText("F4");
+    main.gui.gralMng.addText("F5");
+    main.gui.gralMng.addText("F6");
+    main.gui.gralMng.addText("F7");
+    main.gui.gralMng.addText("F8");
+    main.gui.gralMng.addText("F9");
+    main.gui.gralMng.addText("F10");
+    main.gui.gralMng.setPosition(7, GralPos.size +2, 0, 4, 1, 'd');
+    main.gui.gralMng.addText("alt -");
+    main.gui.gralMng.addText("ctr -");
+    main.gui.gralMng.addText("shctr-");
+    main.gui.gralMng.addText("sh  -");
 
-    main._gralMng.setPosition(5, 7, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(5, 7, 4, 14, 1, 'r');
     int idx;
     for(idx = 0; idx < 10; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(7, 9, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(7, 9, 4, 14, 1, 'r');
     for(idx = 10; idx < 20; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(9, 11, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(9, 11, 4, 14, 1, 'r');
     for(idx = 20; idx < 30; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(11, 13, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(11, 13, 4, 14, 1, 'r');
     for(idx = 30; idx < 40; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(13, 15, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(13, 15, 4, 14, 1, 'r');
     for(idx = 40; idx < 50; ++idx){
       addButton(idx, iterButtonAction);
     }

@@ -25,6 +25,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.FileWriter;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPart;
@@ -155,7 +156,7 @@ class FcmdFavorPathSelector
   List<FavorPath> listAllFavorPaths = new LinkedList<FavorPath>();
   
   /**For output messages. */
-  final MainCmd_ifc console;
+  final LogMessage console;
   
   
   /**The last selected SelectInfo independent from the panel left, mid, right is never used. remove it. */
@@ -184,10 +185,10 @@ class FcmdFavorPathSelector
   
   WindowConfirmAddFavorite windAddFavorite = new WindowConfirmAddFavorite();
   
-  FcmdFavorPathSelector(MainCmd_ifc console, Fcmd main)
+  FcmdFavorPathSelector(LogMessage console, Fcmd main)
   { this.main = main;
     this.console = console;
-    this.mng = main._gralMng;
+    this.mng = main.gui.gralMng;
     this.panelLeft = new FcmdLeftMidRightPanel(main, null, 'l', '1', this.mng); 
     this.panelMid = new FcmdLeftMidRightPanel(main, null, 'm','2',  this.mng); 
     this.panelRight = new FcmdLeftMidRightPanel(main, this.panelMid, 'r', '3',  this.mng);
@@ -224,32 +225,32 @@ class FcmdFavorPathSelector
 
 
     
-    main._gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
+    main.gui.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
-    main._gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gui.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     
 
-    windAddFavorite.window = main._gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
+    windAddFavorite.window = main.gui.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
         
-    main._gralMng.setPosition(4, GralPos.size -4, 1, GralPos.size +34, 0, 'r');
-    windAddFavorite.widgLabel = main._gralMng.addTextField("addFavoriteTab", true, "label", "t");
+    main.gui.gralMng.setPosition(4, GralPos.size -4, 1, GralPos.size +34, 0, 'r');
+    windAddFavorite.widgLabel = main.gui.gralMng.addTextField("addFavoriteTab", true, "label", "t");
     windAddFavorite.widgLabel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.tab.");
-    main._gralMng.setPosition(4, GralPos.size -4, 35, GralPos.size +10, 0, 'r');
-    windAddFavorite.widgPersistent = main._gralMng.addTextField("addFavoriteTab", true, "lmr ?", "t");
+    main.gui.gralMng.setPosition(4, GralPos.size -4, 35, GralPos.size +10, 0, 'r');
+    windAddFavorite.widgPersistent = main.gui.gralMng.addTextField("addFavoriteTab", true, "lmr ?", "t");
     windAddFavorite.widgLabel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.persist.");
     
-    main._gralMng.setPosition(8, GralPos.size -4, 1, GralPos.size +45, 0, 'd');
-    windAddFavorite.widgShortName = main._gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", "t");
+    main.gui.gralMng.setPosition(8, GralPos.size -4, 1, GralPos.size +45, 0, 'd');
+    windAddFavorite.widgShortName = main.gui.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", "t");
     windAddFavorite.widgShortName.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.alias.");
-    windAddFavorite.widgPath = main._gralMng.addTextField("addFavoritePath", true, "the directory path", "t");
+    windAddFavorite.widgPath = main.gui.gralMng.addTextField("addFavoritePath", true, "the directory path", "t");
     windAddFavorite.widgPath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.dir.");
     
-    main._gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
-    main._gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, "esc");
-    main._gralMng.setPosition(-4, -1, -14, GralPos.size +6, 0, 'r',1);
-    GralWidget widg = main._gralMng.addButton("addFavoriteOk", actionAddFavorite, "temp", null, "temp");
+    main.gui.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
+    main.gui.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, "esc");
+    main.gui.gralMng.setPosition(-4, -1, -14, GralPos.size +6, 0, 'r',1);
+    GralWidget widg = main.gui.gralMng.addButton("addFavoriteOk", actionAddFavorite, "temp", null, "temp");
     widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.temp.");
-    widg = main._gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, "Save");
+    widg = main.gui.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, "Save");
     widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.save.");
   
   }

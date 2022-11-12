@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWindow_setifc;
@@ -210,9 +211,13 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     }
     window.addFocusListener(mng.focusListener);
     //window.add
-    if((windProps & GralWindow.windHasMenu) !=0){
-      Menu menuBarSwt = new Menu(window, SWT.BAR);
-      window.setMenuBar(menuBarSwt);
+    //if((windProps & GralWindow.windHasMenu) !=0){
+    GralMenu menu = getMenubar();
+    if(menu !=null){
+      //this.mngImpl.createContextMenu(menu);
+      SwtMenu swtMenu = new SwtMenu(gralWindow, menu, window);
+//      Menu menuBarSwt = new Menu(window, SWT.BAR);
+//      window.setMenuBar(menuBarSwt);
     }
     //super.panelComposite = window;
     if(sTitle !=null){ window.setText(sTitle); }

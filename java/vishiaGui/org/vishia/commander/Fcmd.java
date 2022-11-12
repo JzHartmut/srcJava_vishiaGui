@@ -22,17 +22,21 @@ import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.area9.GuiCallingArgs;
 import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.base.GralArea9Panel;
+//import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.jztxtcmd.JZtxtcmd;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.msgDispatch.MsgRedirectConsole;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
@@ -42,7 +46,7 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class Fcmd extends GuiCfg
+public class Fcmd //extends GuiCfg
 {
 
 
@@ -143,7 +147,7 @@ public class Fcmd extends GuiCfg
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         if(cargs.msgConfig !=null && cargs.msgConfig.exists()){
-          msgDisp.readConfig(cargs.msgConfig);
+          //msgDisp.readConfig(cargs.msgConfig);
         }
         return true;
       } else return false;
@@ -319,7 +323,7 @@ public class Fcmd extends GuiCfg
   void openExtEditor(File file){
     JZtxtcmdScript.Subroutine jzsub = buttonCmds.get("edit");
     if( jzsub == null ) {
-      mainCmd.writeError("internal problem - don't find 'edit' command. ");
+      this.gui.writeError("internal problem - don't find 'edit' command. ");
     } else {
       String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
       System.out.println(sMsg);
@@ -343,7 +347,7 @@ public class Fcmd extends GuiCfg
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         JZtxtcmdScript.Subroutine jzsub = buttonCmds.get("edit");
         if (jzsub == null) {
-          mainCmd.writeError("internal problem - don't find 'edit' command. ");
+          Fcmd.this.gui.writeError("internal problem - don't find 'edit' command. ");
         } else {
         
           String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
@@ -470,7 +474,9 @@ public class Fcmd extends GuiCfg
   
   final CallingArgs cargs;
   
-  final MsgRedirectConsole msgDisp;
+  final FcmdGui gui = new FcmdGui();
+  
+  //final MsgRedirectConsole msgDisp;
   
   final FileCluster fileCluster = FileRemote.clusterOfApplication;
 
@@ -491,9 +497,9 @@ public class Fcmd extends GuiCfg
   GralPanelContent panelButtons;
 
   
-  final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(mainCmd, this);
+  final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(this.gui.log(), this);
 
-  final FcmdExecuter executer = new FcmdExecuter(mainCmd, gui.getOutputBox(), this);
+  final FcmdExecuter executer = new FcmdExecuter(this.gui.log(), this.gui.getOutputBox(), this);
 
   final FcmdSettings settings = new FcmdSettings(this);
   
@@ -560,20 +566,20 @@ public class Fcmd extends GuiCfg
 
   
   final List<Closeable> threadsToClose = new LinkedList<Closeable>();
-  
+
   /**Static reference for the main instance to access from any class in the package.
    * This static instance is set firstly in constructor, all other constructors in this package
    * can be used it therefore. Use {@link #main()}*/
   private static Fcmd main;
   
   
-  public Fcmd(CallingArgs cargs, GralArea9MainCmd cmdgui)
+  public Fcmd(CallingArgs cargs) //, GralArea9MainCmd cmdgui)
   {
-    super(cargs, cmdgui, null, null, null);
+    //super(cargs, cmdgui, null, null, null);
     this.cargs = cargs;
     //redirect all outputs to System.out, System.err and MainCmd to System.out and System.err with timestamp.
-    msgDisp = new MsgRedirectConsole(cmdgui, 0, null);
-    msgDisp.setIdThreadForMsgDispatching(Thread.currentThread().getId());
+    //msgDisp = new MsgRedirectConsole(cmdgui, 0, null);
+    //msgDisp.setIdThreadForMsgDispatching(Thread.currentThread().getId());
     //msgDisp.msgDispatcher.setOutputRoutine(4, "MainLogFile", true, true, cmdgui.getLogMessageOutputFile());
     //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
     actionReadMsgConfig.exec(KeyCode.menuEntered, null);
@@ -596,13 +602,13 @@ public class Fcmd extends GuiCfg
    * the window is initialized with an output area already. This is used for
    * output messages if problems occurs while build the rest of the GUI.
    */
-  @Override
+  //@Override
   protected void initGuiAreas(String sAreaMainPanel)
   {
     //panelBuildIfc.registerUserAction("KeyAction",
       //  keyActions.commanderKeyActions); // all key actions, registered central
 
-    this.gui.setFrameAreaBorders(30, 65, 70, 85); // x1, x2, y1, y2
+    this.gui.setFrameAreaBorders(30, 65, 100, 70, 85, 100); // x1, x2, y1, y2
     //gui.setStandardMenusGThread(new File("."), actionFile);
     //gui.addMenuItemGThread("menuBarFavorsLeft", idents.menuBarNavigationLeft, selectCardThemesLeft);
     //gui.addMenuItemGThread("menuBarFavorsMiddle", idents.menuBarNavigationMiddle, selectCardThemesMiddle);
@@ -612,24 +618,24 @@ public class Fcmd extends GuiCfg
     // gui.set
 
     // Creates tab-Panels for the file lists and command lists.
-    this._gralMng.selectPanel("primaryWindow");
-    this.favorPathSelector.panelLeft.tabbedPanelFileCards = this._gralMng.addTabbedPanel("File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    this.gui.addFrameArea("A1A1", this.favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
+    this.gui.gralMng.selectPanel("primaryWindow");
+    this.favorPathSelector.panelLeft.tabbedPanelFileCards = this.gui.gralMng.addTabbedPanel("@area9,A1A1=File0Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    //this.gui.area9.addFrameArea("A1A1", this.favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
 
     this.favorPathSelector.panelLeft.buildInitialTabs();
-    this._gralMng.selectPanel("primaryWindow");
-    this.favorPathSelector.panelMid.tabbedPanelFileCards = this._gralMng.addTabbedPanel("File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea("B1B1", this.favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
+    this.gui.gralMng.selectPanel("primaryWindow");
+    this.favorPathSelector.panelMid.tabbedPanelFileCards = this.gui.gralMng.addTabbedPanel("@area9,B1B1=File1Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    //gui.addFrameArea("B1B1", this.favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
     this.favorPathSelector.panelMid.buildInitialTabs();
 
-    this._gralMng.selectPanel("primaryWindow");
-    this.favorPathSelector.panelRight.tabbedPanelFileCards = this._gralMng.addTabbedPanel("File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
-    gui.addFrameArea("C1C1", this.favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
+    this.gui.gralMng.selectPanel("primaryWindow");
+    this.favorPathSelector.panelRight.tabbedPanelFileCards = this.gui.gralMng.addTabbedPanel("@area9,C1C1=File2Tab", null, GralMngBuild_ifc.propZoomedPanel);
+    //gui.addFrameArea("C1C1", this.favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
     this.favorPathSelector.panelRight.buildInitialTabs();
 
-    this._gralMng.selectPanel("primaryWindow");
-    panelButtons = this._gralMng.createGridPanel("Buttons", this._gralMng.getColor("gr"), 1, 1, 10, 10);
-    gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
+    this.gui.gralMng.selectPanel("primaryWindow");
+    panelButtons = this.gui.gralMng.createGridPanel("@area9,A3A3=Buttons", this.gui.gralMng.getColor("gr"), 1, 1, 10, 10);
+    //gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
 
     filesCp.buildGraphic();
     settings.buildWindow();  //F2
@@ -673,16 +679,16 @@ public class Fcmd extends GuiCfg
   protected final void initMain()
   {
     if (cargs.fileCfgCmds == null) {
-      mainCmd.writeError("Argument cmdcfg:CONFIGFILE should be given.");
+      this.gui.writeError("Argument cmdcfg:CONFIGFILE should be given.");
       // mainCmd.e
     } else if (cargs.fileCmdsForExt == null) {
-      mainCmd.writeError("Argument cmdext:CONFIGFILE should be given.");
+      this.gui.writeError("Argument cmdext:CONFIGFILE should be given.");
       // mainCmd.e
     } else if (cargs.fileCfgButtonCmds == null) {
-      mainCmd.writeError("Argument cmdButton:CONFIGFILE should be given.");
+      this.gui.writeError("Argument cmdButton:CONFIGFILE should be given.");
       // mainCmd.e
     } else if (cargs.fileSelectTabPaths == null) {
-      mainCmd.writeError("Argument sel:SELECTFILE should be given.");
+      this.gui.writeError("Argument sel:SELECTFILE should be given.");
       // mainCmd.e
     } else {
       String sError;
@@ -704,7 +710,7 @@ public class Fcmd extends GuiCfg
         sError = this.favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
       }
       if (sError != null) {
-        mainCmd.writeError("Error reading " + fileCfg.getAbsolutePath() + ": "
+        this.gui.writeError("Error reading " + fileCfg.getAbsolutePath() + ": "
             + sError);
       }
     }
