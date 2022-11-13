@@ -737,12 +737,12 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
    * @param size Presentation size. It is a character 'A'..'E', where 'A' is a small size. The size determines
    *        the font size especially. 
    */
-  public void createImplWidget_Gthread() //GralMngBuild_ifc panelMng)
-  { GralMng panelMng = GralMng.get();
-    //The macro widget consists of more as one widget. Position the inner widgets:
-    Debugutil.stop();
-  
-  }
+//  public void createImplWidget_Gthread() //GralMngBuild_ifc panelMng)
+//  { GralMng panelMng = GralMng.get();
+//    //The macro widget consists of more as one widget. Position the inner widgets:
+//    Debugutil.stop();
+//  
+//  }
   
   
   

@@ -188,9 +188,7 @@ public interface GralWidget_ifc extends Removeable
    */
   //void setToPanel(GralMngBuild_ifc mng);
   
-  /**Returns the associated singleton GralMng. The GralMng is associated only if the widget is setToPanel,
-   * see {@link #setToPanel(GralMngBuild_ifc)}.
-   * @return null if the Widget is created yet without connection to the graphical implementation layer
+  /**Returns the associated GralMng. The GralMng is associated by construction,
    */
   GralMng gralMng();
   

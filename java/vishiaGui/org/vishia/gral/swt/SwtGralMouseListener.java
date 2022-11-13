@@ -213,9 +213,9 @@ public final class SwtGralMouseListener
       GralWidget widgg = GralWidget.ImplAccess.gralWidgetFromImplData(widget.getData());
       try{
         String widggInfo = widgg.toString();
-        GralMng.get().log.sendMsg(0, "Info widget: %s", widggInfo);
+        //gralMng().log.sendMsg(0, "Info widget: %s", widggInfo);
         //guiMng.log.sendMsg(0, "Info widget: %s / %s", widgg.name, widgg.getDataPath());
-      } catch(Exception exc){ GralMng.get().writeLog(0, exc); }
+      } catch(Exception exc){ System.err.println(exc.getMessage()); } //GralMng.get().writeLog(0, exc); }
       try{
         final int keyCode = SwtGralKey.convertMouseKey(e.button, SwtGralKey.MouseAction.doubleClick, e.stateMask);
         Control widgetSwt = (Control) e.widget;  //a widget is a Control always.

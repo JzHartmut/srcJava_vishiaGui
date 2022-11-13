@@ -22,7 +22,6 @@ import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -43,7 +42,6 @@ import org.vishia.util.CalculatorExpr;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileFunctions;
 import org.vishia.util.KeyCode;
-import org.vishia.util.StringPartFromFileLines;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
 

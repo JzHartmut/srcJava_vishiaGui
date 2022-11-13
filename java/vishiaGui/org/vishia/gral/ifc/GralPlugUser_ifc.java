@@ -3,7 +3,7 @@ package org.vishia.gral.ifc;
 import java.io.Closeable;
 import java.util.Map;
 
-import org.vishia.gral.area9.GuiCallingArgs;
+import org.vishia.gral.base.GuiCallingArgs;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.msgDispatch.LogMessage;

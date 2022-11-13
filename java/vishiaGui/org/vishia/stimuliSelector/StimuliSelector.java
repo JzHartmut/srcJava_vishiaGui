@@ -276,7 +276,7 @@ public class StimuliSelector
     this.btnExampleSel = new GralButton("exmpl", "show", this.actionShowSel);
     this.btnDeselectLines = new GralButton("cleanSelTable ", "clean", this.actionDeselectLines);
     this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
-    this.output = new GralTextBox("output");
+    this.output = this.gralMng.addTextBox("output");
     this.outOld = System.out; this.errOld = System.err;
     System.setOut(this.outNew = new PrintStreamAdapter("", StimuliSelector.this.output));
     System.setErr(this.errNew = new PrintStreamAdapter("", StimuliSelector.this.output));
@@ -327,7 +327,7 @@ public class StimuliSelector
 
   public void waitForClosePrimaryWindow()
   {
-    while(GralMng.get().isRunning()){
+    while(gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();

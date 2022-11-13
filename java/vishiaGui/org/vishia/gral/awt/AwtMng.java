@@ -36,7 +36,6 @@ import org.vishia.gral.base.GralMenu._GraphicImpl;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -448,13 +447,13 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 //    return null;
 //  }
 
-  @Override
-  public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
-    int properties)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+//  @Override
+//  public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
+//    int properties)
+//  {
+//    // TODO Auto-generated method stub
+//    return null;
+//  }
 
   @Override
   public GralWindow createWindow(String name, String title, int windPros)
@@ -816,7 +815,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     GralMng.GralMngFocusListener gralFocus;
     
     AwtMngFocusListener(){
-      gralFocus = GralMng.get().new GralMngFocusListener();
+      gralFocus = AwtMng.this.gralMng.new GralMngFocusListener();
     }
     
     @Override public void focusLost(FocusEvent ev)

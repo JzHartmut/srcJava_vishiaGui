@@ -14,6 +14,7 @@ import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdFilepath;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
@@ -663,10 +664,9 @@ public class GitGui
   
   String sTypeOfImplementation = "SWT";  //default
   
+  final GralWindow window = this.gralMng.addWindow("0+60, 0+90=GitGui", "Git vishia");
 
-  final GralWindow window = new GralWindow("0+60, 0+90", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
-
-  final GralTextField wdgCmd = new GralTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
+  final GralTextField wdgCmd = this.gralMng.addTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
   
   final GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
 
@@ -675,7 +675,7 @@ public class GitGui
   
   final GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,51..0=git-files", new int[] {3,20,0});
   
-  final GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
+  final GralTextBox wdgInfo = this.gralMng.addTextBox("@-30..0, 0..-20=info");
 
   final GralButton wdgBtnDiffCurrWork = new GralButton("@-30+2, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
 
@@ -808,7 +808,22 @@ public class GitGui
     this.wdgTableFiles.specifyActionChange("actionTableFile", this.actionTableFile, null);
     this.wdgInfo.setUser(this.wdgInfoSetSelection);
     this.window.specifyActionOnCloseWindow(this.actionOnCloseWindow);
-    this.window.create(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, this.initGraphic);
+    
+    GralMenu menuTableFiles = this.wdgTableFiles.getContextMenuColumn(1);
+    menuTableFiles.addMenuItem("diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
+    menuTableFiles.addMenuItem("rename/move", "rename/move", actionTableFileRenMove);
+    menuTableFiles.addMenuItem("restore", "Restore this file", actionRestore);
+    menuTableFiles.addMenuItem("show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+    //
+    //Note for all columns extra:
+    
+    GralMenu menuTableVersion = this.wdgTableVersion.getContextMenuColumn(1);
+    menuTableVersion.addMenuItem("cmpVersion", "create zip form this version", actionOutputZip);
+    menuTableVersion.addMenuItem("cmpVersion", "cmp with this version", actionDiffVersion);
+    wdgTableVersion.setContextMenuColumn(2, menuTableVersion);
+    
+    
+    this.gralMng.createGraphic(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null); //, this.initGraphic);
     this.wdgBtnShowCmd.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
     this.wdgCmd.setHtmlHelp(":GitGui.html#exec");
     this.cmdThread.start();
@@ -872,21 +887,21 @@ public class GitGui
   
   
 
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init", this.gralMng)
-  { @Override protected void executeOrder() {
-      wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
-      wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
-      wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
-      wdgTableFiles.addContextMenuEntryGthread(1, "show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
-      //
-      //Note for all columns extra:
-      
-      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "create zip form this version", actionOutputZip);
-      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "create zip from this version", actionOutputZip);
-      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
-      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "cmp with this version", actionDiffVersion);
-    }
-  };
+//  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init", this.gralMng)
+//  { @Override protected void executeOrder() {
+//      wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
+//      wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
+//      wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
+//      wdgTableFiles.addContextMenuEntryGthread(1, "show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+//      //
+//      //Note for all columns extra:
+//      
+//      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "create zip form this version", actionOutputZip);
+//      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "create zip from this version", actionOutputZip);
+//      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
+//      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "cmp with this version", actionDiffVersion);
+//    }
+//  };
 
 
 

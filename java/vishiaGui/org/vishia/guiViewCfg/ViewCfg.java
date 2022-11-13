@@ -12,8 +12,8 @@ import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.gral.area9.GralArea9MainCmd;
-import org.vishia.gral.area9.GuiCallingArgs;
+//import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.base.GuiCallingArgs;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
 import org.vishia.gral.base.GralMng;
@@ -24,7 +24,7 @@ import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtFactory;
-import org.vishia.guiInspc.InspcCurveView;
+//import org.vishia.guiInspc.InspcCurveView;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -76,7 +76,7 @@ public class ViewCfg //extends GuiCfg
   
   public final GralWindow window;
   
-  final InspcCurveView curveView;
+//  final InspcCurveView curveView;
   
   final GralButton wdgbtnOnOff; 
   
@@ -152,67 +152,67 @@ public class ViewCfg //extends GuiCfg
   
   
   
-  /**Organisation class for the GUI.
-   */
-  private static class CmdLineAndGui extends GralArea9MainCmd
-  {
-
-    
-    /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
-     * It is given as ctor-parameter.
-     */
-    final CallingArguments cargs;
-    
-    /**ctor called in static main.
-     * @param cargs aggregation to command-line-argument data, it will be filled here.
-     * @param args The command-line-calling arguments from static main
-     */
-    public CmdLineAndGui(CallingArguments cargs, String[] args)
-    { 
-      super(cargs, args);
-      super.addAboutInfo("ViewCfg");
-      super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-09-03");
-      //super.addStandardHelpInfo();
-      this.cargs = cargs;
-    }
-
-
-    
-    /*---------------------------------------------------------------------------------------------*/
-    /** Tests one argument. This method is invoked from parseArgument. It is abstract in the superclass MainCmd
-        and must be overwritten from the user.
-        :TODO: user, test and evaluate the content of the argument string
-        or test the number of the argument and evaluate the content in dependence of the number.
-  
-        @param argc String of the actual parsed argument from cmd line
-        @param nArg number of the argument in order of the command line, the first argument is number 1.
-        @return true is okay,
-                false if the argument doesn't match. The parseArgument method in MainCmd throws an exception,
-                the application should be aborted.
-    */
-    @Override protected boolean testArgument(String arg, int nArg)
-    { boolean bOk = true;  //set to false if the argc is not passed
-      try {
-        
-        if(arg.startsWith("-parambin=")) 
-	      { this.cargs.sParamBin = getArgument(10);   //an example for default output
-	      }
-	      else if(arg.startsWith("-ctrlbin=")) 
-	      { this.cargs.sFileCtrlValues = getArgument(9);   //an example for default output
-	      }
-//	      else if(arg.startsWith("-oambin=")) 
-//	      { this.cargs.sFileOamValues = getArgument(8);   //an example for default output
+//  /**Organisation class for the GUI.
+//   */
+//  private static class CmdLineAndGui extends GralArea9MainCmd
+//  {
+//
+//    
+//    /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
+//     * It is given as ctor-parameter.
+//     */
+//    final CallingArguments cargs;
+//    
+//    /**ctor called in static main.
+//     * @param cargs aggregation to command-line-argument data, it will be filled here.
+//     * @param args The command-line-calling arguments from static main
+//     */
+//    public CmdLineAndGui(CallingArguments cargs, String[] args)
+//    { 
+//      super(cargs, args);
+//      super.addAboutInfo("ViewCfg");
+//      super.addAboutInfo("made by HSchorrig, 2010-06-07, 2011-09-03");
+//      //super.addStandardHelpInfo();
+//      this.cargs = cargs;
+//    }
+//
+//
+//    
+//    /*---------------------------------------------------------------------------------------------*/
+//    /** Tests one argument. This method is invoked from parseArgument. It is abstract in the superclass MainCmd
+//        and must be overwritten from the user.
+//        :TODO: user, test and evaluate the content of the argument string
+//        or test the number of the argument and evaluate the content in dependence of the number.
+//  
+//        @param argc String of the actual parsed argument from cmd line
+//        @param nArg number of the argument in order of the command line, the first argument is number 1.
+//        @return true is okay,
+//                false if the argument doesn't match. The parseArgument method in MainCmd throws an exception,
+//                the application should be aborted.
+//    */
+//    @Override protected boolean testArgument(String arg, int nArg)
+//    { boolean bOk = true;  //set to false if the argc is not passed
+//      try {
+//        
+//        if(arg.startsWith("-parambin=")) 
+//	      { this.cargs.sParamBin = getArgument(10);   //an example for default output
 //	      }
-	      else { bOk = super.testArgument(arg, nArg); }
-      } catch(Exception exc){
-      }
-      return bOk;
-    }
-  
-
-    
-  } //class CmdLineAndGui
-
+//	      else if(arg.startsWith("-ctrlbin=")) 
+//	      { this.cargs.sFileCtrlValues = getArgument(9);   //an example for default output
+//	      }
+////	      else if(arg.startsWith("-oambin=")) 
+////	      { this.cargs.sFileOamValues = getArgument(8);   //an example for default output
+////	      }
+//	      else { bOk = super.testArgument(arg, nArg); }
+//      } catch(Exception exc){
+//      }
+//      return bOk;
+//    }
+//  
+//
+//    
+//  } //class CmdLineAndGui
+//
   
   
   /**ctor for the main class of the application. 
@@ -281,11 +281,11 @@ public class ViewCfg //extends GuiCfg
       
       FileRemote dirCfg = FileRemote.fromFile(new File("T:/"));
       FileRemote dirSave = FileRemote.fromFile(new File("T:/"));
-      this.curveView = new InspcCurveView("curveView", this.oamShowValues.accessOamVariable, commonCurve, tracksValues, this.gralMng, dirCfg, dirSave, ".", null);
+      //TODO this.curveView = new InspcCurveView("curveView", this.oamShowValues.accessOamVariable, commonCurve, tracksValues, this.gralMng, dirCfg, dirSave, ".", null);
       //((GralButton)btnCurveView).set
       btnCurveView.specifyActionChange(null, this.actionShowCurveWindow, null);
     } else {
-      this.curveView = null;
+      //TDOD this.curveView = null;
     }
     GralWidget wdgbtnOnOff = gralMng.getWidget("btnOnOff");
     this.wdgbtnOnOff = wdgbtnOnOff instanceof GralButton ? (GralButton) wdgbtnOnOff : null;
@@ -481,7 +481,7 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
   
   GralUserAction actionShowCurveWindow = new GralUserAction("showCurveWindow") {
     public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params ) {
-      ViewCfg.this.curveView.showWindow(true);
+      //TDOD ViewCfg.this.curveView.showWindow(true);
       return true;
     }
   };  

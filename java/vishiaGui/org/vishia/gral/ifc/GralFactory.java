@@ -65,15 +65,15 @@ public abstract class GralFactory
    * @return the window
    * @deprecated use {@link #createGraphic(GralWindow, char, int, int, int, int, LogMessage)}
    */
-  public final GralWindow createWindow(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
-  {
-    GralMng.create(log);
-    int windProps = GralWindow_ifc.windResizeable;
-    //@date 2017-01-15 a "!" is faulty yet, use a sensible position string 
-    GralWindow window = new GralWindow("@10+100,30+150", "primaryWindow", sTitle, windProps);
-    createWindow(window, sizeShow, left, top, xSize, ySize);
-    return window;
-  }
+//  public final GralWindow createWindow(LogMessage log, String sTitle, char sizeShow, int left, int top, int xSize, int ySize)
+//  {
+//    GralMng.create(log);
+//    int windProps = GralWindow_ifc.windResizeable;
+//    //@date 2017-01-15 a "!" is faulty yet, use a sensible position string 
+//    GralWindow window = new GralWindow("@10+100,30+150", "primaryWindow", sTitle, windProps);
+//    createWindow(window, sizeShow, left, top, xSize, ySize);
+//    return window;
+//  }
   
 
   /**Creates and opens the primary window of the application with a given GralWindow instance.
@@ -85,20 +85,20 @@ public abstract class GralFactory
    * @return the window
    * @deprecated use {@link #createGraphic(GralWindow, char, int, int, int, int, LogMessage)}
    */
-  @Deprecated public final void createWindow(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize)
-  {
-    GralMng mng = GralMng.get();
-    mng.registerWindow(windowg); //checks whether called firstly.
-    LogMessage log = mng.log;    
-    //The graphicthread creates the Swt Window.
-    //SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
-//    GralGraphicThread gralGraphicThread = createGraphic(windowg, sizeShow, log);
-//    synchronized(gralGraphicThread){
-//      while(gralGraphicThread.getThreadIdGui() == 0){
-//        try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
-//      }
-//    }
-  }
+//  @Deprecated public final void createWindow(GralWindow windowg, char sizeShow, int left, int top, int xSize, int ySize)
+//  {
+//    GralMng mng = GralMng.get();
+//    mng.registerWindow(windowg); //checks whether called firstly.
+//    LogMessage log = mng.log;    
+//    //The graphicthread creates the Swt Window.
+//    //SwtPrimaryWindow swtWindow = SwtPrimaryWindow.create(log, sTitle, sizeShow, left, top, xSize, ySize);
+////    GralGraphicThread gralGraphicThread = createGraphic(windowg, sizeShow, log);
+////    synchronized(gralGraphicThread){
+////      while(gralGraphicThread.getThreadIdGui() == 0){
+////        try{ gralGraphicThread.wait(1000);} catch(InterruptedException exc){}
+////      }
+////    }
+//  }
 
   /**This method should initialize the whole implementation graphic with the given GralWindow 
    * and all {@link GralPanelContent} and all {@link GralWidget} into. 
@@ -145,35 +145,35 @@ public abstract class GralFactory
    * @param implementor null for "SWT", "SWT" or "AWT",
    * @return
    */
-  @Deprecated public static GralMng createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
-    assert(false);
-    GralMng mng = GralMng.get();
-    mng.registerWindow(windowg); //checks whether called firstly.
-    final String sNameFactoryClass;
-    if(implementor == null) { implementor = "SWT"; }
-    if(implementor.equals("SWT")) { sNameFactoryClass = "org.vishia.gral.swt.SwtFactory"; }
-    else if(implementor.equals("AWT")) { sNameFactoryClass = "org.vishia.gral.awt.AwtFactory"; }
-    else { sNameFactoryClass = implementor; }
-    GralFactory factory;
-    try{ 
-      //Class<GralFactory> classfactory = ClassLoader.getSystemClassLoader().loadClass(sNameFactoryClass);
-      Class<?> classfactory = Class.forName(sNameFactoryClass);
-      Object oFactory = classfactory.newInstance();
-      factory = (GralFactory)oFactory;           //Exception if faulty type.
-    }catch(Exception exc){
-      String sError = "class not found or faulty: " + sNameFactoryClass;
-      System.err.println(sError);
-      throw new RuntimeException(sError, exc);
-    }
-    try { //this start the GralGraphicThread, see run(). There the primaryWindow will be created.
-      factory.createGraphic(mng, sizeShow);
-    } catch(Exception exc) {
-      String sError = "Exception initializing graphic: " + exc.getMessage();
-      System.err.println(sError);
-      throw new RuntimeException(sError, exc);
-    }
-    return mng;
-  }
+//  @Deprecated public static GralMng createGraphic(GralWindow windowg, char sizeShow, LogMessage log, String implementor) { 
+//    assert(false);
+//    GralMng mng = GralMng.get();
+//    mng.registerWindow(windowg); //checks whether called firstly.
+//    final String sNameFactoryClass;
+//    if(implementor == null) { implementor = "SWT"; }
+//    if(implementor.equals("SWT")) { sNameFactoryClass = "org.vishia.gral.swt.SwtFactory"; }
+//    else if(implementor.equals("AWT")) { sNameFactoryClass = "org.vishia.gral.awt.AwtFactory"; }
+//    else { sNameFactoryClass = implementor; }
+//    GralFactory factory;
+//    try{ 
+//      //Class<GralFactory> classfactory = ClassLoader.getSystemClassLoader().loadClass(sNameFactoryClass);
+//      Class<?> classfactory = Class.forName(sNameFactoryClass);
+//      Object oFactory = classfactory.newInstance();
+//      factory = (GralFactory)oFactory;           //Exception if faulty type.
+//    }catch(Exception exc){
+//      String sError = "class not found or faulty: " + sNameFactoryClass;
+//      System.err.println(sError);
+//      throw new RuntimeException(sError, exc);
+//    }
+//    try { //this start the GralGraphicThread, see run(). There the primaryWindow will be created.
+//      factory.createGraphic(mng, sizeShow);
+//    } catch(Exception exc) {
+//      String sError = "Exception initializing graphic: " + exc.getMessage();
+//      System.err.println(sError);
+//      throw new RuntimeException(sError, exc);
+//    }
+//    return mng;
+//  }
   
   
   

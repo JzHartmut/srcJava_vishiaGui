@@ -86,7 +86,7 @@ public class GralActionJztc
 
     public ActionRereadScript()
     { super("GralActionJztc-reread script");
-      GralMng.get().registerUserAction("GralActionJztc_reread", this);
+      GralActionJztc.this.gralMng.registerUserAction("GralActionJztc_reread", this);
     }
     
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params) {
@@ -117,16 +117,20 @@ public class GralActionJztc
 
   final Appendable out;
   
-  final MainCmdLogging_ifc log;
+  final GralMng gralMng;
+  
+//  final MainCmdLogging_ifc log;
   
   /**Constructs and stores JZtxtcmd aggregation.
    * @param jztc The main data to access script level
    * @param out Any output used in the sub routine.
    */
-  public GralActionJztc(JZtxtcmdExecuter.JzTcMain jztc, Appendable out, MainCmdLogging_ifc log){
+  public GralActionJztc(JZtxtcmdExecuter.JzTcMain jztc, Appendable out, GralMng gralMng){
+    this.gralMng = gralMng;
     this.thread = new JZtxtcmdThreadQueue("jzTc-GUI", jztc);
     //this.cmdExecuter = cmdExecuter;
-    this.out = out; this.log = log;
+    this.out = out; 
+//    this.log = log;
   }
   
   
@@ -137,7 +141,7 @@ public class GralActionJztc
     }
     this.scriptFile = scriptfile;
     try{ 
-      jzcmdScript = JZtxtcmdScript.createScriptFromFile(scriptfile, log, null);
+      jzcmdScript = JZtxtcmdScript.createScriptFromFile(scriptfile, this.gralMng.log, null);
       List<Object> listSubs = jzcmdScript.scriptClass().listClassesAndSubroutines();
       for(Object e: listSubs) {
         if(e instanceof JZtxtcmdScript.Subroutine) {
@@ -152,7 +156,7 @@ public class GralActionJztc
         }
       }
     } catch (ScriptException exc) {
-      log.writeError("Error GralUserAction.setScript", exc);
+      this.gralMng.log.writeError("Error GralUserAction.setScript", exc);
     }
   }
   
@@ -173,7 +177,7 @@ public class GralActionJztc
     } else {
       action = new Action(jzsub);
       actions.put(name, action);
-      GralMng.get().registerUserAction(jzsub.name, action);
+      this.gralMng.registerUserAction(jzsub.name, action);
     }
   }
   

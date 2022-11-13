@@ -6,7 +6,7 @@ import java.util.EventObject;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.event.EventTimerThread;
-import org.vishia.gral.area9.GralArea9MainCmd;
+//import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Assert;

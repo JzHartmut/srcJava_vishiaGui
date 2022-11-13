@@ -103,7 +103,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     this.buttonOk = buttonOk;
   }
   
-  public static GralInfoBox createTextInfoBox(GralMngBuild_ifc mng, String name, String title)
+  public static GralInfoBox createTextInfoBox(GralMng mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow_ifc.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
@@ -135,23 +135,22 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
    * @param onTop
    * @return
    */
-  public static GralInfoBox createHtmlInfoBox(GralPos currPos, String posString, String name, String title, boolean onTop)
+  public static GralInfoBox createHtmlInfoBox(GralMng mng, GralPos currPos, String posName, String title, boolean onTop)
   {
     int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     if(onTop){ props |= GralWindow_ifc.windOnTop; }
-    GralWindow window = new GralWindow(posString, name, title, props); //mng.createWindow(name, title, props);
-    GralMng mng = GralMng.get();
+    GralWindow window = mng.addWindow(posName, title, props); //mng.createWindow(name, title, props);
     //window.setToPanel(mng);
     //TODO the position frame (size) regards the title bar, it should not do so!
     mng.setPosition(0, -3, 0, 0, 0, '.');
-    GralHtmlBox text = new GralHtmlBox(currPos, name); //     mng.addHtmlBox(name);
+    GralHtmlBox text = new GralHtmlBox(currPos, window.name + "-text"); //     mng.addHtmlBox(name);
     //text.setToPanel(mng);
     mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
     mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 0, 'r', 0.5f);
-    GralButton buttonLock = mng.addSwitchButton(name + "-Info-ok", "following", "locked", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    GralButton buttonLock = mng.addSwitchButton(window.name + "-Info-ok", "following", "locked", GralColor.getColor("wh"), GralColor.getColor("gn"));
     mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 0, 'r', 0.5f);
-    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "close");
+    GralWidget buttonOk = mng.addButton(window.name + "-Info-ok", null, "close");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonLock = buttonLock;
     box.buttonOk.setActionChange(box.actionOkButton);

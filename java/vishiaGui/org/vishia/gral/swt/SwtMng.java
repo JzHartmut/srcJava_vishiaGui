@@ -55,7 +55,6 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -63,7 +62,6 @@ import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralImageBase;
-import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
@@ -73,8 +71,8 @@ import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.gral.widget.GralCanvasArea;
 import org.vishia.msgDispatch.LogMessage;
-import org.vishia.util.CheckVs;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 
 
 
@@ -475,10 +473,10 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 //      else 
       wdga = new SwtGridPanel(widgp, '$', 0);   // an SwtGridPanel is always also a SwtCanvasStrorePanel
       GralWidget_ifc parent = widgg.pos().parent;
-      if(parent instanceof GralTabbedPanel) {
-        SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
-        swtParent.addGridPanel(widgp, widgp.getName(), 2, 2, 10, 10);
-      }
+//      if(parent instanceof GralTabbedPanel) {
+//        SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
+//        swtParent.addGridPanel(widgp, widgp.getName(), 2, 2, 10, 10);
+//      }
     }
     else if(widgg instanceof GralCurveView) {
       GralCurveView widgp = (GralCurveView)widgg;
@@ -544,7 +542,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     try {
       createSubWindow(windowGral);
     } catch(Exception exc) {
-      CheckVs.exceptionInfo("unexpected", exc, 0, 10);
+      ExcUtil.exceptionInfo("unexpected", exc, 0, 10);
     }
     return windowGral;
 
@@ -831,18 +829,18 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	 * If this routine was called, the GralMng.pos is the pos for the Tabbed panel.
 	 * @see org.vishia.gral.base.GralMng.ImplAccess#addTabbedPanel(java.lang.String, org.vishia.gral.base.GralPanelActivated_ifc, int)
 	 */
-	@Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property)
-	{ GralTabbedPanel panelg = new GralTabbedPanel(null, namePanel, user, property);
-		SwtTabbedPanel tabMngPanel = new SwtTabbedPanel(panelg, this, user, property);
-		gralMng.XXXcurrTabPanel = panelg;
-		//GralWidget tabFolder = currTabPanel;
-		TabFolder tabFolderSwt = (TabFolder)tabMngPanel.getWidgetImplementation();
-		setPosAndSize_(panelg.pos(), tabFolderSwt); //(Control)currTabPanel.getGuiComponent().getWidgetImplementation());
-		listVisiblePanels_add(gralMng.XXXcurrTabPanel);  //TODO checkit maybe currTabPanel.getCurrentPanel()
-		//mng.registerWidget(tabMngPanel);
-		return gralMng.XXXcurrTabPanel;
-	}
-	
+//	@Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property)
+//	{ GralTabbedPanel panelg = new GralTabbedPanel(null, namePanel, user, property);
+//		SwtTabbedPanel tabMngPanel = new SwtTabbedPanel(panelg, this, user, property);
+//		gralMng.XXXcurrTabPanel = panelg;
+//		//GralWidget tabFolder = currTabPanel;
+//		TabFolder tabFolderSwt = (TabFolder)tabMngPanel.getWidgetImplementation();
+//		setPosAndSize_(panelg.pos(), tabFolderSwt); //(Control)currTabPanel.getGuiComponent().getWidgetImplementation());
+//		listVisiblePanels_add(gralMng.XXXcurrTabPanel);  //TODO checkit maybe currTabPanel.getCurrentPanel()
+//		//mng.registerWidget(tabMngPanel);
+//		return gralMng.XXXcurrTabPanel;
+//	}
+//	
   
   
   

@@ -12,7 +12,7 @@ import javax.script.ScriptException;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdScript;
-import org.vishia.gral.area9.GuiCallingArgs;
+import org.vishia.gral.base.GuiCallingArgs;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
@@ -165,7 +165,7 @@ public class GuiDropFiles {
     if(this.args.fileGuiCfg !=null) {
       sCfg = FileSystem.readFile(this.args.fileGuiCfg);
     }
-    this.gralMng = GralMng.get();
+    this.gralMng = new GralMng(new LogMessageStream(System.out));
     this.gralMng.registerUserAction(null, this.action_dropFilePath);
     this.gralMng.registerUserAction(null, this.action_exec);
     this.gralMng.registerUserAction(null, this.action_abortCmd);
@@ -176,8 +176,7 @@ public class GuiDropFiles {
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
-    LogMessage log = new LogMessageStream(System.out);  //a logging system.
-    this.window.create("SWT", 'C', log, null);
+    this.gralMng.createGraphic("SWT", 'C', this.gralMng.log);
     readJZtcScript();
     
   }

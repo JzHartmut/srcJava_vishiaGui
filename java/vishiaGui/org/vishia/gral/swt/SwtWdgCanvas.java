@@ -146,7 +146,7 @@ public class SwtWdgCanvas  extends Canvas
                 g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
                   GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
-                  int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array();
+                  int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array(this.swtMng.propertiesGuiSwt);
                   g.drawPolyline(points);
                 } else {
                   GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;

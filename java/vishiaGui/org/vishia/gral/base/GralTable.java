@@ -543,7 +543,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     return menuColumns[col];
   }
+
   
+  public void setContextMenuColumn(int col, GralMenu menu){
+    if(menuColumns == null){
+      menuColumns = new GralMenu[zColumn];
+    }
+    menuColumns[col] = menu; //gi.createColumnMenu(col); //for all cells of this column
+  }
   
   /**Adds a context menu entries to all cells of the designated column. This method can't be used 
    * if either {@link #getContextMenuColumn(int)} or {@link #addContextMenuEntryGthread(int, String, String, GralUserAction)}

@@ -132,7 +132,7 @@ public class GralColorShow
       this.co = co;
       this.index = new Index();
       this.index.ixCol = ixCol; index.ixLight = ixBright;
-      this.wdgColor = new GralTextField("" + ixCol + "," + ixBright); //, GralTextField.Type.editable);
+      this.wdgColor = gralMng.addTextField("" + ixCol + "," + ixBright); //, GralTextField.Type.editable);
       this.wdgColor.setBackColor(co, 0);
       this.wdgColor.setData(this);
       //this.wdgColor.setActionFocused(actionFocusColor);
@@ -177,9 +177,8 @@ public class GralColorShow
       System.err.println("GralColor - cannot read config, " + exc.getMessage());
     }
     */
-    LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,1000, 800);
-    gralMng = wind.gralMng();
+    GralMng gralMng = new GralMng(new LogMessageStream(System.out));
+    GralWindow wind = gralMng.addWindow("@screen,10+80,20+120=Show Colors","Show Colors");
     gralMng.addDispatchOrder(initGraphicFullColors);
     //initGraphic.awaitExecution(1, 0);
     while(gralMng.isRunning()){
@@ -205,8 +204,8 @@ public class GralColorShow
     }
     GralFactory gralFactory = new SwtFactory();
     LogMessage log = new LogMessageStream(System.out);
-    GralWindow wind = gralFactory.createWindow(log, "Show Colors", 'B', 150, 10,1000, 800);
-    gralMng = wind.gralMng();
+    GralMng gralMng = new GralMng(new LogMessageStream(System.out));
+    GralWindow wind = gralMng.addWindow("@screen,10+80,20+120=Show Colors","Show Colors");
     gralMng.addDispatchOrder(initGraphicLessColors);
     //initGraphic.awaitExecution(1, 0);
     while(gralMng.isRunning()){
@@ -513,7 +512,7 @@ public class GralColorShow
   Map<String, GralColor> idxColorsByShortname = new TreeMap<String, GralColor>();
   
   
-  //GralTextField[][] wdgColorBack = new GralTextField[19][10];
+  //GralTextField[][] wdgColorBack = gralMng.addTextField[19][10];
 
   //String[][] shortname = new String[19][10];
   
@@ -1018,8 +1017,8 @@ public class GralColorShow
       
       gralMng.setPosition(4 + 3 * colorV.length /*GralPos.refer+4*/, GralPos.size +10, 1, GralPos.size+15, 0, 'r');
       //
-      wdgTest1 = new GralTextField("test1");
-      wdgTest2 = new GralTextField("test2");
+      wdgTest1 = gralMng.addTextField("test1");
+      wdgTest2 = gralMng.addTextField("test2");
       wdgTest1.setEditable(true);
       wdgTest2.setEditable(true);
       wdgTest1.setActionFocused(actionFocusedTest);
@@ -1031,42 +1030,42 @@ public class GralColorShow
       wdgTest = wdgTest1;
       
       gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 0, 'r');
-      wdgHexValue = new GralTextField("hex");
+      wdgHexValue = gralMng.addTextField("hex");
       wdgHexValue.setEditable(true);
       wdgHexValue.setActionChange(actionEnterHex);
       wdgHexValue.setToPanel(gralMng);
-      wdgShortname = new GralTextField("sname");
+      wdgShortname = gralMng.addTextField("sname");
       wdgShortname.setEditable(true);
       wdgShortname.setActionChange(actionEnterShortname);
       wdgShortname.setToPanel(gralMng);
       gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 0, 'r');
-      wdgName = new GralTextField("name");
+      wdgName = gralMng.addTextField("name");
       wdgName.setEditable(true);
       wdgName.setActionChange(actionEnterName);
       wdgName.setToPanel(gralMng);
       gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
-      wdgHue = new GralTextField("name");
+      wdgHue = gralMng.addTextField("name");
       wdgHue.setEditable(true);
       wdgHue.setActionChange(new ActionEnterHSB(0));
       wdgHue.setToPanel(gralMng);
-      wdgBright = new GralTextField("name");
+      wdgBright = gralMng.addTextField("name");
       wdgBright.setEditable(true);
       wdgBright.setActionChange(new ActionEnterHSB(2));
       wdgBright.setToPanel(gralMng);
-      wdgSat = new GralTextField("name");
+      wdgSat = gralMng.addTextField("name");
       wdgSat.setEditable(true);
       wdgSat.setActionChange(new ActionEnterHSB(1));
       wdgSat.setToPanel(gralMng);
       gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
-      wdgHue2 = new GralTextField("name");
+      wdgHue2 = gralMng.addTextField("name");
       wdgHue2.setEditable(true);
       wdgHue2.setActionChange(new ActionEnterHLS(0));
       wdgHue2.setToPanel(gralMng);
-      wdgLight2 = new GralTextField("name");
+      wdgLight2 = gralMng.addTextField("name");
       wdgLight2.setEditable(true);
       wdgLight2.setActionChange(new ActionEnterHLS(1));
       wdgLight2.setToPanel(gralMng);
-      wdgSat2 = new GralTextField("name");
+      wdgSat2 = gralMng.addTextField("name");
       wdgSat2.setEditable(true);
       wdgSat2.setActionChange(new ActionEnterHLS(2));
       wdgSat2.setToPanel(gralMng);
@@ -1106,8 +1105,8 @@ public class GralColorShow
       
       gralMng.setPosition(GralPos.refer+4, GralPos.size +10, 1, GralPos.size+15, 0, 'r');
       //
-      wdgTest1 = new GralTextField("test1");
-      wdgTest2 = new GralTextField("test2");
+      wdgTest1 = gralMng.addTextField("test1");
+      wdgTest2 = gralMng.addTextField("test2");
       wdgTest1.setEditable(true);
       wdgTest2.setEditable(true);
       wdgTest1.setActionFocused(actionFocusedTest);
@@ -1119,42 +1118,42 @@ public class GralColorShow
       wdgTest = wdgTest1;
       
       gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 0, 'r');
-      wdgHexValue = new GralTextField("hex");
+      wdgHexValue = gralMng.addTextField("hex");
       wdgHexValue.setEditable(true);
       wdgHexValue.setActionChange(actionEnterHex);
       wdgHexValue.setToPanel(gralMng);
-      wdgShortname = new GralTextField("sname");
+      wdgShortname = gralMng.addTextField("sname");
       wdgShortname.setEditable(true);
       wdgShortname.setActionChange(actionEnterShortname);
       wdgShortname.setToPanel(gralMng);
       gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 0, 'r');
-      wdgName = new GralTextField("name");
+      wdgName = gralMng.addTextField("name");
       wdgName.setEditable(true);
       wdgName.setActionChange(actionEnterName);
       wdgName.setToPanel(gralMng);
       gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
-      wdgHue = new GralTextField("name");
+      wdgHue = gralMng.addTextField("name");
       wdgHue.setEditable(true);
       wdgHue.setActionChange(new ActionEnterHSB(0));
       wdgHue.setToPanel(gralMng);
-      wdgBright = new GralTextField("name");
+      wdgBright = gralMng.addTextField("name");
       wdgBright.setEditable(true);
       wdgBright.setActionChange(new ActionEnterHSB(2));
       wdgBright.setToPanel(gralMng);
-      wdgSat = new GralTextField("name");
+      wdgSat = gralMng.addTextField("name");
       wdgSat.setEditable(true);
       wdgSat.setActionChange(new ActionEnterHSB(1));
       wdgSat.setToPanel(gralMng);
       gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
-      wdgHue2 = new GralTextField("name");
+      wdgHue2 = gralMng.addTextField("name");
       wdgHue2.setEditable(true);
       wdgHue2.setActionChange(new ActionEnterHLS(0));
       wdgHue2.setToPanel(gralMng);
-      wdgLight2 = new GralTextField("name");
+      wdgLight2 = gralMng.addTextField("name");
       wdgLight2.setEditable(true);
       wdgLight2.setActionChange(new ActionEnterHLS(1));
       wdgLight2.setToPanel(gralMng);
-      wdgSat2 = new GralTextField("name");
+      wdgSat2 = gralMng.addTextField("name");
       wdgSat2.setEditable(true);
       wdgSat2.setActionChange(new ActionEnterHLS(2));
       wdgSat2.setToPanel(gralMng);

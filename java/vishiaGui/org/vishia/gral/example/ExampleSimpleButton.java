@@ -231,16 +231,14 @@ public class ExampleSimpleButton
     //
     //A logger is a final thing what is need. This logger writes to the console.
     //A complexer application may write to a graphic output window.
-    LogMessage log = new LogMessageStream(System.out);
+    GralMng gralMng = new GralMng(new LogMessageStream(System.out));
     //
     //create the window, use the factory.
-    GralWindow primaryWindow = new GralWindow("10..50,20..90", "ExampleSimpleButton", "ExampleSimpleButton", GralWindow_ifc.windIsMain);
-    GralFactory.createGraphic(primaryWindow, 'C', log, "SWT");
+    GralWindow primaryWindow = gralMng.addWindow("@10..50,20..90=ExampleSimpleButton", "ExampleSimpleButton");
+    gralMng.createGraphic("SWT", 'C', null);
     
     //depr: GralWindow primaryWindow = graphicFactory.createWindow(log, "Example Simple Button", 'C', 50,50,400, 300);
     //
-    //The widget manager is created with the primary window. Use it.
-    GralMng gralMng = primaryWindow.gralMng();
     //
     //An empty graphic window is present now. It is time to create this application class now. 
     //In an complexer application the graphic window can contain an output window, so information

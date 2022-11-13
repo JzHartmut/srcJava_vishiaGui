@@ -143,18 +143,18 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     setTextColor(GralColor.getColor("bk"));
   }
 
-  public GralTextField(String posName, Type... property){
-    this(GralMng.get().pos().pos, posName, property);
-  }
+//  public GralTextField(String posName, Type... property){
+//    this(GralMng.get().pos().pos, posName, property);
+//  }
 
     /**Constructs a text field with given properties
    * @param name Name of the field. Maybe null if it is not need in management by name
    * @param property password, editable, maybe left empty.
    * @deprecated since 2016-09,use {@link GralTextField#GralTextField(String, Type...)} with "@pos=name"
    */
-  public GralTextField(String pos, String name, Type... property){
-    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, property);
-  }
+//  public GralTextField(String pos, String name, Type... property){
+//    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, property);
+//  }
   
   
   @Deprecated public GralTextField(String name, char whatis, GralMng mng){

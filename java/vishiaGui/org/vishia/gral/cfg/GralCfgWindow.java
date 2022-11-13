@@ -10,6 +10,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 
 /*Test with Jbat: call Jbat with this java file with its full path:
@@ -76,15 +77,13 @@ public class GralCfgWindow
   public final static String version = "2022-01-29";
 
   
-  final private MainCmdLogging_ifc log;
-  
   /**The configuration data for graphical appearance. */
   final private GralCfgData guiCfgData;
 
   /**Directory for images. */
   File imgDir;
   
-  protected final GralMng gralMng = new GralMng(null);
+  protected final GralMng gralMng = new GralMng(new LogMessageStream(System.out));
   
   final public GralWindow window;
   
@@ -100,22 +99,21 @@ public class GralCfgWindow
    * @throws ParseException on errors in the sCfg
    */
   @Deprecated private GralCfgWindow(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
-    this.log = log !=null ? log : log;
+//    this.log = log !=null ? log : log;
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
     this.imgDir = imgDir;
     String swtOrawt;
     char size1;
     if(size < 'a') { size1 = size; swtOrawt = "SWT"; }
     else { size1 = (char)(size - 'a'-'A'); swtOrawt = "AWT"; }
-    GralCfgZbnf cfgZbnf = new GralCfgZbnf(GralMng.get());  //temporary instance for parsing
+    GralCfgZbnf cfgZbnf = new GralCfgZbnf(this.gralMng);  //temporary instance for parsing
     cfgZbnf.configureWithZbnf(sCfg, this.guiCfgData); //
     int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
-    GralMng mng = GralMng.get();
-    mng.selectPrimaryWindow();
-    String defaultPos = sPosName.startsWith("@") ? null : "10+50, 10+100"; 
-    this.window = new GralWindow(defaultPos, sPosName, sTitle, props);
+    this.gralMng.selectPrimaryWindow();
+    if( !sPosName.startsWith("@")) { sPosName = "@10+50, 10+100 =" + sPosName; } 
+    this.window = gralMng.addWindow(sPosName, sTitle, props);
     this.configInGthread.getCtDone(0);
-    this.window.create(swtOrawt, size1, log, this.configInGthread);
+    this.gralMng.createGraphic(swtOrawt, size1, log); //, this.configInGthread);
     this.configInGthread.awaitExecution(1, 0);
   }
   
@@ -157,12 +155,12 @@ public class GralCfgWindow
     private static final long serialVersionUID = 1L;
 
     @Override public void executeOrder(){
-      GralMng mng = GralMng.get();
+      GralMng mng = gralMng;
       mng.selectPanel("primaryWindow");  //window position relative to the primary window.
       GralCfgWindow.this.window.setToPanel(mng);
       GralCfgWindow.this.window.setVisible(true);
       GralCfgBuilder cfgBuilder = new GralCfgBuilder(GralCfgWindow.this.guiCfgData, mng, GralCfgWindow.this.imgDir);
-      String sError = cfgBuilder.buildGui(GralCfgWindow.this.log, 0);
+      String sError = cfgBuilder.buildGui(GralCfgWindow.this.gralMng.log, 0);
       if(sError !=null) {
         System.err.println(sError);
       }

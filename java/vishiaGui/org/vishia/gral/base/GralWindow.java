@@ -184,7 +184,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
     this.mainPanel = new GralPanelContent(posPanel, sNamePanel, this.gralMng());
     //                                                     // A window has anytime only one GralPanel, the mainPanel.
-    gralMng.registerWindow(this);
+    super.itsMng.registerWindow(this);
     if((windProps & windResizeable)!=0){
       this.resizeAction = new ActionResizeOnePanel();
     }
@@ -192,16 +192,16 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
 
   public GralWindow(GralPos currPos, String posName, String sTitle, int windProps)
-  { this(currPos, posName, sTitle, windProps, GralMng.get());
+  { this(currPos, posName, sTitle, windProps, null);
   }
   
   public GralWindow(GralPos currPos, String posString, String nameWindow, String sTitle, int windProps)
-  { this(currPos, posString + "=" + nameWindow, sTitle, windProps, GralMng.get());
+  { this(currPos, posString + "=" + nameWindow, sTitle, windProps, null);
   }
   
-  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
-  { this(null, posString, nameWindow, sTitle, windProps);
-  }
+//  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
+//  { this(null, posString, nameWindow, sTitle, windProps);
+//  }
   
   
   @Override public void specifyActionOnCloseWindow(GralUserAction action)
@@ -226,20 +226,20 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    *   call the overridden operation {@link org.vishia.gral.ifc.GralFactory#createGraphic(GralWindow, char, LogMessage)}.
    *   You can then use also any other Factory for the graphic system for any other graphic system. 
    */
-  @Deprecated public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
-    if(this._wdgImpl !=null) throw new IllegalStateException("window already created.");
-    GralMng mng = GralMng.get();
-    if(mng.isRunning()) {
-      mng.addDispatchOrder(this.createImplWindow);
-    } else {
-      //it is the primary window, start the graphic with it.
-      if(log == null) { log = new LogMessageStream(System.out); }
-      GralFactory.createGraphic(this, size, log, awtOrSwt);
-    }
-    if(initializeInGraphicThread !=null) {
-      mng.addDispatchOrder(initializeInGraphicThread);
-    }
-  }
+//  @Deprecated public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
+//    if(this._wdgImpl !=null) throw new IllegalStateException("window already created.");
+//    GralMng mng = GralMng.get();
+//    if(mng.isRunning()) {
+//      mng.addDispatchOrder(this.createImplWindow);
+//    } else {
+//      //it is the primary window, start the graphic with it.
+//      if(log == null) { log = new LogMessageStream(System.out); }
+//      GralFactory.createGraphic(this, size, log, awtOrSwt);
+//    }
+//    if(initializeInGraphicThread !=null) {
+//      mng.addDispatchOrder(initializeInGraphicThread);
+//    }
+//  }
 
   
 
@@ -432,7 +432,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow", this.itsMng)
   {
     @Override public void executeOrder()
-    { GralMng mng = GralMng.get();
+    { GralMng mng = gralMng();
       mng.selectPrimaryWindow();
       GralWindow.this.createImplWidget_Gthread();
       GralWindow.this.setVisible(true);

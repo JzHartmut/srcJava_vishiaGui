@@ -100,10 +100,10 @@ public class GralButton extends GralWidget
   /**True if the button has three states: on, off, disabled. */
   protected boolean bThreeStateSwitch;
   
-  public GralButton(String sPosName)
-  {
-    super((GralPos)null, sPosName, 'B');  //GralWidget
-  }
+//  public GralButton(String sPosName)
+//  {
+//    super((GralPos)null, sPosName, 'B');  //GralWidget
+//  }
   
   public GralButton(GralPos pos, String sName)
   {

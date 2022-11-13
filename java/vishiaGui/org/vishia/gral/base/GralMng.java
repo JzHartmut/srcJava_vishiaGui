@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.event.EventTimerThread;
-import org.vishia.gral.area9.GralArea9MainCmd;
+//import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralCurveView.CommonCurve;
 import org.vishia.gral.base.GralGraphicThread.ImplAccess;
 import org.vishia.gral.cfg.GralCfgBuilder;
@@ -52,6 +52,7 @@ import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.Report;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Assert;
 import org.vishia.util.CheckVs;
 import org.vishia.util.Debugutil;
@@ -80,6 +81,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-27 Hartmut chg now the singleton concept is obsolete. Some more refactoring.
    * <li>2022-10-27 Hartmut new {@link #createGraphic(String, char, LogMessage)} is now localized here (where else!). 
    * <li>2020-02-01 Hartmut new {@link #actionClose} sets the property to close a main Window.
    * <li>2016-11-04 Hartmut chg: {@link #notifyFocus(GralWidget)}: Only widgets with datapath. It is only for the inspector etc. TODO: Is there a list necessary? Store only the last widget in focus!
@@ -408,7 +410,6 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 	/**Any kind of TabPanel for this PanelManager TODO make protected
    */
-  public GralTabbedPanel XXXcurrTabPanel;
   
   //public GralPanel_ifc currPanel;
   
@@ -476,7 +477,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public ImplAccess _mngImpl;
   
-  private static GralMng singleton;
+  private static GralMng XXXsingleton;
 	
   /*
   public GralMng(GralGraphicThread device, LogMessage log)
@@ -498,7 +499,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       this.log = log;
     //its a user action able to use in scripts.
     userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-    if(GralMng.singleton ==null) { GralMng.singleton = this; } 
+    //if(GralMng.singleton ==null) { GralMng.singleton = this; } 
     GralPanel_ifc theWholeScreen = new GralScreen(this);       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
     this.idxPanels.put("screen", theWholeScreen);
     this.posThreadSafe = new TreeMap<Long, PosThreadSafe>();
@@ -506,6 +507,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     this.posThreadSafe.put(posCurrent.threadId, posCurrent);
   }
 
+  
+  public GralMng() {
+    this(new LogMessageStream(System.out));
+  }
   
   
   /**Creates the whole graphically representation with all given widgets on Gral level.
@@ -540,12 +545,13 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @return true if created, false if exists already.
    * @??deprecated {@link #get()} is sufficient TODO detemine log
    */
-  public static boolean create(LogMessage log){
-    if(singleton !=null) return false;
-    else { 
-      singleton = new GralMng(log);
-      return true;
-    }
+  public static boolean XXXcreate(LogMessage log){
+//    if(singleton !=null) return false;
+//    else { 
+//      singleton = new GralMng(log);
+//      return true;
+//    }
+    return false;
   }
   
 
@@ -553,12 +559,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * On creation all logging output will be redirect to System.out.
    * To use another logging output, create the GralMng using {@link GralMng#GralMng(LogMessage)}
    * on start of application, before this routine is firstly called. */
-  public static GralMng get(){ 
-    if(singleton == null) { //not initialized yet, early invocation:
-      singleton = new GralMng(new MainCmdLoggingStream(System.out));
-    }
-    return singleton; 
-  }
+//  public static GralMng get(){ 
+//    if(singleton == null) { //not initialized yet, early invocation:
+//      singleton = new GralMng(new MainCmdLoggingStream(System.out));
+//    }
+//    return singleton; 
+//  }
   
   
   /**Changes or sets the log output. See {@link #log()}.
@@ -770,10 +776,10 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   };
   
   
-  public static void createMainWindow(GralFactory factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
-    factory.createWindow(window, sizeShow, left, top, xSize, ySize);
-  }
-  
+//  public static void createMainWindow(GralFactory factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
+//    factory.createWindow(window, sizeShow, left, top, xSize, ySize);
+//  }
+//  
   
   
   /**This routine should be called in the initializing routine in the graphic thread one time.
@@ -954,14 +960,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     GralPanel_ifc panel = this.idxPanels.get(sName);
     pos.pos.parent = panel;                                // the current pos in GralMng is marked with the panel as parent
     sCurrPanel = sName;
-    if(pos.pos.parent == null && XXXcurrTabPanel !=null) {
-      //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
-      pos.pos.set(XXXcurrTabPanel.pos());  
-      pos.pos.parent = XXXcurrTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
-      idxPanels.put(sName, panel);  //TODO unnecessay, see addGridPanel
+//    if(pos.pos.parent == null && XXXcurrTabPanel !=null) {
+//      //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
+//      pos.pos.set(XXXcurrTabPanel.pos());  
+//      pos.pos.parent = XXXcurrTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
+//      idxPanels.put(sName, panel);  //TODO unnecessay, see addGridPanel
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
-    }
+//    }
     setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
     return panel;
   }
@@ -1483,9 +1489,13 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @return The GralWindow to add some more via concatenation.
    */
   public GralWindow addWindow(String posName, String sTitle) {
+    return addWindow(posName, sTitle, GralWindow.windRemoveOnClose | GralWindow.windResizeable);
+  }
+    
+  public GralWindow addWindow(String posName, String sTitle, int props) {
     GralWindow wdgg = new GralWindow(this.currPos(), posName
         , sTitle
-        , GralWindow.windRemoveOnClose | GralWindow.windResizeable);
+        , props);
     return wdgg;
   }
  
@@ -1552,20 +1562,35 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    *   'l' left, 't' top (above field) 
    * @return
    */
-  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition){
+  public GralTextField addTextField(String name, String prompt, String promptStylePosition, GralTextField.Type ... property){
     if(name !=null && name.charAt(0) == '$'){
       name = sCurrPanel + name.substring(1);
     }
-    GralTextField widgg = new GralTextField(name);
+    GralTextField widgg = new GralTextField(this.currPos(), name, property);
     widgg.setPrompt(prompt, promptStylePosition);
-    widgg.setEditable(editable);
+    //widgg.setEditable(editable);
     // createImplWidget_Gthread(widgg);
     //SwtTextFieldWrapper.createTextField(widgg, this);   
     return widgg;
   }
 
   
+  @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition){
+    return addTextField(name, prompt, promptStylePosition, GralTextField.Type.editable);
+  }
+    
+  public GralTextField addTextField(String name) {
+    return addTextField(name, false, null, null);
+  }
+
+  public GralTextField addTextField(String name, boolean editable) {
+    return addTextField(name, editable, null, null);
+  }
+
   
+  public GralTextField addTextField(String name, GralTextField.Type property) {
+    return addTextField(name, null, null, property);
+  }
 
   
 /** Adds a text box for showing or editing a text in multi lines.
@@ -1584,7 +1609,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   if(name !=null && name.charAt(0) == '$'){
     name = sCurrPanel + name.substring(1);
   }
-  GralTextBox widgg = new GralTextBox(name);
+  GralTextBox widgg = new GralTextBox(this.currPos(), name);
   char[] prompt1 = new char[1];
   prompt1[0] = promptStylePosition;
   widgg.setPrompt(prompt, new String(prompt1));
@@ -1593,6 +1618,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   //SwtTextFieldWrapper.createTextField(widgg, this);   
   return widgg;
 
+}
+
+
+
+public GralTextBox addTextBox(String posName) {
+  return new GralTextBox(currPos(), posName);
 }
 
 
@@ -1635,7 +1666,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
-  GralButton widgButton = new GralButton(sName);
+  GralButton widgButton = new GralButton(currPos(), sName);
   //SwtButton widgButton = new SwtButton(sName, this, (Composite)pos().panel.getPanelImpl(), 0, size);
   if(action !=null)
     stop();
@@ -1663,12 +1694,13 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   //, String sCmd, String sUserAction, String sName)
 )
 {
-  int ySize = (int)pos().pos.height();
-  int xSize = (int)pos().pos.width();
   
-  char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
-  GralButton widgButton = new GralButton(sName);
+  GralButton widgButton = new GralButton(currPos(), sName);
+  int ySize = (int)widgButton.pos().height();
+  int xSize = (int)widgButton.pos().width();
+  char size = ySize > 3? 'B' : 'A';
+
   widgButton.setSwitchMode(colorOff, colorOn);
   widgButton.setActionChange(action);  //maybe null
   widgButton.setText(sButtonText);
@@ -1691,11 +1723,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   //, String sCmd, String sUserAction, String sName)
 )
 {
-  int ySize = (int)pos().pos.height();
-  int xSize = (int)pos().pos.width();
+  
+  GralButton widgButton = new GralButton(currPos(), sName);
+  int ySize = (int)widgButton.pos().height();
+  int xSize = (int)widgButton.pos().width();
   
   char size = ySize > 3? 'B' : 'A';
-  GralButton widgButton = new GralButton(sName);
   widgButton.setSwitchMode(colorOff, colorOn);
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
   //in ctor: widgButton.setPanelMng(this);
@@ -1707,7 +1740,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
 
 public GralButton addCheckButton(
-  String sName
+  String sPosName
 , String sButtonTextOn
 , String sButtonTextOff
 , String sButtonTextDisabled
@@ -1716,16 +1749,13 @@ public GralButton addCheckButton(
 , GralColor colorDisabled
 )
 {
-  int ySize = (int)pos().pos.height();
-  int xSize = (int)pos().pos.width();
-  
+  GralButton widgButton = new GralButton(currPos(), sPosName);
+  int ySize = (int)widgButton.pos().height();
+  int xSize = (int)widgButton.pos().width();
   char size = ySize > 3? 'B' : 'A';
-  GralButton widgButton = new GralButton(sName);
+
   widgButton.setSwitchMode(colorOff, colorOn, colorDisabled);
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn, sButtonTextDisabled);
-  //widgButton.setPanelMng(this);
-  if(sName !=null){ registerWidget(widgButton); }
-  // createImplWidget_Gthread(widgButton);
   return widgButton;
 }
 
@@ -2065,9 +2095,9 @@ public GralButton addCheckButton(
   }
 
   
-  @Override public GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
+  @Override public GralInfoBox createHtmlInfoBox(String posName, String title, boolean onTop)
   {
-    return GralInfoBox.createHtmlInfoBox((GralPos)null, posString, name, title, onTop);
+    return GralInfoBox.createHtmlInfoBox(this, this.currPos(), posName, title, onTop);
   }
 
   
@@ -2329,7 +2359,7 @@ public GralButton addCheckButton(
     
     @Deprecated protected abstract void createSubWindow(GralWindow windowGral) throws IOException;
     
-    @Deprecated public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
+//    @Deprecated public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
     
     @Deprecated public abstract GralWidget addText(String sText, char size, int color);
     
@@ -2499,11 +2529,6 @@ public GralButton addCheckButton(
   }
 
   
-  @Override public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
-      int properties)
-  {
-    return new GralTabbedPanel(null, namePanel, user, properties);
-  }
 
   @Override public GralWidget addSlider(String sName, GralUserAction action, String sShowMethod,
       String sDataPath)

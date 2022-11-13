@@ -17,20 +17,14 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
-import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
-//import org.vishia.gral.ifc.GuiShellMngIfc;
-import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.util.KeyCode;
 import org.vishia.util.ReplaceAlias_ifc;
@@ -181,7 +175,7 @@ public interface GralMngBuild_ifc
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
    * @return The tab-container, there the tabs can be registered.
    */
-  GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int properties);
+//  GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
@@ -800,7 +794,7 @@ public interface GralMngBuild_ifc
 	
   GralInfoBox createTextInfoBox(String name, String title);
 
-  GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop);
+  GralInfoBox createHtmlInfoBox(String posName, String title, boolean onTop);
 
   /**Sets the builder for content configuration.
    * @param cfgBuilder

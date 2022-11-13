@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -67,7 +68,7 @@ public class GralCfgBuilder
   
   private final GralCfgData cfgData;
   
-  private final GralMngBuild_ifc gralMng;
+  private final GralMng gralMng;
   
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/
@@ -76,7 +77,7 @@ public class GralCfgBuilder
   private final Map<String, String> indexAlias = new TreeMap<String, String>();
   
   
-  public GralCfgBuilder(GralCfgData cfgData, GralMngBuild_ifc gui, File currentDir)
+  public GralCfgBuilder(GralCfgData cfgData, GralMng gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gralMng = gui;
@@ -133,7 +134,7 @@ public class GralCfgBuilder
         GralCfgPanel cfgPanel = panelEntry.getValue();
         if(cfgPanel.windTitle !=null) {
           Debugutil.stop();
-          GralWindow wind = new GralWindow(cfgPanel.windPos, cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
+          GralWindow wind = gralMng.addWindow(cfgPanel.windPos + "=" + cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
           wind.createImplWidget_Gthread();
         }
         else {

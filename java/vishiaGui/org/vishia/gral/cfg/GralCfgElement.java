@@ -124,31 +124,31 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    * @return
    * @throws ParseException 
    */
-  GralPos XXXsetPos(GralMngBuild_ifc guiMng) 
-  throws ParseException 
-  { GralMng mng = GralMng.get();
-    if(positionString !=null) {
-      return mng.setPos(positionString);
-    } else {
-      GralCfgPosition p = XXXpositionInput;
-      if(p.yPos >=0 || p.xPos >=0 || p.ySizeDown !=0 || p.xWidth !=0) {
-          
-        int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
-          p.ySizeDown == 0 ? GralPos.samesize : 
-          (p.ySizeFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
-        int xSize = p.xWidth == GralPos.useNatSize ? p.xWidth : 
-          p.xWidth == 0 ? GralPos.samesize :
-          (p.xSizeFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
-        mng.setFinePosition(p.yPos, p.yPosFrac, ySize, p.ySizeFrac, p.xPos, p.xPosFrac, xSize, p.xSizeFrac, 0, 'r', 0, 0, null);  
-      }
-      else {
-        stop();
-        //no position given. The new position will be set relative to the old one on widget.setToPanel.
-      }
-      return mng.getPositionInPanel();
-      //  setPosOld(guiMng);  //use inputPos
-    }
-  }  
+//  GralPos XXXsetPos(GralMngBuild_ifc guiMng) 
+//  throws ParseException 
+//  { GralMng mng = GralMng.get();
+//    if(positionString !=null) {
+//      return mng.setPos(positionString);
+//    } else {
+//      GralCfgPosition p = XXXpositionInput;
+//      if(p.yPos >=0 || p.xPos >=0 || p.ySizeDown !=0 || p.xWidth !=0) {
+//          
+//        int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
+//          p.ySizeDown == 0 ? GralPos.samesize : 
+//          (p.ySizeFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
+//        int xSize = p.xWidth == GralPos.useNatSize ? p.xWidth : 
+//          p.xWidth == 0 ? GralPos.samesize :
+//          (p.xSizeFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
+//        mng.setFinePosition(p.yPos, p.yPosFrac, ySize, p.ySizeFrac, p.xPos, p.xPosFrac, xSize, p.xSizeFrac, 0, 'r', 0, 0, null);  
+//      }
+//      else {
+//        stop();
+//        //no position given. The new position will be set relative to the old one on widget.setToPanel.
+//      }
+//      return mng.getPositionInPanel();
+//      //  setPosOld(guiMng);  //use inputPos
+//    }
+//  }  
   
   
   

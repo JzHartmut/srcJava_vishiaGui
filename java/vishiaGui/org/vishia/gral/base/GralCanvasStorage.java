@@ -625,12 +625,12 @@ public class GralCanvasStorage implements GralCanvas_ifc
     public Object getImplStore(){ return implStore; }
 
     /**Gets the implementation specific instance. */
-    public int[] getImplStoreInt1Array(){ 
+    public int[] getImplStoreInt1Array ( GralGridProperties props ){ 
       if(implStore == null) {
         int[] store = new int[2*points.length];
         implStore = store;
         int ixd = -1;
-        GralGridProperties props = GralMng.get().propertiesGui;
+        //GralGridProperties props = mng.propertiesGui;
         int fxp = props.xPixelUnit();
         int fyp = props.yPixelUnit();
         for(float[] point: points){

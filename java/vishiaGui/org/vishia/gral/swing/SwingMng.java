@@ -8,9 +8,7 @@ import org.vishia.gral.base.GralCurveView.CommonCurve;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
@@ -84,12 +82,7 @@ public class SwingMng  extends GralMng.ImplAccess {
     
   }
 
-  @Override public GralTabbedPanel addTabbedPanel ( String namePanel, GralPanelActivated_ifc user, int property ) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override public GralWidget addText ( String sText, char size, int color ) {
+   @Override public GralWidget addText ( String sText, char size, int color ) {
     // TODO Auto-generated method stub
     return null;
   }

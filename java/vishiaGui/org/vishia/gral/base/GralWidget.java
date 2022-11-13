@@ -742,7 +742,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
 
 
   public GralWidget ( GralPos currPos, String posName, String name, char whatIs){
-    this(currPos, posName, name, whatIs, GralMng.get());
+    this(currPos, posName, name, whatIs, null);
   }
   
   
@@ -1835,12 +1835,13 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
               && --catastrophicalCount >=0){
             parent.getImplAccess().setFocusGThread();
             parent.setVisibleStateWidget(true);
-            if(parent instanceof GralTabbedPanel) {
+            if((parent instanceof GralPanelContent)){ // && ((GralPanelContent)parent).isTabbed()) {
               //TabbedPanel: The tab where the widget is member of have to be set as active one.
-              GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
-              if(child instanceof GralPanelContent) {
-                panelTabbed.selectTab(child.getName());
-              }
+              GralPanelContent panel = (GralPanelContent)parent;
+              panel.setPrimaryWidget(this);
+//              if(child instanceof GralPanelContent) {
+//                panelTabbed.selectTab(child.getName());
+//              }
               //String name = panel1.getName();
               //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
             }
@@ -2388,7 +2389,7 @@ class GralWidgetSetMng {
       } else if(pos !=null && pos.parent !=null) {
         this.itsMng = pos.parent.gralMng();
       } else {
-        this.itsMng = GralMng.get(); //deprecated approach with singleton.
+        this.itsMng = gralMng; //deprecated approach with singleton.
       }
     }
 
