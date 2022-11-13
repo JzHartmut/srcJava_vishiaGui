@@ -43,7 +43,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   public final static int version = 0x20111119;
   
   
-  private static SwtMng mngs;
+  //private static SwtMng mngs;
   
   public final SwtMng mng;
   
@@ -52,8 +52,9 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
 
 
   public SwtWidgetHelper(Control widgetSwt, SwtMng mng)
-  { if(SwtWidgetHelper.mngs !=null){ assert(SwtWidgetHelper.mngs == mng); }
-    else {SwtWidgetHelper.mngs = mng; }
+  { 
+//    if(SwtWidgetHelper.mngs !=null){ assert(SwtWidgetHelper.mngs == mng); }
+//    else {SwtWidgetHelper.mngs = mng; }
     this.widgetSwt = widgetSwt;
     this.mng = mng;
   }
@@ -69,23 +70,23 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   }
   
   
-  public static Color getColor(GralColor color){ return mngs.propertiesGuiSwt.colorSwt(color); }
+//  public static Color getColor(GralColor color){ return mng.propertiesGuiSwt.colorSwt(color); }
   
-  public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
-  { Color colorSwt = getColor(color);
-    Color colorSwtOld = swtWidget.getBackground();
-    swtWidget.setBackground(colorSwt);
-    return getColor(colorSwtOld);
-  }
+//  public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
+//  { Color colorSwt = getColor(color);
+//    Color colorSwtOld = swtWidget.getBackground();
+//    swtWidget.setBackground(colorSwt);
+//    return getColor(colorSwtOld);
+//  }
 
   
-  public static GralColor setForegroundColor(GralColor color, Control swtWidget)
-  { 
-    Color colorSwt = (Color)color.colorGuimpl;
-    Color colorSwtOld = swtWidget.getForeground();
-    swtWidget.setForeground(colorSwt);
-    return getColor(colorSwtOld);
-  }
+//  public static GralColor setForegroundColor(GralColor color, Control swtWidget)
+//  { 
+//    Color colorSwt = (Color)color.colorGuimpl;
+//    Color colorSwtOld = swtWidget.getForeground();
+//    swtWidget.setForeground(colorSwt);
+//    return getColor(colorSwtOld);
+//  }
 
 
   /**Sets the correct TabItem if any widget at this TabItem is focused. That is not done by swt graphic

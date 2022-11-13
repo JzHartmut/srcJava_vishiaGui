@@ -141,7 +141,7 @@ public class GuiCallingArgs extends Arguments
       cargs.sTitle = value;  //the graphic GUI-appearance
     }
     else if((value = checkArgVal("-gui", arg)) !=null)      
-    { cargs.fileGuiCfg = new File(value);  //the graphic GUI-appearance
+    { cargs.fileGuiCfg = new File(System.getProperty("user.dir"), value);  //the graphic GUI-appearance
     
     }
     else if((value = checkArgVal("-cfg", arg)) !=null)      
@@ -175,11 +175,11 @@ public class GuiCallingArgs extends Arguments
     { cargs.positionWindow = "0..0,0..0";
     }
     else if ((value = checkArgVal("-help", arg)) !=null) {
-      File file1 = new File(value);
+      File file1 = new File(System.getProperty("user.dir"), value);
       String sPathHelpAbs = file1.getAbsolutePath();
       cargs.dirHtmlHelp = new File(sPathHelpAbs);  //should be absolute because browser.
     } else if ((value = checkArgVal("-msgcfg", arg)) !=null) {
-      cargs.msgConfig = new File(value);
+      cargs.msgConfig = new File(System.getProperty("user.dir"), value);
     }
     else if((value = checkArgVal("-syntax", arg)) !=null) 
     { cargs.sPathZbnf = value;   //an example for default output

@@ -131,12 +131,6 @@ public class GralCanvasArea extends GralWidget
       
     }
 
-    @Override public Object getWidgetImplementation()
-    {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
     @Override public void setBoundsPixel(int x, int y, int dx, int dy)
     {
       // TODO Auto-generated method stub

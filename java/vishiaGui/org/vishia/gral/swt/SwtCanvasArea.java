@@ -58,6 +58,7 @@ public class SwtCanvasArea extends GralCanvasArea._GraphicImplAccess_
     Object swtPanel = panel.getImplAccess().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
     this.swtCanvas = new SwtWdgCanvas(this, mng, gralPlotArea.getCanvasStore(0) , panelSwt, SWT.NO_BACKGROUND);
+    super.wdgimpl = this.swtCanvas;
     this.swtCanvas.setBackground(mng.getColorImpl(GralColor.getColor("white")));
     mng.setPosAndSizeSwt( gralPlotArea.pos(), this.swtCanvas, 800, 600);
     this.swtCanvas.addPaintListener(this.paintListener);
