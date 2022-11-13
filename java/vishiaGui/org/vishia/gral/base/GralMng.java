@@ -792,7 +792,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     //
     selectPanel("primaryWindow");
     setPosition(0,40,10,0,0,'.');
-    infoHelp = GralInfoBox.createHtmlInfoBox(null, null, "Help", "Help", true);
+    infoHelp = GralInfoBox.createHtmlInfoBox(this, currPos(), "Help", "Help", true);
     if(mainCmd !=null) {
       try{
         for(String line: mainCmd.listHelpInfo){
@@ -1648,6 +1648,15 @@ public GralTextBox addTextBox(String posName) {
   )
 { return addButton(sName, action, null, null, sButtonText);
 }  
+
+
+
+
+public GralButton addButton ( String sName , String sButtonText , GralUserAction action ) {
+  return addButton(sName, action, null, null, sButtonText);
+}  
+
+
 
 @Override public GralButton addButton(
   String sName
@@ -2541,7 +2550,7 @@ public GralButton addCheckButton(
 
   @Override public GralTable addTable(String sPosName, int height, int[] columnWidths)
   {
-    GralTable table = new GralTable<>(sPosName, height, columnWidths);
+    GralTable table = new GralTable<>(this.currPos(), sPosName, height, columnWidths);
     return table;
   }
 

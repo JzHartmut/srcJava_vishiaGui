@@ -1935,7 +1935,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    *   The value of the latest call of this operation is valid if the redraw event is delayed.
    */
   public void redraw ( int delay, int latest, boolean onlyDynamics ){
-    if(itsMng !=null && itsMng._mngImpl !=null ){ //NOTE: set of changes is possible before setToPanel was called. 
+    if(itsMng !=null && itsMng._mngImpl !=null && this._wdgImpl!=null ) { //NOTE: set of changes is possible before setToPanel was called. 
       this._wdgImpl.bRedrawOnlyDynamics = onlyDynamics;
       if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
         _wdgImpl.repaintGthread();

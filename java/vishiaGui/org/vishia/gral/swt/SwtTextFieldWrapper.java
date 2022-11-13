@@ -146,7 +146,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       promptSwt.setText(prompt());
       promptSwt.setBackground(null);
     }
-    textFieldSwt =  new Text(panelSwt, textProperties);
+    this.textFieldSwt =  new Text(panelSwt, textProperties);
     //textFieldSwt.setBounds(boundsField.x, boundsField.y, boundsField.dx, boundsField.dy);
     textFieldSwt.setFont(swtMng.propertiesGuiSwt.stdInputFont);
     textFieldSwt.setEditable(widgg.isEditable());

@@ -331,7 +331,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     
     FileSelectList(GralFileSelector outer, String posName, int rows, int[] columns, char size){
       //super(name, mng);
-      super(posName, rows, columns, size);
+      super(pos(), posName, rows, columns, size);
       this.outer = outer;
       if(columns.length !=4) { throw new IllegalArgumentException("FileSelectList should have 4 columns");}
       super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.ctrl + KeyCode.pgdn);
@@ -639,7 +639,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   public GralFileSelector(GralPos currPos, String name, int rows, int[] columns, int[] columnsFavorlist)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(currPos, name, 'f');
-    favorList = columnsFavorlist !=null ? new GralTable<String>(name, columnsFavorlist) : null;
+    favorList = columnsFavorlist !=null ? new GralTable<String>(currPos, name, 50, columnsFavorlist) : null;
     selectList = new FileSelectList(this, name, rows, columns, 'A');
     colorBack = GralColor.getColor("wh");
     colorBackPending = GralColor.getColor("pma");
@@ -679,7 +679,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     GralMenu menuFolder = widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    widgBtnFavor = new GralButton(null, "favor", actionFavorButton);
+    widgBtnFavor = new GralButton(this.gralMng().currPos(), "favor", "favor", actionFavorButton);
     // widgBtnFavor.createImplWidget_Gthread();
     widgBtnFavor.setVisible(false);
     //the list

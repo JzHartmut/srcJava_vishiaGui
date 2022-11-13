@@ -3,6 +3,7 @@ package org.vishia.gral.widget;
 import java.util.List;
 import java.util.Map;
 
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -87,12 +88,12 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  protected GralSelectList(String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
+  protected GralSelectList(GralPos currPos, String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
   {
     if(posName == null){
       Assert.stop();
     }
-    wdgdTable = new GralTable<UserData>(posName, rows, columns);
+    wdgdTable = new GralTable<UserData>(currPos, posName, rows, columns);
     wdgdTable.setVisible(true);
   }
 

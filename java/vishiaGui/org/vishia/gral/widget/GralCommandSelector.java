@@ -6,6 +6,7 @@ import java.util.List;
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.JZtxtcmdScript;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -88,8 +89,8 @@ public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutin
   
   final Appendable out;
   
-  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
-  { super(name, rows, columns, size);
+  public GralCommandSelector(GralPos currPos, String name, int rows, int[] columns, char size, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
+  { super(currPos, name, rows, columns, size);
     this.cmdExecuter = cmdExecuter;
     this.out = out;
     //this.cmdStore = new CmdStore();

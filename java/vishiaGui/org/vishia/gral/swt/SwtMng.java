@@ -1001,7 +1001,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	
   @Override @Deprecated public GralTable addTable(String sName, int height, int[] columnWidths)
   {
-    GralTable table = new GralTable(sName, columnWidths);
+    GralTable table = new GralTable(null, sName, 20, columnWidths);
     return SwtTable.addTable(table, this, sName, height, columnWidths);
 
   }

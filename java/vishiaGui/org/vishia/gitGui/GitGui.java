@@ -668,42 +668,42 @@ public class GitGui
 
   final GralTextField wdgCmd = this.gralMng.addTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
   
-  final GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
+  final GralButton wdgBtnCmd = this.gralMng.addButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
 
   
-  final GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..50=git-versions", new int[] {2, 10, 0, -10});
+  final GralTable<RevisionEntry> wdgTableVersion = new GralTable<RevisionEntry>(this.gralMng.currPos(), "@3..-30,0..50=git-versions", 50, new int[] {2, 10, 0, -10});
   
-  final GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,51..0=git-files", new int[] {3,20,0});
+  final GralTable<String> wdgTableFiles = new GralTable<String>(this.gralMng.currPos(), "@3..-30,51..0=git-files", 50, new int[] {3,20,0});
   
   final GralTextBox wdgInfo = this.gralMng.addTextBox("@-30..0, 0..-20=info");
 
-  final GralButton wdgBtnDiffCurrWork = new GralButton("@-30+2, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
+  final GralButton wdgBtnDiffCurrWork = new GralButton(this.gralMng.currPos(), "@-30+2, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
 
-  final GralButton wdgBtnDiffCurrFile = new GralButton("@-27+2, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
+  final GralButton wdgBtnDiffCurrFile = new GralButton(this.gralMng.currPos(), "@-27+2, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
 
-  final GralButton wdgBtnPull = new GralButton("@-21+2, -20..-15 = pull", "pull", this.actionPull);
+  final GralButton wdgBtnPull = new GralButton(this.gralMng.currPos(), "@-21+2, -20..-15 = pull", "pull", this.actionPull);
 
-  final GralButton wdgBtnPush = new GralButton("@-21+2, -7..-1 = push", "push", this.actionPush);
+  final GralButton wdgBtnPush = new GralButton(this.gralMng.currPos(), "@-21+2, -7..-1 = push", "push", this.actionPush);
 
-  final GralButton wdgBtnBlame = new GralButton("@-18..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
+  final GralButton wdgBtnBlame = new GralButton(this.gralMng.currPos(), "@-18..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
 
-  final GralButton wdgBtnDaylyBranch = new GralButton("@-15+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
+  final GralButton wdgBtnDaylyBranch = new GralButton(this.gralMng.currPos(), "@-15+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
 
-  final GralButton wdgBtnDaylyMain = new GralButton("@-15+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
+  final GralButton wdgBtnDaylyMain = new GralButton(this.gralMng.currPos(), "@-15+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
 
-  final GralButton wdgBtnAdd = new GralButton("@-12+2, -9..-1 = add", "add", this.actionAdd);
+  final GralButton wdgBtnAdd = new GralButton(this.gralMng.currPos(), "@-12+2, -9..-1 = add", "add", this.actionAdd);
 
-  final GralButton wdgBtnMove = new GralButton("@-12+2, -18..-10 = move", "move", this.actionMove);
+  final GralButton wdgBtnMove = new GralButton(this.gralMng.currPos(), "@-12+2, -18..-10 = move", "move", this.actionMove);
 
-  final GralButton wdgBtnCommitText = new GralButton("@-9+2, -20..-10 = commitText", "commit-text", this.actionOpenCommitText);
+  final GralButton wdgBtnCommitText = new GralButton(this.gralMng.currPos(), "@-9+2, -20..-10 = commitText", "commit-text", this.actionOpenCommitText);
 
-  final GralButton wdgBtnCommit = new GralButton("@-6+2, -20..-10 = commit", "do commit", this.actionCommit);
+  final GralButton wdgBtnCommit = new GralButton(this.gralMng.currPos(), "@-6+2, -20..-10 = commit", "do commit", this.actionCommit);
 
-  final GralButton wdgBtnRefresh = new GralButton("@-6+2, -9..-1 = refresh", "refresh", this.actionRefresh);
+  final GralButton wdgBtnRefresh = new GralButton(this.gralMng.currPos(), "@-6+2, -9..-1 = refresh", "refresh", this.actionRefresh);
 
-  final GralButton wdgBtnCleanInfo = new GralButton("@-3+2, -20..-10 = cleanInfo", "clean Info", this.actionCleanInfo);
+  final GralButton wdgBtnCleanInfo = new GralButton(this.gralMng.currPos(), "@-3+2, -20..-10 = cleanInfo", "clean Info", this.actionCleanInfo);
   
-  final GralButton wdgBtnShowCmd = new GralButton("@-3+2, -9..-1 = showCmd", "showCmd", this.actionShowExec);
+  final GralButton wdgBtnShowCmd = new GralButton(this.gralMng.currPos(), "@-3+2, -9..-1 = showCmd", "showCmd", this.actionShowExec);
   
 
 

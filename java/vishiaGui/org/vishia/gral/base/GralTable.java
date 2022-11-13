@@ -403,9 +403,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
    * see {@link #GralTable(String, int, int[])}, zLineMax is 50. 
    */
-  public GralTable ( String posName, int[] columnWidths) {
-    this(posName, 50, columnWidths);
-  }
+//  public GralTable ( String posName, int[] columnWidths) {
+//    this(posName, 50, columnWidths);
+//  }
   
   
   
@@ -436,9 +436,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
 
   
-  public GralTable ( String posName, int zLineMax, int[] columnWidths) {
-    this(null, posName, zLineMax, columnWidths);
-  }  
+//  public GralTable ( String posName, int zLineMax, int[] columnWidths) {
+//    this(null, posName, zLineMax, columnWidths);
+//  }  
   
   /**Constructs a table with position
    * @param pos String given position in GralPos units.
@@ -446,8 +446,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable ( String pos, String name, int[] columnWidths) 
-  { this(pos !=null ? ((pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, columnWidths); }
+//  public GralTable ( String pos, String name, int[] columnWidths) 
+//  { this(pos !=null ? ((pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, columnWidths); }
   
   
   

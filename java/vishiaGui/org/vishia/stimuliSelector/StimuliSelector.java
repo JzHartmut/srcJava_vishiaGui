@@ -225,7 +225,7 @@ public class StimuliSelector
       int[] columnWidths = new int[2];
       columnWidths[0] = 15;
       columnWidths[1] = 0;
-      this.wdgTables[iTable] = new GralTable<>(name, columnWidths);
+      this.wdgTables[iTable] = new GralTable<Map<String, DataAccess.Variable<Object>>>(this.gralMng.currPos(), name, 20, columnWidths); //new GralTable<>(name, columnWidths);
       this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
       this.wdgTables[iTable].specifyActionOnLineSelected(this.actionSelectInTable);
       StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", this.actionTouchLine);
@@ -235,46 +235,46 @@ public class StimuliSelector
     }
     this.wdgLastSelectedTable = this.wdgTables[0]; //default
     this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
-    this.btnCleanOut = new GralButton("cleanOut", "clean output", this.actionCleanOut);
-    this.btnReadConfig = new GralButton("readConfig", "read config", this.actionReadConfig);
+    this.btnCleanOut = this.gralMng.addButton("cleanOut", this.actionCleanOut, "clean output");
+    this.btnReadConfig = this.gralMng.addButton("readConfig", this.actionReadConfig, "read config");
     StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
-    this.btnGenTestcases = new GralButton("genTestCase", "gen test cases", this.actionGenTestcases);
+    this.btnGenTestcases = this.gralMng.addButton("genTestCase", this.actionGenTestcases, "gen test cases");
     StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
-    this.btnGenSelection = new GralButton("genSelection", "gen selection", new GralUserActionButton("btnGenSelection"));
+    this.btnGenSelection = this.gralMng.addButton("genSelection", new GralUserActionButton("btnGenSelection"), "gen selection");
     JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
     if(sub1 !=null) {
       String btnText = sub1.formalArgs.get(0).textArg;
       if(btnText == null) { btnText = sub1.name; }
-      this.btnExecSelection[0] = new GralButton("btnExec11", btnText, new GralUserActionButton("btnExec1"));
+      this.btnExecSelection[0] = this.gralMng.addButton("btnExec11", new GralUserActionButton("btnExec1"), btnText);
     }
     JZtxtcmdScript.Subroutine sub2 = this.script.getSubroutine("btnExec2");
     if(sub2 !=null) {
       String btnText = sub2.formalArgs.get(0).textArg;
       if(btnText == null) { btnText = sub2.name; }
-      this.btnExecSelection[1] = new GralButton("btnExec12", btnText, new GralUserActionButton("btnExec2"));
+      this.btnExecSelection[1] = this.gralMng.addButton("btnExec12", btnText, new GralUserActionButton("btnExec2"));
     }
     JZtxtcmdScript.Subroutine sub3 = this.script.getSubroutine("btnExec3");
     if(sub3 !=null) {
       String btnText = sub3.formalArgs.get(0).textArg;
       if(btnText == null) { btnText = sub3.name; }
-      this.btnExecSelection[2] = new GralButton("btnExec13", btnText, new GralUserActionButton("btnExec3"));
+      this.btnExecSelection[2] = this.gralMng.addButton("btnExec13", btnText, new GralUserActionButton("btnExec3"));
     }
     JZtxtcmdScript.Subroutine sub4 = this.script.getSubroutine("btnExec4");
     if(sub4 !=null) {
       String btnText = sub4.formalArgs.get(0).textArg;
       if(btnText == null) { btnText = sub4.name; }
-      this.btnExecSelection[3] = new GralButton("btnExec4", btnText, new GralUserActionButton("btnExec4"));
+      this.btnExecSelection[3] = this.gralMng.addButton("btnExec4", btnText, new GralUserActionButton("btnExec4"));
     }
     StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 0, 'd');
     this.wdgSelects = StimuliSelector.this.gralMng.addTextBox("test", true, null, 'r');
     this.wdgSelects.setText("");
     this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
     this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
-    this.btnAddTestcase = new GralButton("addTestCase", "add sel", this.actionAddTestcases);
-    this.btnHelp = new GralButton("help", "help", null);   //this.actionHelp);
+    this.btnAddTestcase = this.gralMng.addButton("addTestCase", "add sel", this.actionAddTestcases);
+    this.btnHelp = this.gralMng.addButton("help", "help", null);   //this.actionHelp);
     this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
-    this.btnExampleSel = new GralButton("exmpl", "show", this.actionShowSel);
-    this.btnDeselectLines = new GralButton("cleanSelTable ", "clean", this.actionDeselectLines);
+    this.btnExampleSel = this.gralMng.addButton("exmpl", "show", this.actionShowSel);
+    this.btnDeselectLines = this.gralMng.addButton("cleanSelTable ", "clean", this.actionDeselectLines);
     this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
     this.output = this.gralMng.addTextBox("output");
     this.outOld = System.out; this.errOld = System.err;

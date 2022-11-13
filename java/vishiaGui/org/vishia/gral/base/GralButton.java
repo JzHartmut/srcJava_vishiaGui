@@ -121,8 +121,8 @@ public class GralButton extends GralWidget
     if(action !=null) { specifyActionChange(null, action, null); }
   }
   
-  public GralButton(String sPosName, String sText, GralUserAction action)
-  { this((GralPos)null, sPosName, sText, action);    }
+//  public GralButton(String sPosName, String sText, GralUserAction action)
+//  { this((GralPos)null, sPosName, sText, action);    }
   
     
   @Deprecated public GralButton(String position, String sName, String sText, GralUserAction action)

@@ -65,7 +65,8 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
       //parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
     }
     try {
-      boxSwt = new Browser(parent,0);
+      this.boxSwt = new Browser(parent,0);
+      super.wdgimpl = this.boxSwt;
       //mng.registerWidget(this);
       mngSwt.setPosAndSizeSwt(box.pos(), boxSwt, 0, 0);
     } catch(Throwable exc){
