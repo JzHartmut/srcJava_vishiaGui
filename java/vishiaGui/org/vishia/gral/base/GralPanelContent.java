@@ -168,9 +168,10 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @param namePanel can also be combined "@pos=name"
    * @param whatIsit See {@link GralWidget#whatIs}
    */
-  public GralPanelContent(GralPos currPos, String posName, char whatIsit, GralMng gralMng)
+  public GralPanelContent(GralPos refPos, String posName, char whatIsit, GralMng gralMng)
   //public PanelContent(CanvasStorePanel panelComposite)
-  { super(currPos, posName, whatIsit, gralMng);
+  { super(refPos, posName, whatIsit, gralMng);
+    refPos.setFullPanel(this);
     gralMng.registerPanel(this);
     if(super._wdgPos.parent instanceof GralWindow) {       // replaces the main panel of the window:
       GralWindow window = (GralWindow) super._wdgPos.parent;

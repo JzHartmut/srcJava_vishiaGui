@@ -188,7 +188,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     if((windProps & windResizeable)!=0){
       this.resizeAction = new ActionResizeOnePanel();
     }
-
+    refPos.set(posPanel);
+    
   }
 
   public GralWindow(GralPos currPos, String posName, String sTitle, int windProps)

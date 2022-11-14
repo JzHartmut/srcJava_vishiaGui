@@ -197,6 +197,22 @@ public final class GralCfgData
   }
   
   
+  /**ZBNF: Window::= ... ;
+   * Class for instance to capture and store the Table data. */
+  public final static class GuiCfgWindow extends GuiCfgWidget implements Cloneable
+  {
+    String title;
+    
+    public GuiCfgWindow(GralCfgElement itsElement){ super(itsElement, 'w'); }
+    
+    public void set_title(String val) {
+      this.title = val;
+    }
+      //colorName = 
+    @Override public String toString() { return "Window: " + super.name; }
+  }
+  
+  
   /**ZBNF: Text::= ... ;
    * Class for instance to capture and store the Table data. */
   public final static class GuiCfgText extends GuiCfgWidget implements Cloneable
@@ -447,6 +463,10 @@ public final class GralCfgData
   private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
 
   
+  /**Map of panels. Filled via {@link #add_Element(GralCfgElement)}  */
+  private final Map<String, GralCfgElement> idxWindow = new TreeMap<String,GralCfgElement>();
+
+  
   public GralCfgData(List<String> conditions)
   {
     this.cfgConditions = conditions;
@@ -454,6 +474,8 @@ public final class GralCfgData
   
   
   public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return idxPanels.entrySet(); } 
+  
+  public Set<Map.Entry<String, GralCfgElement>> getWindows(){return idxWindow.entrySet(); } 
   
   /**ZBNF: size( <#?ySize> , <#?xSize> ) */
   public void set_ySize(int value)
@@ -518,13 +540,14 @@ public final class GralCfgData
   
 
   public GralCfgPanel new_Window()
-  { GralCfgPanel panel = new GralCfgPanel();
+  { assert(false);
+    GralCfgPanel panel = new GralCfgPanel();
     panel.widgetType = new GuiCfgWidget(panel, 'w');
     return panel;
   }
 
   public void add_Window(GralCfgPanel panel)
-  {
+  { assert(false);
     idxPanels.put(panel.name, panel); 
     listElementsInTextfileOrder.add(panel);  //list of elements in text file
     
@@ -566,21 +589,25 @@ public final class GralCfgData
       String sPanel = value.panel;
       if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
         stop();
-      if(sPanel == null){ //the last panel is used furthermore.
-        if(actPanel == null){ 
-          actPanel = new GralCfgPanel("$");
+      if (value.widgetType instanceof GuiCfgWindow){
+        this.idxWindow.put(value.widgetType.name, value);
+      } else {
+        if(sPanel == null){                      //the last panel is used furthermore.
+          if(actPanel == null) {                  
+            actPanel = new GralCfgPanel("$");    // first panel at all
+          }
+          sPanel = this.actPanel.name;
+          value.setPanel(sPanel);
+        } else {                                           //a panel is given.
+          this.actPanel = this.idxPanels.get(sPanel); 
+          if(actPanel == null){                            //first time use that:
+            this.actPanel = new GralCfgPanel(sPanel);      // an unknown panel forces a tab in the given panel. Since 2010
+            this.idxPanels.put(sPanel, this.actPanel);
+          }
         }
-        sPanel = actPanel.name;
-        value.setPanel(sPanel);
-      } else { //a panel is given.
-        actPanel = idxPanels.get(sPanel); 
-        if(actPanel == null){ //first time use that:
-          actPanel = new GralCfgPanel(sPanel);
-          idxPanels.put(sPanel, actPanel);
-        }
+        this.actPanel.listElements.add(value);      //list of elements in panels   
       }
-      actPanel.listElements.add(value);      //list of elements in panels   
-      listElementsInTextfileOrder.add(value);  //list of elements in text file
+      this.listElementsInTextfileOrder.add(value);  //list of elements in text file
     }
     newGuiElement = null;
   } 

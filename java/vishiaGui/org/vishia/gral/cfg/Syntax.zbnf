@@ -7,7 +7,7 @@ GuiDialogZbnfControlled::=
 | DataReplace: <DataReplace>
 | Type <Type>
 | if <Conditional> 
-| <Element>    
+| <Element>                               ## All widgets are an GralCfgElement. Inside widgetType references the particular type.    
 } \e.
 
 
@@ -27,9 +27,11 @@ endif[;]
 
 
 Element::=
-[@[<$?panel> ,]<*:?positionString>:]
- [ Led <Led> 
- | <Button> 
+[@[<$?panel> ,]<*:?positionString> [ = <$-/?name>] :        ## Position and name same for all elements.
+| <$-/?name> :                                              ## Only the name if next position
+|]
+ [ Led <Led>                                                ## Each widget type has its own subclass of GralCfgData.Type
+ | <Button>                                                 ## It is stored in GralCfgElement#widgetType
  | SwitchButton ( <param?SwitchButton> ) ; 
  | ValueBar ( <param?ValueBar> ) ;
  | InputTextline ( <param?InputTextline> ) ;
@@ -44,6 +46,7 @@ Element::=
  | <Imagefile>
  | <Line>
  | <Curveview>
+ | Window <Window> 
 ## | <InputField>
  | <FileInputField>
  ] 
@@ -55,7 +58,8 @@ Element::=
 DataReplace::= <$?key> = <$-/\.:?string> ;.
 
 param::=<?>
-{ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
+{
+[ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
 | cmd =  [<""?cmd>|\[<*\]?cmd>\]] 
 | text = [<""?text>|<$-/?text>] 
 | name = [<""?name>|<$-/?name>] 
@@ -75,9 +79,13 @@ param::=<?>
 | <""?text>
 | <$-/\.:?text>
 ##| <*,)?text>
+|]
 ? , 
 }.
 
+
+
+Window::= [<""?title> | <$-\ ?title>] [( <param?Window> )] ;.
 
 
 Type::= [(<$?typeName>)|<$?typeName>] [: <param?>|( <param?> )] ;.

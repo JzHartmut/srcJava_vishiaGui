@@ -414,9 +414,26 @@ public class GralPos implements Cloneable
     this.y.p1Frac = pos.y.p1Frac; this.y.p2Frac = pos.y.p2Frac;
     this.x.origin = pos.x.origin; this.y.origin = pos.y.origin; 
     this.x.dirNext = pos.x.dirNext; this.y.dirNext = pos.y.dirNext;
+    this.x.n1 = pos.x.n1; this.y.n1 = pos.y.n1;
+    this.x.n2 = pos.x.n2; this.y.n2 = pos.y.n2;
     this.parent = pos.parent;
   }
   
+  
+  /**Sets the position to the given full panel.
+   * @param panel
+   */
+  public void setFullPanel(GralPanelContent panel) {
+    this.x.p1 = 0; this.x.p2 = 0; 
+    this.y.p1 = 0; this.y.p2 = 0;
+    this.x.p1Frac = 0; this.x.p2Frac = 0; 
+    this.y.p1Frac = 0; this.y.p2Frac = 0;
+    this.x.origin = 0; this.y.origin = 0; 
+    this.x.dirNext = 'R'; this.y.dirNext = 'D';
+    this.parent = panel;
+    this.x.n1 = -1; this.y.n1 = -1;
+    this.x.n2 = -1; this.y.n2 = -1;
+  }
   
   
   public void setPosition(float line, float column)

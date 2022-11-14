@@ -18,6 +18,6 @@ if test -d ../../srcJava_vishiaBase; then export vishiaBase="../../srcJava_vishi
 else export vishiaBase="../../java_vishiaBase/makeScripts"
 fi
 
-$vishiaBase/-genjavadocbase.sh
+$vishiaBase/makeScripts/-genjavadocbase.sh
 
 

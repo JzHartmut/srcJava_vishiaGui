@@ -25,6 +25,7 @@ import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
 import org.vishia.gral.cfg.GralCfgWriter;
+import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralCurveView_ifc;
 import org.vishia.gral.ifc.GralFactory;
@@ -510,6 +511,18 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   public GralMng() {
     this(new LogMessageStream(System.out));
+  }
+  
+  
+  
+  public String initScript(String script) {
+    String sError = null;
+    try {
+      GralCfgZbnf.configWithZbnf(script, this);         // does all, reads the config file, parses, creates Graphic Elements
+    } catch (ParseException exc) {
+      sError = exc.getMessage();
+    }
+    return sError;
   }
   
   

@@ -38,7 +38,7 @@ java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
  * @author Hartmut Schorrig
  *
  */
-public class GralCfgWindow
+public class GralCfgWindow_Old
 {
   
   /**The version, history and license.
@@ -98,7 +98,7 @@ public class GralCfgWindow
    * @param log interface for logging output of parser and creation.
    * @throws ParseException on errors in the sCfg
    */
-  @Deprecated private GralCfgWindow(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
+  @Deprecated private GralCfgWindow_Old(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
 //    this.log = log !=null ? log : log;
     this.guiCfgData = new GralCfgData(null);  //no config conditions given.
     this.imgDir = imgDir;
@@ -130,7 +130,7 @@ public class GralCfgWindow
   @Deprecated public static GralWindow createWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
   throws ParseException
   {
-    GralCfgWindow thiz = new GralCfgWindow(sName, sTitle, size, sCfg, imgDir, log);
+    GralCfgWindow_Old thiz = new GralCfgWindow_Old(sName, sTitle, size, sCfg, imgDir, log);
     return thiz.window;
   }
   
@@ -157,10 +157,10 @@ public class GralCfgWindow
     @Override public void executeOrder(){
       GralMng mng = gralMng;
       mng.selectPanel("primaryWindow");  //window position relative to the primary window.
-      GralCfgWindow.this.window.setToPanel(mng);
-      GralCfgWindow.this.window.setVisible(true);
-      GralCfgBuilder cfgBuilder = new GralCfgBuilder(GralCfgWindow.this.guiCfgData, mng, GralCfgWindow.this.imgDir);
-      String sError = cfgBuilder.buildGui(GralCfgWindow.this.gralMng.log, 0);
+      GralCfgWindow_Old.this.window.setToPanel(mng);
+      GralCfgWindow_Old.this.window.setVisible(true);
+      GralCfgBuilder cfgBuilder = new GralCfgBuilder(GralCfgWindow_Old.this.guiCfgData, mng, GralCfgWindow_Old.this.imgDir);
+      String sError = cfgBuilder.buildGui(GralCfgWindow_Old.this.gralMng.log, 0);
       if(sError !=null) {
         System.err.println(sError);
       }

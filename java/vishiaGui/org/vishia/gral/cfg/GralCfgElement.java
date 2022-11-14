@@ -88,6 +88,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   //private final GralPos posInput = new GralPos();
   
+  /**The particular widget cfg data for this element.  */
   GuiCfgWidget widgetType;
   
   GralCfgElement() //GralCfgData itsCfgData)
@@ -181,6 +182,16 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**ZBNF: <?position> */
   public void set_position(GralCfgPosition val) {  } //is set only
  
+  /**ZBNF: Window::= */
+  public GralCfgData.GuiCfgWindow new_Window()
+  { GralCfgData.GuiCfgWindow widgetType1 = new GralCfgData.GuiCfgWindow(this); 
+    this.widgetType = widgetType1; 
+    return widgetType1;
+  }
+  
+  /**ZBNF: Led::= */
+  public void set_Window(GralCfgData.GuiCfgWindow data){  }
+  
   /**ZBNF: Text::= */
   public GuiCfgText new_Text()
   { GuiCfgText widgetType1 = new GuiCfgText(this); 

@@ -202,11 +202,12 @@ public class StimuliSelector
    */
   StimuliSelector(String fileConfig)
   {
-    this.fileConfig = new File(fileConfig);
+    this.fileConfig = new File(System.getProperty("user.dir"), fileConfig);
     JZtxtcmd jzcmd = null;
     try {
       jzcmd = new JZtxtcmd();
       this.script = jzcmd.compile(this.fileConfig, null);
+      assert(this.script !=null);
     } catch( ScriptException exc) {
       System.err.println("ERROR unexpected" + exc.getMessage());
     }
@@ -353,6 +354,7 @@ public class StimuliSelector
     JZtxtcmdExecuter.ExecuteLevel level = null;
     try {
       this.script = this.jzcmd.compile(this.fileConfig, null);
+      assert(this.script !=null);
       this.executer.initialize(this.script, false, null, this.selectorVariables, null);
       level = this.executer.execute_Scriptclass("ToGui"); 
       
