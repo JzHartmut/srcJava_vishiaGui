@@ -426,7 +426,7 @@ public class GralCfgZbnf
         this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
         //
         //======>>>>
-        buildPanel(win.panel, null);
+        buildPanel(win.panel, this.window.mainPanel);
         
       }
     } catch (Exception exc) {
@@ -448,11 +448,11 @@ public class GralCfgZbnf
       this.window.mainPanel.setToTabbedPanel();
       this.currPos = new GralPos(this.window.mainPanel);
       for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
-        GralPanelContent panel = new GralPanelContent(this.currPos, cfgPanel.name, '@', this.gralMng);
+        GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, '@', this.gralMng);
         panel.setGrid(2,2,5,5,-12,-20);
         //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
         this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.
-        sError = buildPanel(cfgPanel, panel);
+        sError = buildPanel(cfgTabPanel, panel);
         if(sError !=null) { break; }
       }
     }

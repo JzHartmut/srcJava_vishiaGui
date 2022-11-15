@@ -1173,6 +1173,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   void deregisterWindow(GralWindow wind) {
     this.idxWindows.remove(wind.getName());
     if(this.windPrimary == wind) {
+      while(this.idxWindows.size() >0) {         // do not use for(...) because of ConcurrentModificationException
+        Map.Entry<String, GralWindow> ewind2 = this.idxWindows.entrySet().iterator().next();
+        GralWindow wind2 = ewind2.getValue();    // just the first entry
+        wind2.remove();                          // it changes the this.idxWindows
+      }
       assert(this.idxWindows.size()==0);
       this.windPrimary = null;
 //      sCurrPanel = windPrimary.name;

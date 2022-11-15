@@ -565,11 +565,16 @@ public final class GralCfgData
   { 
     if(actualConditional ==null || actualConditional.condition){
       String sPanel = value.panel;
-      String name = value.name !=null ? value.name : value.widgetType.name;
-      if(value.widgetType.name !=null && ! value.widgetType.name.equals(value.name)) {
-        throw new IllegalArgumentException("only one name should be given or name should be the same: " + value.toString());
+      final String name;
+      if(value.name == null) {
+        name = value.name = value.widgetType.name;
       } else {
-        value.widgetType.name = value.name;  // the same
+        name = value.name;
+        if(value.widgetType.name !=null && ! value.widgetType.name.equals(value.name)) {
+          throw new IllegalArgumentException("only one name should be given or name should be the same: " + value.toString());
+        } else {
+          value.widgetType.name = value.name;  // the same
+        }
       }
       if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
         stop();
