@@ -82,6 +82,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-14 Hartmut new now {@link #reportGralContent(Appendable)} for all existing windows defined here.
+   * <li>2022-11-14 Hartmut new now {@link #initScript(CharSequence)} wrapped here for more simple user programming. 
+   * <li>2022-11-14 Hartmut rename now {@link #refPos()} instead currPos().
    * <li>2022-10-27 Hartmut chg now the singleton concept is obsolete. Some more refactoring.
    * <li>2022-10-27 Hartmut new {@link #createGraphic(String, char, LogMessage)} is now localized here (where else!). 
    * <li>2020-02-01 Hartmut new {@link #actionClose} sets the property to close a main Window.
@@ -515,14 +518,23 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   
   
-  public String initScript(String script) {
-    String sError = null;
-    try {
-      GralCfgZbnf.configWithZbnf(script, this);         // does all, reads the config file, parses, creates Graphic Elements
-    } catch (ParseException exc) {
-      sError = exc.getMessage();
-    }
-    return sError;
+  /**Initialize the graphic with a script. See {@link GralCfgZbnf#configureWithZbnf(CharSequence, GralCfgData)}.
+   * This operation is only wrapped.
+   * @param script String given, also possible in a StringBuilder prepared.
+   * @throws ParseException
+   */
+  public void initScript(CharSequence script) throws ParseException {
+    GralCfgZbnf.configWithZbnf(script, this);         // does all, reads the config file, parses, creates Graphic Elements
+  }
+  
+  
+  /**Initialize the graphic with a script. See {@link GralCfgZbnf#configureWithZbnf(File, GralCfgData)}.
+   * This operation is only wrapped.
+   * @param script given in file
+   * @throws Exception 
+   */
+  public void initScript(File script) throws Exception {
+    GralCfgZbnf.configWithZbnf(script, this);         // does all, reads the config file, parses, creates Graphic Elements
   }
   
   
@@ -643,7 +655,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @return Will be changed on ctors of GralWidget.
    *   The GralWidget does not store a reference to this, it stores a clone. 
    */
-  public GralPos currPos() { return this.pos().pos; }
+  public GralPos refPos ( ) { return this.pos().pos; }
   
   
   /**Sets the position with a given String, see {@link GralPos#setPosition(CharSequence, GralPos)}
@@ -651,7 +663,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param sPosition
    * @throws ParseException
    */
-  public GralPos setPos(String sPosition) 
+  public GralPos setPos ( String sPosition) 
   throws ParseException
   { PosThreadSafe pos = pos();
     pos.pos.setPosition(sPosition, null);
@@ -659,47 +671,47 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     return pos.pos;
   }
 
-  @Override public void setPositionSize(int line, int column, int height, int width, char direction)
+  @Override public void setPositionSize ( int line, int column, int height, int width, char direction)
   { PosThreadSafe pos = pos();
     if(line < 0){ line = pos.posUsed? GralPos.next: GralPos.same; }
     if(column < 0){ column = pos.posUsed? GralPos.next: GralPos.same; }
     setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos.pos);
   }
 
-  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   { setPosition(pos().pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
   }
 
-  @Override public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction, float border)
   { PosThreadSafe pos = pos();
     pos.pos.setPosition(pos.pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
     pos.posUsed = false;
   }
 
-  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   { PosThreadSafe pos = pos();
     pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
     pos.posUsed = false;
   }
 
-  @Override public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Override public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction, float border)
   { PosThreadSafe pos = pos();
       pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
       pos.posUsed = false;
   }
 
-  @Override public void setFinePosition(int line, int yPosFrac, int ye, int yef
+  @Override public void setFinePosition ( int line, int yPosFrac, int ye, int yef
     , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralPos frame)
   { PosThreadSafe pos = pos();
     pos.pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
     pos.posUsed = false;
   }
 
-  @Override public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
+  @Override public void setSize ( int height, int ySizeFrac, int width, int xSizeFrac)
   { PosThreadSafe pos = pos();
     pos.pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
     pos.posUsed = false;
@@ -709,7 +721,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @param height
    * @param width
    */
-  public void setSize(float height, float width)
+  public void setSize ( float height, float width)
   { PosThreadSafe pos = pos();
     pos.pos.setSize(height, width, pos.pos);
     pos.posUsed = false;
@@ -805,7 +817,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     //
     selectPanel("primaryWindow");
     setPosition(0,40,10,0,0,'.');
-    infoHelp = GralInfoBox.createHtmlInfoBox(this, currPos(), "Help", "Help", true);
+    infoHelp = GralInfoBox.createHtmlInfoBox(this, refPos(), "Help", "Help", true);
     if(mainCmd !=null) {
       try{
         for(String line: mainCmd.listHelpInfo){
@@ -1104,14 +1116,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   @Override public void registerWidget(GralWidget widgd)
   {
-//    PosThreadSafe pos = pos();
-//    GralPanel_ifc panel = widgd.pos() !=null ? widgd.pos().panel : pos.pos.panel;
     if(widgd.name != null){
       idxNameWidgets.put(widgd.name, widgd);
     }
-    //only widgets with size from right TODO percent size too.
-//    boolean toResize = pos.pos.x.p1 < 0 || pos.pos.x.p2 <= 0 || pos.pos.y.p1< 0 || pos.pos.y.p2 <=0; 
-//    panel.addWidget(widgd, toResize);
   }
   
   
@@ -1506,7 +1513,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
     
   public GralWindow addWindow(String posName, String sTitle, int props) {
-    GralWindow wdgg = new GralWindow(this.currPos(), posName
+    GralWindow wdgg = new GralWindow(this.refPos(), posName
         , sTitle
         , props);
     return wdgg;
@@ -1518,7 +1525,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @return GralPanelContent to set some more.
    */
   public GralPanelContent addPanel(String posName) {
-    GralPanelContent wdgg = new GralPanelContent(this.currPos(), posName, this);
+    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, this);
     return wdgg;
   }
   
@@ -1528,7 +1535,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @return GralArea9Panel to set some more.
    */
   public GralArea9Panel addArea9Panel(String posName) {
-    GralArea9Panel wdgg = new GralArea9Panel(this.currPos(),posName, this);
+    GralArea9Panel wdgg = new GralArea9Panel(this.refPos(),posName, this);
     return wdgg;
   }
   
@@ -1579,7 +1586,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     if(name !=null && name.charAt(0) == '$'){
       name = sCurrPanel + name.substring(1);
     }
-    GralTextField widgg = new GralTextField(this.currPos(), name, property);
+    GralTextField widgg = new GralTextField(this.refPos(), name, property);
     widgg.setPrompt(prompt, promptStylePosition);
     //widgg.setEditable(editable);
     // createImplWidget_Gthread(widgg);
@@ -1622,7 +1629,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   if(name !=null && name.charAt(0) == '$'){
     name = sCurrPanel + name.substring(1);
   }
-  GralTextBox widgg = new GralTextBox(this.currPos(), name);
+  GralTextBox widgg = new GralTextBox(this.refPos(), name);
   char[] prompt1 = new char[1];
   prompt1[0] = promptStylePosition;
   widgg.setPrompt(prompt, new String(prompt1));
@@ -1636,7 +1643,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
 
 public GralTextBox addTextBox(String posName) {
-  return new GralTextBox(currPos(), posName);
+  return new GralTextBox(refPos(), posName);
 }
 
 
@@ -1688,7 +1695,7 @@ public GralButton addButton ( String sName , String sButtonText , GralUserAction
   
   char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
-  GralButton widgButton = new GralButton(currPos(), sName);
+  GralButton widgButton = new GralButton(refPos(), sName);
   //SwtButton widgButton = new SwtButton(sName, this, (Composite)pos().panel.getPanelImpl(), 0, size);
   if(action !=null)
     stop();
@@ -1718,7 +1725,7 @@ public GralButton addButton ( String sName , String sButtonText , GralUserAction
 {
   
   if(sName == null){ sName = sButtonText; }
-  GralButton widgButton = new GralButton(currPos(), sName);
+  GralButton widgButton = new GralButton(refPos(), sName);
   int ySize = (int)widgButton.pos().height();
   int xSize = (int)widgButton.pos().width();
   char size = ySize > 3? 'B' : 'A';
@@ -1746,7 +1753,7 @@ public GralButton addButton ( String sName , String sButtonText , GralUserAction
 )
 {
   
-  GralButton widgButton = new GralButton(currPos(), sName);
+  GralButton widgButton = new GralButton(refPos(), sName);
   int ySize = (int)widgButton.pos().height();
   int xSize = (int)widgButton.pos().width();
   
@@ -1771,7 +1778,7 @@ public GralButton addCheckButton(
 , GralColor colorDisabled
 )
 {
-  GralButton widgButton = new GralButton(currPos(), sPosName);
+  GralButton widgButton = new GralButton(refPos(), sPosName);
   int ySize = (int)widgButton.pos().height();
   int xSize = (int)widgButton.pos().width();
   char size = ySize > 3? 'B' : 'A';
@@ -1868,6 +1875,20 @@ public GralButton addCheckButton(
   @Deprecated @Override public void setLed(GralWidget widg, int colorBorder, int colorInner)
   {
     ((GralLed)widg).setColor(GralColor.getColor(colorBorder), GralColor.getColor(colorInner));
+  }
+  
+  
+  /**Reports all existing Widgets on Gral level, sorted to {@link GralWindow}.
+   * It calls internally {@link GralWindow#reportAllContent(Appendable)} for each window.
+   * <br>
+   * See also {@link ImplAccess#reportContent(Appendable)} for the implementation level.
+   * @param out any output, maybe especially {@link System#out} or {@link LogMessage}
+   */
+  public void reportGralContent(Appendable out) {
+    for(Map.Entry<String, GralWindow> ewindow : idxWindows.entrySet()) {
+      GralWindow window = ewindow.getValue();
+      window.reportAllContent(out);
+    }
   }
   
 
@@ -2119,7 +2140,7 @@ public GralButton addCheckButton(
   
   @Override public GralInfoBox createHtmlInfoBox(String posName, String title, boolean onTop)
   {
-    return GralInfoBox.createHtmlInfoBox(this, this.currPos(), posName, title, onTop);
+    return GralInfoBox.createHtmlInfoBox(this, this.refPos(), posName, title, onTop);
   }
 
   
@@ -2463,6 +2484,12 @@ public GralButton addCheckButton(
     protected abstract boolean showContextMenuGthread(GralWidget widg);
     
     
+    /**Reports all existing Widgets on implementation level.
+     * This operation is implemented in the specific implementation managers.
+     * <br>
+     * See also {@link GralMng#reportGralContent(Appendable)} for the Gral level.
+     * @param out any output, maybe especially {@link System#out} or {@link LogMessage}
+     */
     public abstract void reportContent(Appendable out) throws IOException;
 
     public abstract void finishInit();
@@ -2563,7 +2590,7 @@ public GralButton addCheckButton(
 
   @Override public GralTable addTable(String sPosName, int height, int[] columnWidths)
   {
-    GralTable table = new GralTable<>(this.currPos(), sPosName, height, columnWidths);
+    GralTable table = new GralTable<>(this.refPos(), sPosName, height, columnWidths);
     return table;
   }
 

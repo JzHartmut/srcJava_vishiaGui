@@ -1,46 +1,79 @@
 package org.vishia.gral.example;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;
 
+//tag::classAndScript[]
 public class ExampleScriptSimpleButton {
 
   
   LogMessage log;
-  
-  GralMng gralMng;
-  
+
   final String guiScript = 
-      "@10+30, 20+80     =panel:  Window Example ScriptSimpleButton; \n"
-    + "@panel, 2+2, 2+20 =input:  InputField(); \n"
+      "@10+30, 20+80     =mainWin:Window Example ScriptSimpleButton; \n"
+    + "@main, 2+2, 2+20  =input:  InputField(); \n"
     + "@8-3, 2+10        =button: Button(\"press me\", action = actionButtonCode);"
     + "@-10..0,0..0      =output: OutputBox();"
     ;
+  //end::classAndScript[]
   
-  ExampleScriptSimpleButton(String[] args)
+  //tag::GuiElements[]
+  protected class GuiElements {
+    
+    final GralMng gralMng;
+    
+    final GralTextField wdgInputText;
+    
+    final GralTextBox wdgOutput;
+    
+    
+    GuiElements(CharSequence script, LogMessage log) throws ParseException {
+      this.gralMng = new GralMng(log);             // The GralMng should know the user actions used in the script.
+      this.gralMng.registerUserAction("actionButtonCode", ExampleScriptSimpleButton.this.actionButtonCode);
+      //
+      this.gralMng.initScript(script);             // initialize the graphic Gral Widgets (not the implementig graphic).
+      //
+      this.wdgInputText = (GralTextField)this.gralMng.getWidget("input");
+      this.wdgOutput = (GralTextBox)this.gralMng.getWidget("output");
+    }
+  }
+  //end::GuiElements[]
+  
+  //tag::fieldsCtor[]
+  final GuiElements gui;
+  
+  int ctKeyStroke;
+  
+  
+  ExampleScriptSimpleButton(String[] args) throws ParseException
   {
     this.log = new LogMessageStream(System.out);  // may also write to a file, use calling arguments
-    this.gralMng = new GralMng(this.log);             // initialize the graphic Gral Widgets (not the implementig graphic).
+    this.gui = new GuiElements(this.guiScript, log);
   }
+  //end::fieldsCtor[]
+  
 
   /**Code snippet for initializing the GUI. This snippet will be executed
    * in the graphic thread. It is an anonymous inner class. 
    */
   //tag::initImplGraphic[]
   boolean init(String awtOrSwt) {
-    String sError = this.gralMng.initScript(this.guiScript);
-    if(sError !=null) {
-      this.log.writeError(sError);
-      return false;
-    } else {
-      //this.gui.wdgInputText.setText("any text input");
-      this.gralMng.createGraphic(awtOrSwt, 'E', this.log);
-      return true;
-    }
+    this.gui.gralMng.reportGralContent(log);
+    //                                           // check whether the widgets are existing
+    if(this.gui.wdgInputText == null) { throw new IllegalArgumentException("missing widget \"input\""); }
+    if(this.gui.wdgOutput == null) { throw new IllegalArgumentException("missing widget \"output\""); }
+    this.gui.wdgInputText.setText("any text input");
+    this.gui.gralMng.createGraphic(awtOrSwt, 'E', this.log);
+    return true;
   }
   //end::initImplGraphic[]
 
@@ -53,7 +86,7 @@ public class ExampleScriptSimpleButton {
     //Now do nothing because all actions are done in the graphic thread.
     //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
     //
-    while(this.gralMng.isRunning()) {
+    while(this.gui.gralMng.isRunning()) {
       try{ Thread.sleep(100); } catch(InterruptedException exc){}
     }
   }
@@ -61,7 +94,7 @@ public class ExampleScriptSimpleButton {
 
 
 
-
+  //tag::main[]
   /**The main routine. It creates the factory of this class
    * and then calls {@link #main(String[], Factory)}.
    * With that pattern a derived class may have a simple main routine too.
@@ -69,11 +102,17 @@ public class ExampleScriptSimpleButton {
    */
   public static void main(String[] args)
   {
-    ExampleScriptSimpleButton thiz = new ExampleScriptSimpleButton(args); // constructs the main class
-    if(thiz.init("SWT")) {
+    try {
+      ExampleScriptSimpleButton thiz = new ExampleScriptSimpleButton(args); // constructs the main class
+      thiz.init("SWT");
       thiz.execute();
+    } catch (Exception exc) {
+      System.err.println("Exception: " + exc.getMessage());
+      exc.printStackTrace(System.err);
     }
   }
+  //end::main[]
+  
 
   /**Code snippet for the action while the button is pressed. This snippet will be executed
    * if the left mouse key is released on the button. If the left mouse is pressed and then
@@ -83,21 +122,24 @@ public class ExampleScriptSimpleButton {
    * is sought, the button changes its appearance, it is marked. 
    * That actions are done by the gral implementation independing of the implementation layer.
    */
-  private final GralUserAction actionButtonCode = new GralUserAction("buttonCode")
-  { 
-    int ctKeyStroke = 0;
+  void buttonOperation() {
+    String textOfField = this.gui.wdgInputText.getText();
+    try{ 
+      this.gui.wdgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
+    } catch(IOException exc){}
+  }
+  
+  private final GralUserAction actionButtonCode = new GralUserAction("buttonCode") { 
     
     @Override
-    public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-//        String textOfField = ExampleSimpleButton.this.gui.wdgInputText.getText();
-//        try{ ExampleSimpleButton.this.gui.widgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
-//        } catch(IOException exc){}
+        ExampleScriptSimpleButton.this.buttonOperation();
       }
       return true;  
     } 
   };  
-  
+
 
   
 }

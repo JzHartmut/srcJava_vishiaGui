@@ -95,12 +95,12 @@ public class GralCfgWriter
     }
     
     if(cfge.widgetType.whatIs == 'w'){ 
-      GralCfgPanel cfgp = (GralCfgPanel)cfge;
+      //TODO GralCfgPanel cfgp = (GralCfgPanel)cfge;
       writer.append("\n\n//================================================================================\n");
-      writer.append("Window: @").append(cfgp.windPos);
+      //TODO writer.append("Window: @").append(cfgp.windPos);
       //writePosition(ww, cfge);
       writer.append(": ");
-      writer.append(cfgp.name).append(", \"").append(cfgp.windTitle).append("\";\n\n");
+      //TODO writer.append(cfgp.name).append(", \"").append(cfgp.windTitle).append("\";\n\n");
 
     } else {
       //<Element>

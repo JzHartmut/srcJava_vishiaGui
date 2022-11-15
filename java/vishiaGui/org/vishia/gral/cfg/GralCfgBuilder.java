@@ -113,47 +113,54 @@ public class GralCfgBuilder
    */
   public String buildGui(LogMessage log, int msgIdent)
   {
+    assert(false);
     String sError = null;
-    gralMng.getReplacerAlias().addDataReplace(cfgData.dataReplace);
+    this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
     
-    Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
-    if(setIdxPanels.size()==0){
-      //gralMng.selectPanel(cfgData.actPanel);
-      //==================>
-      String sErrorPanel = buildPanel(cfgData.actPanel);  
-      if(sErrorPanel !=null){
-        if(log !=null){
-          log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
-        }
-        if(sError == null){ sError = sErrorPanel; }
-        else { sError += "\n" + sErrorPanel; }
-      }
-    } else {
-      //some panels are given, therefore selects given panels by name or create tabbed panels.
-      for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
-        GralCfgPanel cfgPanel = panelEntry.getValue();
-        if(cfgPanel.windTitle !=null) {
-          Debugutil.stop();
-          GralWindow wind = gralMng.addWindow(cfgPanel.windPos + "=" + cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
-          wind.createImplWidget_Gthread();
-        }
-        else {
-          //A tab in the main window
-          //==================>
-          gralMng.selectPanel(cfgPanel.name);
-        }
-        String sErrorPanel = buildPanel(cfgPanel);  
+    Set<Map.Entry<String, GralCfgElement>> iterWindow = this.cfgData.getWindows();
+    for(Map.Entry<String, GralCfgElement> eWin : iterWindow) {
+      GralCfgElement cfg = eWin.getValue();
+      GralCfgWindow win = (GralCfgWindow)cfg.widgetType;
+      
+      Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
+      if(setIdxPanels.size()==0){
+        //gralMng.selectPanel(cfgData.actPanel);
+        //==================>
+        String sErrorPanel = buildPanel(win.panel);  
         if(sErrorPanel !=null){
           if(log !=null){
             log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
           }
           if(sError == null){ sError = sErrorPanel; }
           else { sError += "\n" + sErrorPanel; }
-        } else {
-          stop();
+        }
+      } else {
+        //some panels are given, therefore selects given panels by name or create tabbed panels.
+        for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
+          GralCfgPanel cfgPanel = panelEntry.getValue();
+  //        if(cfgPanel.windTitle !=null) {
+  //          Debugutil.stop();
+  //          GralWindow wind = gralMng.addWindow(cfgPanel.windPos + "=" + cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
+  //          wind.createImplWidget_Gthread();
+  //        }
+  //        else {
+            //A tab in the main window
+            //==================>
+            gralMng.selectPanel(cfgPanel.name);
+  //        }
+          String sErrorPanel = buildPanel(cfgPanel);  
+          if(sErrorPanel !=null){
+            if(log !=null){
+              log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
+            }
+            if(sError == null){ sError = sErrorPanel; }
+            else { sError += "\n" + sErrorPanel; }
+          } else {
+            stop();
+          }
         }
       }
-    }    
+    }
     return sError;
   }
   
@@ -207,7 +214,7 @@ public class GralCfgBuilder
       stop();
     
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
-    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
     

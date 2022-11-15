@@ -49,7 +49,7 @@
 2013-05-27 20:43:37  x     WriteCurve_ifc.java                      ::          3.448 -0224065991 
 
 ============================== java/vishiaGui/org/vishia/gitGui/ ===================================
-2022-11-13 23:26:29  x     GitGui.java                              ::         68.499 -1331243552 
+2022-11-15 10:14:47  x     GitGui.java                              ::         68.483  1890632231 
 2022-01-23 18:57:46  x     GitGuiCmd.java                           ::          2.731  1279140084 
 2022-01-23 18:03:47  x     GitGuiPaths.java                         ::           .715  0118027708 
 
@@ -99,7 +99,7 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-11-01 12:15:21  x     GralLed.java                             ::          5.646 -0450864146 
 2022-09-25 19:48:48  x     GralMenu.java                            ::         12.586 -0766242011 
-2022-11-14 12:03:08  x     GralMng.java                             ::        102.878  0490498195 
+2022-11-15 10:54:46  x     GralMng.java                             ::        104.328 -0889886368 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-11-14 00:25:23  x     GralPanelContent.java                    ::         22.906 -1106621095 
@@ -121,16 +121,17 @@
 2013-07-15 11:52:00  x     package-info.java                        ::           .413  0984628564 
 
 ============================== java/vishiaGui/org/vishia/gral/cfg/ =================================
-2022-11-13 18:51:18  x     GralCfgBuilder.java                      ::         19.289  1089433367 
-2022-11-14 18:28:51  x     GralCfgData.java                         ::         21.253  1423101973 
+2022-11-14 21:09:29  x     GralCfgBuilder.java                      ::         19.665 -0683026412 
+2022-11-14 21:20:17  x     GralCfgData.java                         ::         22.628 -1750786703 
 2022-08-28 20:17:08  x     GralCfgDesigner.java                     ::         15.580 -1911478894 
-2022-11-14 18:11:33  x     GralCfgElement.java                      ::         10.993  1764669892 
-2021-10-04 14:29:48  x     GralCfgPanel.java                        ::          2.140  1145000466 
+2022-11-14 20:01:06  x     GralCfgElement.java                      ::         11.181 -1318668659 
+2022-11-14 20:52:32  x     GralCfgPanel.java                        ::          2.555 -0169050340 
 2022-08-28 20:05:36  x     GralCfgPosition.java                     ::          5.088  0166729575 
+2022-11-14 18:51:17  x     GralCfgWindow.java                       ::          2.193  0697026746 
 2022-11-14 18:34:28  x     GralCfgWindow_Old.java                   ::          7.403  0276295433 
-2022-10-13 18:52:49  x     GralCfgWriter.java                       ::         10.508  2051314654 
-2022-11-13 19:14:47  x     GralCfgZbnf.java                         ::         35.698 -1124018669 
-2022-11-14 18:16:34  x     Syntax.zbnf                              ::          5.533 -1191631053 
+2022-11-14 19:32:14  x     GralCfgWriter.java                       ::         10.529  2146353917 
+2022-11-15 10:57:29  x     GralCfgZbnf.java                         ::         35.683 -0026620158 
+2022-11-14 21:15:05  x     Syntax.zbnf                              ::          5.533 -1924524913 
 2012-03-28 07:42:16  x     package-info.java                        ::           .907  0254677754 
 
 ============================== java/vishiaGui/org/vishia/gral/cfg/appl/ ============================
@@ -138,8 +139,8 @@
 
 ============================== java/vishiaGui/org/vishia/gral/example/ =============================
 2021-10-04 14:29:56  x     ExampleContextMenu.java                  ::          2.649  0651022227 
-2022-11-14 13:47:19  x     ExampleScriptSimpleButton.java           ::          3.621  1165464028 
-2022-11-14 11:57:55  x     ExampleSimpleButton.java                 ::          6.464 -0953522620 
+2022-11-15 10:54:46  x     ExampleScriptSimpleButton.java           ::          5.009 -1335155410 
+2022-11-15 10:27:35  x     ExampleSimpleButton.java                 ::          6.708  0019808756 
 2012-03-28 07:42:16  x     package-info.java                        ::           . 67  0703720841 
 
 ============================== java/vishiaGui/org/vishia/gral/ifc/ =================================
@@ -240,7 +241,7 @@
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2022-11-13 23:16:36  x     GralCommandSelector.java                 ::          8.570 -1750923008 
 2022-10-05 22:49:08  x     GralFileSelectWindow.java                ::          8.252 -0610930941 
-2022-11-13 23:27:14  x     GralFileSelector.java                    ::         68.802 -0803142098 
+2022-11-15 10:14:47  x     GralFileSelector.java                    ::         68.801 -0789899663 
 2022-10-01 23:10:04  x     GralHorizontalSelector.java              ::         10.650  0601742095 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2022-11-13 18:49:20  x     GralInfoBox.java                         ::         15.219 -0309496018 
@@ -267,7 +268,7 @@
 2022-11-13 14:47:30  x     ViewCfg.java                             ::         18.716  2141660831 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
-2022-11-13 23:48:32  x     StimuliSelector.java                     ::         42.993 -2101574721 
+2022-11-15 10:14:47  x     StimuliSelector.java                     ::         42.992  1944443275 
 
 ============================== java/vishiaGui/org/vishia/testApplet/ ===============================
 2021-10-04 14:29:49  x     TestHallo.java                           ::           .224  2026551343 

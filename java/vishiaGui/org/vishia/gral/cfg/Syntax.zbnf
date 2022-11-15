@@ -27,7 +27,7 @@ endif[;]
 
 
 Element::=
-[@[<$?panel> ,]<*:?positionString> [ = <$-/?name>] :        ## Position and name same for all elements.
+[@[<$?panel> ,]<*=:?positionString> [ = <$-/?name>] :       ## Position and name same for all elements.
 | <$-/?name> :                                              ## Only the name if next position
 |]
  [ Led <Led>                                                ## Each widget type has its own subclass of GralCfgData.Type

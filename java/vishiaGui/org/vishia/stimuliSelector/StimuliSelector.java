@@ -226,7 +226,7 @@ public class StimuliSelector
       int[] columnWidths = new int[2];
       columnWidths[0] = 15;
       columnWidths[1] = 0;
-      this.wdgTables[iTable] = new GralTable<Map<String, DataAccess.Variable<Object>>>(this.gralMng.currPos(), name, 20, columnWidths); //new GralTable<>(name, columnWidths);
+      this.wdgTables[iTable] = new GralTable<Map<String, DataAccess.Variable<Object>>>(this.gralMng.refPos(), name, 20, columnWidths); //new GralTable<>(name, columnWidths);
       this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
       this.wdgTables[iTable].specifyActionOnLineSelected(this.actionSelectInTable);
       StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", this.actionTouchLine);

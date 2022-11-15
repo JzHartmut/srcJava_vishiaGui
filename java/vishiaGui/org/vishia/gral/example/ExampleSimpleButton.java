@@ -23,8 +23,11 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
+//tag::classHead[]
 public class ExampleSimpleButton
 {
+  protected final LogMessage log;
+  //end::classHead[]
   
   /**Version, history and license.
    * <ul>
@@ -57,7 +60,7 @@ public class ExampleSimpleButton
    */
   public static final int version = 20220126;
 
-  //tag::elements[]
+  //tag::guiClass[]
   /**Extra inner class (for more data structuring) for all Gui elements.
    */
   protected class GuiElements
@@ -67,38 +70,36 @@ public class ExampleSimpleButton
   
     GralPos refPos = new GralPos(this.gralMng);            // use an own reference position to build
     
-    final GralWindow window = new GralWindow(this.refPos, "@10+30,20+80=panelWin"
+    final GralWindow window = new GralWindow(this.refPos, "@10+30,20+80=mainWin"
                             , "ExampleSimpleTextButton"
                             , GralWindow.windRemoveOnClose | GralWindow.windResizeable);
     
-    final GralTextField wdgInputText = new GralTextField(this.refPos, "@panel, 2+2, 2+20=input"
+    final GralTextField wdgInputText = new GralTextField(this.refPos, "@main, 2+2, 2+20=input"
                                      , GralTextField.Type.editable);
     
     final GralButton wdgButton = new GralButton(this.refPos, "@8-3, 2+10=button"
-                               , "press me", ExampleSimpleButton.this.actionButtonCode);
+                               , "press me", ExampleSimpleButton.this.actionButton);
   
     GralTextBox widgOutput = new GralTextBox(this.refPos, "@-10..0,0..0=output");
   
     GuiElements() { }                                      // empty ctor, only formally
   }
+  //end::guiClass[]
 
 
 
-
-
-  /**Instance of inner class contains the graphical elements.
-   * 
-   */
+  //tag::fieldsCtor[]
+  /**Instance of inner class contains the graphical elements.*/
   protected final GuiElements gui;
   
-  protected final LogMessage log;
-  
+  int ctKeyStroke = 0;
   
   ExampleSimpleButton(String[] args)
   {
     this.log = new LogMessageStream(System.out);  // may also write to a file, use calling arguments
     this.gui = new GuiElements();                 // initialize the graphic Gral Widgets (not the implementig graphic).
   }
+  //end::fieldsCtor[]
   
   
   
@@ -115,6 +116,7 @@ public class ExampleSimpleButton
   //end::initImplGraphic[]
 
   
+  //tag::execute[]
   /**execute routine for any other actions than the graphical actions. 
    * The application may do some things beside.
    */
@@ -127,6 +129,7 @@ public class ExampleSimpleButton
       try{ Thread.sleep(100); } catch(InterruptedException exc){}
     }
   }
+  //end::execute[]
 
 
 
@@ -137,47 +140,48 @@ public class ExampleSimpleButton
    * With that pattern a derived class may have a simple main routine too.
    * @param args command line arguments.
    */
+  //tag::main[]
   public static void main(String[] args)
   {
-    ExampleSimpleButton thiz = new ExampleSimpleButton(args); // constructs the main class
-    thiz.init("SWT");
-    thiz.execute();
+    try {
+      ExampleSimpleButton thiz = new ExampleSimpleButton(args); // constructs the main class
+      thiz.init("SWT");
+      thiz.execute();
+    } catch (Exception exc) {
+      System.err.println("Exception: " + exc.getMessage());
+      exc.printStackTrace(System.err);
+    }
   }
+  //end::main[]
 
 
 
-
-
-  /**Code snippet for the action while the button is pressed. This snippet will be executed
-   * if the left mouse key is released on the button. If the left mouse is pressed and then
-   * the mouse cursor is removed from the button while it is pressed, the action is not executed.
-   * This is important if a touch screen is used and the accuracy of target seeking of the finger
-   * is not sufficient, the action can be aborted. If the mouse is pressed respectively the button 
-   * is sought, the button changes its appearance, it is marked. 
-   * That actions are done by the gral implementation independing of the implementation layer.
+  //tag::action[]
+  /**Operation on button pressed, on the application level.
+   * It uses the known references to the GralWidget. 
+   * Immediately access to implementation widgets is not necessary.  
    */
-  private final GralUserAction actionButtonCode = new GralUserAction("buttonCode")
+  void actionButton() throws IOException {
+    String textOfField = this.gui.wdgInputText.getText();
+    this.gui.widgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
+  }
+  
+  
+  /**Action operation is called in the event handler of the appropriate widget. */
+  private final GralUserAction actionButton = new GralUserAction("buttonCode")
   { 
-    int ctKeyStroke = 0;
-    
     @Override
     public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        String textOfField = ExampleSimpleButton.this.gui.wdgInputText.getText();
-        try{ ExampleSimpleButton.this.gui.widgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
-        } catch(IOException exc){}
+        try{ 
+          ExampleSimpleButton.this.actionButton();         // defined of class level of the main (environment) class.
+        } catch(Exception exc){                            // Exceptions should catch anyway. but not expected.
+          ExampleSimpleButton.this.log.writeError("Unexpected", exc);
+        }                           
       }
       return true;  
     } 
   };  
-  
-  
-  
-  
-  
-  
- 
-  
-  
-  
+  //end::action[]
+   
 }

@@ -61,6 +61,7 @@ public class GralCfgZbnf
   
   /**Version and history
    * <ul>
+   * <li>2022-11-14 new now accepts also a Window in script, syntax also adapted 
    * <li>2022-09-26 new {@link #configureWithZbnf(File, GralCfgData)} and {@link #configWithZbnf(File)} 
    *   Should be used on file input, also regarding encoding.  
    * <li>2022-08 new {@link #configWithZbnf(CharSequence)}, {@link #buildGui()}. 
@@ -94,7 +95,7 @@ public class GralCfgZbnf
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20220926;
+  public static final int version = 20221114;
 
   
   private final ZbnfParser parser;
@@ -413,29 +414,20 @@ public class GralCfgZbnf
     this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
     this.currPos = new GralPos(this.gralMng);
     try {
-      this.currPos.calcNextPos("screen, 10+100, 20+150");  //the size of the window and position on the screen
-      int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
-      this.window = new GralWindow(this.currPos, "wmain", "Title", windowProps, this.gralMng);
-      this.window.mainPanel.setGrid(2,2,5,5,-8,-30);
-      this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
-      Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = this.cfgData.getPanels();
-      if(setIdxPanels.size()==0){                          // no more panels, it means all is on level of the window
-        //========>>>>>                                    // widgets on main panel
-        sError = buildPanel(this.cfgData.actPanel, this.window.mainPanel);  
-      } else {                                               //some panels are given, hence selects given panels by name or create tabbed panels.
-        //GralTabbedPanel tabs = new GralTabbedPanel(this.currPos, null, this.window.getName() + "_tabs", null, 0, '@');
-        //this.window.addWidget(tabs, false);
-        for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
-          GralCfgPanel cfgPanel = panelEntry.getValue();
-          this.window.mainPanel.setToTabbedPanel();
-          this.currPos = new GralPos(this.window.mainPanel);
-          GralPanelContent panel = new GralPanelContent(this.currPos, cfgPanel.name, '@', this.gralMng);
-          panel.setGrid(2,2,5,5,-12,-20);
-          //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
-          this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.
-          sError = buildPanel(cfgPanel, panel);  
-          
-        }
+      Set<Map.Entry<String, GralCfgElement>> iterWindow = this.cfgData.getWindows();
+      for(Map.Entry<String, GralCfgElement> eWin : iterWindow) {
+        GralCfgElement cfg = eWin.getValue();
+        GralCfgWindow win = (GralCfgWindow)cfg.widgetType;
+        String posName = cfg.positionString !=null ? "@" + cfg.positionString + "=" + win.name
+                       : "@screen, 10+80, 20+120 = mainWin";
+        int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
+        this.window = new GralWindow(this.currPos, posName, win.title, windowProps, this.gralMng);
+        this.window.mainPanel.setGrid(2,2,5,5,-8,-30);
+        this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
+        //
+        //======>>>>
+        buildPanel(win.panel, null);
+        
       }
     } catch (Exception exc) {
       sError = exc.getMessage();
@@ -450,20 +442,33 @@ public class GralCfgZbnf
    * @param cfgDataPanel
    * @return null if ok, elsewhere the error hints, one per line.
    */
-  public String buildPanel(GralCfgPanel cfgDataPanel, GralPanelContent currPanel)
-  {
-    String sError = null;
-    for(GralCfgElement cfge: cfgDataPanel.listElements){
-      //=================>>
-      String sErrorWidgd;
-      try{
-        //======>>>>
-        sErrorWidgd = buildWidget(cfge, currPanel); 
+  public String buildPanel(GralCfgPanel cfgPanel, GralPanelContent currPanel)
+  { String sError = null;
+    if(cfgPanel.listTabs.size()>0) {                  // tabs in this panel
+      this.window.mainPanel.setToTabbedPanel();
+      this.currPos = new GralPos(this.window.mainPanel);
+      for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
+        GralPanelContent panel = new GralPanelContent(this.currPos, cfgPanel.name, '@', this.gralMng);
+        panel.setGrid(2,2,5,5,-12,-20);
+        //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
+        this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.
+        sError = buildPanel(cfgPanel, panel);
+        if(sError !=null) { break; }
       }
-      catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
-      if(sErrorWidgd !=null){
-        if(sError == null){ sError = sErrorWidgd; }
-        else { sError += "\n" + sErrorWidgd; }
+    }
+    else {
+      for(GralCfgElement cfge: cfgPanel.listElements){
+        //=================>>
+        String sErrorWidgd;
+        try{
+          //======>>>>
+          sErrorWidgd = buildWidget(cfge, currPanel); 
+        }
+        catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
+        if(sErrorWidgd !=null){
+          if(sError == null){ sError = sErrorWidgd; }
+          else { sError += "\n" + sErrorWidgd; }
+        }
       }
     }
     return sError;
@@ -510,7 +515,7 @@ public class GralCfgZbnf
       Debugutil.stop();
     
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
-    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
     
@@ -557,7 +562,7 @@ public class GralCfgZbnf
       String sUserAction = cfge.widgetType.userAction; 
       if(sUserAction.startsWith("@")){
         int posEnd = sUserAction.indexOf(':');
-        if(posEnd < 0) { sError = "GuiCfgBuilder - @m: ':' not found. ";  sUserAction = null; }
+        if(posEnd < 0) { this.gralMng.log.writeError("GuiCfgBuilder - @m: ':' not found. ");  sUserAction = null; }
         else {
           for(int ix = 1; ix < posEnd; ++ix){
             char whatMouseKey = sUserAction.charAt(ix);
@@ -572,7 +577,8 @@ public class GralCfgZbnf
         String[] sMethod = CalculatorExpr.splitFnNameAndParams(sUserAction);
         userAction = gralMng.getRegisteredUserAction(sMethod[0]);
         if(userAction == null){
-          sError = "GuiCfgBuilder - user action ignored because not found: " + cfge.widgetType.userAction;
+          
+          this.gralMng.log.writeError("GuiCfgBuilder - user action ignored because not found: " + cfge.widgetType.userAction);
           sUserActionArgs = null;
         } else {
           sUserActionArgs = sMethod[1] == null ? null : CalculatorExpr.splitFnParams(sMethod[1]);
@@ -593,7 +599,7 @@ public class GralCfgZbnf
     if(cfge.widgetType.mouseAction !=null){
       mouseAction = gralMng.getRegisteredUserAction(cfge.widgetType.mouseAction);
       if(mouseAction == null){
-        sError = "GuiCfgBuilder - mouse action ignored because not found: " + cfge.widgetType.mouseAction;
+        this.gralMng.log.writeError("GuiCfgBuilder - mouse action ignored because not found: " + cfge.widgetType.mouseAction;
       }
     } else { mouseAction = null; }
     */
@@ -739,7 +745,7 @@ public class GralCfgZbnf
        
         GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod[0]);
         if(actionShow == null){
-          sError = "GuiCfgBuilder - show method not found: " + sShowMethod[0];
+          this.gralMng.log.writeError("GuiCfgBuilder - show method not found: " + sShowMethod[0]);
         } else {
           String[] param = sShowMethod[1] == null ? null : CalculatorExpr.splitFnParams(sShowMethod[1]);
           widgd.setActionShow(actionShow, param);
@@ -751,7 +757,7 @@ public class GralCfgZbnf
       if(sCmd !=null){
         GralUserAction actionCmd = gralMng.getRegisteredUserAction(sCmd);
         if(actionCmd == null){
-          sError = "GuiCfgBuilder - cmd action not found: " + sCmd;
+          this.gralMng.log.writeError("GuiCfgBuilder - cmd action not found: " + sCmd;
         } else {
           widgd.setActionChange(actionCmd);
         }
@@ -779,7 +785,7 @@ public class GralCfgZbnf
       if(cfge.widgetType.dropFiles !=null){
         GralUserAction actionDrop = gralMng.getRegisteredUserAction(cfge.widgetType.dropFiles);
         if(actionDrop == null){
-          sError = "GuiCfgBuilder - action for drop not found: " + cfge.widgetType.dropFiles;
+          this.gralMng.log.writeError("GuiCfgBuilder - action for drop not found: " + cfge.widgetType.dropFiles);
         } else {
           widgd.setDropEnable(actionDrop, KeyCode.dropFiles);
         }
@@ -787,7 +793,7 @@ public class GralCfgZbnf
       if(cfge.widgetType.dragFiles !=null){
         GralUserAction actionDrag = gralMng.getRegisteredUserAction(cfge.widgetType.dragFiles);
         if(actionDrag == null){
-          sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragFiles;
+          this.gralMng.log.writeError("GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragFiles);
         } else {
           widgd.setDragEnable(actionDrag, KeyCode.dragFiles);
         }
@@ -795,7 +801,7 @@ public class GralCfgZbnf
       if(cfge.widgetType.dragText !=null){
         GralUserAction actionDrag = gralMng.getRegisteredUserAction(cfge.widgetType.dragText);
         if(actionDrag == null){
-          sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragText;
+          this.gralMng.log.writeError("GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragText);
         } else {
           widgd.setDragEnable(actionDrag, KeyCode.dragText);
         }

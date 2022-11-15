@@ -73,6 +73,9 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**The position is set in textual form too. It is because [<?Element>...] was written */
   String positionString;
   
+  /**Name given in position string or before type, not in parameter. See also {@link GralCfgData.GuiCfgWidget#name}. */
+  String name;
+  
   String panel;
   
   /**ZBNF: Position coordinates will be filled from [<?position>.... 
@@ -172,6 +175,11 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   }
  
   /**ZBNF: <*:?position> */
+  public void set_name(String val) { 
+    this.name = val; 
+  }
+ 
+  /**ZBNF: <*:?position> */
   public void set_panel(String val) { 
     this.panel = val; 
   }
@@ -183,14 +191,14 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   public void set_position(GralCfgPosition val) {  } //is set only
  
   /**ZBNF: Window::= */
-  public GralCfgData.GuiCfgWindow new_Window()
-  { GralCfgData.GuiCfgWindow widgetType1 = new GralCfgData.GuiCfgWindow(this); 
+  public GralCfgWindow new_Window()
+  { GralCfgWindow widgetType1 = new GralCfgWindow(this); 
     this.widgetType = widgetType1; 
     return widgetType1;
   }
   
   /**ZBNF: Led::= */
-  public void set_Window(GralCfgData.GuiCfgWindow data){  }
+  public void set_Window(GralCfgWindow data){  }
   
   /**ZBNF: Text::= */
   public GuiCfgText new_Text()

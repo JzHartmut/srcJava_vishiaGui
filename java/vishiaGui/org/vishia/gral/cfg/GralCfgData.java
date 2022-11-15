@@ -1,5 +1,6 @@
 package org.vishia.gral.cfg;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,7 +109,9 @@ public final class GralCfgData
 
     public boolean editable;
     
-    /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. */
+    /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. 
+     * The name can alternatively also given in {@link GralCfgElement#name}. 
+     */
     public String name, text, cmd, userAction, mouseAction, data, showMethod, format, type, prompt, promptPosition, help;
     
     /**From ZBNF-parser param::=<?> ...dropFiles = <""?name> etc. values are set if it is parsed. */
@@ -130,7 +133,6 @@ public final class GralCfgData
      */
     public void set_text(String val) {
       if(this.data == null) { this.data = val; }
-      if(this.name == null) { this.name = val;}
       this.text = val;
     }
     
@@ -197,24 +199,9 @@ public final class GralCfgData
   }
   
   
-  /**ZBNF: Window::= ... ;
-   * Class for instance to capture and store the Table data. */
-  public final static class GuiCfgWindow extends GuiCfgWidget implements Cloneable
-  {
-    String title;
-    
-    public GuiCfgWindow(GralCfgElement itsElement){ super(itsElement, 'w'); }
-    
-    public void set_title(String val) {
-      this.title = val;
-    }
-      //colorName = 
-    @Override public String toString() { return "Window: " + super.name; }
-  }
-  
-  
+
   /**ZBNF: Text::= ... ;
-   * Class for instance to capture and store the Table data. */
+   */
   public final static class GuiCfgText extends GuiCfgWidget implements Cloneable
   {
     public String size = "B";
@@ -299,7 +286,6 @@ public final class GralCfgData
      */
     @Override public void set_text(String val) {
       if(this.data == null) { this.data = val; }
-      if(this.name == null) { this.name = val;}
       this.text = val;
     }
   }
@@ -457,7 +443,12 @@ public final class GralCfgData
    */
   final List<GralCfgElement> listElementsInTextfileOrder = new ArrayList<GralCfgElement>();
   
-  GralCfgPanel actPanel;
+  //GralCfgPanel actPanel;
+  
+  /**The current window where 
+   * 
+   */
+  GralCfgWindow currWindow;
   
   /**Map of panels. Filled via {@link #add_Element(GralCfgElement)}  */
   private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
@@ -473,9 +464,9 @@ public final class GralCfgData
   }
   
   
-  public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return idxPanels.entrySet(); } 
+  public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return this.idxPanels.entrySet(); } 
   
-  public Set<Map.Entry<String, GralCfgElement>> getWindows(){return idxWindow.entrySet(); } 
+  public Set<Map.Entry<String, GralCfgElement>> getWindows(){return this.idxWindow.entrySet(); } 
   
   /**ZBNF: size( <#?ySize> , <#?xSize> ) */
   public void set_ySize(int value)
@@ -539,21 +530,7 @@ public final class GralCfgData
 
   
 
-  public GralCfgPanel new_Window()
-  { assert(false);
-    GralCfgPanel panel = new GralCfgPanel();
-    panel.widgetType = new GuiCfgWidget(panel, 'w');
-    return panel;
-  }
-
-  public void add_Window(GralCfgPanel panel)
-  { assert(false);
-    idxPanels.put(panel.name, panel); 
-    listElementsInTextfileOrder.add(panel);  //list of elements in text file
-    
-  }
-
-  
+   
   /**ZBNF: filled on "GuiDialogZbnfControlled::= ... <Element>"
    * or also on "Conditional::=  ... <Element>"
    * It is the second level of syntax or the third one if Conditional. */
@@ -581,31 +558,64 @@ public final class GralCfgData
    * It is the second level of syntax or the third one if Conditional. 
    * <br>
    * It checks the content:
+   * @throws ParseException 
    * 
    * */
   public void add_Element(GralCfgElement value)
   { 
     if(actualConditional ==null || actualConditional.condition){
       String sPanel = value.panel;
+      String name = value.name !=null ? value.name : value.widgetType.name;
+      if(value.widgetType.name !=null && ! value.widgetType.name.equals(value.name)) {
+        throw new IllegalArgumentException("only one name should be given or name should be the same: " + value.toString());
+      } else {
+        value.widgetType.name = value.name;  // the same
+      }
       if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
         stop();
-      if (value.widgetType instanceof GuiCfgWindow){
-        this.idxWindow.put(value.widgetType.name, value);
+      if (value.widgetType instanceof GralCfgWindow){
+        this.idxWindow.put(name, value);
+        this.currWindow = (GralCfgWindow)value.widgetType;
       } else {
-        if(sPanel == null){                      //the last panel is used furthermore.
-          if(actPanel == null) {                  
-            actPanel = new GralCfgPanel("$");    // first panel at all
-          }
-          sPanel = this.actPanel.name;
-          value.setPanel(sPanel);
-        } else {                                           //a panel is given.
-          this.actPanel = this.idxPanels.get(sPanel); 
-          if(actPanel == null){                            //first time use that:
-            this.actPanel = new GralCfgPanel(sPanel);      // an unknown panel forces a tab in the given panel. Since 2010
-            this.idxPanels.put(sPanel, this.actPanel);
-          }
+        if(this.currWindow ==null) {                       // create a default window of not given.  
+          GralCfgElement cfgWindow = new GralCfgElement();
+          this.currWindow = new GralCfgWindow(null);
+          cfgWindow.widgetType = this.currWindow;
+          this.currWindow.name = "mainWindow";
+          this.idxWindow.put(this.currWindow.name, cfgWindow);
         }
-        this.actPanel.listElements.add(value);      //list of elements in panels   
+        if(value.widgetType instanceof GralCfgPanel) {
+          this.currWindow.panel = (GralCfgPanel)value.widgetType;
+        } else {
+          if(this.currWindow.panel == null) {              // default panel in the window
+            String nameDefaultPanel = this.currWindow.name;
+            if(nameDefaultPanel.endsWith("Window")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-6);}
+            else if(nameDefaultPanel.endsWith("Wind")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-4);}
+            else if(nameDefaultPanel.endsWith("Win")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-3);}
+            this.currWindow.panel = new GralCfgPanel(nameDefaultPanel, this.currWindow);
+            this.idxPanels.put(nameDefaultPanel, this.currWindow.panel);
+          }
+          if(sPanel == null){                      //the last panel is used furthermore.
+            sPanel = this.currWindow.panel.name;
+            value.setPanel(sPanel);
+          } else {                                           //a panel is given.
+            GralCfgPanel panel = this.idxPanels.get(sPanel); 
+            if(panel == null){                             //a new panel name is a tabbed panel in the current window:
+              GralCfgPanel tab1 = this.currWindow.panel;
+              String nameTabPanel = this.currWindow.name + "-Tabbed";
+              this.currWindow.panel = new GralCfgPanel(nameTabPanel, this.currWindow);      // an unknown panel forces a tab in the given panel. Since 2010
+              this.currWindow.panel.listTabs.add(tab1);
+              panel = new GralCfgPanel(sPanel, this.currWindow);
+              this.idxPanels.put(tab1.name, tab1);
+              this.idxPanels.put(sPanel, panel);
+            }
+            if(panel != this.currWindow.panel) {
+              this.currWindow = panel.window;              // another window is selected with the panel
+            }
+            
+          }
+          this.currWindow.panel.listElements.add(value);      //list of elements in panels   
+        }
       }
       this.listElementsInTextfileOrder.add(value);  //list of elements in text file
     }
