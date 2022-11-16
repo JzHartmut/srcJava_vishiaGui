@@ -88,7 +88,7 @@ public final class FcmdFilesCp {
   }
   
   void buildGraphic(){
-    main.gui.addMenuBarArea9ItemGThread("menuFilesCpBar", main.idents.menuFilesCpBar, actionConfirmCp);
+    main.gui.menuBar.addMenuItem("menuFilesCpBar", main.idents.menuFilesCpBar, actionConfirmCp);
     main.gui.gralMng.selectPanel("primaryWindow");
     main.gui.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
     

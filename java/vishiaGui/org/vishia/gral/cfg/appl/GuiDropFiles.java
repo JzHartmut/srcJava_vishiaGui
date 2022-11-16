@@ -232,7 +232,7 @@ public class GuiDropFiles {
   private Appendable logTextbox(CharSequence msg) {
     try {
       this.outTextbox.append(msg);
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.err.println("unexected: cannot append to msgOut");
     }
     return this.outTextbox;

@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -38,12 +38,12 @@ public class FcmdLeftMidRightPanel
   
   /**The container for all tabs of this TabbedPanel. It is a {@link GralPanelContent} of the primaryWindow 
    * associated to one of the frame areas of the GralArea9_ifc. */
-  GralTabbedPanel tabbedPanelFileCards;
+  GralPanelContent tabbedPanelFileCards;
   
   /**The container for the tabs for selection. 
    * It is the first {@link GralPanelContent} inside the {@link #tabbedPanelFileCards} designated with "a-F1" etc. 
    */
-  GralTabbedPanel tabbedPanelFavorCards;
+  GralPanelContent tabbedPanelFavorCards;
   
   /**Table widget for the select table.*/
   FcmdFavorThemeCard cardFavorThemes;
@@ -97,7 +97,7 @@ public class FcmdLeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    cardFavorThemes = new FcmdFavorThemeCard(main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
+    cardFavorThemes = new FcmdFavorThemeCard(this.main.gui.gralMng.refPos(), main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
     this.partnerPanelToSync = partnerPanelToSync;
     if(partnerPanelToSync !=null) {  //only given on one of the panels, set the other.
       partnerPanelToSync.partnerPanelToSync = this;
@@ -117,23 +117,23 @@ public class FcmdLeftMidRightPanel
     String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
     mng.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
-    tabbedPanelFileCards.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
+    this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
     mng.setPosition(0, 0, 0, -0, 1, 'd');
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = FcmdWidgetNames.panelFavoritesLeftMidRight + cNr;
     mng.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
-    tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralMngBuild_ifc.propZoomedPanel);
+    this.tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel);
     //The panel for selection from all favorites: 
     nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;
     mng.setPosition(tabbedPanelFavorCards.pos(), 0, 0, 0, 0, 1, 'd');
-    tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
+    this.tabbedPanelFavorCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //inside the new tab
     cardFavorThemes.createImplWidget_Gthread();
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
-      tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
+      tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
       mng.setPosition(2, -2, 0, -0, 1, 'd');
       main.executer.cmdSelector.createImplWidget_Gthread();
     }
@@ -305,9 +305,9 @@ public class FcmdLeftMidRightPanel
     
     //final int[] widthSelecttableMain = new int[]{10, 30};
 
-    public FcmdFavorThemeCard(Fcmd main, String name, FcmdLeftMidRightPanel panel)
+    public FcmdFavorThemeCard(GralPos refPos, Fcmd main, String name, FcmdLeftMidRightPanel panel)
     { //super(name, mng);
-      super(name, 20, new int[]{10, 30}, 'C');
+      super(refPos, name, 20, new int[]{10, 30}, 'C');
 
       mainPanel = panel;
     }

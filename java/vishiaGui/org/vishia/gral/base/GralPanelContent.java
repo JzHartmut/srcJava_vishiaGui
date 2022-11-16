@@ -17,9 +17,11 @@ import org.vishia.util.Debugutil;
 
 
 /**This class describes a panel which contains either some other widgets (also sub GralPanelContent) 
- * or as second variant tabs (new since 2022-08). 
+ * or as second variant tabs (new since 2022-08). For a tabbed panel call {@link #setToTabbedPanel()}
+ * and add only panels.
  * <br>
- * The implementing widget in Swt is a Composite. To support line views als a canvas is referenced here.
+ * The implementing widget in Swt is a Composite, a Canvas or just a TabFolder. 
+ * To support showing lines and figures a {@link Data#canvas} is referenced here.
  * It means the GralPanelContent can contain lines, figures beside widgets.
  * <br>
  * For positioning grid lines can be drawn in the implementing graphic. 
@@ -30,7 +32,9 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   /**Version history:
    * 
    * <ul>
-   * <li>2022-11-12: can replace the {@link GralWindow#mainPanel} now. See {@link GralPanelContent#GralPanelContent(GralPos, String, char, GralMng)}.
+   * <li>2022-11-15: new {@link #addTabPanel(String, String)}, {@link #removeWidget(String)} 
+   * <li>2022-11-12: can replace the {@link GralWindow#mainPanel} now if another panel type is given to build. 
+   *   See {@link GralPanelContent#GralPanelContent(GralPos, String, char, GralMng)}.
    * <li>2022-09-25: own colors for grid lines used in implementation. 
    * <li>2022-09-14: new {@link #reportAllContent(Appendable)}
    * <li>2022-08: {@link Data#bTabbed} as designation, this is a tabbed panel.
@@ -114,7 +118,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
      * */
     protected boolean bGridZoomed;
     
-    /**>=0 then all widgets of this panel are tab from a tabbed pane. 
+    /**>=0 then all widgets of this panel are tab from this as tabbed panel. 
      * It is ==0 on creation, it contains the height of the tab line if at least one tab is created.
      * If -1 (initial) then this panel is not a tabbed panel. 
      * Usual the widgets are also then panes, or maybe also a table or such one (comprehensive widgets).
@@ -122,6 +126,12 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
      * The implementation should regard this designation and build specific tab folder and items in the implementing widgets.
      */
     public short pixelTab = -1;
+    
+    
+    /**If set, it is a tab of a tabbed panel. It means the parent has {@link #pixelTab} >=0. 
+     * The text on the tab.
+     */
+    protected String nameTab;
     
     /**If this values are set, a grid should be shown. 
      * yGrid, xGrid are the spaces for the fine grid, yGrid2, xGrid2 describes which nth grid line should be more determined.
@@ -201,6 +211,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     this(currPos, posName, '$', gralMng);
   }
   
+  public GralPanelContent(GralPos currPos, String posName, String nameTab, GralMng gralMng) {
+    this(currPos, posName, '@', gralMng);
+    GralPanelContent parent = (GralPanelContent)this._wdgPos.parent;
+    parent.setToTabbedPanel();           //checks also whether it has already faulty non tab children
+    this._panel.nameTab = nameTab;
+  }
+  
  
   
   
@@ -248,6 +265,26 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   
   
+  /**Adds a new panel as Tab for this tabbed panel. 
+   * The panel must not contain any other widgets before.
+   * {@link #setToTabbedPanel()} is called here. 
+   * @param name name of the panel in the GralMng.
+   * @param tabLabel label shown on the tab.
+   * @return a new created panel as child of this panel, which acts as tab
+   */
+  public GralPanelContent addTabPanel(String name, String tabLabel) {
+    setToTabbedPanel();
+    GralPos pos = new GralPos(this.gralMng());  //has full spread 0..0
+    pos.parent = this;                                     // registeres the new panel in this, in the constructor via pos.parent
+    GralPanelContent wdgg = new GralPanelContent(pos, name, tabLabel, this.gralMng());
+    return wdgg;
+  }
+
+
+
+
+
+
   /**If yGrid and xGrid are >0, show a grid. 
    * For tabbed panels show the grid for all tabs.
    * If yGrid==0 or xGrid ==0 does not show a grid.
@@ -279,7 +316,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @param widg
    * @param toResize
    */
-  @Override public void addWidget(GralWidget widg, boolean toResize){
+  void addWidget(GralWidget widg, boolean toResize){
     String nameWidg = widg.name;
     if(widg instanceof GralWindow)
       Debugutil.stop();
@@ -309,8 +346,6 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
       this._panel.primaryWidget = widg; 
     }
   }
-  
-  
   
   
   
@@ -365,6 +400,22 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   }
 
   
+  
+  /**Removes a widget in this panel given by name.
+   * It searches the widget in this panel ({@link Data#idxWidgets}) and calls {@link GralWidget#remove()}.
+   * It removes also the implementing widget. 
+   * @param name name of the widget for GralMng as also in the {@link Data#idxWidgets}
+   * @return true then widget is removed, false: Widget not exists here.
+   */
+  public boolean removeWidget(String name) {
+    GralWidget child = this._panel.idxWidgets.get(name);
+    if(child !=null) {
+      return child.remove();
+    } else {
+      gralMng().log.writeError("remove - does not exist: " + name);
+      return false;
+    }
+  }
   
   @Override public GralCanvasStorage canvas() { return this._panel.canvas; }
 

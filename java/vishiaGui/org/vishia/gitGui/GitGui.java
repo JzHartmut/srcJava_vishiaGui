@@ -290,7 +290,7 @@ public class GitGui
       try{
         if(errorcode !=0) { GitGui.this.wdgInfo.append("ERROR: " + errorcode + "\n"); }
         GitGui.this.wdgInfo.append(GitGui.this.gitOut); 
-      } catch(IOException exc) {} //nothing, not expected
+      } catch(Exception exc) {} //nothing, not expected
       GitGui.this.gitOut.buffer().setLength(0);  //prepare for the next command.
       GitGui.this.gitOut.assign(GitGui.this.gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     }
@@ -596,7 +596,7 @@ public class GitGui
       } else {
         wdgInfo.setText("cmd ouptut:\n");
         try { wdgInfo.append(gitOut);
-        } catch (IOException e) { }
+        } catch (Exception e) { }
       }
   } };
 
@@ -608,7 +608,7 @@ public class GitGui
     public void exec(int errorcode, Appendable out, Appendable err)
     { wdgInfo.setText("cmd ouptut:\n");
       try { wdgInfo.append(gitOut);
-      } catch (IOException e) { }
+      } catch (Exception e) { }
   } };
 
   
@@ -1327,7 +1327,7 @@ public class GitGui
       wdgInfo.setText("(working area)");
       try{
         wdgInfo.append("\n");
-      } catch(IOException exc){}
+      } catch(Exception exc){}
       sGitCmd += " diff --name-status HEAD";
     } else {
       wdgInfo.setText(currentEntry.revisionHash);

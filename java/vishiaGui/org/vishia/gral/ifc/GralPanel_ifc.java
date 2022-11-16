@@ -27,7 +27,11 @@ public interface GralPanel_ifc extends GralWidget_ifc {
   
   GralCanvasStorage canvas();
   
-  void addWidget(GralWidget widg, boolean toResize);
+  /**Only used internally
+   * @param widg
+   * @param toResize
+   */
+  //void addWidget(GralWidget widg, boolean toResize);
 
   void removeWidget(GralWidget widg);
   

@@ -16,7 +16,7 @@ import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -208,7 +208,7 @@ class FcmdFavorPathSelector
     //main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
     //main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /
     //main.gui.addMenuItemGThread("menubarFolderSearch", main.idents.menuBarSearchFiles, actionSearchFiles); // /
-    main.gui.addMenuBarArea9ItemGThread("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, actionSyncMidRight); // /
+    main.gui.menuBar.addMenuItem("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, actionSyncMidRight); // /
     //main.gui.addMenuItemGThread("menubarFileProps", main.idents.menuFilePropsBar, main.filePropsCmd.actionOpenDialog);
     //main.gui.addMenuItemGThread("test", main.idents.menuFileViewBar, main.viewCmd.actionOpenView);
     //main.gui.addMenuItemGThread("test", main.idents.menuFileEditBar, main.actionEdit);
@@ -218,10 +218,10 @@ class FcmdFavorPathSelector
     //main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
     //main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
 
-    main.gui.addMenuBarArea9ItemGThread("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
-    main.gui.addMenuBarArea9ItemGThread("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
-    main.gui.addMenuBarArea9ItemGThread("menuSaveFavoriteSel", main.idents.menuSaveFavoriteSel, actionSaveFavoritePathes); // /
-    main.gui.addMenuBarArea9ItemGThread("menuReadFavoriteSel", main.idents.menuReadFavoriteSel, actionReadFavoritePathes); // /
+    main.gui.menuBar.addMenuItem("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
+    main.gui.menuBar.addMenuItem("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
+    main.gui.menuBar.addMenuItem("menuSaveFavoriteSel", main.idents.menuSaveFavoriteSel, actionSaveFavoritePathes); // /
+    main.gui.menuBar.addMenuItem("menuReadFavoriteSel", main.idents.menuReadFavoriteSel, actionReadFavoritePathes); // /
 
 
     
@@ -375,13 +375,13 @@ class FcmdFavorPathSelector
       if(cfgFileOld.exists()){
         bOk = cfgFileOld.delete();
         if(!bOk){
-          main.mainCmd.writeError("can't delete " + cfgFileOld.getAbsolutePath());
+          main.log.writeError("can't delete " + cfgFileOld.getAbsolutePath());
         }
       }
       if(bOk){
         bOk = cfgFile.renameTo(cfgFileOld);
         if(!bOk){
-          main.mainCmd.writeError("can't rename " + cfgFile.getAbsolutePath());
+          main.log.writeError("can't rename " + cfgFile.getAbsolutePath());
         }
       }
     }
@@ -405,7 +405,7 @@ class FcmdFavorPathSelector
         }
       }
       catch(IOException exc){
-        main.mainCmd.writeError("error writing" , exc);
+        main.log.writeError("error writing" , exc);
       }
     }
     writerCfg.close();
@@ -444,7 +444,7 @@ class FcmdFavorPathSelector
   /**Builds a tab for file or command view from a selected line of selection.
    * @param info The selection info
    */
-  void buildTabFromSelection(FcmdFavorPathSelector.FavorPath info, GralTabbedPanel tabPanel)
+  void buildTabFromSelection(FcmdFavorPathSelector.FavorPath info, GralPanelContent tabPanel)
   { assert(false);
     /*
     tabPanel.addGridPanel(info.tabName1, info.tabName1,1,1,10,10);
@@ -554,8 +554,8 @@ class FcmdFavorPathSelector
         }
         String nameWidgFavorCard = FcmdWidgetNames.tabFavorites + fileCard.nameFilePanel;
         String nameWidgFileCard = FcmdWidgetNames.tabFile + fileCard.nameFilePanel;
-        panel.tabbedPanelFavorCards.removePanel(nameWidgFavorCard);
-        panel.tabbedPanelFileCards.removePanel(nameWidgFileCard);
+        panel.tabbedPanelFavorCards.removeWidget(nameWidgFavorCard);
+        panel.tabbedPanelFileCards.removeWidget(nameWidgFileCard);
         panel.cardFavorThemes.setFocus();
       }
       return true;

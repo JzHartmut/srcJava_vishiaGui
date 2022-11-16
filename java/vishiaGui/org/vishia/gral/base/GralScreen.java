@@ -227,12 +227,7 @@ public class GralScreen implements GralPanel_ifc {
     
   }
 
-  @Override public void addWidget ( GralWidget widg,
-      boolean toResize ) {
  
-    
-  }
-
   @Override public Object getImplWidget () {
     // TODO Auto-generated method stub
     return null;

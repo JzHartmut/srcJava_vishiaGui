@@ -1004,14 +1004,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           if(setVisible){
             widgButtonOk.setPrimaryWidgetOfPanel();
             windConfirmCopy.setVisible(true);
-            main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
+            main.gui.gralMng.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
           }
           //widgButtonMove.setValue(GralMng_ifc.cmdSet, 0, 0);
           zFiles = 0; zBytes = 0;
         }
         windConfirmCopy.setFocus();
         //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
-        main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
+        main.gui.gralMng.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
       }
       return true;
    }  };

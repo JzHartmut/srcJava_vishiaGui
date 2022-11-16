@@ -126,7 +126,7 @@ public class ExampleScriptSimpleButton {
     String textOfField = this.gui.wdgInputText.getText();
     try{ 
       this.gui.wdgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
-    } catch(IOException exc){}
+    } catch(Exception exc){}
   }
   
   private final GralUserAction actionButtonCode = new GralUserAction("buttonCode") { 

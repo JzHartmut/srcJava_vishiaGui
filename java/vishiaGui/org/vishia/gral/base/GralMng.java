@@ -1535,6 +1535,28 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
   
   
+  /**Add a panel to any other panel or window which contains only other panels as tab
+   * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
+   * @return GralPanelContent to set some more.
+   */
+  public GralPanelContent addTabbedPanel(String posName) {
+    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, this);
+    wdgg.setToTabbedPanel();
+    return wdgg;
+  }
+  
+  
+  /**Add a panel as tab pabel. The parent should be a tabbed panel.
+   * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
+   * @param tabName The string shown on the tab.
+   * @return GralPanelContent to set some more.
+   */
+  public GralPanelContent addTabPanel(String posName, String nameTab) {
+    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, nameTab, this);
+    return wdgg;
+  }
+  
+  
   /**Add a panel with 9 areas to any other panel or window.
    * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
    * @return GralArea9Panel to set some more.
@@ -1554,7 +1576,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     if( (widg = findWidget(name)) !=null){
       if(widg instanceof GralTextBox_ifc){
         try{ ((GralTextBox)widg).append(text); }
-        catch(IOException exc){ System.err.println("TODO"); }
+        catch(Exception exc){ System.err.println("TODO"); }
       }
       else {
         System.err.println("GralMng - addText not possible;" + name);

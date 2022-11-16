@@ -35,7 +35,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
   
   public FcmdFavorCard(Fcmd main, String name, FcmdFileCard fileTable, FcmdLeftMidRightPanel panel)
   { //super(name, mng);
-    super(name, 20, new int[]{2,15,0}, 'C');
+    super(main.gui.gralMng.refPos(), name, 20, new int[]{2,15,0}, 'C');
     this.main = main;
     this.mainPanel = panel;
     this.fileTable = fileTable;

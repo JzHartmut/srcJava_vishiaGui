@@ -476,7 +476,7 @@ public class FcmdView
   void openQuickView(FileRemote src){
     if(widgQuickView == null){
       //creates an grid panel and select its in gralMng:
-      main.favorPathSelector.panelRight.tabbedPanelFileCards.addGridPanel("qview", "qview",1,1,10,10);
+      main.favorPathSelector.panelRight.tabbedPanelFileCards.addTabPanel("qview", "qview");
       this.main.gui.gralMng.setPosition(1, -1, 0, 0, 1, 'd');
       //adds a textBox in that grid panel.
       widgQuickView = this.main.gui.gralMng.addTextBox("qview-content", false, null, '.');
@@ -491,7 +491,7 @@ public class FcmdView
   
   
   void closeQuickView(){
-    main.favorPathSelector.panelRight.tabbedPanelFileCards.removePanel("qview");
+    main.favorPathSelector.panelRight.tabbedPanelFileCards.removeWidget("qview");
     widgQuickView.remove();
     widgQuickView = null;
   }

@@ -65,7 +65,7 @@ public class FcmdMkDirFile
     } else {
       widgParentPath.setText("?? nothing selected ??");
     }
-    main.gui.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.mkdirfile.");
+    main.gui.gralMng.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.mkdirfile.");
     windMk.setFocus(); //setWindowVisible(true);
   }
   
@@ -95,8 +95,8 @@ public class FcmdMkDirFile
             FileRemote file = main.fileCluster.getFile(path, name);
             boolean bOk = false;
             try{ bOk = file.createNewFile(); }
-            catch(IOException exc){ main.mainCmd.writeError(exc.getLocalizedMessage()); }
-            if(!bOk){ main.mainCmd.writeError("file exists already");}
+            catch(IOException exc){ main.log.writeError(exc.getLocalizedMessage()); }
+            if(!bOk){ main.log.writeError("file exists already");}
             
           }break;
           case 'd':{
@@ -105,8 +105,8 @@ public class FcmdMkDirFile
             FileRemote dir = main.fileCluster.getFile(path, name);
             boolean bOk = false;
             try{ bOk = dir.mkdir(); }
-            catch(SecurityException exc){ main.mainCmd.writeError(exc.getLocalizedMessage()); }
-            if(!bOk){ main.mainCmd.writeError("directory exists already");}
+            catch(SecurityException exc){ main.log.writeError(exc.getLocalizedMessage()); }
+            if(!bOk){ main.log.writeError("directory exists already");}
           }break;
         }
         windMk.setWindowVisible(false);

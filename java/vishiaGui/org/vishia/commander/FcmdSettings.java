@@ -86,7 +86,7 @@ public class FcmdSettings
   void buildWindow()
   { main.gui.gralMng.selectPanel("primaryWindow");
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop;
-    GralWindow window =  new GralWindow("10+29, 10+47", "windSettings", "Settings - The.file.Commander", windProps);
+    GralWindow window =  main.gui.gralMng.addWindow("@10+29, 10+47 = windSettings", "Settings - The.file.Commander", windProps);
     window.createImplWidget_Gthread();
     windSettings = window; 
     main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
@@ -150,7 +150,7 @@ public class FcmdSettings
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
-        GralMng.get().showInfo(null);
+        FcmdSettings.this.main.gui.gralMng.showInfo(null);
       }
       return true;
   } };
@@ -203,13 +203,13 @@ public class FcmdSettings
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String sFileCfg = ((GralWidget)widg).getCmd();
         main.executer.cmdSelector.clear();
-        String sError = main.executer.readCmdCfgSelectList(main.executer.cmdSelector.addJZsub2SelectTable, new File(main.cargs.dirCfg, sFileCfg), main.console);
+        String sError = main.executer.readCmdCfgSelectList(main.executer.cmdSelector.addJZsub2SelectTable, new File(main.cargs.dirCfg, sFileCfg), main.gui.gralMng.log);
         if(sError != null) {
-          main.showInfoBox(sError);
+          main.gui.outputBox.setText(sError);
           widgOkError.setText("error");
         } else {
           widgOkError.setText("success");
-          main.setTextInfoBox("ok read " + main.cargs.dirCfg + "/" + sFileCfg);
+          main.gui.outputBox.setText("ok read " + main.cargs.dirCfg + "/" + sFileCfg);
         }
       }
       return true;

@@ -18,6 +18,8 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   
   /**Version and history
    * <ul>
+   * <li>2022-01-31 Hartmut chg: {@link #append(CharSequence)} without IOException. 
+   *   It is possible in Java though the interface defines an IOException. Here not necessary and more simple for application. 
    * <li>2022-01-31 Hartmut chg: Some stuff is commented now, because it is all in GralTextField,
    *   because SwtTextFieldWrapper contains all necessities. Not an extra implementation class. 
    * <li>2014-08-16 Hartmut chg: Now Implementation uses the same class, as GralTextField, inheritance was done before.
@@ -92,7 +94,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    * 
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
-  @Override public final Appendable append(CharSequence arg0) throws IOException
+  @Override public final Appendable append(CharSequence arg0)
   { synchronized(newText) {
       newText.append(arg0);
       dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
@@ -106,7 +108,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    * 
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
-  @Override public final Appendable append(char arg0) throws IOException
+  @Override public final Appendable append(char arg0)
   { synchronized(newText) {
     newText.append(arg0);
     dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
@@ -120,7 +122,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    * 
    * @see java.lang.Appendable#append(java.lang.CharSequence, int, int)
    */
-  @Override public final Appendable append(CharSequence arg0, int arg1, int arg2) throws IOException
+  @Override public final Appendable append(CharSequence arg0, int arg1, int arg2)
   {
     append(arg0.subSequence(arg1, arg2));
     return this;

@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import org.vishia.gral.base.GralArea9Panel;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
@@ -13,6 +14,8 @@ public class FcmdGui {
   
   
   final GralWindow fcmdWindow = this.gralMng.addWindow("@screen,10+80, 20+120=mainWin", "The.file.Commander");
+  
+  final GralMenu menuBar = this.fcmdWindow.getMenuBar();
   
   final GralArea9Panel area9 = this.gralMng.addArea9Panel("@mainWin = area9");
  

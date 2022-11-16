@@ -193,7 +193,7 @@ public class FcmdDelete
             windConfirmDelete.setWindowVisible(false);
           }
         }
-      } catch(Exception exc){ main.gui.gralMng.log.sendMsg(0, "FcmdDelete-actionDelete"); }
+      } catch(Exception exc){ main.log.sendMsg(0, "FcmdDelete-actionDelete"); }
       return true;
     }
   };
@@ -204,7 +204,7 @@ public class FcmdDelete
     @Override public int processEvent(EventObject ev)
     { FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
       if(callback.successCode !=0){
-        main.mainCmd.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
+        main.log.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
       }
       listEvDel.remove(ev);
       int nrofPendingFiles = listEvDel.size();

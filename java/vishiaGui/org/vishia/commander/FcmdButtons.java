@@ -133,9 +133,9 @@ public class FcmdButtons
       idxKeyAction.put(key2, action);
     }
     if(menu !=null){
-      GralMenu menuBar = main.gui.getMenuBar();
+      GralMenu menuBar = main.gui.fcmdWindow.getMenuBar();
       menuBar.addMenuItem(menu, action);
-      //main.gui.addMenuBarArea9ItemGThread(null, menu, action);
+      //main.gui.menuBar.addMenuItem(null, menu, action);
     }
   }
   
@@ -239,9 +239,9 @@ public class FcmdButtons
         setBtnMenuAndKeys(entry.action, entry.buttontext, entry.key1, entry.key2, entry.menu);
       }
     }
-    main.gui.addMenuBarArea9ItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
+    main.gui.menuBar.addMenuItem("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
 
-    setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
+    setBtnMenuAndKeys(main.gui.gralMng.actionHelp, main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     
@@ -286,7 +286,7 @@ public class FcmdButtons
     for(idx = 40; idx < 50; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
+    main.gui.area9.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
   }
 
 
@@ -328,10 +328,10 @@ public class FcmdButtons
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
       if(bButtonVisible){
         bButtonVisible = false;
-        main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
+        main.gui.area9.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
       } else {
         bButtonVisible = true;
-        main.gui.setMinMaxSizeArea("A3C3", 15, 15, 0, 0);
+        main.gui.area9.setMinMaxSizeArea("A3C3", 15, 15, 0, 0);
       }
       return true;
       } else return false;

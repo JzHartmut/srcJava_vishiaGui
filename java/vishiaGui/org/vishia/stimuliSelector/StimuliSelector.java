@@ -950,7 +950,7 @@ public class StimuliSelector
         StimuliSelector.this.output.setText("");
         try {
           StimuliSelector.this.output.append("help...\n2. line\n");
-        } catch (IOException e) {}
+        } catch (Exception e) {}
       }
       return true;
     }

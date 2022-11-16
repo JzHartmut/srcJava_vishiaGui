@@ -159,14 +159,14 @@ public class FcmdFileCard extends GralFileSelector
     //The favorite paths card
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
     favorCard = new FcmdFavorCard(main, nameTableSelection, this, mainPanel);
-    GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addGridPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label,1,1,10,10);
+    GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addTabPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label);
     mng.setPosition(0, 0, 0, -0, 1, 'd');  
     favorCard.createImplWidget_Gthread();
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
     panelFavors.setPrimaryWidget(favorCard.wdgdTable);
     //
     //The files card
-    GralPanelContent panelFiles = mainPanel.tabbedPanelFileCards.addGridPanel(FcmdWidgetNames.tabFile + nameFilePanel, label,1,1,10,10);
+    GralPanelContent panelFiles = mainPanel.tabbedPanelFileCards.addTabPanel(FcmdWidgetNames.tabFile + nameFilePanel, label);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
