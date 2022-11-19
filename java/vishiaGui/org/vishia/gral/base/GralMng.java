@@ -1688,7 +1688,7 @@ public GralTextBox addTextBox(String posName) {
 , String sDataPath
 )
 { 
-  GralValueBar wdgg = new GralValueBar(sName);
+  GralValueBar wdgg = new GralValueBar(refPos(), sName);
   wdgg.setDataPath(sDataPath);
   // wdgg.setToPanel(this);
   return wdgg;

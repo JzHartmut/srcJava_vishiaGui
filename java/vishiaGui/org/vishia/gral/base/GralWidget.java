@@ -747,7 +747,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   
   public GralWidget ( GralPos currPos, String sPosName, char whatIs){
-    this(currPos, sPosName, whatIs, null);
+    this(currPos, sPosName, whatIs, currPos.parent.gralMng());
   }
 
   

@@ -99,11 +99,11 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-11-01 12:15:21  x     GralLed.java                             ::          5.646 -0450864146 
 2022-09-25 19:48:48  x     GralMenu.java                            ::         12.586 -0766242011 
-2022-11-19 14:04:48  x     GralMng.java                             ::        106.043 -0940210612 
+2022-11-19 21:33:27  x     GralMng.java                             ::        106.053  1750909742 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-11-16 10:26:23  x     GralPanelContent.java                    ::         25.070  1105367525 
-2022-11-19 10:40:48  x     GralPos.java                             ::         72.680 -1290633594 
+2022-11-19 21:44:17  x     GralPos.java                             ::         72.685 -0184030284 
 2022-11-15 17:59:14  x     GralScreen.java                          ::          4.055  1119902830 
 2022-11-13 19:23:26  x     GralShowMethods.java                     ::         11.736 -0385445325 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
@@ -111,9 +111,9 @@
 2022-11-19 14:18:43  x     GralTable.java                           ::        111.057  1130779967 
 2022-11-16 10:31:12  x     GralTextBox.java                         ::          7.703 -2052547761 
 2022-11-13 19:24:20  x     GralTextField.java                       ::         34.150  0287355535 
-2022-10-01 23:10:04  x     GralValueBar.java                        ::          6.216 -0483513653 
+2022-11-19 21:32:48  x     GralValueBar.java                        ::          6.218  1291974722 
 2022-11-11 17:43:57  x     GralWidgImplAccess_ifc.java              ::          5.924  0960638258 
-2022-11-19 14:17:29  x     GralWidget.java                          ::        109.967  0346846009 
+2022-11-19 21:31:21  x     GralWidget.java                          ::        109.987 -0317610177 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-11-19 14:31:31  x     GralWindow.java                          ::         18.429  1399004812 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 

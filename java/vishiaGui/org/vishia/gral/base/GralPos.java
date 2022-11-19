@@ -1332,7 +1332,7 @@ public class GralPos implements Cloneable
       case areaNr:
         q1 = z - areaNr;
         if(q1 <0 || q1 >3) { throw new IllegalArgumentException("area should be A1..C3"); }
-        this.n1 = -1; this.n2 = 0;     // mark as area value
+        this.n1 = -1; this.n2 = areaNr;     // mark as area value
         break;
       default:
         throw new IllegalArgumentException("GralPos coord set, start value faulty case: 0x" + Integer.toHexString(zType));  
