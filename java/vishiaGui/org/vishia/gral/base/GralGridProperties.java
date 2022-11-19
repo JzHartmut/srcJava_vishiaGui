@@ -7,7 +7,7 @@ import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 
-public class GralGridProperties
+public final class GralGridProperties
 {
   /**Version, history and license.
    * <ul>
@@ -59,10 +59,6 @@ public class GralGridProperties
   , {12,16,18,12, 12,14,18}  //3.5
   , {15,18,20,12, 12,14,18}  //>=4
   };
-  
-  protected final static int[] smallPromptFontSize = stdTextFontSize[0];
-  protected final static int[] stdInputFontSize =    stdTextFontSize[4];
-  protected final static int[] stdButtonFontSize =   stdTextFontSize[7];
   
   /** Number of pixel for fractional part and for the grid size.
    * The array is organized in a 2-dimensional array <code>[frac][size]</code>.
@@ -138,14 +134,11 @@ public class GralGridProperties
   public final GralFont[] fontMonospacedSansSerif = new GralFont[10];  
   
   /**The size of this propety set.*/
-  protected final int size;
+  protected int size;
 
-	public GralGridProperties(char sizeC)
+	public GralGridProperties()
 	{
-		int size = (sizeC - 'A');
-	  if(size <0 || size >= stdInputFontSize.length) throw new IllegalArgumentException("parameter size should be 1.." + stdInputFontSize.length);
-  	this.size = size; 
-    this.xPixelUnit = pixelFrac[size][10];
+		this.xPixelUnit = pixelFrac[size][10];
     colorBackground_ = color(0xeeeeee);
     this.textFont[0] = new GralFont("Arial", stdTextFontSize[0][size], 'n');
     this.textFont[1] = new GralFont("Arial", stdTextFontSize[1][size], 'n');
@@ -171,6 +164,14 @@ public class GralGridProperties
 
 	}
   
+	
+	public void setSizeGui(char sizeC) {
+	  int size = (sizeC - 'A');
+    if(size <0 || size >= pixelFrac.length) throw new IllegalArgumentException("parameter size should be A.." + (char)('A' + pixelFrac.length));
+    this.size = size; 
+	}
+	
+	public int size() { return size; }
 	
 	public int getColorValue(String sColorName)
 	{ //Integer colorValue = 
@@ -268,6 +269,15 @@ public class GralGridProperties
   public int xPixelFrac(int frac){ return pixelFrac[size][frac]; }
 
 
-  
+  /**
+   *
+   */
+  public static abstract class ImplAccess {
+    
+    protected final static int[] smallPromptFontSize = stdTextFontSize[0];
+    protected final static int[] stdInputFontSize =    stdTextFontSize[4];
+    protected final static int[] stdButtonFontSize =   stdTextFontSize[7];
+    
+  }
   
 }

@@ -417,9 +417,9 @@ public final class GralCfgData
   final List<String> cfgConditions;
   
   
-  GralCfgElement firstElement = null;
+//  GralCfgElement firstElement = null;
   
-  private GralCfgElement actualElement = null;
+//  private GralCfgElement actualElement = null;
   
   private Conditional actualConditional;
   
@@ -449,6 +449,11 @@ public final class GralCfgData
    * 
    */
   GralCfgWindow currWindow;
+  
+  /**The current panel where a widget is associated to, with or without panel definition.
+   * A panel definition determines this currPanel with the new current one.
+   */
+  GralCfgPanel currPanel;
   
   /**Map of panels. Filled via {@link #add_Element(GralCfgElement)}  */
   private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
@@ -539,15 +544,15 @@ public final class GralCfgData
     if(newGuiElement == null){ newGuiElement = new GralCfgElement(); }
     //
     if(actualConditional ==null || actualConditional.condition){
-      if(firstElement ==null){
-        firstElement = newGuiElement;
-      }
-      //GralCfgElement actual1 = actualConditional == null ? actualElement : actualConditional.actualElement;
-      if(actualElement !=null){
-        actualElement.next = newGuiElement;
-      }
-      newGuiElement.previous = actualElement;  //may be null
-      actualElement = newGuiElement;
+//      if(firstElement ==null){
+//        firstElement = newGuiElement;
+//      }
+//      //GralCfgElement actual1 = actualConditional == null ? actualElement : actualConditional.actualElement;
+//      if(actualElement !=null){
+//        actualElement.next = newGuiElement;
+//      }
+//      newGuiElement.previous = actualElement;  //may be null
+//      actualElement = newGuiElement;
     }
     return newGuiElement; 
   }  
@@ -565,61 +570,77 @@ public final class GralCfgData
   { 
     if(actualConditional ==null || actualConditional.condition){
       String sPanel = value.panel;
-      final String name;
-      if(value.name == null) {
-        name = value.name = value.widgetType.name;
-      } else {
+      final String name;                                   // The name of the cfgElement have two destinations.
+      if(value.name == null) {                             // expected given with syntax (... name = [<""?name>|<$-/?name>] )
+        name = value.name = value.widgetType.name;         // then store also here.
+      } else {   //------------------------------------or---  given with syntay <*=:?positionString> [ = <$-/?name>]
         name = value.name;
         if(value.widgetType.name !=null && ! value.widgetType.name.equals(value.name)) {
           throw new IllegalArgumentException("only one name should be given or name should be the same: " + value.toString());
         } else {
-          value.widgetType.name = value.name;  // the same
+          value.widgetType.name = value.name;              // store it also in the widgettype
         }
       }
-      if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
-        stop();
-      if (value.widgetType instanceof GralCfgWindow){
+      // name clarified.
+      //
+//      if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
+//        stop();
+      //===================================================== Select type of widget, consider Window, Panel
+      if (value.widgetType instanceof GralCfgWindow){      // definitive given window
         this.idxWindow.put(name, value);
         this.currWindow = (GralCfgWindow)value.widgetType;
-      } else {
-        if(this.currWindow ==null) {                       // create a default window of not given.  
+      } else { //-------------------------------------------- not a window
+        if(this.currWindow ==null) {                       // Window not given, create a default window of not given.  
           GralCfgElement cfgWindow = new GralCfgElement();
           this.currWindow = new GralCfgWindow(null);
           cfgWindow.widgetType = this.currWindow;
           this.currWindow.name = "mainWindow";
           this.idxWindow.put(this.currWindow.name, cfgWindow);
         }
-        if(value.widgetType instanceof GralCfgPanel) {
-          this.currWindow.panel = (GralCfgPanel)value.widgetType;
+        //
+        if(value.widgetType instanceof GralCfgPanel) {     // definitive given panel for example an Area9Panel
+          GralCfgPanel newPanel = (GralCfgPanel)value.widgetType;
+          if(this.currWindow.panelWin == null) {              // it is the panel of the window
+            this.currWindow.panelWin = newPanel;
+          } else {                                         // it is a sub panel in a panel
+            this.currPanel.listElements.add(value);        // add the GralCfgElement which is the newPanel
+          }
+          this.currPanel = newPanel;                       // now use it for furthermore
         } else {
-          if(this.currWindow.panel == null) {              // default panel in the window
+          //------------------------------------------------- other widget, on a panel
+          if(this.currPanel == null) {              // default panel in the window
             String nameDefaultPanel = this.currWindow.name;
             if(nameDefaultPanel.endsWith("Window")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-6);}
             else if(nameDefaultPanel.endsWith("Wind")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-4);}
             else if(nameDefaultPanel.endsWith("Win")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-3);}
-            this.currWindow.panel = new GralCfgPanel(nameDefaultPanel, this.currWindow);
-            this.idxPanels.put(nameDefaultPanel, this.currWindow.panel);
+            this.currPanel = new GralCfgPanel(nameDefaultPanel, this.currWindow);
+            this.idxPanels.put(nameDefaultPanel, this.currPanel);
+            assert(this.currWindow.panelWin == null);  // elsewhere this.currPanel is not null
+            this.currWindow.panelWin = this.currPanel;
           }
-          if(sPanel == null){                      //the last panel is used furthermore.
-            sPanel = this.currWindow.panel.name;
+          //
+          if(sPanel == null){                              //the last panel is used furthermore.
+            sPanel = this.currPanel.name;
             value.setPanel(sPanel);
-          } else {                                           //a panel is given.
+          } else {  //======================================= a panel is given.
             GralCfgPanel panel = this.idxPanels.get(sPanel); 
-            if(panel == null){                             //a new panel name is a tabbed panel in the current window:
-              GralCfgPanel tab1 = this.currWindow.panel;
-              String nameTabPanel = this.currWindow.name + "-Tabbed";
-              this.currWindow.panel = new GralCfgPanel(nameTabPanel, this.currWindow);      // an unknown panel forces a tab in the given panel. Since 2010
-              this.currWindow.panel.listTabs.add(tab1);
-              panel = new GralCfgPanel(sPanel, this.currWindow);
-              this.idxPanels.put(tab1.name, tab1);
+            if(panel == null){                             // an unknown panel name forces a tab in the given window panel. Since 2010
+              if(this.currWindow.panelWin.listElements.size() >0) {
+                GralCfgPanel tab1 = this.currWindow.panelWin; // if the current panel contains already content
+                String nameTabPanel = this.currWindow.panelWin.name + "-Tabbed"; // then create instead a new empty panel for the window
+                GralCfgPanel tabbedPanel = new GralCfgPanel(nameTabPanel, this.currWindow);
+                this.idxPanels.put(nameTabPanel, tabbedPanel);
+                tabbedPanel.listTabs.add(tab1);  // and add the previous current panel as tab panel in the current window:
+                this.currWindow.panelWin = tabbedPanel;  // exchange the panel of the window with the new tabbedPanel
+              }
+              panel = new GralCfgPanel(sPanel, this.currWindow); //the tab pannel
+              this.currWindow.panelWin.listTabs.add(panel);
               this.idxPanels.put(sPanel, panel);
             }
-            if(panel != this.currWindow.panel) {
-              this.currWindow = panel.window;              // another window is selected with the panel
-            }
-            
+            this.currPanel = panel;
+            this.currWindow = panel.window;              // another window is selected with the panel
           }
-          this.currWindow.panel.listElements.add(value);      //list of elements in panels   
+          this.currPanel.listElements.add(value);      //list of elements in panels   
         }
       }
       this.listElementsInTextfileOrder.add(value);  //list of elements in text file

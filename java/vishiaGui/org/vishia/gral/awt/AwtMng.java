@@ -83,7 +83,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   { super(gralMng);
     super.sizeCharProperties = displaySize;
     //mainWindowAwt = window;
-    this.propertiesGuiAwt = new AwtProperties(displaySize);
+    this.propertiesGuiAwt = new AwtProperties(gralMng.gralProps);
     this.gralMng.setProperties(this.propertiesGuiAwt);
     
        
@@ -685,7 +685,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(gralMng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return pos.calcWidgetPosAndSize(gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
   

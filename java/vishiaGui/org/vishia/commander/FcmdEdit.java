@@ -98,7 +98,7 @@ public class FcmdEdit
     wind.addMenuBarItemGThread(null, "&Save-as/UTF8-Unix-lf", actionConvertUTF8unix);
     main.gui.gralMng.setPosition(0, 0, 0, 0, 1, 'r');
     widgContent = main.gui.gralMng.addTextBox("view-content", false, null, '.');
-    widgContent.setTextStyle(GralColor.getColor("bk"), main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
+    //widgContent.setTextStyle(GralColor.getColor("bk"), main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
     windView.setWindowVisible(false);
     //windView1.

@@ -426,7 +426,7 @@ public class GralCfgZbnf
         this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
         //
         //======>>>>
-        buildPanel(win.panel, this.window.mainPanel);
+        buildPanel(win.panelWin, this.window.mainPanel);
         
       }
     } catch (Exception exc) {
@@ -446,8 +446,8 @@ public class GralCfgZbnf
   { String sError = null;
     if(cfgPanel.listTabs.size()>0) {                  // tabs in this panel
       this.window.mainPanel.setToTabbedPanel();
-      this.currPos = new GralPos(this.window.mainPanel);
       for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
+        this.currPos = new GralPos(this.window.mainPanel);
         GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, '@', this.gralMng);
         panel.setGrid(2,2,5,5,-12,-20);
         //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
@@ -515,7 +515,7 @@ public class GralCfgZbnf
       Debugutil.stop();
     
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
-    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
     

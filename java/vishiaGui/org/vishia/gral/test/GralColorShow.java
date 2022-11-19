@@ -961,28 +961,28 @@ public class GralColorShow
         LightSat ls = lightSat[ixRow];
         String text = ls.lName; //String.format("%s %1.1f,%1.1f", ls.lName, ls.light, ls.sat);
         gralMng.setPosition(6+3*ixRow, GralPos.size -2, 0, GralPos.size+2, 0, 'd', 0);
-        GralLabel label = new GralLabel(null, text,0);
+        GralLabel label = new GralLabel(gralMng.refPos(), null, text,0);
         label.createImplWidget_Gthread();
       }
       for(int ixCol=0; ixCol<colHue.length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = colHue[ixCol].colorName;
         gralMng.setPosition(2.5f, GralPos.size -2, 4*ixCol +3, GralPos.size+4, 0, 'd', 0);
-        GralLabel label = new GralLabel(null, nameShow,0);
+        GralLabel label = new GralLabel(gralMng.refPos(), null, nameShow,0);
         label.createImplWidget_Gthread();
       }
       gralMng.setPosition(2.5f, GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 0, 'r', 0);
       for(int ixCol=0; ixCol<namesGray[0].length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = namesGray[0][ixCol];
-        GralLabel label = new GralLabel(null, nameShow,0);
+        GralLabel label = new GralLabel(gralMng.refPos(), null, nameShow,0);
         label.createImplWidget_Gthread();
       }
       gralMng.setPosition(5.5f + 3* gray1Sat.length , GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 0, 'r', 0);
       for(int ixCol=0; ixCol<namesGray[1].length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = namesGray[1][ixCol];
-        GralLabel label = new GralLabel(null, nameShow,0);
+        GralLabel label = new GralLabel(gralMng.refPos(), null, nameShow,0);
         label.createImplWidget_Gthread();
       }
       for(int ixRow = 0; ixRow < colorF.length; ++ixRow){ //cells in columns, vertical

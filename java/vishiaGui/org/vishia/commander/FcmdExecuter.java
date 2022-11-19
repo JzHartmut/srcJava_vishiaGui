@@ -109,7 +109,8 @@ public class FcmdExecuter
   { this.main = main;
     this.gralMng = main.gui.gralMng;
     this.console = console;
-    this.windConfirmExec = this.gralMng.addWindow("@-19..0,-47..0=execWindow", "confirm execute", GralWindow.windConcurrently);
+    this.gralMng.selectPanel("primaryWindow");
+    this.windConfirmExec = this.gralMng.addWindow("@screen, 20+19,40+47=execWindow", "confirm execute", GralWindow.windConcurrently);
     this.widgSelectJzExt = new GralTable<JZtxtcmdScript.Subroutine>(this.gralMng.refPos(), "@0..0,0..0=execChoice", 20, new int[]{47});
     //this.cmdQueue = new CmdQueue(outStatus);
     this.cmdExecuter = new CmdExecuter();
@@ -125,7 +126,7 @@ public class FcmdExecuter
   { 
     
     
-    windConfirmExec.createImplWidget_Gthread();
+    //windConfirmExec.createImplWidget_Gthread();
    // widgSelectExec.specifyActionChange("exec", actionExecCmdAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     widgSelectJzExt.specifyActionChange("exec", actionJZextAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
   }  

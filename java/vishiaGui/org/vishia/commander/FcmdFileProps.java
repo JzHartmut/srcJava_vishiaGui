@@ -144,7 +144,7 @@ public class FcmdFileProps
     widgLength = main.gui.gralMng.addTextField("length", false, "file-length", "t");
     main.gui.gralMng.setPosition(14, GralPos.size -3.5f, 25, -1, 0, 'r');
     widgDate = main.gui.gralMng.addTextField("data", true, "last modified", "t");
-    GralColor colorBack = main.gui.gralMng.propertiesGui.colorBackground_;
+//    GralColor colorBack = main.gui.gralMng.propertiesGui.colorBackground_;
     GralColor colorText = GralColor.getColor("bk");
     int ii;
     GralColor colorOn = GralColor.getColor("lgn");

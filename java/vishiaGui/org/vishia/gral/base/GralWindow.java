@@ -167,7 +167,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    */
   public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
-    super(refPos, posName, 'w', gralMng);
+    super(refPos.setParent(gralMng.screen), posName, 'w', gralMng);
     int lenNameWindow = super.name.length();
     final String sNamePanel;
     final String sTitleDefault;
@@ -193,7 +193,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
 
   public GralWindow(GralPos currPos, String posName, String sTitle, int windProps)
-  { this(currPos, posName, sTitle, windProps, null);
+  { this(currPos, posName, sTitle, windProps, currPos.parent.gralMng());
   }
   
   public GralWindow(GralPos currPos, String posString, String nameWindow, String sTitle, int windProps)

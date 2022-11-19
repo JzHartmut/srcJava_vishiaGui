@@ -23,6 +23,8 @@ public class SwtFactory extends GralFactory
    * It means nothing is necessary with the GralGraphicThread from user level.
    */
   @Override public void createGraphic(GralMng gralMng, char sizeShow){
+    gralMng.gralProps.setSizeGui(sizeShow);
+    
     SwtMng swtMng = new SwtMng(gralMng, sizeShow, gralMng.log);
     
   }

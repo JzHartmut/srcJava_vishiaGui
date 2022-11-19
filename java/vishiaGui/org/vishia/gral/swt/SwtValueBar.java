@@ -50,7 +50,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
 		//colorValueMinLimit = mng.propertiesGui.color(0xff4000);
 		//colorValueMaxLimit = mng.propertiesGui.color(0xff4000);
 		colorBorder = new Color[1];  //at least 1 color, if not parametrized
-		colorBorder[0] = mng.propertiesGuiSwt.color("red");
+		colorBorder[0] = mng.getColorImpl(GralColor.getColor("red"));
     //widget.setPanelMng(this);
   //  widget.setShowMethod(sShowMethod);
     //widget.widget.setData(widgetInfos);
@@ -83,7 +83,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
   	colorBorder = new Color[sColorLevels.length];
   	int ix = -1;
   	for(String sColor: sColorLevels){
-  		colorBorder[++ix] = wdgh.mng.propertiesGuiSwt.color(sColor);
+  		colorBorder[++ix] = wdgh.mng.getColorImpl(GralColor.getColor(sColor));
   	}
   }
 	

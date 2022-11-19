@@ -3,17 +3,13 @@ package org.vishia.gral.example;
 import java.io.IOException;
 
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;
@@ -77,9 +73,12 @@ public class ExampleSimpleButton
     final GralTextField wdgInputText = new GralTextField(this.refPos, "@main, 2+2, 2+20=input"
                                      , GralTextField.Type.editable);
     
-    final GralButton wdgButton = new GralButton(this.refPos, "@8-3, 2+10=button"
-                               , "press me", ExampleSimpleButton.this.actionButton);
-  
+    final GralButton wdgButton1 = new GralButton(this.refPos, "@8-3, 2+10++2.5 =button1"
+        , "press me", ExampleSimpleButton.this.actionButton); //Position string: next to right with 2 units space
+
+    final GralButton wdgButton2 = new GralButton(this.refPos, "button2"
+        , "Button 2", null); //without action,                //without position string, automatic right side
+
     GralTextBox widgOutput = new GralTextBox(this.refPos, "@-10..0,0..0=output");
   
     GuiElements() { }                                      // empty ctor, only formally
@@ -92,7 +91,7 @@ public class ExampleSimpleButton
   /**Instance of inner class contains the graphical elements.*/
   protected final GuiElements gui;
   
-  int ctKeyStroke = 0;
+  int ctKeyStroke1 = 0, ctKeyStroke2 = 0;
   
   ExampleSimpleButton(String[] args)
   {
@@ -126,7 +125,12 @@ public class ExampleSimpleButton
     //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
     //
     while(this.gui.gralMng.isRunning()) {
+      if(gui.wdgButton2.wasReleased()) {
+        String textOfField = this.gui.wdgInputText.getText();
+        this.gui.widgOutput.append("Button2 " + (++this.ctKeyStroke2) + " time, text=" + textOfField + "\n");
+      }
       try{ Thread.sleep(100); } catch(InterruptedException exc){}
+      
     }
   }
   //end::execute[]
@@ -160,10 +164,12 @@ public class ExampleSimpleButton
   /**Operation on button pressed, on the application level.
    * It uses the known references to the GralWidget. 
    * Immediately access to implementation widgets is not necessary.  
+   * This operation is executed in the Graphic thread. 
+   * Be carefully, do not program longer or hanging stuff such as synchronized or sleep.
    */
   void actionButton() throws IOException {
     String textOfField = this.gui.wdgInputText.getText();
-    this.gui.widgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
+    this.gui.widgOutput.append("Button1 " + (++this.ctKeyStroke1) + " time, text=" + textOfField + "\n");
   }
   
   

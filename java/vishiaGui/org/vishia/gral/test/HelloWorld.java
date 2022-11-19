@@ -40,7 +40,7 @@ public class HelloWorld
    * is determined. The widgets are created with the window then, see {@link GralPanelContent#createImplWidget_Gthread()}
    */
   GralWindow window = gralMng.addWindow("@50+30, 50+50=HelloWorldWind", "Simple Hello World application", GralWindow.windResizeable + GralWindow.windHasMenu);
-  GralLabel widgHelloText = new GralLabel("3-2,2+5", "HelloLabel", helloText[0], 0);
+  GralLabel widgHelloText = new GralLabel(gralMng.refPos(), "3-2,2+5=HelloLabel", helloText[0], 0);
   GralButton widgButton = new GralButton("7-3,10+12", "TestButton", "press me", actionTestButton);
   
   

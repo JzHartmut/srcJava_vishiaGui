@@ -158,8 +158,8 @@ public class GralCfgDesigner
       int dxPixel = xy.x - xMouse0;
       int dyPixel = xy.y - yMouse0;
       
-      float dxGridf = (float)dxPixel / mng.propertiesGui.xPixelUnit();
-      float dyGridf = (float)dyPixel / mng.propertiesGui.yPixelUnit();
+      float dxGridf = (float)dxPixel / mng.gralProps.xPixelUnit();
+      float dyGridf = (float)dyPixel / mng.gralProps.yPixelUnit();
       
       int dxGrid = (int)(dxGridf >0 ? dxGridf + 0.5f : dxGridf - 0.5f);
       int dyGrid = (int)(dyGridf >0 ? dyGridf + 0.5f : dyGridf - 0.5f);

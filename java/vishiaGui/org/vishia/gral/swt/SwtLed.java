@@ -167,7 +167,7 @@ private class SwtLedImpl extends Canvas
     
   	void XXXsetColor(String sColor)
   	{
-  		borderColor = innerColor = mng.propertiesGuiSwt.color(sColor);
+  		borderColor = innerColor = mng.getColorImpl(GralColor.getColor(sColor));
   		redraw();
   	}
   	

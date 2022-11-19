@@ -314,7 +314,7 @@ public class StimuliSelector
     @SuppressWarnings("deprecation")
     private void openWindow1(char size){
       GralFactory gralFactory = new SwtFactory();
-      gralFactory.createGraphic(this.gralMng, 'C');
+      gralFactory.createGraphic(this.gralMng, size);
   
   //    LogMessage log = new LogMessageStream(System.out);
   //    

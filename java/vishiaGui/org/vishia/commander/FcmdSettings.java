@@ -87,7 +87,7 @@ public class FcmdSettings
   { main.gui.gralMng.selectPanel("primaryWindow");
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop;
     GralWindow window =  main.gui.gralMng.addWindow("@10+29, 10+47 = windSettings", "Settings - The.file.Commander", windProps);
-    window.createImplWidget_Gthread();
+    //window.createImplWidget_Gthread();
     windSettings = window; 
     main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
     widgRefreshTime = main.gui.gralMng.addTextField(null, true, "refresh time file panel", "t");

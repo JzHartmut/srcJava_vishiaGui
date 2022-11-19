@@ -178,7 +178,7 @@ public class FcmdView
     this.main.gui.gralMng.setPosition(3, 0, 0, 0, 1, 'r');
     widgContent = this.main.gui.gralMng.addTextBox("view-content", false, null, '.');
     widgContent.setUser(userKeys);
-    widgContent.setTextStyle(GralColor.getColor("bk"), this.main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
+    //widgContent.setTextStyle(GralColor.getColor("bk"), this.main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
     windView = wind; 
     windView.specifyActionOnCloseWindow(actionOnSetInvisible);
     windView.setWindowVisible(false);

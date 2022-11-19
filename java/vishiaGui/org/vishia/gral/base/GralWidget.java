@@ -874,9 +874,12 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    */
   public void createImplWidget_Gthread() throws IllegalStateException {
     if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
+      if(this.itsMng._mngImpl ==null) {
+        throw new IllegalStateException("must not call createImplWidget_Gthread if the graphic is not initialized. itsMng._mngImpl ==null");
+      }
       try {
         if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-          dyda.textFont = this.itsMng.propertiesGui.getTextFont(this.itsMng.pos().pos.height());
+          dyda.textFont = this.itsMng.gralProps.getTextFont(this.itsMng.pos().pos.height());
           dyda.setChanged(ImplAccess.chgFont);
         }
         this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy

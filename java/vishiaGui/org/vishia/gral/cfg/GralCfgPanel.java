@@ -40,8 +40,6 @@ final public class GralCfgPanel extends GralCfgData.GuiCfgWidget
    */
   public static final int version = 20120303;
 
-  String name;
-  
   final GralCfgWindow window;
   
   /**All elements of this panel. If it is a tabbed panel, the elements are only panels. */

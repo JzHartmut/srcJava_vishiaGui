@@ -13,9 +13,11 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 
 
-public class SwtProperties extends GralGridProperties
+public class SwtProperties extends GralGridProperties.ImplAccess
 {
-	private final Device guiDevice;
+	final GralGridProperties gralProps;
+	
+  private final Device guiDevice;
 
   public final Font smallPromptFont;
   
@@ -36,16 +38,17 @@ public class SwtProperties extends GralGridProperties
    * <br><br>
    * @param size number between 1..5 to determine the size of the content (font size, pixel per cell)
    */
-  public SwtProperties(Device device, char sizeC)
-  { super(sizeC);
-  	this.guiDevice = device;
+  public SwtProperties(Device device, GralGridProperties gralProps)
+  { //super(sizeC);
+  	this.gralProps = gralProps;
+    this.guiDevice = device;
     this.colorBlack = new Color(guiDevice, 0,0,0);
     this.colorGrid = colorSwt(0xe0e0e0);
     this.colorGridStrong = colorSwt(0xc0c0c0);
-    this.colorBackground = colorSwt(colorBackground_);
-    this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[size], SWT.NORMAL);
-    this.stdInputFont = new Font(device, "Arial", stdInputFontSize[size], SWT.NORMAL);
-    this.stdButtonFont = new Font(device, "Arial", stdButtonFontSize[size], SWT.NORMAL);
+    this.colorBackground = colorSwt(gralProps.colorBackground_);
+    this.smallPromptFont = new Font(device, "Arial", smallPromptFontSize[gralProps.size()], SWT.NORMAL);
+    this.stdInputFont = new Font(device, "Arial", stdInputFontSize[gralProps.size()], SWT.NORMAL);
+    this.stdButtonFont = new Font(device, "Arial", stdButtonFontSize[gralProps.size()], SWT.NORMAL);
   }
   
   /**Returns a color with given Gui-independent color.
@@ -93,12 +96,12 @@ public class SwtProperties extends GralGridProperties
    * @return An instance of SWT-color
    */
   
-  public Color color(String sColorname)
-  { int nColor = getColorValue(sColorname);
-    return colorSwt(nColor);
-  }
-  
-  public Color colorBackgroundSwt(){ return colorSwt(colorBackground_); }
+//  public Color color(String sColorname)
+//  { int nColor = getColorValue(sColorname);
+//    return colorSwt(nColor);
+//  }
+//  
+  public Color colorBackgroundSwt(){ return colorSwt(gralProps.colorBackground_); }
   
   /**Creates an instance of a GUI-system independent color with given SWT color.
    * @param color The SWT-color
@@ -110,7 +113,7 @@ public class SwtProperties extends GralGridProperties
     return ret;
   }
   
-  public Font getSwtFont(float fontSize){ return fontSwt(super.getTextFont(fontSize)); }
+  public Font getSwtFont(float fontSize){ return fontSwt(this.gralProps.getTextFont(fontSize)); }
 
   
   /*
@@ -156,7 +159,7 @@ public class SwtProperties extends GralGridProperties
   
 
   Font getTextFontSwt(float fontSize, char type, char style){
-    return fontSwt(getTextFont(fontSize, type, style));
+    return fontSwt(this.gralProps.getTextFont(fontSize, type, style));
   }
   
   

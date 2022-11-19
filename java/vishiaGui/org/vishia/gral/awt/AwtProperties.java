@@ -9,7 +9,7 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 
-public class AwtProperties extends GralGridProperties
+public class AwtProperties extends GralGridProperties.ImplAccess
 {
 
   public final Font smallPromptFont;
@@ -32,26 +32,26 @@ public class AwtProperties extends GralGridProperties
 
   
   
-  public AwtProperties(char sizeC)
+  public AwtProperties(GralGridProperties gralProps)
   {
-    super(sizeC);
+    //super(sizeC);
     this.colorBlack = new Color(0,0,0);
     this.colorGrid = new Color(0xe0e0e0);
     this.colorGridStrong = new Color(0xc0c0c0);
     this.colorBackground = new Color(0xffffff);
-    this.smallPromptFont = new Font("Arial", 0, smallPromptFontSize[size]);
-    this.stdInputFont = new Font("Arial", 0, stdInputFontSize[size]);
-    this.stdButtonFont = new Font("Arial", 0, stdButtonFontSize[size]);
-    this.textFontAwt[0] = new Font("Arial", 0, stdTextFontSize[0][size]);
-    this.textFontAwt[1] = new Font("Arial", 0, stdTextFontSize[1][size]);
-    this.textFontAwt[2] = new Font("Arial", 0, stdTextFontSize[2][size]);
-    this.textFontAwt[3] = new Font("Arial", 0, stdTextFontSize[3][size]);
-    this.textFontAwt[4] = new Font("Arial", 0, stdTextFontSize[4][size]);
-    this.textFontAwt[5] = new Font("Arial", 0, stdTextFontSize[5][size]);
-    this.textFontAwt[6] = new Font("Arial", 0, stdTextFontSize[6][size]);
-    this.textFontAwt[7] = new Font("Arial", 0, stdTextFontSize[7][size]);
-    this.textFontAwt[8] = new Font("Arial", 0, stdTextFontSize[8][size]);
-    this.textFontAwt[9] = new Font("Arial", 0, stdTextFontSize[9][size]);
+    this.smallPromptFont = new Font("Arial", 0, smallPromptFontSize[gralProps.size()]);
+    this.stdInputFont = new Font("Arial", 0, stdInputFontSize[gralProps.size()]);
+    this.stdButtonFont = new Font("Arial", 0, stdButtonFontSize[gralProps.size()]);
+//    this.textFontAwt[0] = new Font("Arial", 0, GralGridProperties.stdTextFontSize[0][gralProps.size()]);
+//    this.textFontAwt[1] = new Font("Arial", 0, stdTextFontSize[1][size]);
+//    this.textFontAwt[2] = new Font("Arial", 0, stdTextFontSize[2][size]);
+//    this.textFontAwt[3] = new Font("Arial", 0, stdTextFontSize[3][size]);
+//    this.textFontAwt[4] = new Font("Arial", 0, stdTextFontSize[4][size]);
+//    this.textFontAwt[5] = new Font("Arial", 0, stdTextFontSize[5][size]);
+//    this.textFontAwt[6] = new Font("Arial", 0, stdTextFontSize[6][size]);
+//    this.textFontAwt[7] = new Font("Arial", 0, stdTextFontSize[7][size]);
+//    this.textFontAwt[8] = new Font("Arial", 0, stdTextFontSize[8][size]);
+//    this.textFontAwt[9] = new Font("Arial", 0, stdTextFontSize[9][size]);
   }
   
   

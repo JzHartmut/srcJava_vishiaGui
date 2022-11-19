@@ -99,8 +99,8 @@ public class SwtWdgCanvas  extends Canvas
           if(this.figAccess.newPos() || figure.pixelPos == null) { 
             figure.pixelPos = this.swtMng.calcWidgetPosAndSize(figure.pos, 0,0);  // base position as given in the figure
             if(this.figAccess.dynamic()) {                 // dynamic, then calc the new backPositon
-              float xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-              float yf = this.swtMng.gralMng.propertiesGui.yPixelUnit();
+              float xf = this.swtMng.gralMng.gralProps.xPixelUnit();  //1.0 is one GralPos unit
+              float yf = this.swtMng.gralMng.gralProps.yPixelUnit();
               GralCanvasStorage.FigureDataSet dataSet = this.figAccess.dataSet();
               if(dataSet !=null) {
                 this.figAccess.backPositions().dx = (int)(dataSet.dx * xf + 0.5f);
@@ -146,7 +146,7 @@ public class SwtWdgCanvas  extends Canvas
                 g.setForeground(this.swtMng.getColorImpl(orderData.color));
                 if(orderData instanceof GralCanvasStorage.PolyLineFloatArray) {
                   GralCanvasStorage.PolyLineFloatArray line = (GralCanvasStorage.PolyLineFloatArray) orderData;
-                  int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array(this.swtMng.propertiesGuiSwt);
+                  int[] points = ((GralCanvasStorage.PolyLineFloatArray) orderData).getImplStoreInt1Array(this.swtMng.gralMng.gralProps);
                   g.drawPolyline(points);
                 } else {
                   GralCanvasStorage.PolyLine line = (GralCanvasStorage.PolyLine) orderData;
@@ -198,8 +198,8 @@ public class SwtWdgCanvas  extends Canvas
   private GralPoint getPixelScaling(GralCanvasStorage.Figure order) {
     int xf, yf;
     if(order.bPointsAreGralPosUnits){
-      xf = this.swtMng.gralMng.propertiesGui.xPixelUnit();  //1.0 is one GralPos unit
-      yf = this.swtMng.gralMng.propertiesGui.yPixelUnit();
+      xf = this.swtMng.gralMng.gralProps.xPixelUnit();  //1.0 is one GralPos unit
+      yf = this.swtMng.gralMng.gralProps.yPixelUnit();
     } else {
       xf = order.pixelPos.dx;  //0.0..1.0 is the size given in pos in both directions.
       yf = order.pixelPos.dy;

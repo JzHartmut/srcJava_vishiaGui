@@ -420,6 +420,18 @@ public class GralPos implements Cloneable
   }
   
   
+  /**Sets a panel, maybe the {@link GralMng#screen} as parent for the widget, where this GralPos is used.
+   * Note: If this is done after the position is determined by relative coordinates, the coordinates are already calculated
+   * using the parent before, if a refPos was not given.
+   * 
+   * @param parent panel for the widget where the GralPos is used.
+   * @return
+   */
+  public GralPos setParent(GralPanel_ifc parent) {
+    this.parent = parent;
+    return this;
+  }
+  
   /**Sets the position to the given full panel.
    * @param panel
    */
@@ -489,12 +501,9 @@ public class GralPos implements Cloneable
     GralPos posParent1;
     //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;
     Coordinate line = new Coordinate(), col = new Coordinate();
-    int  origin =1;                                        // default left top
-    int border =0, borderFrac =0;
     if(refPos !=null) {
-      origin = 0;  // do not change, get from parent.
+      //  origin = 0;  // do not change, get from parent.
     }
-    char direction = 'r';
     if(sPos ==null) {
       //position text not given, use refer and same size
       line.p1 = next;
@@ -558,6 +567,36 @@ public class GralPos implements Cloneable
         spPos.close();
       }
     }
+    final int border, borderFrac;
+    int origin = 0;
+    final char direction;
+    if("+-".indexOf(line.dirNext) >=0) {
+      direction = line.dirNext == '+' ? 'D' : 'U';
+      border = line.pb;
+      borderFrac = line.pbf;
+    }
+    else if("+-".indexOf(col.dirNext) >=0) {
+      direction = col.dirNext == '+' ? 'R' : 'L';
+      border = col.pb;
+      borderFrac = col.pbf;
+    } 
+    else if(refPos !=null) {
+      if(refPos.y.dirNext != 0) {
+        border = refPos.y.pb;
+        borderFrac = refPos.y.pbf;
+        direction = Character.toUpperCase(refPos.y.dirNext);
+      }
+      else {
+        border = refPos.x.pb;
+        borderFrac = refPos.x.pbf;
+        direction = Character.toUpperCase(refPos.x.dirNext);
+      }
+    } else {
+      border = 0;
+      borderFrac = 0;
+      direction = 0;
+    }
+
     setFinePosition(line.p1, line.p1Frac, line.p2, line.p2Frac, col.p1, col.p1Frac, col.p2, col.p2Frac,  origin, direction, border, borderFrac, posParent1);
   }
   
@@ -616,6 +655,15 @@ public class GralPos implements Cloneable
     } else {
       co.p2 = samesize;                                    // not an integer following, nothing given, then samesize as default
       co.p2Frac = 0;
+    }
+    if(spPos.scan("++").scanOk()) {
+      co.dirNext = '+';
+      if(spPos.scanInteger().scanOk()) {
+        co.pb = (int)(spPos.getLastScannedIntegerNumber());  //border
+        if(spPos.scan(".").scanInteger().scanOk()) {
+          co.pbf = (int)(spPos.getLastScannedIntegerNumber()) %10;  //border fracitonal 0..9
+        }
+      }
     }
     assert(co.p1 != invalidPos && co.p2 != invalidPos && co.p1Frac >=0 && co.p1Frac <=9 && co.p2Frac >=0 && co.p2Frac <=9 );
   }
@@ -823,8 +871,8 @@ public class GralPos implements Cloneable
       this.y.origin = refUse.y.origin;
     }
     
-    this.y.set(yPos, yPosf, ye, yef, "uUdD", refUse.y);      // core of positioning for line and column
-    this.x.set(xPos, xPosf, xe, xef, "lLrR", refUse.x);
+    this.y.set(yPos, yPosf, ye, yef, "uUdD", refUse.y);    // core of positioning for line and column
+    this.x.set(xPos, xPosf, xe, xef, "lLrR", refUse.x);    // resolves the relative positions to refUse
     
     if("rlRL".indexOf(direction)>=0 ){
       this.x.dirNext = Character.toLowerCase(direction);
@@ -1261,10 +1309,11 @@ public class GralPos implements Cloneable
       }
       boolean bSetEnd = false;                             // true then z determines qe
       switch(zType) {
-      case 0: q1 = z; q1f = zFrac; break;                  // no specific designation: absloute pos
+      case 0: q1 = z; q1f = zFrac; this.n1 = this.n2 = -1; break;                  // no specific designation: absloute pos
       case refer:  //same                                  // relative to the reference position
         q1 = refCoord.p1 + (z - refer); 
         q1f = refCoord.p1Frac + zFrac;      //q = p + refer 
+        this.n1 = refCoord.n1;
         break;
       case next: {
         int direction = nextPosChars.indexOf(refCoord.dirNext);
@@ -1278,10 +1327,12 @@ public class GralPos implements Cloneable
         default:                                           // left same position for this coord (the other may be changed)
           q1 = refCoord.p1; q1f = refCoord.p1Frac;             // don't change this coordinate. It may be the other one.              
         }//switch direction     
+        this.n1 = refCoord.n1;
       } break;
       case areaNr:
         q1 = z - areaNr;
         if(q1 <0 || q1 >3) { throw new IllegalArgumentException("area should be A1..C3"); }
+        this.n1 = -1; this.n2 = 0;     // mark as area value
         break;
       default:
         throw new IllegalArgumentException("GralPos coord set, start value faulty case: 0x" + Integer.toHexString(zType));  

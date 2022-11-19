@@ -91,7 +91,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     Color color = swtMng.getColorImpl(GralColor.getColor("dgn"));
     this.labelSwt.setForeground(color);
     float height = this.widgg.pos().height();
-    GralFont gralFont = swtMng.gralMng.propertiesGui.getTextFont(height);
+    GralFont gralFont = swtMng.gralMng.gralProps.getTextFont(height);
     Font swtFont = swtMng.propertiesGuiSwt.fontSwt(gralFont);
     this.labelSwt.setFont(swtFont);
     //on SWT it invokes the resize listener if given.

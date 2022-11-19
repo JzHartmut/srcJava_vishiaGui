@@ -313,8 +313,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
   //final GralMng parent;
   
-  /**Properties of this Dialog Window. */
-  public GralGridProperties propertiesGui;
+  /**Properties of the Gui appearance. */
+  public GralGridProperties.ImplAccess propertiesGui;
+
+  /**Properties of the Gui appearance. */
+  public final GralGridProperties gralProps;
 
   /**Index of all input fields to access symbolic for all panels. */
   protected final Map<String, GralWidget> idxNameWidgets = new TreeMap<String, GralWidget>();
@@ -330,6 +333,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String, GralPanel_ifc> idxPanels = new TreeMap<String,GralPanel_ifc>();
 
+  /**Representation of the 'whole screen' as parent for a window. */
+  public final GralPanel_ifc screen;
+  
   /**Map of all windows. One of them is the primary one */
   protected final Map<String, GralWindow> idxWindows = new TreeMap<String,GralWindow>();
 
@@ -501,11 +507,12 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public GralMng(LogMessage log)
   { //this.propertiesGui = props;
       this.log = log;
+    this.gralProps = new GralGridProperties();  
     //its a user action able to use in scripts.
     userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
     //if(GralMng.singleton ==null) { GralMng.singleton = this; } 
-    GralPanel_ifc theWholeScreen = new GralScreen(this);       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
-    this.idxPanels.put("screen", theWholeScreen);
+    this.screen = new GralScreen(this);       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
+    this.idxPanels.put("screen", screen);
     this.posThreadSafe = new TreeMap<Long, PosThreadSafe>();
     this.posCurrent = new PosThreadSafe(this);
     this.posThreadSafe.put(posCurrent.threadId, posCurrent);
@@ -552,6 +559,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public void createGraphic(String implementor, char sizeShow, LogMessage log) {
     if(log != null) { this.log = log; }
+    this.gralProps.setSizeGui(sizeShow);
     GralFactory factory = GralFactory.getFactory(implementor);
     if(factory !=null) {
       factory.createGraphic(this, sizeShow);
@@ -783,7 +791,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
 
 
-  public void setProperties(GralGridProperties props) {
+  public void setProperties(GralGridProperties.ImplAccess props) {
     this.propertiesGui = props;
   }
   
@@ -871,7 +879,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**package private*/ GralUserAction userMainKeyAction(){ return userMainKeyAction; }
   
   
-  @Override public GralGridProperties propertiesGui(){ return propertiesGui; }
+  @Override public GralGridProperties propertiesGui(){ return gralProps; }
   
   @Override public LogMessage log(){ return log; }
 
@@ -1519,8 +1527,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     
   public GralWindow addWindow(String posName, String sTitle, int props) {
     GralWindow wdgg = new GralWindow(this.refPos(), posName
-        , sTitle
-        , props);
+        , sTitle, props, this);
     return wdgg;
   }
  
@@ -1591,7 +1598,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   @Override public GralWidget addText(String sText, int origin, GralColor textColor, GralColor backColor)
   {
-    GralLabel widgg = new GralLabel(null, sText, origin);
+    GralLabel widgg = new GralLabel(refPos(), null, sText, origin);
     widgg.setTextColor(textColor);
     if(backColor !=null) { widgg.setBackColor(backColor, 0); }
     return widgg;
@@ -1870,9 +1877,9 @@ public GralButton addCheckButton(
   @Deprecated @Override public void addLine(int colorValue, float xa, float ya, float xe, float ye){
     //if(pos().pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
     if(((GralPanelContent)pos().pos.parent).canvas() !=null){
-      GralColor color = propertiesGui.color(colorValue);
-      int xgrid = propertiesGui.xPixelUnit();
-      int ygrid = propertiesGui.yPixelUnit();
+      GralColor color = GralColor.getColor(colorValue);
+      int xgrid = gralProps.xPixelUnit();
+      int ygrid = gralProps.yPixelUnit();
       int x1 = (int)((pos().pos.x.p1 + xa) * xgrid);
       int y1 = (int)((pos().pos.y.p1 - ya) * ygrid);
       int x2 = (int)((pos().pos.x.p1 + xe) * xgrid);
@@ -1912,6 +1919,8 @@ public GralButton addCheckButton(
    * @param out any output, maybe especially {@link System#out} or {@link LogMessage}
    */
   public void reportGralContent(Appendable out) {
+    try { out.append("==== GralMng.reportGralContent():\n");} 
+    catch (Exception exc) { System.err.println("Error GralMng.reportGralContent() Appendable= "+ out); }
     for(Map.Entry<String, GralWindow> ewindow : idxWindows.entrySet()) {
       GralWindow window = ewindow.getValue();
       window.reportAllContent(out);
@@ -2007,7 +2016,7 @@ public GralButton addCheckButton(
   public GralRectangle calcWidgetPosAndSize(GralPos pos,
     int widthParentPixel, int heightParentPixel,
     int widthWidgetNat, int heightWidgetNat
-  ){ return pos.calcWidgetPosAndSize(propertiesGui, widthParentPixel, heightParentPixel
+  ){ return pos.calcWidgetPosAndSize(this.gralProps, widthParentPixel, heightParentPixel
                                     , widthWidgetNat, heightWidgetNat);
   }
   

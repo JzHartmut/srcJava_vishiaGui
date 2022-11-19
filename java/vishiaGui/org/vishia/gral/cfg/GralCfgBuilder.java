@@ -126,7 +126,7 @@ public class GralCfgBuilder
       if(setIdxPanels.size()==0){
         //gralMng.selectPanel(cfgData.actPanel);
         //==================>
-        String sErrorPanel = buildPanel(win.panel);  
+        String sErrorPanel = buildPanel(win.panelWin);  
         if(sErrorPanel !=null){
           if(log !=null){
             log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
@@ -214,7 +214,7 @@ public class GralCfgBuilder
       stop();
     
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
-    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panelWin.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
     

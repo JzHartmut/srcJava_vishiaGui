@@ -1531,7 +1531,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       super(outer, mng);
       this.outer = outer;
       this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
-      xPixelUnit = mng.propertiesGui.xPixelUnit();
+      xPixelUnit = mng.gralProps.xPixelUnit();
       outer.gi = this; 
       int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
       columnPixel = new int[outer.columnWidthsGral.length+1];

@@ -691,7 +691,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    */
   protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
     int yPix = 0;
-    Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
+    Font font = mng.propertiesGuiSwt.stdInputFont; //mng.propertiesGuiSwt.getTextFontSwt(2, 'n', 'n');
     Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
     for(int iCol = 0; iCol < zColumns; ++iCol){
       //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng());

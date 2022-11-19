@@ -20,33 +20,33 @@ public class GralLabel extends GralWidget
     super(currPos, sName, 'S');
   }
 
-  public GralLabel(String sName) {
-    this(null, sName);
-  }
+//  public GralLabel(String sName) {
+//    this(null, sName);
+//  }
   
-  public GralLabel(GralPos currPos, String sName, String sText, int origin)
+  public GralLabel(GralPos currPos, String sPosName, String sText, int origin)
   {
-    super(currPos, sName, 'S');
+    super(currPos, sPosName, 'S');
     this.origin = origin;
     super.setText(sText);
   }
   
-  public GralLabel(String sName, String sText, int origin) {
-    this(null, sText, sName, sText, origin);
-  }
+//  public GralLabel(String sName, String sText, int origin) {
+//    this(null, sText, sName, sText, origin);
+//  }
   
-  public GralLabel(GralPos currPos, String pos, String sName, String sText, int origin)
-  {
-    super(currPos, pos,sName, 'S');
-    this.origin = origin;
-    super.setText(sText);
-  }
+//  public GralLabel(GralPos currPos, String poName, String sText, int origin)
+//  {
+//    super(currPos, posName, 'S');
+//    this.origin = origin;
+//    super.setText(sText);
+//  }
   
 
 
-  public GralLabel(String pos, String sName, String sText, int origin) {
-    this(null, pos, sName, sText, origin);
-  }
+//  public GralLabel(String posName, String sText, int origin) {
+//    this(null, pos, sName, sText, origin);
+//  }
 
   
   @Override public String toString() {

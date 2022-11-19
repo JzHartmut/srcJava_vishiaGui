@@ -32,4 +32,9 @@ public class FcmdGui {
   void setFrameAreaBorders(int x1p, int x2p, int xRange, int y1p, int y2p, int yRange) { 
     this.area9.setFrameAreaBorders(x1p, x2p, xRange, y1p, y2p, yRange); 
   }
+  
+  
+  FcmdGui ( ) {
+    
+  }
 }

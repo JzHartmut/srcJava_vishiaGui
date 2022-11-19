@@ -129,13 +129,13 @@ public class FcmdLeftMidRightPanel
     mng.setPosition(tabbedPanelFavorCards.pos(), 0, 0, 0, 0, 1, 'd');
     this.tabbedPanelFavorCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
     mng.setPosition(0, 0, 0, -0, 1, 'd'); //inside the new tab
-    cardFavorThemes.createImplWidget_Gthread();
+    //.createImplWidget_Gthread();
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
       tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
       mng.setPosition(2, -2, 0, -0, 1, 'd');
-      main.executer.cmdSelector.createImplWidget_Gthread();
+      //main.executer.cmdSelector.createImplWidget_Gthread();
     }
     
   }

@@ -39,6 +39,7 @@ import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.msgDispatch.MsgRedirectConsole;
+import org.vishia.util.ApplMain;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
@@ -606,8 +607,7 @@ public class Fcmd //extends GuiCfg
    * output messages if problems occurs while build the rest of the GUI.
    */
   //@Override
-  protected void initGuiAreas(String sAreaMainPanel)
-  {
+  protected void initGuiAreas ( ) {
     //panelBuildIfc.registerUserAction("KeyAction",
       //  keyActions.commanderKeyActions); // all key actions, registered central
 
@@ -717,6 +717,8 @@ public class Fcmd //extends GuiCfg
             + sError);
       }
     }
+    initGuiAreas();
+    this.gui.gralMng.reportGralContent(this.log);
     this.gui.gralMng.createGraphic("SWT", 'C', null);
     //old: super.initMain(); // starts initializing of graphic. Do it after config
                       // command selector!
@@ -941,12 +943,12 @@ public class Fcmd //extends GuiCfg
    * line interface and the graphical frame. The mainly functionality is
    * contained in the super class.
    */
-  private static class FcmdMainCmd extends MainCmd
+  private static class XXXFcmdMainCmd extends MainCmd
   {
 
     private final CallingArgs cargs;
 
-    public FcmdMainCmd(CallingArgs cargs, String[] args)
+    public XXXFcmdMainCmd(CallingArgs cargs, String[] args)
     { super(args);
       this.cargs = cargs;
       super.addAboutInfo("The.file.Commander");
@@ -1021,36 +1023,44 @@ public class Fcmd //extends GuiCfg
     boolean bOk = true;
     
     CallingArgs cargs = new CallingArgs();
+    try {
+      cargs.parseArgs(args);
+    } catch (Exception exc) {
+      System.err.println("cmdline arg exception: " + exc.getMessage());
+      System.exit(9);
+    }
+
     // Initializes the GUI till a output window to show information.
     // Uses the commonly GuiMainCmd class because here are not extra arguments.
     //GralArea9MainCmd cmdgui = new FcmdMainCmd(cargs, args); // implements MainCmd, parses
-    MainCmd cmdgui = new FcmdMainCmd(cargs, args); // implements MainCmd, parses
+//    MainCmd cmdgui = new FcmdMainCmd(cargs, args); // implements MainCmd, parses
     //new GralMng(null, cmdgui);
     
     // calling arguments
-    int windProps = GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windHasMenu | GralWindow_ifc.windResizeable;
+//    int windProps = GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windHasMenu | GralWindow_ifc.windResizeable;
     //bOk = cmdgui.parseArgumentsAndInitGraphic("The.file.Commander", "2A2C", '.', "20+70,20+250", windProps);
-    try {
-      cmdgui.parseArguments();
-    } catch (Exception exception) {
-      cmdgui.writeError("Cmdline argument error:", exception);
-      cmdgui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
-      bOk = false; // not exiting, show error in GUI
-    }
-    if (bOk) {
+//    try {
+//      cmdgui.parseArguments();
+//    } catch (Exception exception) {
+//      cmdgui.writeError("Cmdline argument error:", exception);
+//      cmdgui.setExitErrorLevel(MainCmd_ifc.exitWithArgumentError);
+//      bOk = false; // not exiting, show error in GUI
+//    }
+//    if (bOk) {
       // Uses socket communication for InterprocessComm, therefore load the
       // factory.
       new InterProcessCommFactorySocket();
       //
       // Initialize this main class and execute.
-      Fcmd main = new Fcmd(cargs); //, cmdgui);
+      Fcmd thiz = new Fcmd(cargs); //, cmdgui);
+      thiz.initMain();
       //main.msgDisp = MsgDispatchSystemOutErr.create();
-      while(main.gui.gralMng.isRunning()) {
-        main.stepMain();
+      while(thiz.gui.gralMng.isRunning()) {
+        thiz.stepMain();
       }
 //      main.execute();
-    }
-    cmdgui.exit();
+//    }
+//    cmdgui.exit();
   }
 
 

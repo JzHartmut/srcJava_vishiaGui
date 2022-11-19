@@ -20,9 +20,12 @@ public class ExampleScriptSimpleButton {
 
   final String guiScript = 
       "@10+30, 20+80     =mainWin:Window Example ScriptSimpleButton; \n"
-    + "@main, 2+2, 2+20  =input:  InputField(); \n"
-    + "@8-3, 2+10        =button: Button(\"press me\", action = actionButtonCode);"
-    + "@-10..0,0..0      =output: OutputBox();"
+    
+          
+    + "@tab1, 2+2, 2+20  =input:   InputField(); \n"
+    + "@8-3, 2+10        =button1: Button(\"press me\", action = actionButtonCode);"
+    + "@tab2, 8-3, 2+10  =button2: Button(\"Button2\");"
+    + "@-10..0,0..0      =output:  OutputBox();"
     ;
   //end::classAndScript[]
   

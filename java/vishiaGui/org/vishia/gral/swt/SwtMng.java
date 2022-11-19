@@ -789,7 +789,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(gralMng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return pos.calcWidgetPosAndSize(gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -817,7 +817,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(super.gralMng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return pos.calcWidgetPosAndSize(super.gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -1294,7 +1294,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   @Override protected void initGraphic(){
     this.displaySwt = new Display();
-    this.propertiesGuiSwt = new SwtProperties(this.displaySwt, this.sizeCharProperties);
+    this.propertiesGuiSwt = new SwtProperties(this.displaySwt, super.gralMng.gralProps);
     this.gralMng.setProperties(this.propertiesGuiSwt);
     this.displaySwt.addFilter(SWT.Close, this.windowsCloseListener);  //it sets bExit on close of windows for the graphic thread
     this.displaySwt.addFilter(SWT.Traverse, this.traverseKeyFilter);
