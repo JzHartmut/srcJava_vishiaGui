@@ -624,8 +624,8 @@ public class Fcmd //extends GuiCfg
     this.gui.gralMng.selectPanel("primaryWindow");
     this.favorPathSelector.panelLeft.tabbedPanelFileCards = this.gui.gralMng.addTabbedPanel("@area9,A1A1=File0Tab");
     //this.gui.area9.addFrameArea("A1A1", this.favorPathSelector.panelLeft.tabbedPanelFileCards); // dialogPanel);
-
     this.favorPathSelector.panelLeft.buildInitialTabs();
+
     this.gui.gralMng.selectPanel("primaryWindow");
     this.favorPathSelector.panelMid.tabbedPanelFileCards = this.gui.gralMng.addTabbedPanel("@area9,B1B1=File1Tab");
     //gui.addFrameArea("B1B1", this.favorPathSelector.panelMid.tabbedPanelFileCards); // dialogPanel);
@@ -637,23 +637,23 @@ public class Fcmd //extends GuiCfg
     this.favorPathSelector.panelRight.buildInitialTabs();
 
     this.gui.gralMng.selectPanel("primaryWindow");
-    panelButtons = this.gui.gralMng.createGridPanel("@area9,A3A3=Buttons", this.gui.gralMng.getColor("gr"), 1, 1, 10, 10);
+    panelButtons = this.gui.gralMng.createGridPanel("@area9,A3C3=Buttons", this.gui.gralMng.getColor("gr"), 1, 1, 10, 10);
     //gui.addFrameArea("A3C3", panelButtons); // dialogPanel);
 
-    filesCp.buildGraphic();
-    settings.buildWindow();  //F2
-    status.buildWindow();  //F2
-    filePropsCmd.buildWindow();  //F2
-    viewCmd.buildWindowView();   //F3
-    editWind.buildWindow();   //F3
-    copyCmd.buildWindowConfirmCopy("confirm copy / move / compare");
-    delCmd.buildWindowConfirmCopy("confirm delete");
-    searchCmd.buildWindowConfirmCopy("confirm search");
-    compareCmd.buildWindowConfirmCopy("confirm compare");
-    mkCmd.buildWindowConfirmMk();
-    executer.buildWindowConfirmExec();
-    deleteCmd.buildWindowConfirmDelete(); //F8
-    this.favorPathSelector.buildWindowAddFavorite();
+//    filesCp.buildGraphic();
+//    settings.buildWindow();  //F2
+//    status.buildWindow();  //F2
+//    filePropsCmd.buildWindow();  //F2
+//    viewCmd.buildWindowView();   //F3
+//    editWind.buildWindow();   //F3
+//    copyCmd.buildWindowConfirmCopy("confirm copy / move / compare");
+//    delCmd.buildWindowConfirmCopy("confirm delete");
+//    searchCmd.buildWindowConfirmCopy("confirm search");
+//    compareCmd.buildWindowConfirmCopy("confirm compare");
+//    mkCmd.buildWindowConfirmMk();
+//    executer.buildWindowConfirmExec();
+//    deleteCmd.buildWindowConfirmDelete(); //F8
+//    this.favorPathSelector.buildWindowAddFavorite();
 
     fButtons.initPanelButtons();
     GralMenu menu = this.gui.fcmdWindow.getMenuBar();
@@ -672,10 +672,11 @@ public class Fcmd //extends GuiCfg
     this.gui.outputBox.specifyActionChange(null, this.executer.actionCmdFromOutputBox, null);
     this.gui.outputBox.setHtmlHelp(":FcmdNew.html#cmdOutput");
     this.lastFilePanels.clear();                                     // The order of used file panels
-    this.lastFilePanels.add(this.favorPathSelector.panelMid);        // default: mid, right, left
-    this.lastFilePanels.add(this.favorPathSelector.panelRight);
-    this.lastFilePanels.add(this.favorPathSelector.panelLeft);
-    this.favorPathSelector.panelMid.cardFavorThemes.setFocus();
+//    this.lastFilePanels.add(this.favorPathSelector.panelMid);        // default: mid, right, left
+//    this.lastFilePanels.add(this.favorPathSelector.panelRight);
+//    this.lastFilePanels.add(this.favorPathSelector.panelLeft);
+//    this.favorPathSelector.panelMid.cardFavorThemes.setFocus();
+    this.gui.outputBox.setText("Test Outbox");
   }
 
   //@Override
@@ -758,6 +759,8 @@ public class Fcmd //extends GuiCfg
     this.favorPathSelector.panelLeft.checkRefresh(time);
     this.favorPathSelector.panelMid.checkRefresh(time);
     this.favorPathSelector.panelRight.checkRefresh(time);
+    try { Thread.sleep(50); } catch (InterruptedException e) { }
+    
   }
   
   
@@ -1061,6 +1064,7 @@ public class Fcmd //extends GuiCfg
 //      main.execute();
 //    }
 //    cmdgui.exit();
+      thiz.finishMain();
   }
 
 

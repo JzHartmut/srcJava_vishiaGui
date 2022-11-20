@@ -9,6 +9,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ObjectVishia;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartScan;
 
@@ -154,10 +155,12 @@ java org.vishia.gral.base.GralPos.testScanSize();
  * @author Hartmut Schorrig
  *
  */
-public class GralPos implements Cloneable
+public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-20 showing Area9 positions, now ABC ar colomns not rows.
+   * <li>2022-11-20 Using {@link ObjectVishia} for improved {@link ObjectVishia#toString(Appendable, String...)} 
    * <li>2022-11-12 accepts also a GralWindow instead a GralPanel to replace the {@link GralWindow#mainPanel}  
    * <li>2022-11-11 accepts positions A1C3 for Area9 
    * <li>2022-10-27 new {@link #calcWidgetPosAndSize(GralGridProperties)} without more arguments. 
@@ -539,16 +542,16 @@ public class GralPos implements Cloneable
         } else {
           posParent1 = refPos;  //the parent is valid. Because no other panel. Use the current panel.
         }
-        char cc = spPos.getCurrentChar();
-        if(cc >='A' && cc <='C') {                         // positioning in a GralArea9Panel
-          line.p1 = cc - 'A' + GralPos.areaNr;
-          col.p1 = spPos.seekPos(1).getCurrentChar() - '1' +  + GralPos.areaNr;
+        char cc = spPos.seekNoWhitespaceOrComments().getCurrentChar();
+        if(cc >='A' && cc <='C') {                         // positioning in a GralArea9Panel, column
+          col.p1 = cc - 'A' + GralPos.areaNr;
+          line.p1 = spPos.seekPos(1).getCurrentChar() - '1' +  + GralPos.areaNr;
           if(spPos.seekPos(1).scan().scanAnyChar("ABC").scanOk()) {
-            line.p2 = spPos.getLastScannedString().charAt(0) - 'A' + 1  + GralPos.areaNr;
-            col.p2 = spPos.getCurrentChar() - '1' + 1 + GralPos.areaNr;
+            col.p2 = spPos.getLastScannedString().charAt(0) - 'A' + 1  + GralPos.areaNr;
+            line.p2 = spPos.getCurrentChar() - '1' + 1 + GralPos.areaNr;
           } else {
-            line.p2 = line.p1+1;
-            col.p2 = col.p1+1;
+            col.p2 = line.p1+1;
+            line.p2 = col.p1+1;
           }
           this.x.n2 = this.x.n2 = GralPos.areaNr;          // mark as area designation
           this.y.n1 = -1; this.y.n1 = -1;                  // not a percent value, but resize.
@@ -982,6 +985,15 @@ public class GralPos implements Cloneable
   }
   
   
+  
+  public void assertCorrectness() {
+    if(this.x.n2 == areaNr || this.y.n2 == areaNr) {
+      assert(  this.x.p1 <=3 && this.x.p2 <=3 && this.x.p1 < this.x.p2
+            && this.y.p1 <=3 && this.y.p2 <=3 && this.y.p1 < this.y.p2);
+    }
+  }
+  
+  
   public float xGrid() {
     return x.p1 + x.p1Frac / 10.0f;
   }
@@ -1193,27 +1205,34 @@ public class GralPos implements Cloneable
    * @return b for concatenate.
    * @throws IOException can be force RuntimeException if a StringBuilder is given as Appendable
    */
-  public Appendable toString(Appendable b, boolean bAppendPanel) throws IOException 
+  @Override public Appendable toString(Appendable b, String ... appendPanel) throws IOException 
   { b.append('@');
-    if(bAppendPanel && this.parent != null) {
+    if(appendPanel !=null && this.parent != null) {
       b.append(this.parent.getName()).append(", ");
     }
-    appendPos(b, this.y.p1, this.y.p1Frac);
-    b.append("..");
-    appendPos(b, this.y.p2, this.y.p2Frac);
-    b.append(", ");
-    appendPos(b, this.x.p1, this.x.p1Frac);
-    b.append("..");
-    appendPos(b, this.x.p2, this.x.p2Frac);
+    if(this.y.n2 == areaNr) {
+      b.append((char)('A' + this.x.p1)).append((char)('1' + this.y.p1));
+      b.append((char)('A' + this.x.p2-1)).append((char)('1' + this.y.p2-1));
+    } else {
+      appendPos(b, this.y.p1, this.y.p1Frac);
+      b.append("..");
+      appendPos(b, this.y.p2, this.y.p2Frac);
+      b.append(", ");
+      appendPos(b, this.x.p1, this.x.p1Frac);
+      b.append("..");
+      appendPos(b, this.x.p2, this.x.p2Frac);
+    }
     return b;
   }
   
   /**Use especially for debug.
    * @see java.lang.Object#toString()
    */
-  @Override public String toString()
-  { return "panel=" + (this.parent == null ? "?" : this.parent.getName()) + ", "
-    +"line=" + this.y.toString() + " col=" + this.x.toString() + " " + this.y.dirNext + this.x.dirNext + this.y.origin + this.x.origin;
+  @Override public String toString(){
+    try { return toString(new StringBuilder(), "p").toString(); }
+    catch(IOException exc) { return "?"; } // does never occur.
+//    return "@" + (this.parent == null ? "?" : this.parent.getName()) + ", "
+//    +this.y.toString() + ", " + this.x.toString() + " " + this.y.dirNext + this.x.dirNext + this.y.origin + this.x.origin;
   }
 
   

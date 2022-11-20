@@ -130,12 +130,12 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    * where two horizontal and two vertical lines built them:
    * <pre>
    * +=======+===============+===========+
-   * |  A1   |       A2      |    A3     | 
+   * |  A1   |       B1      |    C1     | 
    * +-------+---------------+-----------+ 
-   * |  B1   |       B2      |    B3     | 
+   * |  A1   |       B2      |    C2     | 
    * |       |               |           | 
    * +-------+---------------+-----------+ 
-   * |  C1   |       C2      |    C3     | 
+   * |  A3   |       B3      |    C3     | 
    * |       |               |           | 
    * +=======+===============+===========+
    * </pre>
@@ -252,6 +252,7 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    */
   protected GralRectangle convertArea(String area)
   { int x1,x2,y1,y2;
+    
     x1 = "ABC".indexOf(area.charAt(0));
     if(x1 < 0){x1 = "ABC".indexOf(area.charAt(1));}
     y1 = "123".indexOf(area.charAt(0));

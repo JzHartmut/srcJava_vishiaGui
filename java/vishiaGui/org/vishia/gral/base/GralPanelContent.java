@@ -131,7 +131,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     /**If set, it is a tab of a tabbed panel. It means the parent has {@link #pixelTab} >=0. 
      * The text on the tab.
      */
-    protected String nameTab;
+    public final String labelTab;
     
     /**If this values are set, a grid should be shown. 
      * yGrid, xGrid are the spaces for the fine grid, yGrid2, xGrid2 describes which nth grid line should be more determined.
@@ -150,13 +150,18 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     /**If this instance is not null, the content of that should be paint in the paint routine
      * of the implementation graphic. */
     public GralCanvasStorage canvas;
+    
+    protected Data(String labelTab) {
+      this.labelTab = labelTab;
+    }
   };
-  public Data _panel = new Data();
+  public final Data _panel;
   
   @Deprecated public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
   //public PanelContent(CanvasStorePanel panelComposite)
   { super((GralPos)null, namePanel, '$');
     this.name = namePanel;
+    this._panel = new Data(null);
     //this.panelComposite = panelComposite;
     //GralMng mng = GralMng.get();
     mng.registerPanel(this);
@@ -178,9 +183,10 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @param namePanel can also be combined "@pos=name"
    * @param whatIsit See {@link GralWidget#whatIs}
    */
-  public GralPanelContent(GralPos refPos, String posName, char whatIsit, GralMng gralMng)
+  public GralPanelContent(GralPos refPos, String posName, String labelTab, char whatIsit, GralMng gralMng)
   //public PanelContent(CanvasStorePanel panelComposite)
   { super(refPos, posName, whatIsit, gralMng);
+    this._panel = new Data(labelTab);
     refPos.setFullPanel(this);
     gralMng.registerPanel(this);
     if(super._wdgPos.parent instanceof GralWindow) {       // replaces the main panel of the window:
@@ -208,14 +214,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   }
 
   public GralPanelContent(GralPos currPos, String posName, GralMng gralMng) {
-    this(currPos, posName, '$', gralMng);
+    this(currPos, posName, null, '$', gralMng);
   }
   
-  public GralPanelContent(GralPos currPos, String posName, String nameTab, GralMng gralMng) {
-    this(currPos, posName, '@', gralMng);
+  public GralPanelContent(GralPos currPos, String posName, String labelTab, GralMng gralMng) {
+    this(currPos, posName, labelTab, '@', gralMng);
     GralPanelContent parent = (GralPanelContent)this._wdgPos.parent;
     parent.setToTabbedPanel();           //checks also whether it has already faulty non tab children
-    this._panel.nameTab = nameTab;
   }
   
  
@@ -530,9 +535,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     if(level < 20) {
       final String nl = "\n| | | |                               ";
       if(level >0) {
-        out.append(nl.substring(0, 2*level+1));
+        out.append(nl.substring(0, 2*level-1));
       }
-      out.append("Panel: ").append(this.name);
+      out.append("+-Panel: ").append(this.name);
+      if(this._panel.labelTab !=null) {
+        out.append('(').append(this._panel.labelTab).append(')');
+      }
+      out.append(" @").append(this._wdgPos.toString());
       for(GralWidget widg: this._panel.widgetList) {
         if(widg instanceof GralPanelContent) {
           ((GralPanelContent)widg).reportAllContent(out, level+1);

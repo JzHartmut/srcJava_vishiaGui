@@ -448,7 +448,7 @@ public class GralCfgZbnf
       this.window.mainPanel.setToTabbedPanel();
       for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
         this.currPos = new GralPos(this.window.mainPanel);
-        GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, '@', this.gralMng);
+        GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, "?tab", '@', this.gralMng);
         panel.setGrid(2,2,5,5,-12,-20);
         //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
         this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.

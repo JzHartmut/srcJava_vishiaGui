@@ -19,7 +19,7 @@ public class FcmdGui {
   
   final GralArea9Panel area9 = this.gralMng.addArea9Panel("@mainWin = area9");
  
-  final GralTextBox outputBox = this.gralMng.addTextBox("@area9,C1C3=outputBox", true, null, '\0');
+  final GralTextBox outputBox = this.gralMng.addTextBox("@area9,A2C2=outputBox", true, null, '\0');
   
   
   

@@ -105,7 +105,11 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
     //
     if (parent instanceof TabFolder) {                     // This panel should be used as Tab of the parent TabFolder
       final TabItem tab = new TabItem((TabFolder) parent, SWT.None);
-      tab.setText(wdgg.getName());
+      if(wdgg._panel.labelTab !=null) {
+        tab.setText(wdgg._panel.labelTab);
+      } else {
+        tab.setText(wdgg.getName());
+      }
       tab.setControl(this.panelSwtImpl);
       Rectangle areaTab;
       final GralWidget_ifc parentPanelifc = wdgg.pos().parent;

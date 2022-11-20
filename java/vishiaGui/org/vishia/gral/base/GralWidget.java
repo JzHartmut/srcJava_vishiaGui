@@ -26,6 +26,7 @@ import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
+import org.vishia.util.ObjectVishia;
 
 
 
@@ -796,6 +797,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
     } else {
       this.name = sPosName;
     }
+    currPos1.assertCorrectness();
     currPos1.checkSetNext();           //mark "used" for the referred GralPos
     this._wdgPos = currPos1.clone();   //use a clone for the widget.
     //this.widget = null;
@@ -1986,7 +1988,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
 
   
   
-  public Appendable toString(Appendable u) {
+  @Override public Appendable toString(Appendable u, String ... cond) {
     try {
       u.append(whatIs);
       if(this instanceof GralLabel)
@@ -1995,7 +1997,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
       if(sDataPath !=null) { u.append(", data=").append(sDataPath);}
       if(this.dyda.displayedText !=null) { u.append(", text=").append('\"').append(this.dyda.displayedText).append('\"');}
       if(_wdgPos !=null){
-        this._wdgPos.toString(u, true);
+        this._wdgPos.toString(u, "p");
       } else {
         u.append("@?");
       }
@@ -2375,7 +2377,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
  * @since 2022-10, necessary for referenced GralMng, not as singleton.
  *
  */
-class GralWidgetSetMng {
+class GralWidgetSetMng extends ObjectVishia {
   
   /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */

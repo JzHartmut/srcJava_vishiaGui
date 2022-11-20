@@ -348,7 +348,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   public void reportAllContent(Appendable out) {
     try {
       out.append("==== GralWindow.reportAllContent():\n");
-      out.append("Window: ").append(this.name).append(", main");
+      out.append("Window: ").append(this.name);
       this.mainPanel.reportAllContent(out,0);
       out.append("\n====\n");
     } catch(Exception exc) {
