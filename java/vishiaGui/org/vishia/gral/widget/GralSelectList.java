@@ -6,6 +6,7 @@ import java.util.Map;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -35,7 +36,7 @@ import org.vishia.util.Removeable;
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralSelectList<UserData> implements Removeable //extends GralWidget
+public abstract class GralSelectList<UserData> extends GralWidgetBase implements Removeable //extends GralWidget
 {
   /**Version and history:
    * <ul>
@@ -88,12 +89,12 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  protected GralSelectList(GralPos currPos, String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
-  {
+  protected GralSelectList(GralPos refPos, String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
+  { super(posName, refPos, null);
     if(posName == null){
       Assert.stop();
     }
-    wdgdTable = new GralTable<UserData>(currPos, posName, rows, columns);
+    wdgdTable = new GralTable<UserData>(refPos, posName, rows, columns);
     wdgdTable.setVisible(true);
   }
 
@@ -130,10 +131,13 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   
   /**
    */
-  public void createImplWidget_Gthread()
-  {
-    wdgdTable.createImplWidget_Gthread();
-    wdgdTable.setActionChange(actionTable);
+  @Override public boolean createImplWidget_Gthread() {
+    boolean ret = checkImplWidgetCreation(this.wdgdTable._wdgImpl);
+    if(ret) {
+      wdgdTable.createImplWidget_Gthread();
+      wdgdTable.setActionChange(actionTable);
+    }
+    return ret;
   }
   
  
@@ -145,6 +149,8 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
     }
   }
   
+  
+  @Override public boolean setVisible(boolean visible) { return this.wdgdTable.setVisible(visible); }
   
   /**Sets the focus of the associated table widget.
    * @return true if focused.

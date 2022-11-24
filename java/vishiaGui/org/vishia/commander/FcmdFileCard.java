@@ -6,6 +6,7 @@ import org.vishia.commander.FcmdFavorPathSelector.FavorPath;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
@@ -141,8 +142,8 @@ public class FcmdFileCard extends GralFileSelector
    * @param mainPanelP The left, mid or right panel where this cards are assigned to
    * @param label The label of the tab, it builds the name of all widgets.
    */
-  FcmdFileCard(FcmdLeftMidRightPanel mainPanelP, String label){
-    super(null, 50, new int[]{2,0,-6,-12}, null);
+  FcmdFileCard(GralPos refPos, FcmdLeftMidRightPanel mainPanelP, String label){
+    super(refPos, FcmdWidgetNames.tableFile + label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, null);
     this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
@@ -152,7 +153,6 @@ public class FcmdFileCard extends GralFileSelector
     this.colorSelectFocused123[2] = GralColor.getColor("lgr");
     String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
     
-    this.setNameWidget(namePanelFile);
     main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
     GralMng mng = main.gui.gralMng;
     //
@@ -161,7 +161,6 @@ public class FcmdFileCard extends GralFileSelector
     favorCard = new FcmdFavorCard(main, nameTableSelection, this, mainPanel);
     GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addTabPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label);
     mng.setPosition(0, 0, 0, -0, 1, 'd');  
-    favorCard.createImplWidget_Gthread();
     favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
     panelFavors.setPrimaryWidget(favorCard.wdgdTable);
     //
@@ -176,13 +175,11 @@ public class FcmdFileCard extends GralFileSelector
     widgLabel = mng.addTextField(nameWidgLabel, false, null, null);
     */
     mng.setPosition(0, 2, 0, 0, 1, 'd');
-    wdgCardSelector = new GralHorizontalSelector<Object>("cards", actionSetFromTabSelection);
-    wdgCardSelector.setToPanel(mng);
+    wdgCardSelector = new GralHorizontalSelector<Object>(mng.refPos(), "cards", actionSetFromTabSelection);
     //mng.addHorizontalSelector(wdgCardSelector);
 
     mng.setPosition(2, 0, 0, 0, 1, 'd');
     //set the base class GralFileSelector to the panel. It contains the path and the table for file selection.
-    setToPanel(mng);
     //GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
     //Sets the columns for the table.
     //super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});
@@ -203,7 +200,7 @@ public class FcmdFileCard extends GralFileSelector
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuContextEditIntern, main.editWind.actionOpenEdit);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.actionEdit);
+    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.fcmdActions.actionEdit);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);

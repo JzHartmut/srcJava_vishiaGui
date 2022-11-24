@@ -183,7 +183,7 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.viewCmd.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
     setBtnMenuAndKeys(main.viewCmd.actionQuickView, null, main.idents.key1QuickView, main.idents.key2QuickView, main.idents.menuBarQuickView);
     setBtnMenuAndKeys(main.editWind.actionOpenEdit, main.idents.buttonEditIntern, main.idents.keyEditIntern, main.idents.menuBarEditIntern);
-    setBtnMenuAndKeys(main.actionEdit, main.idents.buttonFileEdit, main.idents.keyFileEdit, main.idents.menuFileEditBar);
+    setBtnMenuAndKeys(main.fcmdActions.actionEdit, main.idents.buttonFileEdit, main.idents.keyFileEdit, main.idents.menuFileEditBar);
     setBtnMenuAndKeys(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy, main.idents.keyFileCopy, main.idents.menuConfirmCopyBar);
     setBtnMenuAndKeys(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile, main.idents.keyFileCreate, main.idents.menuConfirmMkdirFileBar);
     setBtnMenuAndKeys(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel, main.idents.keyFileDel1, main.idents.menuConfirmFileDelBar);
@@ -194,27 +194,27 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh2, null);
     setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh3, null);
     
-    setBtnMenuAndKeys(main.selectCardThemesLeft, main.idents.buttonFavorLeft, main.idents.keyFavorLeft, main.idents.menuBarNavigationLeft);
-    setBtnMenuAndKeys(main.selectCardThemesMiddle, main.idents.buttonFavorMiddle, main.idents.keyFavorMiddle, main.idents.menuBarNavigationMiddle);
-    setBtnMenuAndKeys(main.selectCardThemesRight, main.idents.buttonFavorRight, main.idents.keyFavorRight, main.idents.menuBarNavigationRight);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectCardThemesLeft, main.idents.buttonFavorLeft, main.idents.keyFavorLeft, main.idents.menuBarNavigationLeft);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectCardThemesMiddle, main.idents.buttonFavorMiddle, main.idents.keyFavorMiddle, main.idents.menuBarNavigationMiddle);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectCardThemesRight, main.idents.buttonFavorRight, main.idents.keyFavorRight, main.idents.menuBarNavigationRight);
     
-    setBtnMenuAndKeys(main.selectFileCardLeft,  main.idents.buttonSelectPanelLeft,    main.idents.keySelectPanelLeft,   main.idents.menuBarSelectPanelLeft);
-    setBtnMenuAndKeys(main.selectFileCardLeft,  null,                                main.idents.keySelectPanelLeft2,   null);
-    setBtnMenuAndKeys(main.selectFileCardMid,   main.idents.buttonSelectPanelMiddle,  main.idents.keySelectPanelMiddle, main.idents.menuBarSelectPanelMiddle);
-    setBtnMenuAndKeys(main.selectFileCardMid,   null,                                main.idents.keySelectPanelMiddle2, null);
-    setBtnMenuAndKeys(main.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
-    setBtnMenuAndKeys(main.selectFileCardRight, null,                                main.idents.keySelectPanelRight2,  null);
-    setBtnMenuAndKeys(main.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardLeft,  main.idents.buttonSelectPanelLeft,    main.idents.keySelectPanelLeft,   main.idents.menuBarSelectPanelLeft);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardLeft,  null,                                main.idents.keySelectPanelLeft2,   null);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardMid,   main.idents.buttonSelectPanelMiddle,  main.idents.keySelectPanelMiddle, main.idents.menuBarSelectPanelMiddle);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardMid,   null,                                main.idents.keySelectPanelMiddle2, null);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardRight, null,                                main.idents.keySelectPanelRight2,  null);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
 
-    setBtnMenuAndKeys(main.actionFocusCardInPanelToLeft, main.idents.buttonFocusLeftCard,   main.idents.keyFocusLeftCard,  main.idents.menuBarFocusLeftCard);
-    setBtnMenuAndKeys(main.actionFocusCardInPanelToRight, main.idents.buttonFocusRightCard,   main.idents.keyFocusRightCard,  main.idents.menuBarFocusRightCard);
-    setBtnMenuAndKeys(main.actionFocusFileCard, main.idents.buttonFocusFileCard,   main.idents.keyFocusFileCard,  main.idents.menuBarFocusFileCard);
-    setBtnMenuAndKeys(main.actionFocusThemeCard, main.idents.buttonFocusThemeCard,   main.idents.keyFocusThemeCard,  main.idents.menuBarFocusThemeCard);
-    setBtnMenuAndKeys(main.actionFocusPanelToLeft, main.idents.buttonFocusPanelToLeft,   main.idents.keyFocusPanelToLeft,  main.idents.menuBarFocusPaneltoLeft);
-    setBtnMenuAndKeys(main.actionFocusPanelToRight, main.idents.buttonFocusPanelToRight,   main.idents.keyFocusPanelToRight,  main.idents.menuBarFocusPanelToRight);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusCardInPanelToLeft, main.idents.buttonFocusLeftCard,   main.idents.keyFocusLeftCard,  main.idents.menuBarFocusLeftCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusCardInPanelToRight, main.idents.buttonFocusRightCard,   main.idents.keyFocusRightCard,  main.idents.menuBarFocusRightCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusFileCard, main.idents.buttonFocusFileCard,   main.idents.keyFocusFileCard,  main.idents.menuBarFocusFileCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusThemeCard, main.idents.buttonFocusThemeCard,   main.idents.keyFocusThemeCard,  main.idents.menuBarFocusThemeCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusPanelToLeft, main.idents.buttonFocusPanelToLeft,   main.idents.keyFocusPanelToLeft,  main.idents.menuBarFocusPaneltoLeft);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusPanelToRight, main.idents.buttonFocusPanelToRight,   main.idents.keyFocusPanelToRight,  main.idents.menuBarFocusPanelToRight);
 
     
-    setBtnMenuAndKeys(main.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameNonCase, main.idents.buttonFileSortNameNonCase, main.idents.keyFileSortNameNonCase, main.idents.menuBarFileSortNameNonCase);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameCase, main.idents.buttonFileSortNameCase, main.idents.keyFileSortNameCase, main.idents.menuBarFileSortNameCase);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerExtensionNonCase, main.idents.buttonFileSortExtNonCase, main.idents.keyFileSortExtNonCase, main.idents.menuBarFileSortExtNonCase);

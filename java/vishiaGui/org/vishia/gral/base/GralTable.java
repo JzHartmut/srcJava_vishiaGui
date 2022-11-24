@@ -672,20 +672,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     int ixline1 = ixline >= 0 ? ixline: zLineVisible + ixline;  //negative: -1 is the last line.
     if(ixline1 < 0) { ixline1 = 0;}
     if(ixline1 >= zLineVisible) { ixline1 = zLineVisible-1; }
-    assert(zLineVisible >0);
-    assert(ixcolumn < gi.cells[0].length);
-    lineSelected = (TableLineData)line;
-    nLineFirst = -1;  //get new, undefined elsewhere.
-    actionOnLineSelected(KeyCode.userSelect, lineSelected);
-    lineSelectedixCell = ixline1;
-    if(lineSelectedixCell >= zLineVisible){
-      lineSelectedixCell = zLineVisible -1;
+    if(zLineVisible >0) {
+      assert(ixcolumn < gi.cells[0].length);
+      lineSelected = (TableLineData)line;
+      nLineFirst = -1;  //get new, undefined elsewhere.
+      actionOnLineSelected(KeyCode.userSelect, lineSelected);
+      lineSelectedixCell = ixline1;
+      if(lineSelectedixCell >= zLineVisible){
+        lineSelectedixCell = zLineVisible -1;
+      }
+      if(ixcolumn >=0){
+        this.colSelectedixCellC = ixcolumn;
+      }
+      bPrepareVisibleArea = true;
+      repaint();
+    } else {
+      this.gralMng().log().writeWarning("table not visiable");
     }
-    if(ixcolumn >=0){
-      this.colSelectedixCellC = ixcolumn;
-    }
-    bPrepareVisibleArea = true;
-    repaint();
   }
 
   

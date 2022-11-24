@@ -238,7 +238,9 @@ public class FcmdLeftMidRightPanel
       }
     } 
     if(fileCard == null){
-      fileCard = new FcmdFileCard(this, label);
+      //TODO graphic appearance
+      this.main.gui.gralMng.refPos().setParent(this.tabbedPanelFileCards);
+      fileCard = new FcmdFileCard(this.main.gui.gralMng.refPos(), this, label);
       listTabs.add(fileCard);
     }
     return fileCard;
@@ -325,10 +327,13 @@ public class FcmdLeftMidRightPanel
     
     
     @Override
-    public void createImplWidget_Gthread(){
-      super.createImplWidget_Gthread();
-      wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
-      wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
+    public boolean createImplWidget_Gthread(){
+      boolean bCreate = super.createImplWidget_Gthread();
+      if(bCreate) {
+        wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
+        wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
+      }
+      return bCreate;
     }
 
     /**Adds a line to this table.

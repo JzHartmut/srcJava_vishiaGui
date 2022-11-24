@@ -368,7 +368,14 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
   
   
-  
+  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+    if(super.createImplWidget_Gthread()) {
+      this.mainPanel.createImplWidget_Gthread();
+      return true;
+    } else {
+      return false;
+    }
+  }
   
   
   /**This class is not intent to use from an application.

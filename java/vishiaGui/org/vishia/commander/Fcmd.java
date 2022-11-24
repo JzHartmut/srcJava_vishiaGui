@@ -108,217 +108,63 @@ public class Fcmd //extends GuiCfg
     
     File dirCfg;
 
+    Argument sDirCfg = new Argument("cfg", ":dirCfg");
+    
+    
+    public CallingArgs() {
+      super();
+      super.aboutInfo = "The.file.Commander made by Hartmut Schorrig, www.vishia.org "
+                      + Fcmd.version;
+      super.helpInfo = "see https://www.vishia.org";
+      super.addArg(this.sDirCfg);
+    }
+
+    
+    
+    
+    //@Override 
+    // not used, old concept with old arguments
+    protected boolean XXXtestArgument(String arg, int nArg)
+    {
+      boolean bOk = true;
+      if (arg.startsWith("cfg:")) {
+        this.dirCfg = new File(arg.substring(4));
+//      } else if (arg.startsWith("cmdcfg:")) {
+//        this.fileCfgCmds = new File(arg.substring(7));
+//      } else if (arg.startsWith("cmdext:")) {
+//        this.fileCmdsForExt = new File(arg.substring(7));
+//      } else if (arg.startsWith("cmdButton:")) {
+//        this.fileCfgButtonCmds = new File(arg.substring(10));
+//      } else if (arg.startsWith("sel:")) {
+//        this.fileSelectTabPaths = new File(arg.substring(4));
+//      } else {
+        bOk = super.testArgument(arg, nArg);
+      }
+      return bOk;
+    }
+
+    
+    @Override public boolean testConsistence(Appendable out) throws IOException {
+      boolean bOk = true;
+      if(this.sDirCfg.val == null) { 
+        bOk = false; out.append("cmdline argument cfg:PATHCFG is missing"); 
+      }
+      if(bOk){
+        this.dirCfg = new File(this.sDirCfg.val);
+        if(!this.dirCfg.exists()){ bOk = false; out.append("cmdline argument cfg is faulty:" + this.dirCfg.getAbsolutePath());}
+      }
+      if(bOk){
+        if(this.dirHtmlHelp ==null){ this.dirHtmlHelp = new File(this.dirCfg, "../help"); }
+        if(this.fileCfgCmds ==null){ this.fileCfgCmds = new File(this.dirCfg, "cmd.cfg"); }
+        if(this.fileCmdsForExt ==null){ this.fileCmdsForExt = new File(this.dirCfg, "ext.cfg"); }
+        if(this.fileCfgButtonCmds ==null){ this.fileCfgButtonCmds = new File(this.dirCfg, "cmdi.cfg"); }
+        if(this.fileSelectTabPaths ==null){ this.fileSelectTabPaths = new File(this.dirCfg, "path.cfg"); }
+      }
+      return bOk;
+    }
+
   }
 
-  /**
-   * This action is invoked for all general key pressed actions. It tests the
-   * key and switches to the concretely action for the pressed key. General keys
-   * are [F1] for help, [F4] for edit etc.
-   */
-  GralUserAction actionTest = new GralUserAction("actionTest")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
-    {
-      Fcmd.this.gui.gralMng.addInfo("Test\n", true);
-      return true;
-    }
-  };
-
-  /**
-   * This action is invoked for all general key pressed actions. It tests the
-   * key and switches to the concretely action for the pressed key. General keys
-   * are [F1] for help, [F4] for edit etc.
-   */
-  GralUserAction actionKey = new GralUserAction("actionKey")
-  {
-    @Override
-    public boolean userActionGui(String sIntension, GralWidget infos,
-        Object... params)
-    {
-      Debugutil.stop();
-      return true;
-    }
-  };
-
-  /**Key alt-F1 to select a directory/cmd list in a list of directories for the
-   * left panel. The original Norton Commander approach is to select a drive
-   * letter for windows. Selection of paths instead are adequate.
-   */
-  GralUserAction actionReadMsgConfig = new GralUserAction("actionReadMsgConfig")
-  {
-    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        if(cargs.msgConfig !=null && cargs.msgConfig.exists()){
-          //msgDisp.readConfig(cargs.msgConfig);
-        }
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key alt-F1 to select a directory/cmd list in a list of directories for the
-   * left panel. The original Norton Commander approach is to select a drive
-   * letter for windows. Selection of paths instead are adequate.
-   */
-  GralUserAction selectCardThemesLeft = new GralUserAction("selectCardThemesLeft")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        Fcmd.this.favorPathSelector.panelLeft.cardFavorThemes.wdgdTable.setFocus();
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key alt-F2 to select a directory/cmd list in a list of directories for the
-   * middle panel.
-   */
-  GralUserAction selectCardThemesMiddle = new GralUserAction("selectCardThemesMiddle")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        Fcmd.this.favorPathSelector.panelMid.cardFavorThemes.wdgdTable.setFocus();
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key alt-F3 to select a directory/cmd list in a list of directories for the
-   * right panel.
-   */
-  GralUserAction selectCardThemesRight = new GralUserAction("selectCardThemesRight")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        Fcmd.this.favorPathSelector.panelRight.cardFavorThemes.wdgdTable.setFocus();
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key sh-F1 to select a directory/cmd list in a list of directories for the
-   * right panel.
-   */
-  GralUserAction selectFileCardLeft = new GralUserAction("selectFileCardLeft")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        Fcmd.this.favorPathSelector.panelLeft.setFocus();
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key sh-F2 to select a directory/cmd list in a list of directories for the
-   * right panel.
-   */
-  GralUserAction selectFileCardMid = new GralUserAction("selectFileCardMid")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        Fcmd.this.favorPathSelector.panelMid.setFocus();
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key sh-F3 to select a directory/cmd list in a list of directories for the
-   * right panel.
-   */
-  GralUserAction selectFileCardRight = new GralUserAction("selectFileCardRight")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        Fcmd.this.favorPathSelector.panelRight.setFocus();
-        return true;
-      } else return false;
-    }
-  };
-
-  /**Key sh-F3 to select a directory/cmd list in a list of directories for the
-   * right panel.
-   */
-  GralUserAction selectFileCardOther = new GralUserAction("selectFileCardOther")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(lastFilePanels.size() >=2){
-          FcmdLeftMidRightPanel otherPanel = lastFilePanels.get(1);
-          otherPanel.setFocus();
-        }
-        return true;
-      } else return false;
-    }
-  };
-  
-
-  GralUserAction actionFocusPanelToLeft = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      FcmdLeftMidRightPanel actPanel = lastFilePanels.get(0);
-      if(actPanel.cc == 'm'){ Fcmd.this.favorPathSelector.panelLeft.setFocus(); }
-      else if(actPanel.cc == 'r'){ favorPathSelector.panelMid.setFocus(); }
-      return true; 
-    }
-  };
-  
-
-  GralUserAction actionFocusPanelToRight = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      FcmdLeftMidRightPanel actPanel = lastFilePanels.get(0);
-      if(actPanel.cc == 'm'){ Fcmd.this.favorPathSelector.panelRight.setFocus(); }
-      else if(actPanel.cc == 'l'){ Fcmd.this.favorPathSelector.panelMid.setFocus(); }
-      return true; 
-    }
-  };
-  
-
-  GralUserAction actionFocusFileCard = new GralUserAction("FcmdLeftMidRightPanel.actionFileCard"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      return true; 
-    }
-  };
-  
-
-  GralUserAction actionFocusThemeCard = new GralUserAction("FcmdLeftMidRightPanel.actionThemeCard"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      return true; 
-    }
-  };
-  
-
-  
-  
-
-  /**Action to focus the cmd card.
-   */
-  GralUserAction actionFocusCmdCard = new GralUserAction("actionFocusCmdCard")
-  {
-    @Override public boolean userActionGui(int key, GralWidget infos, Object... params){ 
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-      executer.cmdSelector.wdgdTable.setFocus();
-      return true;
-      } else return false;
-    }
-  };
-  
-  
-  
-  GralUserAction actionFocusCardInPanelToLeft = new GralUserAction("FcmdLeftMidRightPanel.actionLeftCard"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      lastFilePanels.get(0).focusLeftCard();
-      return true; 
-    }
-  };
-  
-  
-  GralUserAction actionFocusCardInPanelToRight = new GralUserAction("FcmdLeftMidRightPanel.actionRightCard"){
-    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params){ 
-      //sets focus to right
-      lastFilePanels.get(0).focusRightCard();
-      return true; 
-    }
-  };
-  
 
   
   
@@ -340,46 +186,6 @@ public class Fcmd //extends GuiCfg
   
   
 
-  /**
-   * Key F4 for edit command. Its like Norton Commander.
-   */
-  GralUserAction actionEdit = new GralUserAction("actionEdit")
-  {
-    @Override public boolean exec(int key, GralWidget_ifc wdg, Object... params) {
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        JZtxtcmdScript.Subroutine jzsub = buttonCmds.get("edit");
-        if (jzsub == null) {
-          Fcmd.this.gui.writeError("internal problem - don't find 'edit' command. ");
-        } else {
-        
-          String sMsg = "GralCommandSelector - put cmd;" + jzsub.toString();
-          System.out.println(sMsg);
-          List<DataAccess.Variable<Object>> args = main.getterFileArguments.getArguments(jzsub);
-          //executer.cmdQueue.addCmd(jzsub, args, Fcmd.this.currentFileCard.currentDir());  //to execute.
-          executer.cmdExecuter.addCmd(jzsub, args, Fcmd.this.gui.getOutputBox(), Fcmd.this.currentFileCard.currentDir());
-        }
-      }
-      return true;
-    }
-  };
-
-  
-  
-  /**This callback will be invoked in the drag event while the mouse is released in the destination. 
-   */
-  GralUserAction actionDragFileFromStatusLine = new GralUserAction("actionDragFileFromStatusLine"){
-    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params) {
-      if(key == KeyCode.dragFiles){
-        String path = widgd.getValue();
-        String[][] sFiles = (String[][])params[0];  //sFiles has lenght 1
-        sFiles[0] = new String[1]; 
-        sFiles[0][0] = path;
-        Debugutil.stop();
-      }
-      return true;
-    }
-  };
-  
   /**This implementation resolves the arguments for invoked commands with the capabilities of the Fcmd.
    * Especially the following argument strings are supported:
    * <ul>
@@ -476,6 +282,8 @@ public class Fcmd //extends GuiCfg
   
   final CallingArgs cargs;
   
+  final FcmdActions fcmdActions = new FcmdActions(this);
+  
   final FcmdGui gui = new FcmdGui();
   
   LogMessage log = this.gui.gralMng.log;         // initial use System.out, later changed to outputBox
@@ -571,10 +379,12 @@ public class Fcmd //extends GuiCfg
   
   final List<Closeable> threadsToClose = new LinkedList<Closeable>();
 
+  
   /**Static reference for the main instance to access from any class in the package.
    * This static instance is set firstly in constructor, all other constructors in this package
    * can be used it therefore. Use {@link #main()}*/
   private static Fcmd main;
+  
   
   
   public Fcmd(CallingArgs cargs) //, GralArea9MainCmd cmdgui)
@@ -586,7 +396,7 @@ public class Fcmd //extends GuiCfg
     //msgDisp.setIdThreadForMsgDispatching(Thread.currentThread().getId());
     //msgDisp.msgDispatcher.setOutputRoutine(4, "MainLogFile", true, true, cmdgui.getLogMessageOutputFile());
     //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
-    actionReadMsgConfig.exec(KeyCode.menuEntered, null);
+    this.fcmdActions.actionReadMsgConfig.exec(KeyCode.menuEntered, null);
     
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new TreeMap<String, JZtxtcmdScript.Subroutine>();
@@ -666,7 +476,7 @@ public class Fcmd //extends GuiCfg
     menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", this.executer.actionSetCmdCfg); // /
     
     //TODO menu.addMenuItem("menuAbout", this.idents.menuBarAbout, this.gui.gralMng.actionAbout);
-    menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", this.actionTest); 
+    menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", this.fcmdActions.actionTest); 
     String sHelpUrlDir = this.cargs.dirHtmlHelp.getAbsolutePath();
     this.gui.gralMng.setHelpUrl(sHelpUrlDir + "/Fcmd.html");
     this.gui.outputBox.specifyActionChange(null, this.executer.actionCmdFromOutputBox, null);
@@ -941,62 +751,6 @@ public class Fcmd //extends GuiCfg
   
   
   
-  /**
-   * This class is instantiated in the static main routine and builds a command
-   * line interface and the graphical frame. The mainly functionality is
-   * contained in the super class.
-   */
-  private static class XXXFcmdMainCmd extends MainCmd
-  {
-
-    private final CallingArgs cargs;
-
-    public XXXFcmdMainCmd(CallingArgs cargs, String[] args)
-    { super(args);
-      this.cargs = cargs;
-      super.addAboutInfo("The.file.Commander");
-      super.addAboutInfo("made by Hartmut Schorrig, www.vishia.org, hartmut.schorrig@vishia.de");
-      super.addAboutInfo("Version-date: " + Fcmd.version);
-    }
-
-    @Override protected boolean testArgument(String arg, int nArg)
-    {
-      boolean bOk = true;
-      if (arg.startsWith("cfg:")) {
-        cargs.dirCfg = new File(arg.substring(4));
-      } else if (arg.startsWith("cmdcfg:")) {
-        cargs.fileCfgCmds = new File(arg.substring(7));
-      } else if (arg.startsWith("cmdext:")) {
-        cargs.fileCmdsForExt = new File(arg.substring(7));
-      } else if (arg.startsWith("cmdButton:")) {
-        cargs.fileCfgButtonCmds = new File(arg.substring(10));
-      } else if (arg.startsWith("sel:")) {
-        cargs.fileSelectTabPaths = new File(arg.substring(4));
-      } else {
-        bOk = super.testArgument(arg, nArg);
-      }
-      return bOk;
-    }
-    
-    @Override protected boolean checkArguments(){
-      boolean bOk = true;
-      if(cargs.dirCfg == null) { 
-        bOk = false; writeError("cmdline argument cfg:PATHCFG is missing"); 
-      }
-      if(bOk){
-        if(!cargs.dirCfg.exists()){ bOk = false; writeError("cmdline argument cfg is faulty:" + cargs.dirCfg.getAbsolutePath());}
-      }
-      if(bOk){
-        if(cargs.dirHtmlHelp ==null){ cargs.dirHtmlHelp = new File(cargs.dirCfg, "../help"); }
-        if(cargs.fileCfgCmds ==null){ cargs.fileCfgCmds = new File(cargs.dirCfg, "cmd.cfg"); }
-        if(cargs.fileCmdsForExt ==null){ cargs.fileCmdsForExt = new File(cargs.dirCfg, "ext.cfg"); }
-        if(cargs.fileCfgButtonCmds ==null){ cargs.fileCfgButtonCmds = new File(cargs.dirCfg, "cmdi.cfg"); }
-        if(cargs.fileSelectTabPaths ==null){ cargs.fileSelectTabPaths = new File(cargs.dirCfg, "path.cfg"); }
-      }
-      return bOk;
-    }
-
-  } // class MainCmd
 
 
   static void testT1()
@@ -1027,7 +781,11 @@ public class Fcmd //extends GuiCfg
     
     CallingArgs cargs = new CallingArgs();
     try {
-      cargs.parseArgs(args);
+      if(  !cargs.parseArgs(args, System.err)
+        || !cargs.testConsistence(System.err)
+        ) {
+        System.exit(cargs.exitCodeArgError);
+      }
     } catch (Exception exc) {
       System.err.println("cmdline arg exception: " + exc.getMessage());
       System.exit(9);

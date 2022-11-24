@@ -98,9 +98,6 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     setActionChange(actionOnSelect);
   }
   
-  public GralHorizontalSelector(String name, GralUserAction actionOnSelect){
-    this(null, name, actionOnSelect);
-  }
   
   /**Adds a item to show.
    * @param text

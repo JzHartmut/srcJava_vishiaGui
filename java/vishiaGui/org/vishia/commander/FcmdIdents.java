@@ -19,7 +19,7 @@ public class FcmdIdents extends FcmdIdentsBase
 {
   List<GralButtonKeyMenu> entries = new LinkedList<GralButtonKeyMenu>();
   
-  final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(main.actionReadMsgConfig, "&Help/read &MsgCfg", null, null, null, 0, 0, entries);  ////
+  final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(this.main.fcmdActions.actionReadMsgConfig, "&Help/read &MsgCfg", null, null, null, 0, 0, entries);  ////
   final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionDeselectDirtree, "fol&Der/&Deselect dirtree  [ctrl-d]", "&Deselect dirtree [ctrl-d]", null, null, KeyCode.ctrl + 'd', KeyCode.ctrl + 'D', entries);
   final GralButtonKeyMenu cleanFileRemoteRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionCleanFileRemote, "fol&Der/&Clean dirtree", null, null, null, 0, 0, entries);
   

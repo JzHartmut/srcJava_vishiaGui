@@ -25,6 +25,7 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -67,7 +68,7 @@ import org.vishia.util.Timeshort;
  * @author Hartmut Schorrig
  *
  */
-public class GralFileSelector extends GralWidget implements Removeable //extends GralWidget
+public class GralFileSelector extends GralWidgetBase implements Removeable //extends GralWidget
 {
   
   /**Version, history and copyright/copyleft.
@@ -329,9 +330,9 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   {
     final GralFileSelector outer;
     
-    FileSelectList(GralFileSelector outer, String posName, int rows, int[] columns, char size){
+    FileSelectList(GralPos refPos, GralFileSelector outer, String posName, int rows, int[] columns, char size){
       //super(name, mng);
-      super(pos(), posName, rows, columns, size);
+      super(refPos, posName, rows, columns, size);
       this.outer = outer;
       if(columns.length !=4) { throw new IllegalArgumentException("FileSelectList should have 4 columns");}
       super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.ctrl + KeyCode.pgdn);
@@ -636,11 +637,11 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
    * @param columns
    * @param size
    */
-  public GralFileSelector(GralPos currPos, String name, int rows, int[] columns, int[] columnsFavorlist)
+  public GralFileSelector(GralPos refPos, String name, int rows, int[] columns, int[] columnsFavorlist)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
-    super(currPos, name, 'f');
-    favorList = columnsFavorlist !=null ? new GralTable<String>(currPos, name, 50, columnsFavorlist) : null;
-    selectList = new FileSelectList(this, name, rows, columns, 'A');
+    super(name, refPos,null);
+    favorList = columnsFavorlist !=null ? new GralTable<String>(refPos, name, 50, columnsFavorlist) : null;
+    selectList = new FileSelectList(refPos, this, name, rows, columns, 'A');
     colorBack = GralColor.getColor("wh");
     colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
@@ -649,16 +650,13 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   }
   
   
-  public GralFileSelector ( String name, int rows, int[] columns, int[] columnsFavorlist)
-  { this((GralPos)null, name, rows, columns, columnsFavorlist); }
-  
   /**Maybe called after construction, should be called before {@link #setToPanel(GralMngBuild_ifc)}
    * @param name
    */
-  public void setNameWidget(String name){ 
-    //this.name = name;
-    selectList.wdgdTable.name = name;
-  }
+//  public void setNameWidget(String name){ 
+//    //this.name = name;
+//    selectList.wdgdTable.name = name;
+//  }
   
   
   public void setDateFormat(String sFormat){
@@ -679,7 +677,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     GralMenu menuFolder = widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    widgBtnFavor = new GralButton(this.gralMng().refPos(), "favor", "favor", actionFavorButton);
+    widgBtnFavor = new GralButton(this.itsMng.refPos(), "favor", "favor", actionFavorButton);
     // widgBtnFavor.createImplWidget_Gthread();
     widgBtnFavor.setVisible(false);
     //the list
@@ -1385,7 +1383,7 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
     selectList.wdgdTable.setVisible(visible);
     widgdPathDir.setVisible(visible);
     widgBtnFavor.setVisible(visible);
-    return bVisibleState; 
+    return selectList.wdgdTable.isVisible(); 
   }
   
   void stop(){}
@@ -1413,7 +1411,18 @@ public class GralFileSelector extends GralWidget implements Removeable //extends
   }
 
   
-  
+  /**Creates the implementation, which consists of the widgets:
+   * {@link #selectList}
+   * {@link #windSearch}
+   *
+   */
+  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+    if(this.selectList.createImplWidget_Gthread()) {
+      return true;
+    }
+    else return false;
+  }
+
   
   public FileRemoteCallback callbackChildren1 = new FileRemoteCallback()
   {

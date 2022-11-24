@@ -175,7 +175,7 @@ import org.vishia.util.ObjectVishia;
  * @author Hartmut Schorrig
  *
  */
-public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
+public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Version, history and license.
@@ -352,11 +352,6 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   public static final String sVersion = "2022-09-13";
 
   
-  /**The position of the widget. 
-   * The GralPos contains also the reference to the parent composite panel {@link GralPanel_ifc} which contains the widget. */
-  protected GralPos _wdgPos;
-
-
   //private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
   
   /**The implementation specific widget. The instance is derived from the graphic implementation-specific
@@ -464,9 +459,6 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    * See the inner class {@link ConfigData}. It is a sub structure. 
    * It has no cohesion with the {@link #itsCfgElement}.  */
   public ConfigData cfg = new ConfigData();
-  
-  /**Name of the widget in the panel. */
-  public String name;
   
     
   
@@ -773,33 +765,8 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    *   If currPos is given and valid, this argument can be null.
    */
   public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
-    super(currPos, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
+    super(sPosName, currPos, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
     assert(this.itsMng !=null);
-    int posName;
-    final GralPos currPos1;
-    if(currPos == null) { currPos1 = this.itsMng.pos().pos; }
-    else {currPos1 = currPos;}
-    if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
-      String posString1 = sPosName.substring(0, posName).trim();
-      this.name = sPosName.substring(posName+1).trim();
-      try{
-//        if(whatIs == 'w') {
-//          //a window: don't change the GralMng.pos, create a new one.
-//          currPos1.panel = this.itsMng.getPrimaryWindow();
-//          currPos1.calcNextPos(posString1);  // Note: setNextPos() returns a cloned position.
-//        } else {
-          //a normal widget on a panel
-          currPos1.calcNextPos(posString1);  // Note: setNextPos() returns a cloned position.
-//        }
-      } catch(ParseException exc) {
-        throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString1);
-      }
-    } else {
-      this.name = sPosName;
-    }
-    currPos1.assertCorrectness();
-    currPos1.checkSetNext();           //mark "used" for the referred GralPos
-    this._wdgPos = currPos1.clone();   //use a clone for the widget.
     //this.widget = null;
     this.whatIs = whatIs;
     //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
@@ -847,7 +814,7 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
   
   
   
-  /**Sets this widget to the current panel at the current given position. 
+  /**Creates the implementation widget instance(s). 
    * This routine should be called only one time after the Gral widget was created. 
    * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
    * This operation invokes the abstract operation {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)} 
@@ -855,58 +822,61 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
    * It tests the type of the derived GralWidget to create the correct graphical implementation widget. 
    * <br>
    * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
-   * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 
+   * is references because it is the environment class. The implementation graphical widget is an aggregation in this instance. It is possible 
    * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
    * consists of two implementation widgets, the text field and a label for the prompt.
    * <br><br>
    * <b>Positioning and Registering the widget:</b>
-   * This is done on creation of the derived GralWidget, see ...
-   * on construction of a widget with a String-given position, before it appears on graphic, or on construction of the 
-   * graphic widget. It calls the package private {@link GralWidget#initPosAndRegisterWidget(GralPos)}, which takes the 
-   * given position, stores it in the {@link GralWidget#pos()} and adds the widget both to its panel which is given
-   * with the pos and registers the widget in the GralMng for simple global access. 
-   * If the name of the widget starts with "@" its name in the panel is the part after "@" whereby the global name 
-   * is the "panelname.widgetname". If a widget's position is given from left and from right or with percent, it is resized
-   * on resizing the window and the panel.
+   * That is clarified by the {@link #_wdgPos} of the Gral widget. 
+   * The GralPos can contain relative or negative values from bottom or left. 
+   * It means for the particular position the area of the panel where the widget is positioned is necessary to calculate.
    * <br><br>
-   * 
+   * This operation is or should be overridden for the {@link GralPanelContent}, {@link GralWindow}
+   * and all comprehensive widgets which contains from more as one basic widget. 
+   * The overridden operation should call this operation for the the basically widgets for the implementation. 
+   * The overridden operations may be called firstly this operation as super.createImplWidget_Gthread()
+   * if the derived class has also a basic implementation widget as parent.
+   * Or it shold call firstly {@link #checkImplWidgetCreation()}.
+   * On both, return false should prevent creation of the internal widgets.
+   * This is so for {@link GralWindow} and {@link GralPanelContent},
+   * see {@link GralWindow#createImplWidget_Gthread()} and {@link GralPanelContent#createImplWidget_Gthread()}.
+   *   
    * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
    *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
    */
-  public void createImplWidget_Gthread() throws IllegalStateException {
-    if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
-      if(this.itsMng._mngImpl ==null) {
-        throw new IllegalStateException("must not call createImplWidget_Gthread if the graphic is not initialized. itsMng._mngImpl ==null");
-      }
-      try {
+  public boolean createImplWidget_Gthread() throws IllegalStateException {
+    try {
+      if(checkImplWidgetCreation(this._wdgImpl)) {
         if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
           dyda.textFont = this.itsMng.gralProps.getTextFont(this.itsMng.pos().pos.height());
           dyda.setChanged(ImplAccess.chgFont);
         }
-        this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
-        if(this instanceof GralWindow) {
-          //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
-          //the implementation can decide whether the same implementation widget is used
-          //also for the GralPanelContent or create an own one.
-          ((GralWindow)this).mainPanel.createImplWidget_Gthread();
-        }
-        else if(this instanceof GralPanelContent) {
-          //------------------------------------------------ // a panel contains children, create it.
-          ((GralPanelContent)this).createChildrensImplWidget_Gthread();
-         }
+        
+          this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
+//        if(this instanceof GralWindow) {
+//          //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
+//          //the implementation can decide whether the same implementation widget is used
+//          //also for the GralPanelContent or create an own one.
+//          ((GralWindow)this).mainPanel.createImplWidget_Gthread();
+//        }
+//        else if(this instanceof GralPanelContent) {
+//          //------------------------------------------------ // a panel contains children, create it.
+//          ((GralPanelContent)this).createChildrensImplWidget_Gthread();
+//         }
         if(this.contextMenu !=null) {
           this.itsMng._mngImpl.createContextMenu(this);
         }
-      } catch(Throwable exc) {
-        System.err.println(ExcUtil.exceptionInfo("\nERROR: implementing widget " + this.name +": ", exc, 0,10));
+        return true;
       }
-    } else {
-      System.err.println("\nERROR: widget implementation already given. ");
+    } catch(Throwable exc) {
+      System.err.println(ExcUtil.exceptionInfo("\nERROR: implementing widget " + this.name +": ", exc, 0,10));
     }
-
+    return false; //on catched exception of not implementation. see return inside.
   }
 
+  
+  
   public void setToPanel(GralMng gralMng) {
     createImplWidget_Gthread();
   }
@@ -2379,24 +2349,5 @@ public class GralWidget extends GralWidgetSetMng implements GralWidget_ifc, Gral
  */
 class GralWidgetSetMng extends ObjectVishia {
   
-  /**The widget manager from where the widget is organized. Most of methods need the information
-   * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected final GralMng itsMng;
-  
-    /**Either the GralMng is given, or pos should be given, then the GralMng is gotten from {@link GralPos#parent}.
-     * If both are null, the {@link GralMng#get()} is used as fallback for compatibility.
-     * @param pos
-     * @param itsMng
-     */
-    public GralWidgetSetMng(GralPos pos, GralMng gralMng) {
-      if(gralMng !=null) {
-        this.itsMng = gralMng;
-      } else if(pos !=null && pos.parent !=null) {
-        this.itsMng = pos.parent.gralMng();
-      } else {
-        this.itsMng = gralMng; //deprecated approach with singleton.
-      }
-    }
-
 
 }

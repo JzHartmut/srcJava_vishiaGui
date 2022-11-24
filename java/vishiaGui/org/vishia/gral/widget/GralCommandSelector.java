@@ -101,9 +101,12 @@ public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutin
   
   
   @Override
-  public void createImplWidget_Gthread(){
-    super.createImplWidget_Gthread();
-    wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
+  public boolean createImplWidget_Gthread(){
+    boolean bCreate = wdgdTable.createImplWidget_Gthread();
+    if(bCreate) {
+      wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
+    }
+    return bCreate;
   }
 
   

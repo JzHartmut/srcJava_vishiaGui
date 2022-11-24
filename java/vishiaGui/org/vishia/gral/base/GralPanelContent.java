@@ -160,7 +160,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   @Deprecated public GralPanelContent(String namePanel, GralMng mng, Object panelComposite)
   //public PanelContent(CanvasStorePanel panelComposite)
   { super((GralPos)null, namePanel, '$');
-    this.name = namePanel;
+    //this.name = namePanel;
     this._panel = new Data(null);
     //this.panelComposite = panelComposite;
     //GralMng mng = GralMng.get();
@@ -354,12 +354,14 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   
   
-  /**Organizes the creation of all instantiation of all widgets of this panel, only called in this package from {@link GralWidget#createImplWidget_Gthread()}
-   */
-  void createChildrensImplWidget_Gthread() throws IllegalStateException {
-    for(GralWidget widg: this._panel.widgetList) {
-      widg.createImplWidget_Gthread();                     // recursively call of same
-    }
+  
+  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+    if(super.createImplWidget_Gthread()) {
+      for(GralWidget widg: this._panel.widgetList) {
+        widg.createImplWidget_Gthread();                     // recursively call of same
+      }
+      return true;
+    } else return false;
   }  
   
   /**Removes this widget from the lists in this panel. This method is not intent to invoke

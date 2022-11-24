@@ -189,7 +189,7 @@ public class GuiCallingArgs extends Arguments
     }
     
     else if(checkArg("-SWT", arg)) 
-    { cargs.graphicFactory = new SwtFactory();   //an example for default output
+    { cargs.graphicFactory = new SwtFactory();
     }
     
     else if(checkArg("-AWT", arg)) 
@@ -197,7 +197,7 @@ public class GuiCallingArgs extends Arguments
     }
     
     else 
-    { super.testArgument(arg, nArg);             // uses the argList of all other arguments
+    { bOk = super.testArgument(arg, nArg);             // uses the argList of all other arguments
     }
     return bOk;
   }
@@ -206,7 +206,7 @@ public class GuiCallingArgs extends Arguments
 
 
   @Override
-  public boolean testArgs(Appendable msg) throws IOException {
+  public boolean testConsistence(Appendable msg) throws IOException {
     return true;
   }
 
