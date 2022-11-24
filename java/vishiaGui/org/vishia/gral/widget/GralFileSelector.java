@@ -646,7 +646,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
     
-    createGraphic(this.itsMng);                                 // creates the sub content for this comprehensive widget
+    createGraphic(this.gralMng);                                 // creates the sub content for this comprehensive widget
   }
   
   
@@ -677,7 +677,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     GralMenu menuFolder = widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", actionRefreshFileTable);
     panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    widgBtnFavor = new GralButton(this.itsMng.refPos(), "favor", "favor", actionFavorButton);
+    widgBtnFavor = new GralButton(this.gralMng.refPos(), "favor", "favor", actionFavorButton);
     // widgBtnFavor.createImplWidget_Gthread();
     widgBtnFavor.setVisible(false);
     //the list

@@ -1359,12 +1359,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             else { done = action.action().exec(keyCode, this, args, lineSelected); }
           }
         } //if(table.)
-        if(!done && itsMng.userMainKeyAction() !=null){
-          done = itsMng.userMainKeyAction().exec(keyCode, getCurrentLine());
+        if(!done && gralMng.userMainKeyAction() !=null){
+          done = gralMng.userMainKeyAction().exec(keyCode, getCurrentLine());
         }
         if(!done){
           //if actionChanging.userAction() returns false 
-          GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
+          GralUserAction mainKeyAction = gralMng.getRegisteredUserAction("KeyAction");
           if(mainKeyAction !=null){
             //old form called because compatibility, if new for with int-parameter returns false.
             if(!mainKeyAction.exec(keyCode, this)){
@@ -1412,7 +1412,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param line
    */
   private void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
-    itsMng.setLastClickedWidget(lineSelected);
+    gralMng.setLastClickedWidget(lineSelected);
     if(actionOnLineSelected !=null){
       actionOnLineSelected.exec(key, this, line);
     }
@@ -1536,7 +1536,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
       xPixelUnit = mng.gralProps.xPixelUnit();
       outer.gi = this; 
-      int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
+      int xdPix = outer.gralMng.propertiesGui().xPixelUnit();
       columnPixel = new int[outer.columnWidthsGral.length+1];
       int xPix = 0;
       columnPixel[0] = xPix;
@@ -1546,11 +1546,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
 
       this.xpixelCell = new int[outer.columnWidthsGral.length+1];
-      int ydPix = outer.itsMng.propertiesGui().yPixelUnit();
+      int ydPix = outer.gralMng.propertiesGui().yPixelUnit();
       linePixel = 2 * ydPix;
     }
     
-    protected GralMng itsMng(){ return outer.itsMng; }
+    protected GralMng itsMng(){ return outer.gralMng; }
     
     protected boolean bColumnEditable(int ix){ return GralTable.this.bColumnEditable[ix]; }
     
@@ -1779,7 +1779,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       long dbgtime = System.currentTimeMillis();
       bRedrawPending = true;
 
-      Assert.check(outer.itsMng.currThreadIsGraphic());
+      Assert.check(outer.gralMng.currThreadIsGraphic());
       GralTable<UserData>.TableLineData/*<?>*/ line;
       
       if(outer.bPrepareVisibleArea){
@@ -1963,7 +1963,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //Any cell has got the focus, it means the table has gotten the focus.
         bFocused = true; 
         if(!bRedrawPending){
-          itsMng.gralFocusListener.focusGainedGral(GralTable.this);
+          gralMng.gralFocusListener.focusGainedGral(GralTable.this);
           //super.focusGained();
           //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
           repaint(50,100);

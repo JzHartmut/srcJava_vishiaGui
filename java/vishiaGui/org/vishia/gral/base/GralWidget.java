@@ -766,13 +766,13 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    */
   public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
     super(sPosName, currPos, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
-    assert(this.itsMng !=null);
+    assert(this.gralMng !=null);
     //this.widget = null;
     this.whatIs = whatIs;
     //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
     //this.bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
     this.itsCfgElement = null;
-    assert(this.itsMng !=null);  //should be created firstly in the application, since 2015-01-18
+    assert(this.gralMng !=null);  //should be created firstly in the application, since 2015-01-18
     registerWidget();
 
   }
@@ -787,18 +787,18 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     } else if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent){
       ((GralPanelContent)this._wdgPos.parent).addWidget(this, _wdgPos.toResize());
     } else if(_wdgPos ==null) {
-      this._wdgPos.parent = itsMng.getCurrentPanel();
+      this._wdgPos.parent = gralMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
-    this.itsMng.registerWidget(this);
+    this.gralMng.registerWidget(this);
   }
   
   
   @Deprecated public GralWidget(String sName, char whatIs, GralMng mng)
   { this((GralPos)null, sName, whatIs);
-    assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
+    assert(gralMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(mng !=null){
-      assert(this.itsMng == mng);
+      assert(this.gralMng == mng);
       //sets the mng and the pos of Window in that cases
       //where the mng is present on ctor. (not in new form)
       //setPanelMng(mng);   
@@ -849,11 +849,11 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     try {
       if(checkImplWidgetCreation(this._wdgImpl)) {
         if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-          dyda.textFont = this.itsMng.gralProps.getTextFont(this.itsMng.pos().pos.height());
+          dyda.textFont = this.gralMng.gralProps.getTextFont(this.gralMng.pos().pos.height());
           dyda.setChanged(ImplAccess.chgFont);
         }
         
-          this.itsMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
+          this.gralMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
 //        if(this instanceof GralWindow) {
 //          //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
 //          //the implementation can decide whether the same implementation widget is used
@@ -865,7 +865,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
 //          ((GralPanelContent)this).createChildrensImplWidget_Gthread();
 //         }
         if(this.contextMenu !=null) {
-          this.itsMng._mngImpl.createContextMenu(this);
+          this.gralMng._mngImpl.createContextMenu(this);
         }
         return true;
       }
@@ -882,14 +882,8 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   }
   
   
-  public GralPos pos(){ return _wdgPos; } 
   
   
-  
-  public void chgPos(GralPos newPos){
-    dyda.setChanged(ImplAccess.chgPos);
-    _wdgPos = newPos;
-  }
   
   /**Returns this.
    * @see org.vishia.gral.base.GetGralWidget_ifc#getGralWidget()
@@ -909,7 +903,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   }
 
   
-  @Override public String getName(){ 
+  @Deprecated @Override public String getName(){ 
     if(name !=null) return name;
     else if(sDataPath !=null) return sDataPath;
     else if(sCmd !=null) return sCmd;
@@ -1394,7 +1388,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
       //first usage:
       String sPath1 = this.getDataPath();
       if(sPath1 !=null && (sPath1 = sPath1.trim()).length()>0){
-        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath1);
+        String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath1);
         variable = container.getVariable(sPath1);
         this.setContentInfo(variable);
       } else {
@@ -1420,7 +1414,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
           if(sPath1.contains("["))
             stop();
           String sPath2 = sPath1.trim();
-          String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
+          String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
           VariableAccess_ifc variable1 = container.getVariable(sPath);
           if(variable1 !=null){
             variables.add(variable1);
@@ -1430,7 +1424,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
         if(sDataPath.contains("["))
           stop();
         String sPath2 = sDataPath.trim();
-        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
+        String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
         this.variable = container.getVariable(sPath);
       }
     }
@@ -1563,7 +1557,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * @return The value in String representation, null if the widget has no possibility of input.
    */
   public String getValue()
-  { return itsMng.getValueFromWidget(this);
+  { return gralMng.getValueFromWidget(this);
   }
   
   
@@ -1599,7 +1593,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     if(_wdgImpl == null) {
       bVisibleState = true;  //without graphic yet now
     } else {
-      if(itsMng.currThreadIsGraphic()) {
+      if(gralMng.currThreadIsGraphic()) {
         _wdgImpl.setVisibleGThread(visible);   //sets the implementation widget visible.
       } else {
         dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
@@ -1793,7 +1787,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * @param latest 
    */
   public void setFocus(int delay, int latest){
-    if(delay >0 || !itsMng.currThreadIsGraphic() || _wdgImpl == null) {
+    if(delay >0 || !gralMng.currThreadIsGraphic() || _wdgImpl == null) {
       dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
       repaint(delay, latest);
     } else {
@@ -1862,7 +1856,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * to get and set values and properties of this widgets non-symbolic.
    * @return The manager.
    */
-  @Override public GralMng gralMng(){ return itsMng; }
+  @Override public GralMng gralMng(){ return gralMng; }
   
   /**Returns the implementation widget or its Wrapper.
    * Need cast due to implementation level.
@@ -1910,9 +1904,9 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    *   The value of the latest call of this operation is valid if the redraw event is delayed.
    */
   public void redraw ( int delay, int latest, boolean onlyDynamics ){
-    if(itsMng !=null && itsMng._mngImpl !=null && this._wdgImpl!=null ) { //NOTE: set of changes is possible before setToPanel was called. 
+    if(gralMng !=null && gralMng._mngImpl !=null && this._wdgImpl!=null ) { //NOTE: set of changes is possible before setToPanel was called. 
       this._wdgImpl.bRedrawOnlyDynamics = onlyDynamics;
-      if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
+      if(delay == 0 && gralMng.currThreadIsGraphic() && _wdgImpl !=null){
         _wdgImpl.repaintGthread();
       } else {
         long time = System.currentTimeMillis();
@@ -1941,7 +1935,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent) {
       ((GralPanelContent)_wdgPos.parent).removeWidget(this);
     }
-    itsMng.deregisterWidgetName(this);
+    gralMng.deregisterWidgetName(this);
     return true;
   }
   
@@ -2040,7 +2034,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
      * @deprecated use {@link ImplAccess#ImplAccess(GralWidget, GralMng.ImplAccess)}
      */
     @Deprecated protected ImplAccess(GralWidget widgg){
-      this(widgg, widgg.itsMng._mngImpl);
+      this(widgg, widgg.gralMng._mngImpl);
     }
     
     
@@ -2057,7 +2051,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
       assert(mngImpl !=null);
 
       if(widgg._wdgPos ==null) {
-        widgg._wdgPos = widgg.itsMng.getPosCheckNext();
+        widgg._wdgPos = widgg.gralMng.getPosCheckNext();
         widgg.registerWidget(); //yet now because before the panel was unknown
       }
       widgg.lastTimeSetVisible = System.currentTimeMillis();
@@ -2087,7 +2081,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     }
     
     /**Access to the GralMng from the implementation level.  */
-    public final GralMng gralMng() { return this.widgg.itsMng; }
+    public final GralMng gralMng() { return this.widgg.gralMng; }
 
 
     /**This method is not intent to call by user. It may be called from all widget implementation 
@@ -2100,11 +2094,11 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     public final void XXXfocusGained(){
       //System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
       if(widgg.htmlHelp !=null){
-        widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
+        widgg.gralMng.setHtmlHelp(widgg.htmlHelp);
       }
       if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }
       //notify GralWidgetMng about focused widget.
-      widgg.itsMng.notifyFocus(widgg);
+      widgg.gralMng.notifyFocus(widgg);
     }
     
     /**Sets the state of the widget whether it seams to be visible.
@@ -2222,7 +2216,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
    * till the next request of {@link #redraw(int, int)} or {@link #redraw()}.
    */
-  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ", this.itsMng){
+  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ", this.gralMng){
     @Override public void executeOrder() {
       if(_wdgImpl !=null) { _wdgImpl.repaintGthread(); }//Note: exception thrown in GralGraphicThread
     }
@@ -2342,7 +2336,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
  * <li>At least the statements of the ctor are executed. Only with this statements 
  *   a (final) class variable can be set from ctor arguments.
  * </ul>
- * With this class first this super ctor of GralWidget is called, it sets the {@link GralWidgetSetMng#itsMng}
+ * With this class first this super ctor of GralWidget is called, it sets the {@link GralWidgetSetMng#gralMng}
  * which is accessible in the second phase.
  * @since 2022-10, necessary for referenced GralMng, not as singleton.
  *

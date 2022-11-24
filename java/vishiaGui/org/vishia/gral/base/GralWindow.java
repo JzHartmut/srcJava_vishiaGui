@@ -184,7 +184,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
     this.mainPanel = new GralPanelContent(posPanel, sNamePanel, this.gralMng());
     //                                                     // A window has anytime only one GralPanel, the mainPanel.
-    super.itsMng.registerWindow(this);
+    super.gralMng.registerWindow(this);
     if((windProps & windResizeable)!=0){
       this.resizeAction = new ActionResizeOnePanel();
     }
@@ -258,8 +258,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   
   @Override public boolean remove() {
     super.remove();
-    itsMng.deregisterPanel(this.mainPanel);
-    itsMng.deregisterWindow(this);
+    gralMng.deregisterPanel(this.mainPanel);
+    gralMng.deregisterWindow(this);
     return true;
   }
   
@@ -437,7 +437,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   /**Code snippet for initializing the GUI area (panel). This snippet will be executed
    * in the GUI-Thread if the GUI is created. 
    */
-  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow", this.itsMng)
+  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow", this.gralMng)
   {
     @Override public void executeOrder()
     { GralMng mng = gralMng();

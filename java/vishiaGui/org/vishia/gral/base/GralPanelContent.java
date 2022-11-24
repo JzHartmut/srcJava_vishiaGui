@@ -333,7 +333,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
       } else {
         nameGlobal = nameWidg;
       }
-      itsMng.registerWidget(nameGlobal, widg);
+      gralMng.registerWidget(nameGlobal, widg);
       this._panel.idxWidgets.put(nameWidg, widg);
     }
     if(this._panel.widgetList.remove(widg)){
@@ -379,7 +379,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
       } else {
         nameGlobal = nameWidg;
       }
-      itsMng.removeWidget(nameGlobal);
+      gralMng.removeWidget(nameGlobal);
       this._panel.idxWidgets.remove(nameWidg);
     }
     

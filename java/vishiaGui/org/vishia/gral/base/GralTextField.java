@@ -698,7 +698,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   
   
-  protected GralKeyListener gralKeyListener = new GralKeyListener(itsMng)
+  protected GralKeyListener gralKeyListener = new GralKeyListener(gralMng)
   {
     @Override public boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ return false; }
   };
@@ -722,7 +722,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     
     
     protected GraphicImplAccess(GralWidget widgg)
-    { this(widgg, widgg.itsMng._mngImpl);
+    { this(widgg, widgg.gralMng._mngImpl);
     }
     
     

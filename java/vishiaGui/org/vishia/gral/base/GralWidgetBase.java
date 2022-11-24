@@ -47,7 +47,7 @@ public abstract class GralWidgetBase  extends ObjectVishia {
   
   /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected final GralMng itsMng;
+  protected final GralMng gralMng;
   
   
   /**The position of the widget. 
@@ -63,19 +63,19 @@ public abstract class GralWidgetBase  extends ObjectVishia {
     /**Either the GralMng is given, or pos should be given, then the GralMng is gotten from {@link GralPos#parent}.
      * If both are null, the {@link GralMng#get()} is used as fallback for compatibility.
      * @param pos
-     * @param itsMng
+     * @param gralMng
      */
     public GralWidgetBase(String sPosName, GralPos refPos, GralMng gralMng) {
       if(gralMng !=null) {
-        this.itsMng = gralMng;
+        this.gralMng = gralMng;
       } else if(refPos !=null && refPos.parent !=null) {
-        this.itsMng = refPos.parent.gralMng();
+        this.gralMng = refPos.parent.gralMng();
       } else {
-        this.itsMng = gralMng; //deprecated approach with singleton.
+        this.gralMng = gralMng; //deprecated approach with singleton.
       }
       int posName;
       final GralPos currPos1;
-      if(refPos == null) { currPos1 = this.itsMng.pos().pos; }
+      if(refPos == null) { currPos1 = this.gralMng.pos().pos; }
       else {currPos1 = refPos;}
       if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
         String posString1 = sPosName.substring(0, posName).trim();
@@ -102,6 +102,10 @@ public abstract class GralWidgetBase  extends ObjectVishia {
     }
 
     
+    public final GralPos pos(){ return _wdgPos; } 
+    
+
+    
     public abstract boolean setVisible(boolean visible);
     
 
@@ -116,7 +120,7 @@ public abstract class GralWidgetBase  extends ObjectVishia {
      */
     public final boolean checkImplWidgetCreation ( GralWidget.ImplAccess wdgImpl ) {
       if(wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
-        if(this.itsMng._mngImpl ==null) {
+        if(this.gralMng._mngImpl ==null) {
           throw new IllegalStateException("must not call createImplWidget_Gthread if the graphic is not initialized. itsMng._mngImpl ==null");
         }
         return true;

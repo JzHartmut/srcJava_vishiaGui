@@ -33,7 +33,7 @@ import org.vishia.util.Removeable;
  * <li>The delayed repaint request queues the instance {@link GralWidget#repaintRequ} (only private visible)
  *   of {@link org.vishia.gral.base.GralGraphicTimeOrder} in the central queue of requests using 
  *   {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicTimeOrder)}. 
- *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#itsMng}.
+ *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#gralMng}.
  * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
  *   {@link org.vishia.gral.base.GralGraphicTimeOrder}. Any of them may have a specific delay. 
  *   The graphic thread organizes it in a proper kind of time.
@@ -150,7 +150,11 @@ public interface GralWidget_ifc extends Removeable
   };
 
   
-  public String getName();
+  /**
+   * @return
+   * @deprecated access the final name immediately.
+   */
+  @Deprecated public String getName();
   
   public GralPos pos();
   

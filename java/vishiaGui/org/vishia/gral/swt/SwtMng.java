@@ -174,7 +174,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   public final static String version = "2022-10-27";
   
   
-  /**Gets the SwtMng instance for the given implementation Widget from the {@link GralWidget#itsMng}.
+  /**Gets the SwtMng instance for the given implementation Widget from the {@link GralWidget#gralMng}.
    * Note: It is a quest of effort, simplicity or universality where to use only one instance for the GralMng and SwtMng
    * (Singleton) or reference it. The reference is a small effort in data. 
    * The access via reference or from singleton is approximately the same (run time effort).
@@ -185,7 +185,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * Hence a simple unified way should be use to access the GralMng and the SwtMng from the GralWidget.
    * This is this operation. 
    * <br>
-   * In the past the singleton was favored, but all GralWidgets have the GralMng reference {@link GralWidget#itsMng}
+   * In the past the singleton was favored, but all GralWidgets have the GralMng reference {@link GralWidget#gralMng}
    * So the singleton usage can be refactored. 
    * @param widgi The implementation access, anytime accessible from the SWT implementation level. 
    * @return The reference to the GralMng is found via {@link ImplAccess#gralMng()}, 
