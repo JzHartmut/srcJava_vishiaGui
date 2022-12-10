@@ -637,11 +637,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param columns
    * @param size
    */
-  public GralFileSelector(GralPos refPos, String name, int rows, int[] columns, int[] columnsFavorlist)
+  public GralFileSelector(GralPos refPos, String posName, int rows, int[] columns, int[] columnsFavorlist)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
-    super(name, refPos,null);
+    super(refPos, posName, null);
     favorList = columnsFavorlist !=null ? new GralTable<String>(refPos, name, 50, columnsFavorlist) : null;
-    selectList = new FileSelectList(refPos, this, name, rows, columns, 'A');
+    selectList = new FileSelectList(refPos, this, posName, rows, columns, 'A');
     colorBack = GralColor.getColor("wh");
     colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
@@ -1666,12 +1666,14 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   GralUserAction actionFavorButton = new GralUserAction("actionFavorButton"){
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        if(selectList.wdgdTable.isVisible()){
-          selectList.wdgdTable.setVisible(false);
-          favorList.setVisible(true);
-        } else {
-          selectList.wdgdTable.setVisible(true);
-          favorList.setVisible(false);
+        if(favorList !=null) {
+          if(selectList.wdgdTable.isVisible()) {
+            selectList.wdgdTable.setVisible(false);
+            favorList.setVisible(true);
+          } else {
+            selectList.wdgdTable.setVisible(true);
+            favorList.setVisible(false);
+          }
         }
         return true;
       } else return false;

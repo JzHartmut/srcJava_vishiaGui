@@ -76,7 +76,7 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   
 
   /**The table which is showing in the widget. */
-  public GralTable<UserData> wdgdTable;
+  final public GralTable<UserData> wdgdTable;
   
 
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.
@@ -90,7 +90,7 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   protected Map<String, GralUserAction> actions;
   
   protected GralSelectList(GralPos refPos, String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
-  { super(posName, refPos, null);
+  { super(refPos, posName, null);
     if(posName == null){
       Assert.stop();
     }

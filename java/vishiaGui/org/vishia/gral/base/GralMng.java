@@ -1357,7 +1357,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       wind.createImplWidget_Gthread();           // creates all widgets of the window.
       wind.setWindowVisible( bVisible ); 
       GralPos pos = wind.pos();
-      if(pos.x.p2 == 0 && pos.y.p2 == 0){
+      if(pos.x.p1 ==0 && pos.x.p2 == 0 && pos.y.p1 == 0 && pos.y.p2 == 0){
         wind.setFullScreen(true);  
       }
     }

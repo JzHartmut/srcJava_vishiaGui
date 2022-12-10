@@ -34,13 +34,29 @@ public class InspcCurveViewApp
   
   Args argData = new Args();
   
+  
+  InspcCurveViewApp ( ) {
+    this.gralMng = new GralMng();
+    this.reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl", this.gralMng) {
+      @Override protected void executeOrder () {
+        try {
+          InspcCurveViewApp.this.curveView.windCurve.reportAllContentImpl(log);
+          log.flush();
+        } catch (Exception e) {
+          System.out.append("unexpected Exception " + e.getMessage());
+        }
+      }
+    };
+  }
+  
+  
   public static void main(String[] args){
     InspcCurveViewApp main = new InspcCurveViewApp();
     File dir;
     for(String arg: args) { System.out.println(arg); }
     try {
       if(  false == main.argData.parseArgs(args, System.err)
-        || false == main.argData.testArgs(System.err)
+        || false == main.argData.testConsistence(System.err)
         ) { 
         System.exit(1); 
       }
@@ -62,7 +78,7 @@ public class InspcCurveViewApp
   
   
   private void execute(){
-    this.gralMng = GralMng.get();                       // GralMng the singleton
+    this.gralMng = gralMng;                       // GralMng the singleton
     FileOutputStream fLog = null;
     try {
       fLog = new FileOutputStream("T:/InspcCurveViewApp.log");
@@ -103,17 +119,7 @@ public class InspcCurveViewApp
       
   }
   
-  GralGraphicTimeOrder reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl", this.gralMng) {
-    
-    @Override protected void executeOrder () {
-      try {
-        InspcCurveViewApp.this.curveView.windCurve.reportAllContentImpl(log);
-        log.flush();
-      } catch (Exception e) {
-        System.out.append("unexpected Exception " + e.getMessage());
-      }
-    }
-  };
+  final GralGraphicTimeOrder reportAllContentImpl;
 
   
   
@@ -194,19 +200,18 @@ public class InspcCurveViewApp
     /**Here empty no further test necessary
      *
      */
-    @Override
-    public boolean testArgs(Appendable msg) throws IOException {
+    @Override public boolean testConsistence(Appendable msg) throws IOException {
       return true;
     }
   }
   
   
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng){
-    @Override public void executeOrder()
-    {
-      //curveView.buildGraphicInCurveWindow(null);
-      //
-  } };
+//  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng){
+//    @Override public void executeOrder()
+//    {
+//      //curveView.buildGraphicInCurveWindow(null);
+//      //
+//  } };
   
   
 }

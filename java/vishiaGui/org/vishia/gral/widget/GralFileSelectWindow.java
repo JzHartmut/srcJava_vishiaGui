@@ -82,17 +82,18 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    public GralFileSelectWindow(String name, GralMng mng){
      mng.selectPanel("primaryWindow");
      mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
-     wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive | GralWindow.windResizeable );
-     mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
-     fileSelector = new GralFileSelector(mng.refPos(), name + "-selectFile", 100, new int[]{2,0,-6,-12}, null);
+     this.wind = mng.createWindow(name + "Window", "select file", GralWindow_ifc.windExclusive | GralWindow_ifc.windResizeable );
+     //mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
+     String posName = "@0..-3,0..0=" + name;
+     this.fileSelector = new GralFileSelector(mng.refPos(), posName + "-selelector", 100, new int[]{2,0,-6,-12}, null);
      //fileSelector.setToPanel(mng);
-     fileSelector.specifyActionOnFileSelected(actionSelectFile);
-     fileSelector.setActionOnEnterFile(actionOk);
-     mng.setPosition(-2, 0, 0, -7, 0, 'r',1);
-     widgFilename = mng.addTextField(name+"-name", true, null, null);
+     this.fileSelector.specifyActionOnFileSelected(this.actionSelectFile);
+     this.fileSelector.setActionOnEnterFile(this.actionOk);
+     String posText = "@-3..0, 0..-9=" + name +"-fname";
+     this.widgFilename = mng.addTextField(posText, true, null, null);
      mng.setPosition(-3, 0, -8, GralPos.size + 7, 0, 'r',1);
-     widgButtonOk = mng.addButton(name+"-ok", null, "Ok");
-     widgButtonOk.setActionChange(actionOk);
+     String posBtnOk = "@-3..0, -8..-1=" + name + "-ok";
+     this.widgButtonOk = new GralButton(mng.refPos(), posBtnOk, "Ok", this.actionOk);
      
    }
    

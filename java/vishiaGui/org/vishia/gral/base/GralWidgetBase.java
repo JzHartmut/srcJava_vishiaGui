@@ -65,7 +65,7 @@ public abstract class GralWidgetBase  extends ObjectVishia {
      * @param pos
      * @param gralMng
      */
-    public GralWidgetBase(String sPosName, GralPos refPos, GralMng gralMng) {
+    public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng) {
       if(gralMng !=null) {
         this.gralMng = gralMng;
       } else if(refPos !=null && refPos.parent !=null) {

@@ -262,12 +262,12 @@ public final class InspcCurveView
     //gralMng.setPosition(4, 0, 4, 0, 0, '.');
     gralMng.setPosition(44, 56, 94, 104, 0, '.');
     //this.widgFileSelector = null;
-    this.windFileSelector = new GralFileSelectWindow("File Selection", gralMng);   //"@screen, 50+40, 50+80"
+    this.windFileSelector = new GralFileSelectWindow("FileSelection", gralMng);   //"@screen, 50+40, 50+80"
 //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
 //    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
 //    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
-    this.widgFilename = new GralTextField("-filename", GralTextField.Type.editable);
+    this.widgFilename = new GralTextField(gralMng.refPos(), "-filename", GralTextField.Type.editable);
     buildGraphic(this.windCurve, colorSelector, common, tracksValues);
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
@@ -313,7 +313,7 @@ public final class InspcCurveView
       gralMng.setPosition(3, GralPos.size -3, -6, 0, 0, 'r', 0);
       widgBtnHelp = gralMng.addButton("btnHelp", this.gralMng.actionHelp, "help", null, "help");
     }
-    widgTableVariables = new GralTable<GralCurveViewTrack_ifc>("variables", new int[]{-posright});
+    widgTableVariables = new GralTable<GralCurveViewTrack_ifc>(gralMng.refPos(), "variables", 20, new int[]{-posright});
     gralMng.setPosition(3, GralPos.size +20, posright, 0, 0, 'd', 0);
     widgTableVariables.setColumnEditable(0, true);
     //widgTableVariables.setToPanel(gralMng);
@@ -1140,7 +1140,7 @@ public final class InspcCurveView
         //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), false, actionReadCfg);
         widgCurve.setVisible(false);
         widgFilename.setVisible(true);
-        windFileSelector.openDialog(fileCurr, "file", true, null);
+        windFileSelector.openDialog(fileCurr, "file", true, actionEnterFile);
 //        windFileSelector.setVisible(true);
 //        windFileSelector.fillIn(fileCurr, false);
 //        windFileSelector.setFocus();
@@ -1349,7 +1349,7 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         if(colorSelector == null) {
-          colorSelector = new GralColorSelector("colorSelector", GralMng.get());
+          colorSelector = new GralColorSelector("colorSelector", gralMng);
           
         }
         colorSelector.openDialog("select Color for selected track", actionColorSet);

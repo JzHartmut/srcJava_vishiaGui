@@ -764,8 +764,8 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * @param gralMng should be given if currPos is not given, to work with a dedicated GralMng, not with the singleton.
    *   If currPos is given and valid, this argument can be null.
    */
-  public GralWidget ( GralPos currPos, String sPosName, char whatIs, GralMng gralMng){ 
-    super(sPosName, currPos, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
+  public GralWidget ( GralPos refPos, String sPosName, char whatIs, GralMng gralMng){ 
+    super(refPos, sPosName, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
     assert(this.gralMng !=null);
     //this.widget = null;
     this.whatIs = whatIs;
