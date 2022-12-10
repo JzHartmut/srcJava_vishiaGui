@@ -120,30 +120,29 @@ public class FcmdLeftMidRightPanel
     String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
     //refPos.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
-    this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
+    this.tabbedPanelFavorCards = this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
     
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = FcmdWidgetNames.panelFavoritesLeftMidRight + cNr;
     //refPos.setFullPanel(parentPanel);;
     //------------------------------------------------------- add a tabbed panel as tab, favor is a tab of the parent.
-    this.tabbedPanelFavorCards = this.tabbedPanelFileCards.addTabPanel(nameTabPanel,"favor"); //mng.addTabbedPanel(nameTabPanel);
-    //The panel for selection from all favorites: 
+    //this.tabbedPanelFileCards.addTabPanel(nameTabPanel,"favor"); //mng.addTabbedPanel(nameTabPanel);
+    //
     nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
-    tabLabelGridPanel = "a-F"+cNr;
+    tabLabelGridPanel = "a-F"+cNr;                         //The panel for selection from all favorites: 
     GralPanelContent tabPanelFavor1 = this.tabbedPanelFavorCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
     
-    //String sPos = "@area9, B" + cNr + "B" + cNr;
-    GralPos refPos = tabPanelFavor1.pos(); //this.main.gui.gralMng.refPos();
+    //GralPos refPos = tabPanelFavor1.pos(); //this.main.gui.gralMng.refPos();
     //try { refPos.setPosition(sPos); } catch (Exception exc) { }
-    
-    cardFavorThemes = new FcmdFavorThemeCard(refPos, main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
+    mng.selectPanel(tabPanelFavor1);
+    this.cardFavorThemes = new FcmdFavorThemeCard(mng.refPos(), main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
     
     
     //.createImplWidget_Gthread();
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
-      tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+      //tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
       mng.setPosition(2, -2, 0, -0, 1, 'd');
       //main.executer.cmdSelector.createImplWidget_Gthread();
     }
@@ -228,16 +227,22 @@ public class FcmdLeftMidRightPanel
   
   
   
+  /**Searches or creates a necessary file card
+   * @param label it is the text in favor list.
+   *   The label is completed with ".1"..".3" for the left/mid/right panel.
+   *   This label is searched in #listTabs  
+   * @return the file card either as existing or new created.
+   */
   FcmdFileCard searchOrCreateFileCard(String label){
   //search or create the tab
     FcmdFileCard fileCard = null;
     String labelTab = label + "." + cNr;
-    for(FcmdFileCard item: listTabs){
+    for(FcmdFileCard item: this.listTabs){                 // search list opened file cards for this favor
       if(item.nameFilePanel.equals(labelTab)){ 
-        fileCard = item; break;
+        fileCard = item; break;                            // found: use it
       }
     } 
-    if(fileCard == null){
+    if(fileCard == null){                                  // not found: create a tab for it.
       //TODO graphic appearance
       this.main.gui.gralMng.refPos().setParent(this.tabbedPanelFileCards);
       fileCard = new FcmdFileCard(this.main.gui.gralMng.refPos(), this, label);

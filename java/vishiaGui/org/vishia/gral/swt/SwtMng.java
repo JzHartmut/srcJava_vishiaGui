@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -1315,7 +1316,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       GralWindow wind = ewind.getValue();
       
       out.append("\n==== SwtMng.reportContent: Window: ").append(wind.getName()).append("\n");
-      reportContent(out, (Composite)getSwtImpl(wind), 0);
+      reportContent(out, (Composite)getSwtImpl(wind), "wind: ", 0);
       out.append("\n====\n");
     }
   }
@@ -1323,28 +1324,40 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   static final String nl = "\n| | | | | | | | ";
   
   
-  void reportContent(Appendable out, Composite parent, int recursion) throws IOException {
+  void reportContent(Appendable out, Control parent, String mark, int recursion) throws IOException {
     Rectangle pos = parent.getBounds();
     String sType = parent.getClass().getName();
+    out.append(nl.substring(0, 2*recursion+1));
+    boolean bVisible = parent.isVisible();
+    if(bVisible) { out.append("+*-"); }
+    else { out.append("+--"); }
+    out.append(mark);
     out.append(sType).append(':');
     GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
     out.append(parent.toString());
-    Control[] children = parent.getChildren();
-    for(Control child : children) {
-      if(child !=null) {
-        pos = child.getBounds();
-        out.append(nl.substring(0, 2*recursion+1));
-        if(child instanceof Composite) {
-          reportContent(out, (Composite)child, recursion+1);
-        }
-        else  {
-          out.append("+-");
-          GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
-          out.append(child.toString());
-        }
+    Object data = parent.getData();
+    if(data instanceof GralWidget) {
+      ((GralWidget)data).toString(out);
+    } else {
+      out.append("data = ").append(data == null ? "null" : data.toString());
+    }
+    if(parent instanceof TabFolder) {
+      TabItem[] items = ((TabFolder)parent).getItems();
+      for(TabItem item: items) {
+        Control itemWdg = item.getControl();
+        reportContent(out, itemWdg, "tab: ", recursion +1);
       }
     }
+    if(parent instanceof Composite) {
+      Control[] children = ((Composite)parent).getChildren();
+      for(Control child : children) {
+        if(child !=null) {
+          reportContent(out, child, "", recursion +1);
+        }
+      } }
   }
+  
+  
   
   
   

@@ -26,7 +26,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
-import org.vishia.util.FileWriter;
+import org.vishia.util.FileAppend;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringPart;
 
@@ -141,7 +141,7 @@ class FcmdFavorPathSelector
   File fileCfg;
   
   /**Instance to write the cfgFile. */
-  FileWriter writerCfg = new FileWriter();
+  FileAppend writerCfg = new FileAppend();
   
   /**The three tabbed panels. */
   final FcmdLeftMidRightPanel panelLeft, panelMid, panelRight;

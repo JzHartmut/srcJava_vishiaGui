@@ -2309,6 +2309,7 @@ public GralButton addCheckButton(
       GralMng.this.notifyFocus(widgg);
       GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
       widgg.repaint();  //maybe changed outfit on focus gained.
+      System.out.println("focusGainedGral: " + widgg.getName() + ":" + widgg.pos());
       String htmlHelp = widgg.getHtmlHelp();
       if(htmlHelp !=null && htmlHelp.startsWith(":FcmdNew.html")) { 
         Debugutil.stop(); }

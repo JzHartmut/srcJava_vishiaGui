@@ -127,12 +127,16 @@ public final class GralCfgData
       this.whatIs = whatIs;
     }
     
-    /**For Show(varx) use the text as {@link {@link #data} and #name. It is the simple form. 
+    /**<code> &lt;""?text> | &lt;$-/\.:?text></code> is the non designated form of a parameter.
+     * Use it as name if the name is not given, and also as data path. 
+     * <br>
+     * Example Show(myVar) use the text as {@link {@link #data} and {@link #name}. It is the simple form. 
      * Also set the field {@link #text}
      * @param val
      */
     public void set_text(String val) {
       if(this.data == null) { this.data = val; }
+      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
       this.text = val;
     }
     

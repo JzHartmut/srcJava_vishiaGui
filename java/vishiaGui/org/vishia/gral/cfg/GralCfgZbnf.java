@@ -607,7 +607,7 @@ public class GralCfgZbnf
     //
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
-      GralButton widg = new GralButton(this.currPos, cfge.widgetType.name, cfge.widgetType.text, userAction);
+      GralButton widg = new GralButton(this.currPos, sName, cfge.widgetType.text, userAction);
       widg.setData(cfge.widgetType.data);
       widg.sCmd = cfge.widgetType.cmd;
       if(wButton.bSwitch) {
@@ -627,7 +627,7 @@ public class GralCfgZbnf
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
       int origin = 0; //TODO
-      GralLabel widg = new GralLabel(this.currPos, wText.name, wText.text, origin);
+      GralLabel widg = new GralLabel(this.currPos, sName, wText.text, origin);
       if(color0 !=null) widg.setTextColor(color0);
       if(color1 !=null) widg.setBackColor(color1, 0);
       bColor0Set = bColor1Set = true;

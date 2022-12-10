@@ -704,6 +704,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       for(int iCol = 0; iCol < zColumns; ++iCol){
         boolean editable = super.bColumnEditable(iCol);
         Text cell = new Text(swtTable, SWT.LEFT | SWT.SINGLE | (editable  ? 0 : SWT.READ_ONLY));
+        cell.setText("cell" + iRow + "," + iCol);
         if(editable){ 
           cell.addKeyListener(swtKeyListener);
         }
