@@ -34,8 +34,8 @@ import org.vishia.gral.widget.GralFileSelectWindow;
 import org.vishia.gral.widget.GralColorSelector.SetColorFor;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.inspcPC.mng.InspcFieldOfStruct;
-import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
@@ -50,6 +50,8 @@ public final class InspcCurveView
 
   /**Version, history and license. 
    * <ul>
+   * <li>2022-12-11 Hartmut fixes while running wiht new Gral concept. Especially the {@link #windFileSelector}
+   *   is now an extra window, hence some changes necessary. Yet not all done.  
    * <li>2021-12-19 Hartmut new: Now has a help button 
    * <li>2021-12-19 Hartmut chg: in {@link #actionSelectVariableInTable}:
    *   repaint after 500 ms without forced repaint instead 100 ms, then variables in the table can be selected fastly.
@@ -125,7 +127,7 @@ public final class InspcCurveView
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String sVersion = "2014-01-10";
+  public final static String sVersion = "2022-12-11";
 
   //boolean bTabWidget = true;
 
@@ -313,7 +315,7 @@ public final class InspcCurveView
       gralMng.setPosition(3, GralPos.size -3, -6, 0, 0, 'r', 0);
       widgBtnHelp = gralMng.addButton("btnHelp", this.gralMng.actionHelp, "help", null, "help");
     }
-    widgTableVariables = new GralTable<GralCurveViewTrack_ifc>(gralMng.refPos(), "variables", 20, new int[]{-posright});
+    widgTableVariables = new GralTable<GralCurveViewTrack_ifc>(gralMng.refPos(), "@3..-22, -19..0=variables", 20, new int[]{-posright});
     gralMng.setPosition(3, GralPos.size +20, posright, 0, 0, 'd', 0);
     widgTableVariables.setColumnEditable(0, true);
     //widgTableVariables.setToPanel(gralMng);
@@ -365,9 +367,9 @@ public final class InspcCurveView
     gralMng.setPosition(-19, GralPos.size +3, posright, GralPos.size +8, 0, 'r', 0);
     widgValdTime = gralMng.addTextField(null, true, "dtime", "t");
     gralMng.setPosition(-15, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
-    widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionOpenFileDialog, sBtnReadCfg, null, sBtnReadCfg);
+    widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionReadCfg, sBtnReadCfg, null, sBtnReadCfg);
     widgBtnSaveCfg = gralMng.addButton("btnSaveCfg", actionOpenFileDialog, sBtnSaveCfg, null, sBtnSaveCfg);
-    widgBtnReadValues = gralMng.addButton("btnReadValues", actionOpenFileDialog, sBtnReadValues, null, sBtnReadValues);
+    widgBtnReadValues = gralMng.addButton("btnReadValues", actionReadValues, sBtnReadValues, null, sBtnReadValues);
     widgBtnSaveValues = gralMng.addButton("btnSaveValues", actionOpenFileDialog, sBtnSaveValues, null, sBtnSaveValues);
     wdgButtonAutosave = gralMng.addSwitchButton("btnAutoSaveValues", "off-autosave", "on-autosave", GralColor.getColor("lgn"), GralColor.getColor("am") );
     
@@ -550,7 +552,7 @@ public final class InspcCurveView
       widgCurve.readCurve(file);
     } catch(Exception exc){
       widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-      System.err.println(Assert.exceptionInfo("InspcCurveView-read", exc, 1, 2));
+      System.err.println(ExcUtil.exceptionInfo("InspcCurveView-read", exc, 1, 2));
     }
     
   }
@@ -592,7 +594,7 @@ public final class InspcCurveView
       //timeLastSave = System.currentTimeMillis();
     } catch(Exception exc){
       widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-      System.err.println(Assert.exceptionInfo("InspcCurveView-save", exc, 1, 2));
+      System.err.println(ExcUtil.exceptionInfo("InspcCurveView-save", exc, 1, 2));
     }
     
   }
@@ -1100,6 +1102,43 @@ public final class InspcCurveView
   
   
   
+  GralUserAction actionReadCfg = new GralUserAction("ReadCfg"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) { 
+      if(widgd == InspcCurveView.this.widgBtnReadCfg) {
+        if(actionCode == KeyCode.mouse1Up) {
+          windFileSelector.openDialog(fileCurveCfg, "select filel.cfg", false, this);
+          return true;
+        }
+      } else {
+        widgTableVariables.setFocus();
+        windFileSelector.closeDialog();
+        actionReadCfg(0, null, params);
+      }
+      return true;
+  } };
+  
+  
+  
+  GralUserAction actionReadValues = new GralUserAction("ReadValues"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) { 
+      if(widgd == InspcCurveView.this.widgBtnReadValues) {
+        if(actionCode == KeyCode.mouse1Up) {
+          windFileSelector.openDialog(fileCurveData, "select datafile.* (csv)", false, this);
+          return true;
+        }
+      } else {
+        widgTableVariables.setFocus();
+        windFileSelector.closeDialog();
+        actionReadValues(0, null, params);
+      }
+      return true;
+  } };
+  
+  
+  
+  
+  
+  
   
   void actionOpenFileDialog_i ( GralWidget_ifc widgd ) {
     try{
@@ -1224,7 +1263,7 @@ public final class InspcCurveView
   
   
   boolean actionReadCfg(int actionCode, GralWidget_ifc widgd, Object... params)
-  { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+  { //if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
       try{
         fileCurveCfg = (FileRemote)params[0];
         System.out.println("InspcCurveView - read curve view from; " + fileCurveCfg.getAbsolutePath());
@@ -1242,7 +1281,7 @@ public final class InspcCurveView
         widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
       }
       //windFileCfg.closeWindow();
-    }
+    //}
     return true;
   }
   
@@ -1295,8 +1334,7 @@ public final class InspcCurveView
   /**Action invoked if the read file was selected in the {@link GralFileSelectWindow}
    */
   void actionReadValues(int actionCode, GralWidget_ifc widgd, Object... params)
-  { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-      try{
+  { try{
         assert(params[0] instanceof File);
         FileRemote file = (FileRemote)params[0];
         this.fileCurveData = file; //.getParentFile();
@@ -1308,9 +1346,8 @@ public final class InspcCurveView
         
       } catch(Exception exc){
         widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-        System.err.println(Assert.exceptionInfo("InspcCurveView - Read Curve", exc, 1, 2));
+        System.err.println(ExcUtil.exceptionInfo("InspcCurveView - Read Curve", exc, 1, 2));
       }
-    }
   }
   
 
@@ -1325,7 +1362,7 @@ public final class InspcCurveView
         
       } catch(Exception exc){
         widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
-        System.err.println(Assert.exceptionInfo("InspcCurveView - dirCurveSave", exc, 1, 2));
+        System.err.println(ExcUtil.exceptionInfo("InspcCurveView - dirCurveSave", exc, 1, 2));
       }
     }
   }

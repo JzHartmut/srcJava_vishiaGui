@@ -135,6 +135,7 @@ public interface GralWidget_ifc extends Removeable
 
   public enum ActionChangeWhen
   { onAnyChgContent
+  , onAnyKey  
   , onEnter
   , onCtrlEnter
   , onFocusGained

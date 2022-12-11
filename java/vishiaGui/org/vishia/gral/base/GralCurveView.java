@@ -256,6 +256,15 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public final static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
     
+    /**This is also for debug access to see the time to the values.
+     * 
+     */
+    final TimedValues timeValues;
+    
+    /**Contains all values maybe in different formats double, float, int, short
+     * and also the name of the tracke, min and max. 
+     * The time for the values are stored in {@link TimedValues#timeShort}
+     */
     public final TimedValues.Track valueTrack;
     
     /**The index of the track in the List of tracks. 
@@ -311,6 +320,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     
     public Track(GralCurveView outer, String name, int ixList){ 
       this.outer = outer; this.name = name; this.ixList = ixList; 
+      this.timeValues = outer.tracksValue;
       TimedValues.Track valueTrack = outer.tracksValue.getTrack(name);
       if(valueTrack ==null) {                              // use an existing ValueTrack
         valueTrack = outer.tracksValue.addTrack(name, 'F');// or create it here for all.
@@ -1537,8 +1547,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * [0] is right. Use <code>(ixData >> shIxiData) & mIxiData</code> to calculate the real data index.
      * the used length is the number of pixel. 2000 are enough for a large representation.
      * This array is filled newly whenever any draw or paint action is done. It is prepared in the routine
-     * The field contains old indices if the size of drawing is less then the size of window.
      * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the drawTrack routine of the implementation level.
+     * The field contains old indices if the size of drawing is less then the size of window.
      */
     protected final int[] ixDataShown = new int[2000];
 

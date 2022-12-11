@@ -27,6 +27,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2022-12-11 Hartmut new {@link #closeDialog()} systematically because {@link #openDialog(FileRemote, String, boolean, GralUserAction)} is given. 
    * <li>2013-03-28 Hartmut implements {@link GralFileDialog_ifc} because it should be so. TODO tuning with the
    *   other possibility {@link org.vishia.gral.swt.SwtFileDialog} which uses the standard file dialog of windows or linux
    * <li>2013-03-28 Hartmut creating, it was a static inner class of {@link GralFileSelector}
@@ -116,18 +117,25 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    *   or a File[] or List<File> if more as one file is selected. 
    */
   public void openDialog(FileRemote startDir, String sTitle, boolean bForWrite, GralUserAction actionSelect){
-    wind.setTitle(sTitle);
-    actionOkForUser = actionSelect;
+    this.wind.setTitle(sTitle);
+    this.actionOkForUser = actionSelect;
     if(bForWrite){
-      widgButtonOk.setText("write");
+      this.widgButtonOk.setText("write");
     } else {
-      widgButtonOk.setText("select");
+      this.widgButtonOk.setText("select");
     }
-    fileSelector.fillIn(startDir, false);
-    wind.setWindowVisible(true);
-    fileSelector.setFocus();
+    this.fileSelector.fillIn(startDir, false);
+    this.wind.setWindowVisible(true);
+    this.fileSelector.setFocus();
   }
   
+  
+  /**Set the window invisible, after select.
+   * 
+   */
+  public void closeDialog ( ) {
+    this.wind.setWindowVisible(false);
+  }
   
   @Override
   public boolean open(String sTitle, int mode)

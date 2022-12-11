@@ -99,6 +99,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-21 Hartmut chg: using {@link GralWidget_ifc.ActionChangeWhen#onAnyKey} instead onEnter. It is systematically. 
    * <li>2022-10-22 Hartmut chg: rename variables of {@link NodeTableLine} with prefix tbl_ to distinguish from nd_ variables from node 
    * <li>2018-10-28 Hartmut chg: Now uses argument zLineMax from {@link #GralTable(String, int, int[])} instead constant 50 for number of showed lines.
    * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
@@ -1352,7 +1353,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           done = true;
         }
         if(!done /*&& lineSelected !=null*/){
-          GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+          GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey);
           if(action !=null){
             Object[] args = action.args();
             if(args == null){ done = action.action().exec(keyCode, this, lineSelected); }

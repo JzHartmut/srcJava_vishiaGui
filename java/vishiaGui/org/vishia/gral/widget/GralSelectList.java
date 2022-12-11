@@ -10,8 +10,10 @@ import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 
@@ -40,6 +42,8 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
 {
   /**Version and history:
    * <ul>
+   * <li>2022-12-11 Hartmut chg: because new concept of Gral setToPanel is no more called. 
+   *   set the {@link #actionTable} now in the ctor which would be also proper in the past but now necessary.
    * <li>2018-10-28 Hartmut chg: {@link #createImplWidget_Gthread()} instead setToPanel(mng)
    * <li>2011-11-18 chg: This class does not inherit from GralWidget now. The GralWidget, which represents this class,
    *   is referenced with the public aggregation {@link #wdgdTable}. Only this instance is registered on a panel
@@ -92,10 +96,11 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   protected GralSelectList(GralPos refPos, String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
   { super(refPos, posName, null);
     if(posName == null){
-      Assert.stop();
+      Debugutil.stop();
     }
-    wdgdTable = new GralTable<UserData>(refPos, posName, rows, columns);
-    wdgdTable.setVisible(true);
+    this.wdgdTable = new GralTable<UserData>(refPos, posName, rows, columns);
+    this.wdgdTable.specifyActionChange(null, this.actionTable, null, GralWidget_ifc.ActionChangeWhen.onAnyKey);
+    this.wdgdTable.setVisible(true);
   }
 
   

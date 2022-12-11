@@ -22,7 +22,6 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
-import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
@@ -180,6 +179,9 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-11 new: {@link ActionChangeSelect#onAnyKey}: This action was missing especially in a {@link GralTable},
+   *   because only the common action was used without designation. Is it satisfying? Better have the specific action for key pressing. 
+   *   The change was done maybe without necessity but with a systematically focus. 
    * <li>2022-11-11 chg: {@link #createImplWidget_Gthread()} is now only existing in this class, 
    *   works together with the derived {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}.
    *   Necessities of {@link GralWindow#mainPanel} and children of {@link GralPanelContent} are regarded here. 
@@ -383,6 +385,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   protected static class ActionChangeSelect
   {
     ActionChange onAnyChangeContent;
+    ActionChange onAnyKey;
     ActionChange onEnter;
     ActionChange onCtrlEnter;
     ActionChange onFocusGained;
@@ -417,12 +420,22 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     private String[] sShowParam;
     
     
-    /**Either this or {@link #actionChangeSelect} is set. */
+    /**If this field is set, this is the only one action for the widget.
+     * Either the action is specified for a definitive operation, then also {@link #actionChange1When} is set.
+     * Or this action is called on any situation.
+     * <br>
+     * If this field is set, {@link #actionChangeSelect} is null. (Saves memory space if only one action is given).
+     * If this field is null, {@link #actionChangeSelect} may be set for more as one dedicated actions. */
     protected ActionChange actionChange1;
     
+    /**Condition(s) for the only one {@link #actionChange1}. 
+     * If this field is null, but 'actionChange1' is set, then 'actionChange1' is valid for all occurrences.
+     * This field is null if 'actionChange1' is null.
+     */
     protected ActionChangeWhen[] actionChange1When;
     
-    /**Either this or {@link #actionChange} is set. */
+    /**sub object for more as one action. If this field is set, {@link #actionChange1} is null.
+     * */
     protected ActionChangeSelect actionChangeSelect;
 
     /**Action method on activating, changing or release the widget-focus. */
@@ -1030,13 +1043,18 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * </ul> 
    * @param action any instance. Its action method is invoked depending of the type of widget
    *        usual if the user takes an action on screen, press button etc.
-   *        
+   * @deprecated use instead {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
+   *   possible in form 'specifyActionChange(null, action, null);' 
    */
   @Deprecated public void setActionChange(GralUserAction action){ specifyActionChange(null, action, null); } //cfg.actionChanging = action; }
   
   
+  /**Contains all actions only to store a single action in 
+   * 
+   */
   private static ActionChangeWhen[] whenAll = 
   { ActionChangeWhen.onAnyChgContent
+  , ActionChangeWhen.onAnyKey
   , ActionChangeWhen.onFocusGained
   , ActionChangeWhen.onChangeAndFocusLost
   , ActionChangeWhen.onCtrlEnter
@@ -1052,7 +1070,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   };
 
   
-  /**Sets the action to invoke after changing or touching the widget.
+  /**Sets the action to invoke after changing or touching the widget due to GUI handling.
    * @param sAction maybe null, String for visualization, especially menu entry for context menu.
    * @param action The action. null admissible to remove the existing action. 
    * @param args possible arguments for the action or null
@@ -1091,6 +1109,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   {
     switch(when){
     case onAnyChgContent: cfg.actionChangeSelect.onAnyChangeContent = action; break;
+    case onAnyKey: cfg.actionChangeSelect.onAnyKey = action; break;
     case onCtrlEnter: cfg.actionChangeSelect.onCtrlEnter = action; break;
     case onFocusGained: cfg.actionChangeSelect.onFocusGained = action; break;
     case onChangeAndFocusLost: cfg.actionChangeSelect.onChangeAndFocusLost = action; break;
@@ -1154,6 +1173,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
       if(when == null || cfg.actionChangeSelect == null) return null;
       switch(when){
       case onAnyChgContent: return cfg.actionChangeSelect.onAnyChangeContent;
+      case onAnyKey: return cfg.actionChangeSelect.onAnyChangeContent;
       case onCtrlEnter: return cfg.actionChangeSelect.onCtrlEnter;
       case onFocusGained: return cfg.actionChangeSelect.onFocusGained;
       case onChangeAndFocusLost: return cfg.actionChangeSelect.onChangeAndFocusLost;
