@@ -355,8 +355,17 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   
   
+  /**Overridden form of {@link GralWidget#createImplWidget_Gthread()} to create also content of the panel.
+   * First the Panel will be created if necessary.
+   * Then all widgets in the panel will be created.
+   * This operation does also regard new Gral Widgets without implementation, on dynamically creation on runtime. 
+   * On a tabed panel the widgets are the tabs of the panel.
+   * If widgets are found, which are already created, nothing is done with it. All ok.
+   * 
+   */
   @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
-    if(super.createImplWidget_Gthread()) {
+    super.createImplWidget_Gthread();
+    if(super._wdgImpl !=null) {
       for(GralWidget widg: this._panel.widgetList) {
         widg.createImplWidget_Gthread();                     // recursively call of same
       }

@@ -172,8 +172,8 @@ public class FcmdLeftMidRightPanel
     cardFavorThemes.indexFavorFolders.clear();  
     //clear all GUI tables of this main tab.
     for(FcmdFileCard fileTabs: listTabs){
-      fileTabs.favorCard.clear();
-      fileTabs.favorCard.indexFavorPaths.clear();
+      fileTabs.wdgFavorCard.clear();
+      fileTabs.wdgFavorCard.indexFavorPaths.clear();
     }
     //insert from left, from right etc. with the panels as first elements in the list:
     final FcmdLeftMidRightPanel favorFolderFrom1, favorFolderFrom2;
@@ -211,12 +211,12 @@ public class FcmdLeftMidRightPanel
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
         FcmdFileCard fileTab = searchOrCreateFileCard(favorFolder.label);
           //Favor select list of the associated File table
-        fileTab.favorCard.fillFavorPaths(favorFolder);
+        fileTab.wdgFavorCard.fillFavorPaths(favorFolder);
       } else {
         //The fileTable may be existend, then 
         FcmdFileCard fileTab = searchFileCard(favorFolder.label);
         if(fileTab !=null && fileTab.label.equals(favorFolder.label)){
-          fileTab.favorCard.fillFavorPaths(favorFolder);
+          fileTab.wdgFavorCard.fillFavorPaths(favorFolder);
         }
       }
       cardFavorThemes.addFavorFolder(favorFolder);
@@ -244,10 +244,11 @@ public class FcmdLeftMidRightPanel
     } 
     if(fileCard == null){                                  // not found: create a tab for it.
       //TODO graphic appearance
-      this.main.gui.gralMng.refPos().setParent(this.tabbedPanelFileCards);
+      GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, label);
+      this.main.gui.gralMng.refPos().setParent(tabFileCard);
       fileCard = new FcmdFileCard(this.main.gui.gralMng.refPos(), this, label);
       listTabs.add(fileCard);
-      fileCard.createImplWidget();
+      this.tabbedPanelFileCards.createImplWidget();
     }
     return fileCard;
   }
@@ -422,13 +423,13 @@ public class FcmdLeftMidRightPanel
       }
     
       //adds all favorite pathes to it newly.
-      mainPanel.actFileCard.favorCard.fillFavorPaths(favorTabInfo);
+      mainPanel.actFileCard.wdgFavorCard.fillFavorPaths(favorTabInfo);
       if(currentDir !=null){
         mainPanel.indexActualDir.put(mainPanel.actFileCard.favorPathInfo.selectName, currentDir.getPath());
         mainPanel.actFileCard.fillIn(currentDir, false);
         mainPanel.actFileCard.setFocus();
       } else { 
-        mainPanel.actFileCard.favorCard.setFocus();
+        mainPanel.actFileCard.wdgFavorCard.setFocus();
       }
       return true;
     }

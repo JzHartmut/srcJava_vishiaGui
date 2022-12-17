@@ -77,7 +77,7 @@ public class FcmdFileCard extends GralFileSelector
   public static final int version = 0x20120626;
   
   /**Table widget for the select table of the file tab.*/
-  FcmdFavorCard favorCard;
+  FcmdFavorCard wdgFavorCard;
 
   /**The component */
   final Fcmd main;
@@ -158,14 +158,12 @@ public class FcmdFileCard extends GralFileSelector
     //
     //The favorite paths card
     String nameTableSelection = FcmdWidgetNames.tableFavorites + nameFilePanel;
-    favorCard = new FcmdFavorCard(main, nameTableSelection, this, mainPanel);
     GralPanelContent panelFavors = mainPanel.tabbedPanelFavorCards.addTabPanel(FcmdWidgetNames.tabFavorites + nameFilePanel, label);
     mng.setPosition(0, 0, 0, -0, 1, 'd');  
-    favorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
-    panelFavors.setPrimaryWidget(favorCard.wdgdTable);
+    this.wdgFavorCard = new FcmdFavorCard(main, nameTableSelection, this, mainPanel);
+    this.wdgFavorCard.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorSelect.");
+    panelFavors.setPrimaryWidget(wdgFavorCard.wdgdTable);
     //
-    //The files card
-    GralPanelContent panelFiles = mainPanel.tabbedPanelFileCards.addTabPanel(FcmdWidgetNames.tabFile + nameFilePanel, label);
     //to show the properties of the selected file in the info line:
     //
     //sets this Widget to the selected panel, it is the grid panel which was created even yet.
@@ -191,7 +189,7 @@ public class FcmdFileCard extends GralFileSelector
     menuFolder.addMenuItem("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
     menuFolder.addMenuItem("contextfolder-search", main.idents.menuContextSearchFiles, main.favorPathSelector.actionSearchFiles);
     menuFolder.addMenuItem("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);
-    panelFiles.setPrimaryWidget(super.selectList.wdgdTable);
+    ((GralPanelContent)super.pos().parent).setPrimaryWidget(super.selectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
     this.specifyActionOnFileSelected(actionOnFileSelection);
@@ -206,7 +204,7 @@ public class FcmdFileCard extends GralFileSelector
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
     selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
     //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
-    favorCard.wdgdTable.specifyActionOnLineSelected(favorCard.actionFavorSelected);
+    wdgFavorCard.wdgdTable.specifyActionOnLineSelected(wdgFavorCard.actionFavorSelected);
     //
     //sets the action for Select a file: open the execute menu
     setActionOnEnterFile(main.executer.actionOnEnterFile);
@@ -226,10 +224,10 @@ public class FcmdFileCard extends GralFileSelector
    */
   void setNewContent(FcmdFavorPathSelector.FavorPath favorPathInfoP, FileRemote dir){
     favorPathInfo = favorPathInfoP;
-    if(favorCard == null){
+    if(wdgFavorCard == null){
       System.err.println("FcmdFileCard.setNewContent - favorCard is null; " + favorPathInfo);
     } else {
-      favorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
+      wdgFavorCard.add(favorPathInfo);  //only it is a new one, it will be checked.
       setOriginDir(favorPathInfo.getOriginDir());
       //widgLabel.setText(favorPathInfo.selectName);
       fillIn(dir, false);
@@ -239,7 +237,7 @@ public class FcmdFileCard extends GralFileSelector
   
   void setFocusFavorOrFile(){
     if(mainPanel.bFavorCardHasFocus){
-      favorCard.setFocus();
+      wdgFavorCard.setFocus();
     } else {
       this.setFocus();
     }
@@ -265,10 +263,10 @@ public class FcmdFileCard extends GralFileSelector
   
   /**Removes this file card with its widgets and data. It is 'close tab'. */
   @Override public boolean remove(){
-    if(favorCard !=null) {
-      favorCard.remove();
+    if(wdgFavorCard !=null) {
+      wdgFavorCard.remove();
     }
-    favorCard = null;
+    wdgFavorCard = null;
     favorPathInfo = null;
     return super.remove();
   }
@@ -383,7 +381,7 @@ public class FcmdFileCard extends GralFileSelector
       //only if it is the focused panel:
       //note the file card in order of usage.
       
-      this.main.lastFavorCard = this.favorCard;
+      this.main.lastFavorCard = this.wdgFavorCard;
       this.main.currentFileCard = this;
       this.mainPanel.actFileCard = this;
       this.main.statusLine.setFileInfo(this.sTabSelection, file);
@@ -492,11 +490,11 @@ public class FcmdFileCard extends GralFileSelector
    * {@link Fcmd#lastFilePanels}. 
    */
   private void setActFilePanel_setColorCurrLine(){
-    main.lastFavorCard = favorCard;
+    main.lastFavorCard = wdgFavorCard;
     main.currentFileCard = this;
     mainPanel.actFileCard = FcmdFileCard.this;
     main.setLastSelectedPanel(mainPanel);
-    System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.favorCard.sActSelectedFavorPath);
+    System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.wdgFavorCard.sActSelectedFavorPath);
     //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
     int ixMainPanel = -1;
     for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
@@ -608,11 +606,11 @@ public class FcmdFileCard extends GralFileSelector
     //main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
     if(favorPathNew == null){
       //TODO clear filecard
-      this.favorCard.sActSelectedFavorPath = "??NO FavorPath.selectName";
+      this.wdgFavorCard.sActSelectedFavorPath = "??NO FavorPath.selectName";
       System.out.println("actionSetFromTabSelection: favorPathNew = null");
       this.main.favorPathSelector.bSyncMidRight = false;
     } else {
-      this.favorCard.sActSelectedFavorPath = favorPathNew.selectName;
+      this.wdgFavorCard.sActSelectedFavorPath = favorPathNew.selectName;
       this.sTabSelection = this.label + "." + favorPathNew.selectName;
       this.main.favorPathSelector.bSyncMidRight = 
           this.syncTabSelection !=null 

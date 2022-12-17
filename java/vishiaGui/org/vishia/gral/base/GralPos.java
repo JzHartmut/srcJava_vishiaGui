@@ -902,8 +902,8 @@ public class GralPos extends ObjectVishia implements Cloneable
       this.x.pb = refUse.x.pb; this.x.pbf = refUse.x.pbf;
       this.y.pb = refUse.y.pb; this.y.pbf = refUse.y.pbf;
     }
-    assert(".\0lr".indexOf(this.x.dirNext) >=0);
-    assert(".\0ud".indexOf(this.y.dirNext) >=0);
+    assert(".\0lrf".indexOf(this.x.dirNext) >=0);
+    assert(".\0udf".indexOf(this.y.dirNext) >=0);
     assert(this.x.p1Frac >=0 && this.x.p1Frac < 10 && this.y.p1Frac >=0 && this.y.p1Frac < 10 );
     assert(this.x.p2Frac >=0 && this.x.p2Frac < 10 && this.y.p2Frac >=0 && this.y.p2Frac < 10 );
   
