@@ -93,7 +93,7 @@ public class ExampleSimpleButton
   
   int ctKeyStroke1 = 0, ctKeyStroke2 = 0;
   
-  ExampleSimpleButton(String[] args)
+  ExampleSimpleButton ( String[] args )
   {
     this.log = new LogMessageStream(System.out);  // may also write to a file, use calling arguments
     this.gui = new GuiElements();                 // initialize the graphic Gral Widgets (not the implementig graphic).
@@ -108,7 +108,7 @@ public class ExampleSimpleButton
    * in the graphic thread. It is an anonymous inner class. 
    */
   //tag::initImplGraphic[]
-  void init(String awtOrSwt) {
+  void init ( String awtOrSwt) {
     this.gui.wdgInputText.setText("any text input");
     this.gui.gralMng.createGraphic(awtOrSwt, 'E', this.log);
   }
@@ -119,7 +119,7 @@ public class ExampleSimpleButton
   /**execute routine for any other actions than the graphical actions. 
    * The application may do some things beside.
    */
-  void execute()
+  void execute ( )
   {
     //Now do nothing because all actions are done in the graphic thread.
     //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
@@ -145,7 +145,7 @@ public class ExampleSimpleButton
    * @param args command line arguments.
    */
   //tag::main[]
-  public static void main(String[] args)
+  public static void main ( String[] args)
   {
     try {
       ExampleSimpleButton thiz = new ExampleSimpleButton(args); // constructs the main class
@@ -167,7 +167,7 @@ public class ExampleSimpleButton
    * This operation is executed in the Graphic thread. 
    * Be carefully, do not program longer or hanging stuff such as synchronized or sleep.
    */
-  void actionButton() throws IOException {
+  void actionButton ( ) throws IOException {
     String textOfField = this.gui.wdgInputText.getText();
     this.gui.widgOutput.append("Button1 " + (++this.ctKeyStroke1) + " time, text=" + textOfField + "\n");
   }

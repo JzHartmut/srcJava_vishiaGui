@@ -159,6 +159,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-17 Hartmut new {@link #setAsFrame()}
    * <li>2022-11-20 showing Area9 positions, now ABC ar colomns not rows.
    * <li>2022-11-20 Using {@link ObjectVishia} for improved {@link ObjectVishia#toString(Appendable, String...)} 
    * <li>2022-11-12 accepts also a GralWindow instead a GralPanel to replace the {@link GralWindow#mainPanel}  
@@ -504,6 +505,7 @@ public class GralPos extends ObjectVishia implements Cloneable
     GralPos posParent1;
     //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;
     Coordinate line = new Coordinate(), col = new Coordinate();
+    boolean bRefFrame = false;         // true then the refPos gives the frame coordinates.
     if(refPos !=null) {
       //  origin = 0;  // do not change, get from parent.
     }
@@ -621,15 +623,17 @@ public class GralPos extends ObjectVishia implements Cloneable
     co.p1Frac = invalidPos;
     co.p2 = invalidPos;                                      // default, same size for heigth or width
     co.p2Frac = invalidPos;
-    int rel_p1 = 0;
+    final int rel_p1;
     final int[] rel_select = { refer, ratio};
-    //
+    //------------------------------------------------------- first value
     int typeFirstChar = "+%".indexOf(sign);
     if(typeFirstChar >=0) {
       rel_p1 = rel_select[typeFirstChar];                  // additional value to p1
       spPos.seekPos(1);  //skip over first char
+    } else {
+      rel_p1 = 0;                                          // absolute value for left.
     }
-    if(spPos.scanInteger().scanOk()) {                     // value maybe negative scanned  10 or -10
+    if(spPos.scanInteger().scanOk()) {  //------------------- first value maybe negative scanned  10 or -10
       co.p1 = rel_p1 + (int)spPos.getLastScannedIntegerNumber();  //higher bits determines rel_p1, lower bits are scanned number
       if(spPos.scan(".").scanInteger().scanOk()) {
         co.p1Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
@@ -640,15 +644,16 @@ public class GralPos extends ObjectVishia implements Cloneable
       co.p1 = next;                                        // nothing given, then the next position should be used
       co.p1Frac = 0;                                       // respectively the same in the unchanged direction
     }
+    //------------------------------------------------------- second value
     int size2;
-    int rel_p2;   //relative to p1
-    if(spPos.scan("..").scanOk()) {                        // absolute position for end is given
+    final int rel_p2;   //relative to p1
+    if(spPos.scan("..").scanOk()) {     //------------------- second value absolute position for end is given
       rel_p2 = 0;
     } else {
       rel_p2 = size;                                       // not .. then size as 2th number
       spPos.scan("+").scanStart();                         //skip over '+', it is the separator, 
     }
-    if(spPos.scanInteger().scanOk()) {                     //can start with '-' but not with '+'
+    if(spPos.scanInteger().scanOk()) {  //------------------- second value can start with '-' but not with '+'
       co.p2 = rel_p2 + (int)spPos.getLastScannedIntegerNumber();    // maybe negative, means from right
       if(spPos.scan(".").scanInteger().scanOk()) {
         co.p2Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
@@ -842,6 +847,8 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param border
    * @param borderFrac
    * @param refPos The reference position for relative coordinates. If null use this itself. 
+   * @param bRefFrame true then the given position is the frame for absolute given new positions.
+   *   false then the frame is the panel, the positions are written absolutely.
    */
   public void setFinePosition(int yPos, int yPosf, int ye, int yef
       , int xPos, int xPosf, int xe, int xef, int origin, char direction
@@ -956,6 +963,31 @@ public class GralPos extends ObjectVishia implements Cloneable
   }
   
 
+  /**Mark the position as frame position for some other derived positions. 
+   * If this is done, the position itself won't be changed as reference by positioning in the GralWidget posName string. 
+   * Instead firstly a clone is done and the clone is changed for only the widget. 
+   * This position remain unchanged. 
+   * Hint: To refer to the last widget's position you can also use the {@link GralWidget#pos()} value.
+   * <br>
+   * From this position {@link GralPos#next} cannot be used. 
+   * <br>
+   * Example for usage: <pre>
+   * GralPos framePos = super.pos().setAsFrame();                   // from a comprehensive widget.
+   * this.mySubWdg1 = new TextField(framePos, "@2+2, 10..-10=text"); //position is related to framePos
+   * <br>
+   * If for that example the framePos contains "@10..20, 6..-20" inside a panel,
+   * the resulting position for the text widget is "@12+2, 16..-30" related to the panel. 
+   * <br>
+   * This property is regarded especially in {@link #setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
+   * and also in all positioning operations.
+   * 
+   * @return this 
+   */
+  public GralPos setAsFrame() {
+    this.x.dirNext = this.y.dirNext = 'f';           // it are frame coord. Note do not use 'F', will be converted to 'f' 
+    return this;
+  }
+  
   
   /**This operation should be called before usage the position.
    * If the dirNext is in upper case, {@link #setNextPosition()} is called.
@@ -973,12 +1005,14 @@ public class GralPos extends ObjectVishia implements Cloneable
     case '.': break;
     case 'l': this.x.dirNext = 'L'; break;
     case 'r': this.x.dirNext = 'R'; break;
+    case 'f': break;
     default: throw new IllegalArgumentException("faulty dirnext" + toString());
     }
     switch(this.y.dirNext) {                 // check and set to upper case
     case 'u': this.y.dirNext = 'U'; break;
     case 'd': this.y.dirNext = 'D'; break;
     case '.': break;
+    case 'f': break;
     case '\0': break;
     default: throw new IllegalArgumentException("faulty dirnext" + toString());
     }
@@ -1308,7 +1342,7 @@ public class GralPos extends ObjectVishia implements Cloneable
      * @param zeFrac
      * @param refCoord The refer position. Note that parent may be == this because the new position based on the current.
      */
-    public Coordinate set(final int z, final int zFrac, final int ze, final int zeFrac, String nextPosChars, final Coordinate refCoord)
+    protected Coordinate set(final int z, final int zFrac, final int ze, final int zeFrac, String nextPosChars, final Coordinate refCoord)
     { /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
       int q1 = invalidPos, q1f =0, q2 = invalidPos, q2f =0;
 
@@ -1328,7 +1362,19 @@ public class GralPos extends ObjectVishia implements Cloneable
       }
       boolean bSetEnd = false;                             // true then z determines qe
       switch(zType) {
-      case 0: q1 = z; q1f = zFrac; this.n1 = this.n2 = -1; break;                  // no specific designation: absloute pos
+      case 0: 
+        if(refCoord.dirNext == 'f') {                      // related to given as framePos
+          if(z >=0) {                                       // 10.. (positive value)
+            q1 = refCoord.p1 + z;                          // it is related to the left coord of framePos
+          } else {                                         // -20.. (negative or ..0)
+            q1 = refCoord.p2 + z;                          // it is related to the right coord of framePos
+          }
+          q1f = refCoord.p1Frac +  zFrac;                  // absolute coord are positive here
+        } else {
+          q1 = z; q1f = zFrac;                             // no specific designation: absloute pos
+        }
+        this.n1 = this.n2 = -1;     
+        break;
       case refer:  //same                                  // relative to the reference position
         q1 = refCoord.p1 + (z - refer); 
         q1f = refCoord.p1Frac + zFrac;      //q = p + refer 
@@ -1358,7 +1404,18 @@ public class GralPos extends ObjectVishia implements Cloneable
       } //switch for z coord
       //
       switch(zeType) {
-      case 0: q2 = ze; q2f = zeFrac; break;                // no specific designation: absloute pos
+      case 0: 
+        if(refCoord.dirNext == 'f') {                      // related to given framePos
+          if(ze >0) {                                      // ..20 (positive value
+            q2 = refCoord.p1 + ze;                         // it is related to the left coord of framePos
+          } else {                                         // ..-20 (negative or ..0)
+            q2 = refCoord.p2 + ze;                          // it is related to the right coord of framePos
+          }
+          q2f = refCoord.p2Frac +  zeFrac;                  // absolute coord are positive here
+        } else {
+          q2 = ze; q2f = zeFrac;                           // no specific designation: absolute pos
+        }
+        break;
       case size:
         int ze2 = (ze - size);                             // relative end position to start pos
         if(zeNeg) { 

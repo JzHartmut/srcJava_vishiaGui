@@ -362,8 +362,9 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * It is recommended that implementation specific features should not used if they are not necessary
    * and the application should be held graphic implementation independent.
    * <br><br>
-   * This reference is null if the GralWidgets extends the Graphic specific implementation widget.
-   * It should be used in the future (2013-06).
+   * This reference is null if the implementation independent GralWidget is only created yet,
+   * and the implementation is not created till now.
+   * Call of {@link #createImplWidget_Gthread()} creates the implementation. 
    */
   public ImplAccess _wdgImpl;
 
@@ -858,7 +859,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
    *   was called. 
    */
-  public boolean createImplWidget_Gthread() throws IllegalStateException {
+  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
     try {
       if(checkImplWidgetCreation(this._wdgImpl)) {
         if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.

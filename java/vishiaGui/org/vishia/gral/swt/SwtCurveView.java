@@ -143,18 +143,18 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
    * @param ixixDataLast The end index in {@link ixDataShown} for this presentation.
    */
   private void drawTrack(GC g, Point size, GralCurveView.Track track, int iTrack, int ixixDataLast){
-    int ixixiData = 0;
+    int ixixiData = 0;                                     // index in data index array
     //float pixelFromRight = 0;
-    int xp2 = size.x -1;
-    int xp1 = xp2;
-    int ixData2 = super.ixDataShown[ixixiData];
-    int nrofPixel4Data = super.nrofPixel4data[ixixiData];
-    int ixData = ixData2;
+    int xp2 = size.x -1;                                   // end x coord of point
+    int xp1 = xp2;                                         // start x coord of point
+    int ixData2 = super.ixDataShown[ixixiData];            // data index,
+    int nrofPixel4Data = super.nrofPixel4data[ixixiData];  // 0 = one point, 1.. more graphic points per one value 
+    int ixData = ixData2;                                  // index of left data value for one point.
     int ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData; //real index in data
     //
     float yFactor = size.y / -10.0F / track.scale.yScale;  //y-scaling
     float y0Pix = (1.0F - track.scale.y0Line/100.0F) * size.y; //y0-line
-    float yF = track.valueTrack.getFloat(ixD);
+    float yF = track.valueTrack.getFloat(ixD);             // current, here start value
     int time2 = this.widgg.tracksValue.getTimeShort(ixD);
     int time1;
     int yp9 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
@@ -167,17 +167,17 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     }
     //
     while( ixixiData < ixixDataLast){ //for all gotten ixData
-      ixixiData += nrofPixel4Data +1;
+      ixixiData += nrofPixel4Data +1;                      // get next value to left
       ixData1 = super.ixDataShown[ixixiData];
       //ixData1 = ixDataShown[(int)pixelFromRight];
       
-      xp1 -= nrofPixel4Data +1;
-      if(ixData != ixData1) {
+      xp1 -= nrofPixel4Data +1;                            // next end point of next value 
+      if(ixData != ixData1) {   // should always true
         int yp1min = Integer.MAX_VALUE, yp1max = Integer.MIN_VALUE;
         int nrofYp = 0;
         yp1 = 0;
-        do{ //all values per 1 pixel
-          ixData -= widgg.adIxData;
+        do{                                                // use all values per 1 pixel
+          ixData -= widgg.adIxData;                        // to next point
           ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData;
           int yp11;
           //if(ixData == ixDataDraw){

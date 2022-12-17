@@ -73,6 +73,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2022-12-17 improved while test, positions use now the new {@link GralPos#setAsFrame()}.
+   *   A test class {@link org.vishia.gral.test.basics.Test_GralFileSelector} is created for test. 
    * <li>2021-12-18 Hartmut: new feature: {@link #fillIn(FileRemote, boolean)}, if the file is a file not directory
    *   then this file is highlighted. Firstly used on InspcCurveViewApp to get cfg and data from the same directory,
    *   re-read the same file is before by saving the gotten file before. 
@@ -640,49 +642,30 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   public GralFileSelector(GralPos refPos, String posName, int rows, int[] columns, int[] columnsFavorlist)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPos, posName, null);
-    favorList = columnsFavorlist !=null ? new GralTable<String>(refPos, name, 50, columnsFavorlist) : null;
-    selectList = new FileSelectList(refPos, this, posName, rows, columns, 'A');
-    colorBack = GralColor.getColor("wh");
-    colorBackPending = GralColor.getColor("pma");
+    GralMng panelMng = this.gralMng;
+    this.favorList = columnsFavorlist !=null ? new GralTable<String>(refPos, name, 50, columnsFavorlist) : null;
+    this.colorBack = GralColor.getColor("wh");
+    this.colorBackPending = GralColor.getColor("pma");
     //this.mainCmd = mainCmd;
     
-    createGraphic(this.gralMng);                                 // creates the sub content for this comprehensive widget
-  }
-  
-  
-  /**Maybe called after construction, should be called before {@link #setToPanel(GralMngBuild_ifc)}
-   * @param name
-   */
-//  public void setNameWidget(String name){ 
-//    //this.name = name;
-//    selectList.wdgdTable.name = name;
-//  }
-  
-  
-  public void setDateFormat(String sFormat){
-    dateFormatOlder = new SimpleDateFormat(sFormat);
-  }
-  
-
-  
-  private void createGraphic(GralMng panelMng) {
-    GralPos posAll = panelMng.getPositionInPanel();
+    GralPos posAll = this._wdgPos.clone().setAsFrame(); //panelMng.getPositionInPanel();
     GralWidget_ifc panel = posAll.parent;
     String sPanel = panel.getName();
     //Text field for path above list
-    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
-    widgdPathDir = panelMng.addTextField(null, true, null, null);
-    widgdPathDir.setActionChange(actionSetPath);
-    widgdPathDir.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
+//    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
+    this.widgdPathDir = new GralTextField(posAll, "@0+2, 0..-6=" + this.name + "_dir");
+       // panelMng.addTextField(null, true, null, null);
+    this.widgdPathDir.specifyActionChange(null, actionSetPath, null);
+    this.widgdPathDir.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     GralMenu menuFolder = widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", actionRefreshFileTable);
-    panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    widgBtnFavor = new GralButton(this.gralMng.refPos(), "favor", "favor", actionFavorButton);
-    // widgBtnFavor.createImplWidget_Gthread();
-    widgBtnFavor.setVisible(false);
+    //panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
+    this.widgBtnFavor = new GralButton(posAll, "@0+2, -5..0=" + this.name + "favorBtn", "favor", actionFavorButton);
+    //widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
-    panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
+    //panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
+    this.selectList = new FileSelectList(posAll, this, "@2..0, 0..0=" + this.name, rows, columns, 'A');
     // selectList.createImplWidget_Gthread();
     selectList.wdgdTable.setVisible(true);
     selectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, actionRefreshFileTable);
@@ -710,7 +693,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, 0, 1, 'd');
     //on same position as favor table: the file list.
     if(favorList !=null) {
-      favorList.setToPanel(panelMng);
+      //favorList.setToPanel(panelMng);
       favorList.insertLine(null, 0, new String[]{"test", "path"}, null);
       favorList.setVisible(false);
     }
@@ -718,6 +701,25 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     //questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
     panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.
+  }
+  
+  
+  /**Maybe called after construction, should be called before {@link #setToPanel(GralMngBuild_ifc)}
+   * @param name
+   */
+//  public void setNameWidget(String name){ 
+//    //this.name = name;
+//    selectList.wdgdTable.name = name;
+//  }
+  
+  
+  public void setDateFormat(String sFormat){
+    dateFormatOlder = new SimpleDateFormat(sFormat);
+  }
+  
+
+  
+  private void createGraphic(GralMng panelMng) {
 
   }
   

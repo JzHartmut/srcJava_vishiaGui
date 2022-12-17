@@ -247,6 +247,7 @@ public class FcmdLeftMidRightPanel
       this.main.gui.gralMng.refPos().setParent(this.tabbedPanelFileCards);
       fileCard = new FcmdFileCard(this.main.gui.gralMng.refPos(), this, label);
       listTabs.add(fileCard);
+      fileCard.createImplWidget();
     }
     return fileCard;
   }

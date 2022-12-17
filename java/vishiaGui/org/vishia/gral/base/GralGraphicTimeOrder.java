@@ -13,6 +13,7 @@ import org.vishia.event.TimeOrder;
  * @author Hartmut Schorrig.
  *
  */
+@SuppressWarnings("serial") 
 public abstract class GralGraphicTimeOrder extends TimeOrder
 {
   
@@ -64,9 +65,7 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
   public final static String version = "2015-01-17";
 
   
-  private static final long serialVersionUID = 1L;
-  
-  final GralMng gralMng;
+    final GralMng gralMng;
   
   /**To create the instance for the EventConsumer to enqueue time orders in the graphic thread queue.
    * NOTE: class is need, not an anonymous instance, because initialization in super(..., new Enqueu...)
