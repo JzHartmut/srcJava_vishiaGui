@@ -4,6 +4,7 @@ package org.vishia.gral.swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -54,7 +55,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
    */
   private final SwtWidgetHelper swtWidgHelper;
   
-  protected Label labelSwt;
+  protected SwtTransparentLabel labelSwt;
 
   private Font fontSwt;
   
@@ -66,7 +67,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     Composite panelSwt = SwtMng.getSwtParent(pos);
     //assert(parentImpl.tabFolder ==null);
     int styleSwt = 0;
-    this.labelSwt = new Label(panelSwt, styleSwt);
+    this.labelSwt = new SwtTransparentLabel(panelSwt, styleSwt);
     super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(this.labelSwt, swtMng);
     int mode;
     switch(origin()){
@@ -85,17 +86,18 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     //swtMng.setPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
     GralRectangle rectangle = swtMng.calcWidgetPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
     this.labelSwt.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-    Color bkcolor = swtMng.getColorImpl(widgg.getBackColor(0));
-    this.labelSwt.setBackground(bkcolor);
-    //this.labelSwt.set
-    Color color = swtMng.getColorImpl(GralColor.getColor("dgn"));
+    Color color = swtMng.getColorImpl(super.dyda().textColor);
     this.labelSwt.setForeground(color);
     float height = this.widgg.pos().height();
     GralFont gralFont = swtMng.gralMng.gralProps.getTextFont(height);
     Font swtFont = swtMng.propertiesGuiSwt.fontSwt(gralFont);
     this.labelSwt.setFont(swtFont);
+    FontData[] fontData = swtFont.getFontData();
+    float fontHeigth = fontData[0].height;
+    System.out.println(super.dyda().displayedText + " dy=" + rectangle.dy + " height=" + height + " fontHeight = " + fontHeigth);
+    //widgg.setText(widgg.getText() + " dy=" + rectangle.dy + " height=" + height);
     //on SWT it invokes the resize listener if given.
-    swtMng.gralMng.registerWidget(widgg);
+    //swtMng.gralMng.registerWidget(widgg);
     repaintGthread();  //to set text etc.
   }
 

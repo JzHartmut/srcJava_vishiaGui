@@ -531,7 +531,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @throws ParseException
    */
   public void initScript(CharSequence script) throws ParseException {
-    GralCfgZbnf.configWithZbnf(script, this);         // does all, reads the config file, parses, creates Graphic Elements
+    GralCfgZbnf.configWithZbnf(script, null, this);         // does all, reads the config file, parses, creates Graphic Elements
   }
   
   
@@ -541,7 +541,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * @throws Exception 
    */
   public void initScript(File script) throws Exception {
-    GralCfgZbnf.configWithZbnf(script, this);         // does all, reads the config file, parses, creates Graphic Elements
+    GralCfgZbnf.configWithZbnf(script, null, this);         // does all, reads the config file, parses, creates Graphic Elements
   }
   
   

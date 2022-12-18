@@ -42,6 +42,7 @@ import org.vishia.util.CalculatorExpr;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileFunctions;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringFunctions_B;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
 
@@ -370,11 +371,11 @@ public class GralCfgZbnf
    * @return The main window of the graphic application
    * @throws ParseException on syntax error in sGui
    */
-  public static GralWindow configWithZbnf ( CharSequence sGui, GralMng gralMng ) throws ParseException { 
+  public static GralWindow configWithZbnf ( CharSequence sGui, String sWinTitle, GralMng gralMng ) throws ParseException { 
     GralCfgZbnf thiz = new GralCfgZbnf(gralMng);                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(sGui, thiz.cfgData);
-    thiz.buildGui();                                       // build only the Gral instances without implementation graphic
+    thiz.buildGui(sWinTitle);                                       // build only the Gral instances without implementation graphic
     return thiz.window;                                    // only the window is used, the rest can be garbaged.
   }
   
@@ -388,11 +389,11 @@ public class GralCfgZbnf
    * @return The main window of the graphic application
    * @throws ParseException on syntax error in sGui
    */
-  public static GralWindow configWithZbnf ( File fGui, GralMng gralMng) throws Exception { 
+  public static GralWindow configWithZbnf ( File fGui, String sWinTitle, GralMng gralMng) throws Exception { 
     GralCfgZbnf thiz = new GralCfgZbnf(gralMng);                  // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(fGui, thiz.cfgData);
-    thiz.buildGui();                                       // build only the Gral instances without implementation graphic
+    thiz.buildGui(sWinTitle);                                       // build only the Gral instances without implementation graphic
     return thiz.window;                                    // only the window is used, the rest can be garbaged.
   }
   
@@ -409,7 +410,7 @@ public class GralCfgZbnf
    * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
    *   The window can be gotten by #window. The rest of this class may be not furthermore used.
    */
-  public String buildGui ( ) {
+  public String buildGui ( String sWinTitle ) {
     String sError = null;
     this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
     this.currPos = new GralPos(this.gralMng);
@@ -421,7 +422,8 @@ public class GralCfgZbnf
         String posName = cfg.positionString !=null ? "@" + cfg.positionString + "=" + win.name
                        : "@screen, 10+80, 20+120 = mainWin";
         int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
-        this.window = new GralWindow(this.currPos, posName, win.title, windowProps, this.gralMng);
+        String sWinTitle1 = sWinTitle == null ? win.title : sWinTitle;
+        this.window = new GralWindow(this.currPos, posName, sWinTitle1, windowProps, this.gralMng);
         this.window.mainPanel.setGrid(2,2,5,5,-8,-30);
         this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
         //
@@ -627,7 +629,8 @@ public class GralCfgZbnf
     else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
       int origin = 0; //TODO
-      GralLabel widg = new GralLabel(this.currPos, sName, wText.text, origin);
+      String text = StringFunctions_B.convertBackslashChars(wText.text).toString();
+      GralLabel widg = new GralLabel(this.currPos, sName, text, origin);
       if(color0 !=null) widg.setTextColor(color0);
       if(color1 !=null) widg.setBackColor(color1, 0);
       bColor0Set = bColor1Set = true;

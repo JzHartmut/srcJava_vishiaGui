@@ -57,7 +57,7 @@ public class GuiCallingArgs extends Arguments
   
   
   /**String for title bar. */
-  String sTitle;
+  public String sTitle;
   
   /**The graphic base factory can be detected from command line arguments
    * or set directly from the calling level. */

@@ -95,7 +95,10 @@ public class ViewCfg //extends GuiCfg
   {
     /**Name of the config-file for the Gui-appearance. */
     public final Argument sFileGui = new Argument("-gui", ":path/to/config.gui  The gui configuration file. Syntax see ...");
-  	
+    
+    /**Programmed title (if script does not contain one, primary. */
+    //public final Argument sTitle = new Argument("-title", ":\"Title of Window\"");
+    
     /**Directory where sFileCfg is placed, with / on end. The current dir if sFileCfg is given without path. */
     public String sParamBin;
     
@@ -121,6 +124,7 @@ public class ViewCfg //extends GuiCfg
       super.aboutInfo = "Configurable Gui, made by Hartmut Schorrig, 2010, 2022-09-23";
       super.helpInfo = "see https://www.vishia.org/gral/index.html";
       super.addArg(this.sFileOamValues);
+      //super.addArg(this.sTitle);  // sTitle is in super class. 
       super.addArg(this.sFileOamVariables);
       super.addArg(this.targetIpc);
       super.addArg(this.sFileGui);
@@ -255,7 +259,8 @@ public class ViewCfg //extends GuiCfg
       
       try {
         File fCfg = /*new File*/(cargs.fileGuiCfg);
-        this.window = GralCfgZbnf.configWithZbnf(fCfg, this.gralMng);         // does all, reads the config file, parses, creates Graphic Elements
+        String sTitle = cargs.sTitle;
+        this.window = GralCfgZbnf.configWithZbnf(fCfg, sTitle, this.gralMng);         // does all, reads the config file, parses, creates Graphic Elements
       } catch (Exception e) {
         throw new IllegalArgumentException("Graphic confic error: " + e.getMessage());
       }                  

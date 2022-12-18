@@ -614,6 +614,11 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   /**This inner class holds the dynamic data of a widget.
    * This data are existent for any widget independent of its type.
    * It can be used in a specific way depending on the widget type.
+   * <br>
+   * Hint for visibility in Java: The class and members are public. 
+   * But the access to the class, the reference {@link GralWidget#dyda} is protected. 
+   * To access any data from a implementing widget, use {@link GralWidget.ImplAccess#dyda()}
+   * which is protected but visible for the own widget implementation. 
    */
   public final static class DynamicData {
     
@@ -863,7 +868,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     try {
       if(checkImplWidgetCreation(this._wdgImpl)) {
         if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-          dyda.textFont = this.gralMng.gralProps.getTextFont(this.gralMng.pos().pos.height());
+          dyda.textFont = this.gralMng.gralProps.getTextFont(this._wdgPos.height());
           dyda.setChanged(ImplAccess.chgFont);
         }
         
@@ -1477,6 +1482,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   @Override public void refreshFromVariable(VariableContainer_ifc container
       , long timeLatest, GralColor colorRefreshed, GralColor colorOld
   ){    
+    if(sDataPath ==null) return;
     if(sDataPath !=null && sDataPath.startsWith("intern"))
       stop();
     if(this instanceof GralLed)

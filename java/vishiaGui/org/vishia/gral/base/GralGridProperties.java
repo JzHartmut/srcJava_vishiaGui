@@ -48,16 +48,18 @@ public final class GralGridProperties
    * First index is the height of field, second is the size of presentation.
    */
   protected final static int[][] stdTextFontSize =
-  { {4, 5, 5, 7, 7, 8, 9}  ////1, 1.1, 1.2
-  , {5, 6, 6, 8, 9, 9,10}  // 1 1/3,
-  , {5, 7, 7, 9, 9,10,12}  //1.5
-  , {6, 9, 8, 10,10,12,14}  //1 2/3
-  , {7, 10, 9, 11,12,14,18}  //2
-  , {7, 11, 10,11,12,14,18}  //2 1/3
-  , {9,12, 14, 11,12,14,18}  //2.5, 2 2/3
-  , {12,14, 16, 12, 12,14,18}  //3
-  , {12,16,18,12, 12,14,18}  //3.5
-  , {15,18,20,12, 12,14,18}  //>=4
+  {//6   7   8   9  10  12  15  18   pixel per grid unit
+   //A   B   C   D   E   F   G   H 
+    {3,  3,  4,  5,  5,  7,  8, 10}  ////1, 1.1, 1.2
+  , {3,  4,  4,  6,  7,  8, 10, 12}  // 1.3 1.4,
+  , {4,  4,  6,  8,  8, 10, 12, 15}  //1.5 1.6
+  , {4,  6,  7,  9,  9, 12, 15, 18}  //1.7..1.9
+  , {7,  8,  9, 11, 12, 14, 17, 20}  //2.0..2.2
+  , {8,  9, 10, 12, 14, 16, 20, 24}  //2.3 2.4
+  , {9, 10, 12, 14, 16, 18, 22, 28}  //2.5..2.9
+  , {10,12, 14, 16, 18, 20, 25, 30}  //3.0..3.4
+  , {12,14, 16, 18, 20, 24, 30, 36}  //3.5..3.9
+  , {15,18, 20, 22, 24, 30, 36, 44}  //>=4.0
   };
   
   /** Number of pixel for fractional part and for the grid size.
@@ -109,11 +111,12 @@ public final class GralGridProperties
   , {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }  //pixel size E
   , {0, 1, 2, 4, 5, 6, 7, 8,10,11, 12 }  //pixel size F
   , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }  //pixel size G
+  , {0, 3, 4, 6, 8, 9,10,12,14,15, 18 }  //pixel size H
   };
   
   //protected final static int[][] yPixelFrac = xPixelFrac;
   	  
-  protected final int xPixelUnit;
+  protected int xPixelUnit;
 
   //Map<Integer, GralColor> colors = new TreeMap<Integer, GralColor>();
 
@@ -138,7 +141,15 @@ public final class GralGridProperties
 
 	public GralGridProperties()
 	{
-		this.xPixelUnit = pixelFrac[size][10];
+
+	}
+  
+	
+	public void setSizeGui(char sizeC) {
+	  int size = (sizeC - 'A');
+    if(size <0 || size >= pixelFrac.length) throw new IllegalArgumentException("parameter size should be A.." + (char)('A' + pixelFrac.length));
+    this.size = size; 
+    this.xPixelUnit = pixelFrac[size][10];                 // pixel per grid unit, last entry in pixelFrac
     colorBackground_ = color(0xeeeeee);
     this.textFont[0] = new GralFont("Arial", stdTextFontSize[0][size], 'n');
     this.textFont[1] = new GralFont("Arial", stdTextFontSize[1][size], 'n');
@@ -161,14 +172,6 @@ public final class GralGridProperties
     this.fontMonospacedSansSerif[7] = new GralFont(sMonospaced, stdTextFontSize[7][size], 'n');
     this.fontMonospacedSansSerif[8] = new GralFont(sMonospaced, stdTextFontSize[8][size], 'n');
     this.fontMonospacedSansSerif[9] = new GralFont(sMonospaced, stdTextFontSize[9][size], 'n');
-
-	}
-  
-	
-	public void setSizeGui(char sizeC) {
-	  int size = (sizeC - 'A');
-    if(size <0 || size >= pixelFrac.length) throw new IllegalArgumentException("parameter size should be A.." + (char)('A' + pixelFrac.length));
-    this.size = size; 
 	}
 	
 	public int size() { return size; }
@@ -183,15 +186,15 @@ public final class GralGridProperties
   
   public GralFont getTextFont(float size)
   {
-    if(size <=1.2f) return textFont[0];  //1, 1.1, 1.2
-    if(size <=1.4f) return textFont[1];  // 1 1/3, 
-    if(size <=1.6f) return textFont[2];  //1.5
-    if(size <=1.8f) return textFont[3];  //1 2/3
-    if(size <=2.0f) return textFont[4];  //2
-    if(size <=2.4f) return textFont[5];   //2 1/3
-    if(size <=2.8f) return textFont[6];   //2.5, 2 2/3
-    if(size <=3.1f) return textFont[7];   //3
-    if(size <=3.9f) return textFont[8];   //3.5
+    if(size <=1.25f) return textFont[0];  //1, 1.1, 1.2
+    if(size <=1.45f) return textFont[1];  // 1 1/3, 
+    if(size <=1.65f) return textFont[2];  //1.5
+    if(size <=1.95f) return textFont[3];  //1 2/3
+    if(size <=2.25f) return textFont[4];  //2
+    if(size <=2.45f) return textFont[5];   //2 1/3
+    if(size <=2.95f) return textFont[6];   //2.5, 2 2/3
+    if(size <=3.45f) return textFont[7];   //3
+    if(size <=3.95f) return textFont[8];   //3.5
     return textFont[9];                   //>=4
     
   }
@@ -210,15 +213,15 @@ public final class GralGridProperties
   public GralFont getTextFont(float fontHeight, char type, char style)
   {
     int ifontSize;
-    if(fontHeight <=1.2f) ifontSize = 0;  //1, 1.1, 1.2
-    else if(fontHeight <=1.4f) ifontSize = 1;  // 1 1/3, 
-    else if(fontHeight <=1.6f) ifontSize = 2;  //1.5
-    else if(fontHeight <=1.8f) ifontSize = 3;  //1 2/3
-    else if(fontHeight <=2.0f) ifontSize = 4;  //2
-    else if(fontHeight <=2.4f) ifontSize = 5;   //2 1/3
-    else if(fontHeight <=2.8f) ifontSize = 6;   //2.5, 2 2/3
-    else if(fontHeight <=3.1f) ifontSize = 7;   //3
-    else if(fontHeight <=3.9f) ifontSize = 8;   //3.5
+    if(fontHeight <=1.25f) ifontSize = 0;  //1, 1.1, 1.2
+    else if(fontHeight <=1.45f) ifontSize = 1;  //1.3..1.4 
+    else if(fontHeight <=1.65f) ifontSize = 2;  //1.5..1.6
+    else if(fontHeight <=1.95f) ifontSize = 3;  //1.7..1.9
+    else if(fontHeight <=2.25f) ifontSize = 4;  //2.0..2.2
+    else if(fontHeight <=2.45f) ifontSize = 5;   //2.3 2.4
+    else if(fontHeight <=2.95f) ifontSize = 6;   //2.5 ..2.9
+    else if(fontHeight <=3.45f) ifontSize = 7;   //3.0..3.4
+    else if(fontHeight <=3.95f) ifontSize = 8;   //3.5..3.9
     else ifontSize = 9;                   //>=4
     final GralFont font;
     switch(type){

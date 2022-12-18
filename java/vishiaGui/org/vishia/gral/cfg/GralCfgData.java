@@ -135,8 +135,8 @@ public final class GralCfgData
      * @param val
      */
     public void set_text(String val) {
-      if(this.data == null) { this.data = val; }
-      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
+//      if(this.data == null) { this.data = val; }
+//      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
       this.text = val;
     }
     
