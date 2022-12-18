@@ -247,7 +247,7 @@ public class FcmdView
    * 
    */
   public void quickView(){
-    if(btnQuickview.isOn()){
+    if(btnQuickview !=null && btnQuickview.isOn()){   //check !=null only temporary
       nrQuickview +=1;
       widgShowInfo.setText("" + nrQuickview);
       view(null);

@@ -23,6 +23,9 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
   /**The tabbed panel where this class is member of. */
   final FcmdLeftMidRightPanel mainPanel;
   
+  /**Reference to the associated fileTable as the parent of this,
+   * which refers this in {@link FcmdFileCard#wdgFavorCard}.
+   */
   final FcmdFileCard fileTable;
   
   /**Stores the last selected and used favor path (pressing enter or double click)
@@ -122,7 +125,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
     //to restore if this favor respectively selection is used ones more.
     FileRemote dir = null;
     String currentDir;
-    if(fileTable.favorPathInfo !=null){
+    if(fileTable.favorPathInfo !=null){                    // save the current dir to restore it on re-enter the same favor.
       dir = fileTable.getCurrentDir();
       if(dir != null){
         currentDir = dir.getAbsolutePath();
@@ -132,7 +135,7 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
     //
     //Now switch to the new favor in the file panel: 
     FcmdFavorPathSelector.FavorPath favorPathInfo = (FcmdFavorPathSelector.FavorPath)line.getUserData();
-    //new: fileTable.actionSetFromTabSelection.exec(KeyCode.menuEntered, null, favorPathInfo);
+    fileTable.actionSetFromTabSelection.exec(KeyCode.menuEntered, null, favorPathInfo);
     //main.favorPathSelector.actFavorPathInfo = favorPathInfo; //The last used selection (independent of tab left, middle, right)
     this.sActSelectedFavorPath = favorPathInfo.selectName;
     this.fileTable.sTabSelection = this.fileTable.label + "." + favorPathInfo.selectName;

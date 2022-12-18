@@ -17,9 +17,9 @@
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2022-11-19 14:16:42  x     FcmdEdit.java                            ::          8.196  1294045397 
 2022-11-19 14:20:02  x     FcmdExecuter.java                        ::         16.413 -0728050999 
-2022-11-16 09:55:02  x     FcmdFavorCard.java                       ::         10.248  0464398935 
+2022-12-17 22:10:20  x     FcmdFavorCard.java                       ::         10.459  0580807182 
 2022-12-05 08:59:14  x     FcmdFavorPathSelector.java               ::         31.341  1079841325 
-2022-12-17 21:34:08  x     FcmdFileCard.java                        ::         29.974 -0035722339 
+2022-12-17 22:24:40  x     FcmdFileCard.java                        ::         30.604  0705460797 
 2022-11-19 11:30:57  x     FcmdFileProps.java                       ::         20.557  0696227384 
 2022-11-15 17:58:47  x     FcmdFilesCp.java                         ::          7.592  0766812261 
 2022-11-20 14:07:07  x     FcmdGui.java                             ::          1.170  1323028377 
@@ -32,7 +32,7 @@
 2022-11-12 21:15:32  x     FcmdStatus.java                          ::          3.945 -2064914958 
 2022-11-20 23:07:38  x     FcmdStatusLine.java                      ::          6.867  1091254000 
 2021-10-04 14:29:49  x     FcmdTargetProxy.java                     ::           .103 -0703963512 
-2022-11-19 14:16:59  x     FcmdView.java                            ::         24.571 -0261002328 
+2022-12-17 22:12:05  x     FcmdView.java                            ::         24.626 -0417633707 
 2021-10-04 14:29:51  x     FcmdWidgetNames.java                     ::          1.761 -0968150682 
 2022-11-15 19:00:09  x     FcmdWindowMng.java                       ::           .889  1905200979 
 2012-03-28 07:42:16  x     package-info.java                        ::           .253 -2063976015 
@@ -114,7 +114,7 @@
 2022-11-19 21:32:48  x     GralValueBar.java                        ::          6.218  1291974722 
 2022-11-11 17:43:57  x     GralWidgImplAccess_ifc.java              ::          5.924  0960638258 
 2022-12-15 23:57:14  x     GralWidget.java                          ::        109.448  0065048926 
-2022-12-17 19:29:39  x     GralWidgetBase.java                      ::          8.012 -1756344301 
+2022-12-17 23:12:19  x     GralWidgetBase.java                      ::          8.659 -1240216751 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-11-24 23:34:48  x     GralWindow.java                          ::         18.652  0684535148 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
@@ -241,7 +241,7 @@
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2022-11-24 22:00:00  x     GralCommandSelector.java                 ::          8.641  1402614593 
 2022-12-11 19:58:27  x     GralFileSelectWindow.java                ::          8.755  0184982558 
-2022-12-17 19:33:54  x     GralFileSelector.java                    ::         69.394 -0980205072 
+2022-12-18 11:50:08  x     GralFileSelector.java                    ::         73.623 -1378355183 
 2022-11-24 20:36:38  x     GralHorizontalSelector.java              ::         10.531  1190976432 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2022-11-13 18:49:20  x     GralInfoBox.java                         ::         15.219 -0309496018 

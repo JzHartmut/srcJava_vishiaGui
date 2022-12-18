@@ -2,7 +2,6 @@ package org.vishia.commander;
 
 import java.io.File;
 
-import org.vishia.commander.FcmdFavorPathSelector.FavorPath;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
@@ -22,8 +21,18 @@ import org.vishia.util.FileCompare;
 import org.vishia.util.KeyCode;
 
 /**This is one file table in the the.File.commander. Each main panel (left, middle, right)
- * has maybe more as one tabs, each tab has exactly one file table. The file table is reused
+ * has maybe more as one tabs, each tab has exactly one instance of this. The file table is reused
  * for the several tabs of the main panel, and they are reused too if the directory is changed.
+ * <br><br>
+ * This class is inherited from the {@link GralFileSelector}. This allows same handling for the files,
+ * but additional handling for favors: 
+ * <br>
+ * The {@link #wdgFavorCard} is referenced here and contains names and {@link FcmdFavorCard.FavorPath}
+ * to fill different directories to this {@link GralFileSelector} base data.
+ * <br><br>
+ * For different opened favors the #wdgCardSelector is a quasi tab to select this different favors.
+ * The opened favors are well visible hence in this widget without focus the favor card itself. 
+ * But the same functionality to select favors can also be done via the {@link FcmdFavorCard}
  * <br><br>
  * <b>Synchronization of 2 file cards</b>:<br>
  * If the synchronization is switch on with {@link FcmdFavorPathSelector#bSyncMidRight} then 
@@ -181,7 +190,7 @@ public class FcmdFileCard extends GralFileSelector
     //GralPos.Coordinate[] columns = new GralPos.Coordinate[4];
     //Sets the columns for the table.
     //super.selectList.wdgdTable.setColumnWidth(50, new int[]{2,0,-6,-11});
-    super.selectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
+    super.wdgSelectList.wdgdTable.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.fileSelect.");
     GralMenu menuFolder = super.widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("contextfolder-setOrigin", main.idents.menuContextSetOriginDir, main.favorPathSelector.actionSetDirOrigin);
     menuFolder.addMenuItem("menuContextCreateFavor", main.idents.menuContextCreateFavor, main.favorPathSelector.actionCreateFavor);
@@ -189,20 +198,20 @@ public class FcmdFileCard extends GralFileSelector
     menuFolder.addMenuItem("contextfolder-create", main.idents.menuConfirmMkDirFileContext, main.mkCmd.actionOpenDialog);
     menuFolder.addMenuItem("contextfolder-search", main.idents.menuContextSearchFiles, main.favorPathSelector.actionSearchFiles);
     menuFolder.addMenuItem("contextfolder-refresh", main.idents.menuFileNaviRefreshContext, main.favorPathSelector.actionRefreshFileTable);
-    ((GralPanelContent)super.pos().parent).setPrimaryWidget(super.selectList.wdgdTable);
+    ((GralPanelContent)super.pos().parent).setPrimaryWidget(super.wdgSelectList.wdgdTable);
     //
     //sets the action for a simple table: what to do on line selected: Show file names. 
     this.specifyActionOnFileSelected(actionOnFileSelection);
-    selectList.wdgdTable.setActionFocused(actionFocused);
+    wdgSelectList.wdgdTable.setActionFocused(actionFocused);
     //Note: some menu entries are set in the super class already.
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuContextEditIntern, main.editWind.actionOpenEdit);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.fcmdActions.actionEdit);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
-    selectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuContextEditIntern, main.editWind.actionOpenEdit);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.fcmdActions.actionEdit);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
+    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
     //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
     wdgFavorCard.wdgdTable.specifyActionOnLineSelected(wdgFavorCard.actionFavorSelected);
     //
@@ -441,7 +450,7 @@ public class FcmdFileCard extends GralFileSelector
     if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
       String sDirName = getCurrentDir().getName();
       //check whether the other file card contains a entry with this directory name
-      GralTableLine_ifc<FileRemote> line = otherFileCard.selectList.wdgdTable.getLine(sDirName);
+      GralTableLine_ifc<FileRemote> line = otherFileCard.wdgSelectList.wdgdTable.getLine(sDirName);
       if(line !=null){
         FileRemote dir = line.getUserData();
         bFillInReq = true;
@@ -502,7 +511,7 @@ public class FcmdFileCard extends GralFileSelector
         break;
       }
       if(panel.actFileCard !=null){
-        panel.actFileCard.selectList.wdgdTable.setColorBackSelectedLine(colorSelectFocused123[++ixMainPanel]);
+        panel.actFileCard.wdgSelectList.wdgdTable.setColorBackSelectedLine(colorSelectFocused123[++ixMainPanel]);
         panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
       } else {
         panel.orderMainPanel = 0; //not used.

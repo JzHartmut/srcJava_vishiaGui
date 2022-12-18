@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import org.vishia.util.ObjectVishia;
@@ -142,6 +143,31 @@ public abstract class GralWidgetBase  extends ObjectVishia {
     }
   }
 
+  
+  /**Especially for test and debug, short info about widget.
+   * @see java.lang.Object#toString()
+   */
+  @Override public String toString ( ) { 
+    StringBuilder u = new StringBuilder(240);
+    toString(u);
+    return u.toString();
+  }
+
+  
+  
+  @Override public Appendable toString(Appendable u, String ... cond) {
+    try {
+      if(this.name !=null) { u.append(":").append(this.name);}
+      if(this._wdgPos !=null){
+        this._wdgPos.toString(u, "p");
+      } else {
+        u.append("@?");
+      }
+    } catch(IOException exc) {
+      throw new RuntimeException("unexpected", exc);
+    }
+    return u;
+  }
 
   /**Should create the implementation widget. 
    * This operation should be called on new created Gral Widgets if it is able to suppose
