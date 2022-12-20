@@ -17,6 +17,7 @@ import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
@@ -1801,7 +1802,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
    */
   public void setFocus(){ setFocus(0,0); }
-
+  
   
   
   /**Sets the focus to this widget. This method is possible to call in any thread.
@@ -1820,9 +1821,9 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     } else {
       //action in the graphic thread.
       if(!bHasFocus) {
-        GralWidget_ifc child = this;
+        GralWidgetBase_ifc child = this;
         if(! (child instanceof GralWindow)) {
-          GralWidget_ifc parent = _wdgPos.parent;
+          GralWidgetBase_ifc parent = _wdgPos.parent;
           int catastrophicalCount = 100;
           //set the visible state and the focus of the parents.
           while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
@@ -1830,10 +1831,10 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
               && parent.getImplAccess() !=null
               && --catastrophicalCount >=0){
             parent.getImplAccess().setFocusGThread();
-            parent.setVisibleStateWidget(true);
             if((parent instanceof GralPanelContent)){ // && ((GralPanelContent)parent).isTabbed()) {
               //TabbedPanel: The tab where the widget is member of have to be set as active one.
               GralPanelContent panel = (GralPanelContent)parent;
+              panel.setVisibleStateWidget(true);
               panel.setPrimaryWidget(this);
 //              if(child instanceof GralPanelContent) {
 //                panelTabbed.selectTab(child.getName());
@@ -1876,14 +1877,6 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   
   
   
-  
-  /**Gets the working interface of the manager. 
-   * It can be used to set and get values from other widgets symbolic identified by its name.
-   * Note: It is possible too to store the {@link GralWidget} of specific widgets
-   * to get and set values and properties of this widgets non-symbolic.
-   * @return The manager.
-   */
-  @Override public GralMng gralMng(){ return gralMng; }
   
   /**Returns the implementation widget or its Wrapper.
    * Need cast due to implementation level.
@@ -2077,10 +2070,6 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
       this.mngImpl = mngImpl;
       assert(mngImpl !=null);
 
-      if(widgg._wdgPos ==null) {
-        widgg._wdgPos = widgg.gralMng.getPosCheckNext();
-        widgg.registerWidget(); //yet now because before the panel was unknown
-      }
       widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
     
@@ -2091,7 +2080,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     @Override public void setPosBounds ( ) {
       GralRectangle xyPix = mngImpl.calcWidgetPosAndSize(widgg.pos(), 600, 800);
       if(this.widgg instanceof GralPanelContent) {         // it may be a tab of a tabbed panel
-        GralWidget_ifc parent_ifc = widgg.pos().parent;    // its parent may be a tab folder
+        GralWidgetBase_ifc parent_ifc = widgg.pos().parent;    // its parent may be a tab folder
         final int dy;
         if(parent_ifc instanceof GralPanelContent) {       // may be a tab folder or not
           dy = ((GralPanelContent)parent_ifc)._panel.pixelTab;  // size from top to the tab

@@ -6,6 +6,7 @@ import java.text.ParseException;
 import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
@@ -159,6 +160,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-20 Hartmut chg {@link #parent} can now be also a comprehensive widget, using {@link GralWidgetBase_ifc}.
    * <li>2022-12-17 Hartmut new {@link #setAsFrame()}
    * <li>2022-11-20 showing Area9 positions, now ABC ar colomns not rows.
    * <li>2022-11-20 Using {@link ObjectVishia} for improved {@link ObjectVishia#toString(Appendable, String...)} 
@@ -360,7 +362,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
   //public int xSepLine, ySepLine;
   
-  public GralWidget_ifc parent;
+  public GralWidgetBase_ifc parent;
 
 
   /**The values for x and y positions. Note: should be private! Don't use in application furthermore. */
@@ -374,12 +376,16 @@ public class GralPos extends ObjectVishia implements Cloneable
   }                                                        // Note: a parent is necessary to get the gralMng() for panel selection.
   
   
-  /**Set a initial GralPos for a given PanelContent (also a Window).
-   * Afterwards any absolute position should be set. Without set, this GralPos describes the whole panel size.
-   * Because also the end values (right, bottom) are 0, it is the whole left to right and top to bottom position.
-   * @param panel The given panel
+  /**Set a initial GralPos with the given widget as parent. 
+   * The parent can be especially a {@link GralPanelContent} but also a {@link GralWidgetBase} - derived class
+   * which is a comprehensive widget (contains a few widgets).
+   * The initial position describes the whole area of the parent. 
+   * This initial position can be used as reference position (refPos). 
+   * <br>
+   * It is also possible recommended to mark the position with {@link #setAsFrame()} for the child widgets.
+   * @param panel The given parent, a panel or comprehensive widget.
    */
-  public GralPos(GralWidget_ifc parent) {
+  public GralPos(GralWidgetBase_ifc parent) {
     this.parent = parent;
   }
   
@@ -431,7 +437,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param parent panel for the widget where the GralPos is used.
    * @return
    */
-  public GralPos setParent(GralPanel_ifc parent) {
+  public GralPos setParent(GralWidget_ifc parent) {
     this.parent = parent;
     return this;
   }

@@ -38,6 +38,7 @@ import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
@@ -2119,7 +2120,7 @@ public GralButton addCheckButton(
       //GralPanel_ifc currPanel = 
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        GralWidget_ifc panel = widgd.pos().parent;
+        GralWidgetBase_ifc panel = widgd.pos().parent;
         String namePanel = panel.getName();
         cfgBuilder.buildGui(log, 0);
         //designer.editFieldProperties(widgd, null);
@@ -2205,7 +2206,10 @@ public GralButton addCheckButton(
   
   @Override public void repaintCurrentPanel()
   {
-    pos().pos.parent.repaint();
+    GralWidgetBase_ifc panel = pos().pos.parent;
+    if(panel instanceof GralPanelContent) {
+      ((GralPanelContent)panel).repaint();
+    }
   }
   
   

@@ -35,6 +35,8 @@ import org.vishia.util.Removeable;
  *                                     |---idxLine------*>|
  *                                     |---tableLines---*>|
  * </pre>
+ * Hint: The GralSelectList should not be inherited from GralTable though it seems to be possible,
+ * because it is not primary a table. It is more obvious to break the inheritance.
  * @author Hartmut Schorrig
  *
  */
@@ -157,10 +159,16 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   
   @Override public boolean setVisible(boolean visible) { return this.wdgdTable.setVisible(visible); }
   
+  
+  @Override public boolean isVisible() { return this.wdgdTable.isVisible(); }
+  
+  @Override public boolean isInFocus() { return this.wdgdTable.isInFocus(); }
+  
+  
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  public boolean setFocus(){ wdgdTable.setFocus(); return true; }
+  @Override public void setFocus(){ wdgdTable.setFocus();  }
   
   /**Removes all data and all widgets of this class. */
   @Override public boolean remove(){

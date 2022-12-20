@@ -2,7 +2,9 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.List;
 
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.ObjectVishia;
 
 /**It is the base calss for comprehensive widgets,
@@ -10,7 +12,7 @@ import org.vishia.util.ObjectVishia;
  * the GralMng and the  
  *
  */
-public abstract class GralWidgetBase  extends ObjectVishia {
+public abstract class GralWidgetBase  extends ObjectVishia implements GralWidgetBase_ifc {
 
 
 
@@ -50,18 +52,29 @@ public abstract class GralWidgetBase  extends ObjectVishia {
 
   /**The widget manager from where the widget is organized. Most of methods need the information
    * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected final GralMng gralMng;
+  public final GralMng gralMng;
 
 
   /**The position of the widget. 
    * The GralPos contains also the reference to the parent composite panel {@link GralPanel_ifc} which contains the widget. */
-  protected GralPos _wdgPos;
+  protected final GralPos _wdgPos;
 
 
 
   /**Name of the widget in the panel. */
   public final String name;
 
+//  /**Set on focus gained, false on focus lost. */
+//  protected boolean bHasFocus;
+//  
+//  
+//  /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
+//   * It is an estimation whether this widget is be shown yet. 
+//   */
+//  protected boolean bVisibleState = true;
+//  
+//
+  
 
   /**Either the GralMng is given, or pos should be given, then the GralMng is gotten from {@link GralPos#parent}.
    * If both are null, the {@link GralMng#get()} is used as fallback for compatibility.
@@ -108,12 +121,123 @@ public abstract class GralWidgetBase  extends ObjectVishia {
     this._wdgPos = bFramePos ? currPos1 : currPos1.clone();   //use always a clone for the widget.
   }
 
+  /**Access to the name of the widget. But you can also access the final public {@link org.vishia.gral.base.GralWidgetBase#name} immediately.
+   * Defined in {@link GralWidgetBase_ifc#getName()}
+   * @return the name
+   */
+  @Override public String getName ( ) { return this.name; }
 
-  public final GralPos pos(){ return _wdgPos; } 
+  /**Position of the widget, which refers also the {@link GralPos#parent}. 
+   * The parent in a GralPos has usual the reference to the {@link org.vishia.gral.base.GralMng}.
+   * 
+   * @return the position, always available, never null.
+   */
+  @Override public final GralPos pos ( ) { return this._wdgPos; } 
 
+  /**Returns the associated GralMng. The GralMng is associated by construction,
+   */
+  @Override public final GralMng gralMng() { return this.gralMng; }
 
+  
 
   public abstract boolean setVisible(boolean visible);
+  
+  
+  
+//  /**Standard implementation. Override only if necessary for sepcial handling.
+//   * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
+//   */
+//  public void setFocus(){ setFocus(0,0); }
+//
+//  
+//  
+//  /**Sets the focus to this widget. This method is possible to call in any thread.
+//   * If it is called in the graphic thread and the delay = 0, then it is executed immediately.
+//   * Elsewhere the request is stored in the graphic thread execution queue and invoked later.
+//   * If the widget is inside a tab of a tabbed panel, the tab is designated as currently therewith.
+//   * That is done in the calling thread because it is a thread safe operation.
+//   * 
+//   * @param delay Delay in ms for invoking the focus request 
+//   * @param latest 
+//   */
+//  public void setFocus(int delay, int latest){
+//    if(delay >0 || !gralMng.currThreadIsGraphic() || _wdgImpl == null) {
+//      dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
+//      repaint(delay, latest);
+//    } else {
+//      //action in the graphic thread.
+//      setFocusGthread();
+//    }
+//  }
+//
+//  
+//  
+//  /**This operation should be overridden by comprehensive widgets and GralPanelContent
+//   * because the focus should be set to one of the specific widget in that containers.
+//   * This non overridden operation does nothing then. 
+//   */
+//  protected void setFocusGthread ( ) {
+//    GralWidget.ImplAccess wdgi = getImplAccess();
+//    if(wdgi == null) return;
+//    else {
+//      if(!this.bHasFocus) {
+//        GralWidgetBase_ifc child = this;
+//        if(! (child instanceof GralWindow)) {
+//          GralWidgetBase_ifc parent = _wdgPos.parent;
+//          int catastrophicalCount = 100;
+//          //set the visible state and the focus of the parents.
+//          while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
+//              && !parent.isInFocus()
+//              && parent.getImplAccess() !=null
+//              && --catastrophicalCount >=0){
+//            parent.getImplAccess().setFocusGThread();
+//            if(parent instanceof GralPanelContent) {
+//              ((GralPanelContent)parent).setVisibleStateWidget(true);   // for example a tab panel activate it. 
+//            }
+//            if((parent instanceof GralPanelContent)){ // && ((GralPanelContent)parent).isTabbed()) {
+//              //TabbedPanel: The tab where the widget is member of have to be set as active one.
+//              GralPanelContent panel = (GralPanelContent)parent;
+//              panel.setPrimaryWidget((GralWidget)this);    // casting possible because it is overridden on comprehensive widgets.
+////              if(child instanceof GralPanelContent) {
+////                panelTabbed.selectTab(child.getName());
+////              }
+//              //String name = panel1.getName();
+//              //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
+//            }
+//            if(parent instanceof GralWindow) {       //This is not the window itself
+//              parent = null;
+//            } else {
+//              child = parent;
+//              parent = parent.pos().parent; //
+//            }
+//          }
+//        }
+//        wdgi.setFocusGThread();  //sets the focus to the
+//        bVisibleState = true;
+//      } 
+//      GralWidgetBase_ifc parent = this;
+//      GralWidget child;
+//      GralPanelContent panel;
+//      while(parent instanceof GralPanelContent
+//        && (child = (panel = (GralPanelContent)parent)._panel.primaryWidget) !=null
+//        && child._wdgImpl !=null
+//        && !child.bHasFocus
+//        ) {
+//        child.setFocus();
+//        child._wdgImpl.setFocusGThread();
+//        child.bVisibleState = true;
+//        child._wdgImpl.repaintGthread();
+//        List<GralWidget> listWidg = panel.getWidgetList();
+//        for(GralWidget widgChild : listWidg) {
+//          widgChild._wdgImpl.setVisibleGThread(true);
+//          widgChild.bVisibleState = true;
+//        }
+//        parent = child;  //loop if more as one GralPanelContent
+//      }
+//      
+//    }
+//  }
+  
 
 
   /**This operation is implemented in the {@link GralWidget} by the default behavior.
@@ -144,6 +268,38 @@ public abstract class GralWidgetBase  extends ObjectVishia {
   }
 
   
+  /**Should create the implementation widget. 
+   * This operation should be called on new created Gral Widgets if it is able to suppose
+   * that the parent is created already. This is definitely on new widgets in runtime.
+   * If the conditions to create are given, either immediately the {@link #createImplWidget_Gthread()} is called
+   * if it is in the graphic thread, or a GralGraphicTimeOrder is created to do so in the graphic thread.
+   * It means this operation can be called in any thread.
+   * 
+   * @return true if created or the time order for creation is started.
+   *   false if creation is not possible yet.
+   */
+  public final boolean createImplWidget ( ) {
+    if(this.gralMng._mngImpl !=null && this._wdgPos.parent.getImplAccess() !=null ) {
+      //assume the widget is not implemented, elsewhere this operation may not be called,
+      //but the conditions for implementation are given: parent is implemented.
+      if(this.gralMng.currThreadIsGraphic()){
+        return createImplWidget_Gthread();      // call immediately the graphic thread operation.
+      } else {
+        GralGraphicTimeOrder order = new TimeOrderCreateImplWidget(this);
+        this.gralMng.addDispatchOrder(order);
+        return true;
+      }
+    }
+    else return false; // no gralMng implementation.
+  }
+
+  
+  
+  @Override public GralWidget.ImplAccess getImplAccess() {
+    return null;  //default, it is overridden if it is a Widget.
+  }
+  
+  
   /**Especially for test and debug, short info about widget.
    * @see java.lang.Object#toString()
    */
@@ -169,36 +325,6 @@ public abstract class GralWidgetBase  extends ObjectVishia {
     return u;
   }
 
-  /**Should create the implementation widget. 
-   * This operation should be called on new created Gral Widgets if it is able to suppose
-   * that the parent is created already. This is definitely on new widgets in runtime.
-   * If the conditions to create are given, either immediately the {@link #createImplWidget_Gthread()} is called
-   * if it is in the graphic thread, or a GralGraphicTimeOrder is created to do so in the graphic thread.
-   * It means this operation can be called in any thread.
-   * 
-   * @return true if created or the time order for creation is started.
-   *   false if creation is not possible yet.
-   */
-  public final boolean createImplWidget ( ) {
-    if(this.gralMng._mngImpl !=null && this._wdgPos.parent.getImplAccess() !=null ) {
-      //assume the widget is not implemented, elsewhere this operation may not be called,
-      //but the conditions for implementation are given: parent is implemented.
-      if(this.gralMng.currThreadIsGraphic()){
-        return createImplWidget_Gthread();      // call immediately the graphic thread operation.
-      } else {
-        GralGraphicTimeOrder order = new TimeOrderCreateImplWidget(this) {
-          @Override protected void executeOrder () {
-            createImplWidget_Gthread();
-          }
-        };
-        this.gralMng.addDispatchOrder(order);
-        return true;
-      }
-    }
-    else return false; // no gralMng implementation.
-  }
-
-  
   @SuppressWarnings("serial") 
   public static class TimeOrderCreateImplWidget extends GralGraphicTimeOrder {
 

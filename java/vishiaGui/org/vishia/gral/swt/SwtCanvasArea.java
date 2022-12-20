@@ -5,6 +5,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.widgets.Composite;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralCanvasArea;
 
@@ -54,7 +55,7 @@ public class SwtCanvasArea extends GralCanvasArea._GraphicImplAccess_
   {
     gralPlotArea.super(gralPlotArea, mng);
     this.mng = mng;
-    GralWidget_ifc panel = gralPlotArea.pos().parent;
+    GralWidgetBase_ifc panel = gralPlotArea.pos().parent;
     Object swtPanel = panel.getImplAccess().getWidgetImplementation();
     Composite panelSwt = (Composite) swtPanel; //mng.getCurrentPanel();
     this.swtCanvas = new SwtWdgCanvas(this, mng, gralPlotArea.getCanvasStore(0) , panelSwt, SWT.NO_BACKGROUND);

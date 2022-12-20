@@ -47,6 +47,7 @@ import org.vishia.gral.ifc.GralFileDialog_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
@@ -106,13 +107,10 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param widgg
    * @return null if a implementation is not available.
    */
-  public static Component getAwtImpl ( GralWidget_ifc widgg) {
-    Object oImpl = widgg.getImplWidget();
-    if(oImpl instanceof Component) return (Component) oImpl;
-    else if(oImpl instanceof AwtWidgetHelper) {
-      return ((AwtWidgetHelper)oImpl).widga;
-    }
-    else return null;
+  public static Component getAwtImpl ( GralWidgetBase_ifc widgg) {
+    GralWidget.ImplAccess impl = widgg.getImplAccess();
+    if(impl == null) return null;                          // not instantiated or has not a specific implementation widget.
+    else  return (Component)impl.getWidgetImplementation();  // maybe null on comprehensive widgets
   }
 
 
@@ -577,7 +575,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     int test = 6;
     if(owidg !=null){
       Component swtWidget = (Component)owidg;
-      GralWidget_ifc panel = widgd.pos().parent;
+      GralWidgetBase_ifc panel = widgd.pos().parent;
       GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
       GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.

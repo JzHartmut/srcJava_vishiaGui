@@ -15,6 +15,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 /**
@@ -64,7 +65,7 @@ public class AwtPanel  extends GralPanelContent.ImplAccess
   public AwtPanel(GralPanelContent wdgg)
   {
     super(wdgg);
-    GralWidget_ifc wdgp =  wdgg.pos().parent;
+    GralWidgetBase_ifc wdgp =  wdgg.pos().parent;
     final Component awdgp = AwtMng.getAwtImpl(wdgp); 
     assert awdgp instanceof Container;
     final Container awdgparent = (Container) awdgp;

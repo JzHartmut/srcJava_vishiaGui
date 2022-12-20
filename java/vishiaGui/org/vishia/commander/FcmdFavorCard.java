@@ -99,12 +99,12 @@ public class FcmdFavorCard  extends GralSelectList<FcmdFavorPathSelector.FavorPa
    * of the current line of table of all 3 current file panels to the 3-stage color
    * to see which table has the focus. 
    */
-  @Override public boolean setFocus(){ 
+  @Override public void setFocus(){ 
     mainPanel.bFavorCardHasFocus = true;
     mainPanel.bFavorThemeCardHasFocus = false;
     main.setLastSelectedPanel(mainPanel);
     //setActFilePanel_setColorCurrLine();
-    return super.setFocus(); 
+    super.setFocus(); 
   }
   
   

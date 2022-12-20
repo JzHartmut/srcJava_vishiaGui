@@ -67,6 +67,7 @@ import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
@@ -210,13 +211,10 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * @param widgg
    * @return null if a implementation is not available.
    */
-  public static Control getSwtImpl ( GralWidget_ifc widgg) {
-    Object oImpl = widgg.getImplWidget();
-    if(oImpl instanceof Control) return (Control) oImpl;
-    else if(oImpl instanceof SwtWidgetHelper) {
-      return ((SwtWidgetHelper)oImpl).widgetSwt;
-    }
-    else return null;
+  public static Control getSwtImpl ( GralWidgetBase_ifc widgg) {
+    GralWidget.ImplAccess impl = widgg.getImplAccess();
+    if(impl == null) return null;                          // not instantiated or has not a specific implementation widget.
+    else  return (Control)impl.getWidgetImplementation();  // maybe null on comprehensive widgets
   }
 
   
@@ -473,7 +471,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 //      if(widgp.canvas() !=null) { tab = new SwtCanvasStorePanel(widgp); }
 //      else 
       wdga = new SwtGridPanel(widgp, '$', 0);   // an SwtGridPanel is always also a SwtCanvasStrorePanel
-      GralWidget_ifc parent = widgg.pos().parent;
+      GralWidgetBase_ifc parent = widgg.pos().parent;
 //      if(parent instanceof GralTabbedPanel) {
 //        SwtTabbedPanel swtParent = (SwtTabbedPanel)parent.getImplAccess();
 //        swtParent.addGridPanel(widgp, widgp.getName(), 2, 2, 10, 10);

@@ -56,7 +56,7 @@ import org.vishia.util.Removeable;
  * @author Hartmut Schorrig
  *
  */
-public interface GralWidget_ifc extends Removeable
+public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
 {
   
   /**Version, history and license.
@@ -151,14 +151,6 @@ public interface GralWidget_ifc extends Removeable
   };
 
   
-  /**
-   * @return
-   * @deprecated access the final name immediately.
-   */
-  @Deprecated public String getName();
-  
-  public GralPos pos();
-  
   public String getDataPath();
   
   /**Any widget can have a command String, which can be quest for example in an action. 
@@ -193,16 +185,7 @@ public interface GralWidget_ifc extends Removeable
    */
   //void setToPanel(GralMngBuild_ifc mng);
   
-  /**Returns the associated GralMng. The GralMng is associated by construction,
-   */
-  GralMng gralMng();
-  
   void setVisibleStateWidget(boolean visible);
-  
-  /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
-   * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
-   */
-  public abstract void setFocus();
   
   /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
    * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
@@ -213,10 +196,6 @@ public interface GralWidget_ifc extends Removeable
   
   
   
-  /**Returns true if this widget is the focused one.
-   */
-  boolean isInFocus();
-  
   /**Returns true if the graphic implementatin widget was initialized, and then it was disposed. 
    * It is able to use especially to detect whether a sub window is closed or if the primary window was closed,
    * to finish any other (waiting) thread. It may be used on any disposed widget.
@@ -224,25 +203,6 @@ public interface GralWidget_ifc extends Removeable
    */
   boolean isGraphicDisposed();
 
-  
-  /**Sets this widget visible on graphic or invisible. Any widget can be visible or not. More as one widgets
-   * can use the same position, only one of them may set visible. 
-   * For a {@link GralWindow}, its the visibility of the whole window. 
-   * Note that a window which is invisible is not shown in the task bar of the operation system. 
-   * Note that an application can have more as one window. 
-   * Note that a dialog window can be set to invisible if it is not need yet instead destroy and build newly.
-   * @param visible
-   * @return
-   */
-  boolean setVisible(boolean visible);
-  
-  /**Returns whether the widget is visible or not. This method can be invoked in any thread.
-   * It is an estimation because the state of the widget may be changed in the last time or a window
-   * can be covered by another one. The widget is not visible if it is a member of a card in a tabbed
-   * panel and that tab is not the selected one.
-   * @return true if the widget seams to be visible.
-   */
-  boolean isVisible();
   
   /**Sets whether it is able to edit the content of the text field or text box.
    * If a content is not able to edit, it is a showing field or box. The user can't change the
@@ -332,8 +292,6 @@ public interface GralWidget_ifc extends Removeable
    */
   void setHtmlHelp(String url);
   
-  
-  GralWidget.ImplAccess getImplAccess();
   
   //public abstract GralWidget getGralWidget();
 

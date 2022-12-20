@@ -13,6 +13,7 @@ import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 
 
@@ -112,7 +113,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       }
       tab.setControl(this.panelSwtImpl);
       Rectangle areaTab;
-      final GralWidget_ifc parentPanelifc = wdgg.pos().parent;
+      final GralWidgetBase_ifc parentPanelifc = wdgg.pos().parent;
       final GralPanelContent parentPanel = (GralPanelContent) parentPanelifc;
       final GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess) parentPanel.getImplAccess();
       areaTab = super.panelSwtImpl.getClientArea();

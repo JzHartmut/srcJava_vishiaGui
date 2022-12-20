@@ -364,9 +364,9 @@ public class FcmdLeftMidRightPanel
     }
     
     
-    @Override public boolean setFocus(){
+    @Override public void setFocus(){
       mainPanel.bFavorThemeCardHasFocus = true;
-      return super.setFocus();
+      super.setFocus();
     }
     
     void clear()
