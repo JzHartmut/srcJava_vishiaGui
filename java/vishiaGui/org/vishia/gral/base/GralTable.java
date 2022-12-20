@@ -99,7 +99,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
-   * <li>2022-12-21 Hartmut chg: using {@link GralWidget_ifc.ActionChangeWhen#onAnyKey} instead onEnter. It is systematically. 
+   * <li>2022-12-12 Hartmut new: {@link #setColumnProportional(int[])} and resizing with this proportional values.
+   *   This feature was longer plant but never implemented till now. See also changes in {@link GraphicImplAccess#resizeTable(GralRectangle)}. 
+   * <li>2022-12-12 Hartmut chg: using {@link GralWidget_ifc.ActionChangeWhen#onAnyKey} instead onEnter. It is systematically. 
    * <li>2022-10-22 Hartmut chg: rename variables of {@link NodeTableLine} with prefix tbl_ to distinguish from nd_ variables from node 
    * <li>2018-10-28 Hartmut chg: Now uses argument zLineMax from {@link #GralTable(String, int, int[])} instead constant 50 for number of showed lines.
    * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
@@ -276,6 +278,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
+  
+  /**Set if relative column widths are used.
+   * null if only absolute.
+   * Set with 
+   */
+  protected int[] columnWidthsPromille;
   
   protected boolean[] bColumnEditable;
   
@@ -574,7 +582,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   public void setColumnWidth(int width, int[] columnWidths){
-    columnWidthsGral = columnWidths;
+    this.columnWidthsGral = columnWidths;
+  }
+  
+  /**Specify a proportional width for each column. 
+   * The absolute values given on construction or {@link #setColumnWidth(int, int[])} are used as minimal values.
+   * Hence a value of 0 for width means, the given absolute width should be used anytime. 
+   * <br>
+   * The sum of all here given widths is the size of all columns on proportion to the here given column values.
+   * 
+   * @param widths
+   */
+  public void setColumnProportional(int[] widths){
+    this.columnWidthsPromille = widths;
   }
   
   
@@ -1496,10 +1516,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * to desire whether a new implementation color should be gotten. */
     protected int ixColorScrollbar, ixColorScrollbarLast = -1;
     
-    /**Start position of each column in pixel. 
-     * @deprecated only used in org.vishia.gral.swt.SwtTable#initSwtTable(...) */
-    protected int[] columnPixel;
-    
     protected final int xPixelUnit;
         
     /**number of columns which should be shift to rigth on tree indent. 0. don't shift. Usual 1 */
@@ -1538,14 +1554,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       xPixelUnit = mng.gralProps.xPixelUnit();
       outer.gi = this; 
       int xdPix = outer.gralMng.propertiesGui().xPixelUnit();
-      columnPixel = new int[outer.columnWidthsGral.length+1];
-      int xPix = 0;
-      columnPixel[0] = xPix;
-      for(int iCol = 0; iCol < outer.columnWidthsGral.length; ++iCol){
-        xPix += outer.columnWidthsGral[iCol] * xdPix;
-        columnPixel[iCol+1] = xPix;
-      }
-
       this.xpixelCell = new int[outer.columnWidthsGral.length+1];
       int ydPix = outer.gralMng.propertiesGui().yPixelUnit();
       linePixel = 2 * ydPix;
@@ -1565,6 +1573,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected int ixLine(){ return outer.ixLine; }
     
     protected int[] columnWidthsGral(){ return outer.columnWidthsGral; }
+    
+    protected int[] columnWidthsPromille(){ return outer.columnWidthsPromille; }
     
     
     
@@ -1878,31 +1888,104 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     protected void resizeTable(GralRectangle pixTable) {
       int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
       int yPixelUnit = itsMng().propertiesGui().yPixelUnit();
-      outer.zLineVisible = pixTable.dy / yPixelUnit / 2;
+      outer.zLineVisible = pixTable.dy / yPixelUnit / 2;   // height of one cell always 2
       if(outer.zLineVisible > outer.zLineVisibleMax){ outer.zLineVisible = outer.zLineVisibleMax; }
-      xyVscrollbar.x = pixTable.dx - xPixelUnit;
+      int xPixTable = pixTable.dx - xPixelUnit;
+      int xPixTable2 = xPixTable;                          // available sum of pixel of the columns which are proportional
+      xyVscrollbar.x = xPixTable;
       xyVscrollbar.dx = xPixelUnit;
       xyVscrollbar.y = 0;
       xyVscrollbar.dy = pixTable.dy;
-      int xPixel1 = 0;
-      xpixelCell[0] = xPixel1;
+      //
+      int[] columnWidthsGral = columnWidthsGral();
+      int[] xPixColumns = new int[columnWidthsGral.length];
+      int[] xProportionals = columnWidthsPromille();
+      float[] xFProportional = null;
+      int xPixPos = 0;
+      xpixelCell[0] = xPixPos;
       int ixPixelCell;
-      int xPos;
-      //Columns from left with positive width
-      for(ixPixelCell = 0; ixPixelCell < columnWidthsGral().length && (xPos = columnWidthsGral()[ixPixelCell]) > 0; ++ixPixelCell){
-        xPixel1 += xPos * xPixelUnit;
-        xpixelCell[ixPixelCell+1] = xPixel1;
+      int xPixColumn;
+      int xPixTableMin = 0;
+      //----------------------------------------------------- count sum of grid column widths for possible reducing min width
+      for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+        xPixColumn = columnWidthsGral[ixPixelCell] * xPixelUnit;   // the absolute width
+        xPixColumns[ixPixelCell] = xPixColumn;
+        if(xPixColumn <0) { xPixColumn = -xPixColumn; }
+        else if(xPixColumn < xPixelUnit) { xPixColumn = xPixelUnit; }
+        xPixTableMin += xPixColumn;
+      }
+      if(xPixTableMin > xPixTable) {                       // The space is too less, reduce the min width
+        float f = (float)xPixTable / xPixTableMin;         // adjust pixel (min) per column
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          xPixColumn = columnWidthsGral[ixPixelCell] * xPixelUnit;   // the absolute width
+          xPixColumns[ixPixelCell] = (int)(f*xPixColumn);  // also negative
+        }
+      }
+      //----------------------------------------------------- detect the sum (size) for proportional values
+      int xSumProportional = 0;                            // sum of proportional values
+      int xSumProportional2 = 0;                           // sum of proportional values only from relevant columns
+      if(xProportionals !=null) {
+        xFProportional = new float[xProportionals.length];
+        //--------------------------------------------------- calculates sum of proportional widths first without check relevant columns.
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          xSumProportional += xProportionals[ixPixelCell];
+        }
+        //--------------------------------------------------- second step: compare widths with proportion, which are relevant
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          float f = (float)xProportionals[ixPixelCell] / xSumProportional;
+          int xPixGrid = xPixColumns[ixPixelCell];
+          if(xPixGrid <0) { xPixGrid = - xPixGrid; }
+          int xPixPropor = (int)(f * xPixTable2);
+          if(xPixGrid < xPixPropor) {                      // only if the proportional position is greater than the minimal one
+            xSumProportional2 += xProportionals[ixPixelCell]; // then count their width to the sum
+            xFProportional[ixPixelCell] = f;               // and mark that columns !=0
+          } else {
+            xPixTable2 -= xPixGrid;                        // column with min width, do not regard on calculate the proportion.
+            xFProportional[ixPixelCell] = 0;               // mark the columns = 0 which uses the minimal size
+          }
+        }
+        //--------------------------------------------------- third step: calculate proportional factor
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          if(xFProportional[ixPixelCell] !=0) {
+            float f = (float)xProportionals[ixPixelCell] / xSumProportional2;
+            xFProportional[ixPixelCell] = f;
+          }
+        }
+      }
+      
+      //----------------------------------------------------- Columns from left with positive width
+      for(ixPixelCell = 0; ixPixelCell < xPixColumns.length && (xPixColumn = xPixColumns[ixPixelCell]) > 0; ++ixPixelCell) {
+        //--------------------------------------------------- xPixColumn = absolute minimal width
+        //if(columnWidthsPromille !=null && columnWidthsPromille.length > ixPixelCell) {
+        if(xFProportional !=null && xFProportional[ixPixelCell] >0) {
+          //int xPixColRel = (xProportionals[ixPixelCell] * xPixTable + (xSumProportional>>1))/ xSumProportional;
+          int xPixColRel = (int)(xFProportional[ixPixelCell] * xPixTable2);
+//          if(xPixColRel > xPixColumn) {                    // xPixColRel is the relative column width in pixel
+            xPixColumn = xPixColRel;                       // use the greater value, for width, relative promille or min. 
+//          }
+        }
+        xPixPos += xPixColumn;
+        xpixelCell[ixPixelCell+1] = xPixPos;
       }
       nrofColumnTreeShift = ixPixelCell +1;
       System.out.println("GralTable - resizeTable; nrofColumnTreeShift =" + nrofColumnTreeShift);
-      xPixel1 = pixTable.dx - xPixelUnit;
-      xpixelCell[columnWidthsGral().length] = xPixel1;  //right position.
-      for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPos = columnWidthsGral()[ixPixelCell]) < 0; --ixPixelCell){
-        xPixel1 += xPos * xPixelUnit;
-        xpixelCell[ixPixelCell] = xPixel1;
+      xPixPos = xPixTable;
+      xpixelCell[columnWidthsGral().length] = xPixTable;  //right position.
+      //----------------------------------------------------- Columns from right with negative width
+      for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPixColumn = - xPixColumns[ixPixelCell]) > 0; --ixPixelCell){
+      //--------------------------------------------------- xPixColumn = absolute minimal width
+        //if(columnWidthsPromille !=null && columnWidthsPromille.length > ixPixelCell) {
+        if(xFProportional !=null && xFProportional[ixPixelCell] >0) {
+          //int xPixColRel = (xProportionals[ixPixelCell] * xPixTable + (xSumProportional>>1))/ xSumProportional;
+          int xPixColRel = (int)(xFProportional[ixPixelCell] * xPixTable2);
+//          if(xPixColRel > xPixColumn) {                    // xPixColRel is the relative column width in pixel
+            xPixColumn = xPixColRel;                       // use the greater value, for width, relative promille or min. 
+//          }
+        }
+        xPixPos -= xPixColumn;
+        xpixelCell[ixPixelCell] = xPixPos;
       }
       setBoundsCells(0, outer.zLineVisible);
-
     }
     
     

@@ -666,7 +666,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(columnsFavorlist !=null) {
       this.indexFavorPaths = new TreeMap<String, FavorPath>();
       
-      this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@4..0,0..0=" + this.name +".favor", 50, new int[] {20, 0, -20});
+      this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@4..0,0..0=" + this.name +".favor", 50, new int[] {10, 20, -20});
+      this.wdgFavorTable.setColumnProportional((new int[] { 0, 10, 10}));
       this.wdgFavorTable.setVisible(true);
     } else {
       this.indexFavorPaths = null;

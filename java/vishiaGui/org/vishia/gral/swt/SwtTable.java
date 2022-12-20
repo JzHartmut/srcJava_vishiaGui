@@ -717,8 +717,6 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         GralTable.CellData cellData = new GralTable.CellData(iRow, iCol);
         cell.setData(cellData);
         super.cells[iRow][iCol] = cellData;                // in GralTable.GraphicImplAccess
-        int xdPixCol = super.columnPixel[iCol+1] - columnPixel[iCol];
-        cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
         cell.setBackground(colorBackTableSwt);
         //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
         cellsSwt[iRow][iCol] = cell;                       // The array of swt.Txt
