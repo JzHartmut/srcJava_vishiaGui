@@ -160,6 +160,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-20 Hartmut new {@link #screenPos(int, int, int, int)} to get a pos relative to given widget but for another window.
    * <li>2022-12-20 Hartmut chg {@link #parent} can now be also a comprehensive widget, using {@link GralWidgetBase_ifc}.
    * <li>2022-12-17 Hartmut new {@link #setAsFrame()}
    * <li>2022-11-20 showing Area9 positions, now ABC ar colomns not rows.
@@ -992,6 +993,40 @@ public class GralPos extends ObjectVishia implements Cloneable
   public GralPos setAsFrame() {
     this.x.dirNext = this.y.dirNext = 'f';           // it are frame coord. Note do not use 'F', will be converted to 'f' 
     return this;
+  }
+  
+  
+  
+  /**Returns the position on the screen relative to the given pos
+   * Note: the from positions should be only >0 TODO
+   * @param line
+   * @param col
+   * @param dy
+   * @param dx
+   * @return
+   */
+  public GralPos screenPos(int line, int col, int dy, int dx) {
+    
+    GralPos pos = clone();
+    pos.x.p1 =line;
+    pos.y.p1 =col;
+    GralWidgetBase_ifc parent = this.parent;
+    while(parent !=null) {
+      pos.parent = parent;
+      GralPos ppos = parent.pos(); 
+      if(ppos !=null) {
+        pos.x.p1 += ppos.x.p1;
+        pos.y.p1 += ppos.y.p1;
+        parent = ppos.parent;
+      } else {
+        parent = null;
+      }
+    }
+    pos.x.p2 = dx + size;
+    pos.y.p2 = dx + size;
+    pos.x.n1 = pos.x.n2 = -1;
+    pos.y.n1 = pos.y.n2 = -1;
+    return pos;
   }
   
   

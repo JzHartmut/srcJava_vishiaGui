@@ -99,6 +99,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-12 Hartmut new: {@link #getColumnInFocus()}. why was this not existing till now?
    * <li>2022-12-12 Hartmut new: {@link #setColumnProportional(int[])} and resizing with this proportional values.
    *   This feature was longer plant but never implemented till now. See also changes in {@link GraphicImplAccess#resizeTable(GralRectangle)}. 
    * <li>2022-12-12 Hartmut chg: using {@link GralWidget_ifc.ActionChangeWhen#onAnyKey} instead onEnter. It is systematically. 
@@ -762,6 +763,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
 
+  
+  /**Returns the column which is in focus on an action,
+   * @return -1 if implementation does not exists, else 0...
+   */
+  public int getColumnInFocus() {
+    if(this._wdgImpl !=null) { return ((GralTable.GraphicImplAccess) this._wdgImpl).ixColumnFocus; }
+    else return -1; //nothing in foucs
+  }
+  
+  
   /**Gets the index in the visual presentation of the given line.
    * @param line any line of this table, maybe null, maybe a line from any other table
    * @return 0 for the first line, 1..., -1 if not found respectively the line is not in the visible area. 
@@ -1535,6 +1546,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**Sets temporary between focus lost and redraw. It is reset if the focus is gained for another cell
      * of the same table. */
     protected boolean bFocusLost;
+    
+    protected int ixLineFocus, ixColumnFocus;
+    
     
     /**Set to true if the table has the focus in window.
      */

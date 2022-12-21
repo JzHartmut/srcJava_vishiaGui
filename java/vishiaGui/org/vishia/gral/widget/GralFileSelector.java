@@ -74,7 +74,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
-   * <li>2022-12-17 Favor table activated now at last.
+   * <li>2022-12-21 progress, now switch between both tables and also [F3] key with a view window.
+   * <li>2022-12-20 Favor table activated now at last.
    * <li>2022-12-17 improved while test, positions use now the new {@link GralPos#setAsFrame()}.
    *   A test class {@link org.vishia.gral.test.basics.Test_GralFileSelector} is created for test. 
    * <li>2021-12-18 Hartmut: new feature: {@link #fillIn(FileRemote, boolean)}, if the file is a file not directory
@@ -528,6 +529,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   protected final GralTable<FavorPath> wdgFavorTable;
+  
+  protected final GralViewFileContent windView;
 
   /**Index of all entries in the visible list. */
   final Map<String, FavorPath> indexFavorPaths;
@@ -667,6 +670,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.indexFavorPaths = new TreeMap<String, FavorPath>();
       
       this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@4..0,0..0=" + this.name +".favor", 50, new int[] {10, 20, -20});
+      this.wdgFavorTable.specifyActionChange(null, this.action.actionFavorTable, null);
       this.wdgFavorTable.setColumnProportional((new int[] { 0, 10, 10}));
       this.wdgFavorTable.setVisible(true);
     } else {
@@ -688,7 +692,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     menuFolder.addMenuItem("x", "refresh [cR]", this.action.actionRefreshFileTable);
     //panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     this.widgBtnFavor = new GralButton(refPos, "@2+2, -5..0=" + this.name + "favorBtn", "favor", this.action.actionFavorButton);
-    this.widgBtnFavor.setSwitchMode(GralColor.getColor("lgn"), GralColor.getColor("wh"));
+    this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
     //widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
@@ -727,6 +731,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     panelMng.setPosition(5, 0, 10, GralPos.size + 40, 1, 'd');
     //questionWindow = GralInfoBox.createTextInfoBox(panelMng, "questionInfoBox", "question");  
     panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.
+    
+    this.windView = new GralViewFileContent(refPos, "@50..100, 50..100=" + this.name + ".view");
   }
   
   
@@ -1491,31 +1497,52 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     return true;
   }
   
+
+  
+  protected void doSelectFavor ( ) {
+    this.widgBtnFavor.setState(GralButton.State.Off);
+    this.wdgFavorTable.setVisible(false);
+    GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
+    int nColumnFocus = this.wdgFavorTable.getColumnInFocus();
+    String sFavor = favorLine.getCellText(0);
+    if(sFavor != this.sCurrFavor || nColumnFocus ==1) {
+      this.sCurrFavor = sFavor;
+      if(nColumnFocus == 1) {
+        favorLine.setCellText("", 2);                      // 2th colum focused, remove the current path, use the standard one.
+      }
+      String sCurrPath = favorLine.getCellText(2);
+      if(nColumnFocus == 1) {
+        
+      }
+      if(sCurrPath.length()==0) {
+        sCurrPath = favorLine.getCellText(1);
+      }
+      File favorfile = new File(sCurrPath);
+      fillIn(FileRemote.fromFile(favorfile), false);
+    }
+    this.wdgSelectList.wdgdTable.setVisible(true);
+    this.wdgSelectList.wdgdTable.setFocus();
+  }
   
   
-  protected void switchFileFavor() {
-    if(this.widgBtnFavor.isOn()) {
-      this.wdgFavorTable.setVisible(false);
+
+  protected void doActivateFavor ( ) {
+    this.widgBtnFavor.setState(GralButton.State.On);
+    this.wdgSelectList.wdgdTable.setVisible(false);
+    if(this.currentFile !=null) {
+      String sCurrFile = this.currentFile.getAbsolutePath();
       GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
-      String sFavor = favorLine.getCellText(0);
-      if(sFavor != this.sCurrFavor) {
-        this.sCurrFavor = sFavor;
-        String sCurrPath = favorLine.getCellText(2);
-        if(sCurrPath.length()==0) {
-          sCurrPath = favorLine.getCellText(1);
-        }
-        File favorfile = new File(sCurrPath);
-        fillIn(FileRemote.fromFile(favorfile), false);
-      }
-      this.wdgSelectList.wdgdTable.setVisible(true);
+      favorLine.setCellText(sCurrFile, 2);
+    }
+    this.wdgFavorTable.setVisible(true);
+  }
+  
+  
+  protected void switchFileFavor ( ) {
+    if(! this.widgBtnFavor.isOn()) {
+      doSelectFavor();
     } else {
-      this.wdgSelectList.wdgdTable.setVisible(false);
-      if(this.currentFile !=null) {
-        String sCurrFile = this.currentFile.getAbsolutePath();
-        GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
-        favorLine.setCellText(sCurrFile, 2);
-      }
-      this.wdgFavorTable.setVisible(true);
+      doActivateFavor();
     }
   }
   
@@ -1528,6 +1555,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   public boolean actionUserKey(int keyCode, Object userDataOfLine, GralTableLine_ifc<FileRemote> line)
   { 
+    if(keyCode == KeyCode.alt + KeyCode.dn ) { 
+      doActivateFavor();
+    }
+    else if(keyCode == KeyCode.F3) {
+      FileRemote file = line.getUserData();
+      this.windView.view(file);
+    }
     return false;
   }
 
@@ -1588,7 +1622,36 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   protected class Callbacks { 
-  
+
+    
+    protected final GralUserAction actionFavorTable = new GralUserAction("actionTable")
+    {
+
+      @Override public boolean userActionGui(int keyCode, GralWidget widgdTable, Object... params)
+      {
+        //assert(sIntension.equals("table-key"));
+        @SuppressWarnings("unchecked")
+        GralTableLine_ifc<FavorPath> line = (GralTableLine_ifc<FavorPath>)params[0];
+        Object data = line == null ? null : line.getUserData();
+        //int keyCode = (Integer)params[1];
+        boolean done = true;
+        if(data !=null) {
+          //if(keyCode == keyLeft){ actionLeft(data, line); }
+          //else if(keyCode == keyRight){ actionRight(data, line); }
+          //else 
+          if(keyCode == KeyCode.enter){ doSelectFavor(); done = true; }
+          else if(keyCode == KeyCode.mouse1Double){ doSelectFavor(); done = true;  }
+          //else { done = actionUserKey(keyCode, data, line); }
+        } else {
+          done = false;
+        }
+        return done;
+      }
+      
+      
+    };
+
+    
   public FileRemoteCallback callbackChildren1 = new FileRemoteCallback()
   {
 

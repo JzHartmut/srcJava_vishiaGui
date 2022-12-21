@@ -670,6 +670,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
     @Override public void focusGained(FocusEvent ev) { 
+      GralTable.CellData cell = (GralTable.CellData)((Text)ev.getSource()).getData();
+      SwtTable.this.ixLineFocus = cell.ixCellLine;
+      SwtTable.this.ixColumnFocus = cell.ixCellColumn;
       SwtTable.this.focusGainedTable();
       setFocused(widgg, true); 
       cellInFocus = (Text)ev.getSource();
