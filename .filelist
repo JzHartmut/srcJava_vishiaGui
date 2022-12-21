@@ -9,7 +9,7 @@
 ============================== java/vishiaGui/org/vishia/ ==========================================
 
 ============================== java/vishiaGui/org/vishia/commander/ ================================
-2022-11-21 00:21:27  x     Fcmd.java                                ::         32.485 -1924701927 
+2022-12-21 18:54:07  x     Fcmd.java                                ::         32.525  0820643756 
 2022-11-20 23:06:59  x     FcmdActions.java                         ::         10.031 -0967068095 
 2022-11-20 23:07:55  x     FcmdButtons.java                         ::         18.951 -0940360387 
 2022-11-15 18:54:28  x     FcmdCopyCmprDel.java                     ::         70.184  2114418410 
@@ -17,23 +17,23 @@
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2022-11-19 14:16:42  x     FcmdEdit.java                            ::          8.196  1294045397 
 2022-11-19 14:20:02  x     FcmdExecuter.java                        ::         16.413 -0728050999 
-2022-12-20 11:51:14  x     FcmdFavorCard.java                       ::         10.449  0502512507 
-2022-12-05 08:59:14  x     FcmdFavorPathSelector.java               ::         31.341  1079841325 
-2022-12-17 22:24:40  x     FcmdFileCard.java                        ::         30.604  0705460797 
+2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
+2022-12-21 19:23:17  x     FcmdFavorPathSelector.java               ::         31.697  0466510763 
+2022-12-21 19:14:52  x     FcmdFileCard.java                        ::         31.752  0367940321 
 2022-11-19 11:30:57  x     FcmdFileProps.java                       ::         20.557  0696227384 
-2022-11-15 17:58:47  x     FcmdFilesCp.java                         ::          7.592  0766812261 
+2022-12-21 19:11:24  x     FcmdFilesCp.java                         ::          7.592  0766812261 
 2022-11-20 14:07:07  x     FcmdGui.java                             ::          1.170  1323028377 
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
 2022-11-20 23:04:10  x     FcmdIdents.java                          ::         14.097  0035476139 
 2021-10-04 14:29:51  x     FcmdKeyActions.java                      ::          2.315 -2032154697 
-2022-12-20 11:51:43  x     FcmdLeftMidRightPanel.java               ::         18.056 -1319746053 
+2022-12-21 22:24:22  x     FcmdLeftMidRightPanel.java               ::         18.104  0748521805 
 2022-11-16 10:00:17  x     FcmdMkDirFile.java                       ::          4.183  0975604639 
 2022-11-19 11:17:38  x     FcmdSettings.java                        ::          9.662 -1342262910 
 2022-11-12 21:15:32  x     FcmdStatus.java                          ::          3.945 -2064914958 
 2022-11-20 23:07:38  x     FcmdStatusLine.java                      ::          6.867  1091254000 
 2021-10-04 14:29:49  x     FcmdTargetProxy.java                     ::           .103 -0703963512 
 2022-12-17 22:12:05  x     FcmdView.java                            ::         24.626 -0417633707 
-2021-10-04 14:29:51  x     FcmdWidgetNames.java                     ::          1.761 -0968150682 
+2022-12-21 19:51:28  x     FcmdWidgetNames.java                     ::          1.756  1371890618 
 2022-11-15 19:00:09  x     FcmdWindowMng.java                       ::           .889  1905200979 
 2012-03-28 07:42:16  x     package-info.java                        ::           .253 -2063976015 
 
@@ -114,7 +114,7 @@
 2022-11-19 21:32:48  x     GralValueBar.java                        ::          6.218  1291974722 
 2022-11-11 17:43:57  x     GralWidgImplAccess_ifc.java              ::          5.924  0960638258 
 2022-12-20 11:52:34  x     GralWidget.java                          ::        109.299  0987858147 
-2022-12-20 10:35:52  x     GralWidgetBase.java                      ::         13.940  2073750523 
+2022-12-21 22:22:28  x     GralWidgetBase.java                      ::         13.864 -0875884897 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-11-24 23:34:48  x     GralWindow.java                          ::         18.652  0684535148 
 2016-07-02 09:37:22  x     GralWindow_setifc.java                   ::          1.980  0685613695 
@@ -217,7 +217,7 @@
 2013-10-05 22:28:54  x     SwtSetValue_ifc.java                     ::           .374  1688335866 
 2022-10-01 23:10:04  x     SwtSlider.java                           ::          1.541  1957534257 
 2022-11-12 22:39:00  x     SwtSubWindow.java                        ::         24.225  0799428237 
-2022-12-20 23:41:11  x     SwtTable.java                            ::         41.278  1113557672 
+2022-12-21 22:27:02  x     SwtTable.java                            ::         41.278  1113557672 
 2022-01-31 19:48:38  x     SwtTextBox.java                          ::         14.779 -0197457034 
 2022-11-13 23:35:20  x     SwtTextFieldWrapper.java                 ::         22.692  1934996592 
 2022-12-18 14:26:18  x     SwtTransparentLabel.java                 ::          1.917  0729056109 
@@ -242,8 +242,8 @@
 2022-11-13 22:38:06  x     GralCanvasArea.java                      ::          4.639  1431383281 
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2022-11-24 22:00:00  x     GralCommandSelector.java                 ::          8.641  1402614593 
-2022-12-11 19:58:27  x     GralFileSelectWindow.java                ::          8.755  0184982558 
-2022-12-21 17:06:30  x     GralFileSelector.java                    ::         78.593 -0031319307 
+2022-12-21 19:15:04  x     GralFileSelectWindow.java                ::          8.755 -0191567318 
+2022-12-21 22:20:11  x     GralFileSelector.java                    ::         78.925 -1084914120 
 2022-11-24 20:36:38  x     GralHorizontalSelector.java              ::         10.531  1190976432 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2022-11-13 18:49:20  x     GralInfoBox.java                         ::         15.219 -0309496018 

@@ -359,7 +359,7 @@ public class Fcmd //extends GuiCfg
   
   /**The last used favor card or its last used file card.
    * It is used for delete tab. */
-  FcmdFavorCard lastFavorCard;
+  //FcmdFavorCard lastFavorCard;
   
   FcmdFileCard currentFileCard;
   
@@ -706,12 +706,12 @@ public class Fcmd //extends GuiCfg
   /**Get the last selected file card in order of selection of the file panels.
    * @return The file card reference.   */
   FcmdFileCard getLastSelectedFileCard(){
-    
-    if(lastFavorCard!=null){
-      return lastFavorCard.fileTable;
-    } else {
-      return null;
-    }
+    return this.currentFileCard;
+//    if(lastFavorCard!=null){
+//      return lastFavorCard.fileTable;
+//    } else {
+//      return null;
+//    }
   }
   
   

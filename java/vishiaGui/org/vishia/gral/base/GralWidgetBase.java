@@ -262,7 +262,6 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
       }
       return true;
     } else {
-      System.err.println("\nERROR: widget implementation already given. ");
       return false;                                        // implementation exists.
     }
   }

@@ -68,45 +68,45 @@ class FcmdFavorPathSelector
    */
   public static final int version = 0x20120204;
   
-  /**Entry in the favorite list. */
-  static class FavorPath
-  { /**The path of directory to select. */
-    final String path;
-    /**The name shown in the list. */
-    final String selectName;
-    
-    final FileCluster fileCluster;
-    /**The label on the tab in tabbed panel. */
-    //String label;
-    /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
-     * it means, a tab with the label will be created. */
-    int mMainPanel;
-
-    /**Origin dir adequate {@link #path}. It is null on initialization, but build on call of
-     * {@link #getOriginDir()}. */
-    private FileRemote dir;
-    
-    public FavorPath(String selectName, String path, FileCluster fileCluster)
-    { this.fileCluster = fileCluster;
-      this.path = path;
-      this.selectName = selectName;
-    }
-
-    
-    /**Returns the dir instance for the origin path. The dir instance is built only one time
-     * but only if it is necessary. It means it is built on the first call of this method.
-     * @return
-     */
-    public FileRemote getOriginDir(){
-      if(dir == null){ //build it only one time, but only if it is necessary.
-        dir = fileCluster.getFile(path, null);  //new FileRemote(path);
-      }
-      return dir;
-    }
-    
-    
-    @Override public String toString(){ return path; } //for debug
-  }
+//  /**Entry in the favorite list. */
+//  static class FavorPath
+//  { /**The path of directory to select. */
+//    final String path;
+//    /**The name shown in the list. */
+//    final String selectName;
+//    
+//    final FileCluster fileCluster;
+//    /**The label on the tab in tabbed panel. */
+//    //String label;
+//    /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
+//     * it means, a tab with the label will be created. */
+//    int mMainPanel;
+//
+//    /**Origin dir adequate {@link #path}. It is null on initialization, but build on call of
+//     * {@link #getOriginDir()}. */
+//    private FileRemote dir;
+//    
+//    public FavorPath(String selectName, String path, FileCluster fileCluster)
+//    { this.fileCluster = fileCluster;
+//      this.path = path;
+//      this.selectName = selectName;
+//    }
+//
+//    
+//    /**Returns the dir instance for the origin path. The dir instance is built only one time
+//     * but only if it is necessary. It means it is built on the first call of this method.
+//     * @return
+//     */
+//    public FileRemote getOriginDir(){
+//      if(dir == null){ //build it only one time, but only if it is necessary.
+//        dir = fileCluster.getFile(path, null);  //new FileRemote(path);
+//      }
+//      return dir;
+//    }
+//    
+//    
+//    @Override public String toString(){ return path; } //for debug
+//  }
   
   
   static class FavorFolder
@@ -116,7 +116,7 @@ class FcmdFavorPathSelector
     /**The name shown in the list. */
     final String selectNameTab;
     /**The associated list of selectInfos. */
-    final List<FavorPath> listfavorPaths = new LinkedList<FavorPath>();
+    final List<GralFileSelector.FavorPath> listfavorPaths = new LinkedList<GralFileSelector.FavorPath>();
     /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
      * it means, a tab with the label will be created. */
     int mMainPanel;
@@ -153,14 +153,14 @@ class FcmdFavorPathSelector
   final Fcmd main;
   
   /**All entries which are shown in all three select lists. */
-  List<FavorPath> listAllFavorPaths = new LinkedList<FavorPath>();
+  List<GralFileSelector.FavorPath> listAllFavorPaths = new LinkedList<GralFileSelector.FavorPath>();
   
   /**For output messages. */
   final LogMessage console;
   
   
   /**The last selected SelectInfo independent from the panel left, mid, right is never used. remove it. */
-  //FavorPath actFavorPathInfo;
+  //GralFileSelector.FavorPath actFavorPathInfo;
 
   boolean bSyncMidRight;
   
@@ -218,7 +218,7 @@ class FcmdFavorPathSelector
     //main.gui.addMenuItemGThread("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
     //main.gui.addMenuItemGThread("test", main.idents.menuExecuteCmdBar, main.cmdSelector.actionExecCmdWithFiles);
 
-    main.gui.menuBar.addMenuItem("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
+    //main.gui.menuBar.addMenuItem("menuBarCreateFavor", main.idents.menuBarCreateFavor, actionCreateFavor); // /
     main.gui.menuBar.addMenuItem("menuDelTab", main.idents.menuDelTab, actionDelTab); // /
     main.gui.menuBar.addMenuItem("menuSaveFavoriteSel", main.idents.menuSaveFavoriteSel, actionSaveFavoritePathes); // /
     main.gui.menuBar.addMenuItem("menuReadFavoriteSel", main.idents.menuReadFavoriteSel, actionReadFavoritePathes); // /
@@ -276,7 +276,7 @@ class FcmdFavorPathSelector
         listAllFavorPathFolders.clear();
         String sLine;
         int posSep;
-        //List<FavorPath> list = null;
+        //List<GralFileSelector.FavorPath> list = null;
         FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
         StringPart spLine = new StringPart();
         StringBuilder uLine = new StringBuilder(1000);
@@ -325,7 +325,7 @@ class FcmdFavorPathSelector
                 //info. = sParts[0].trim();
                 String selectName = sParts[0].trim();
                 String path = sParts[1].trim();
-                FavorPath favorPathInfo = new FavorPath(selectName, path, main.fileCluster);
+                GralFileSelector.FavorPath favorPathInfo = new GralFileSelector.FavorPath(selectName, path, main.fileCluster);
                 if(sParts.length >2){
                   final String actTabEntry = sParts[2].trim();
                   //final String actTab;
@@ -397,7 +397,7 @@ class FcmdFavorPathSelector
           if((folder.mMainPanel & 2)!=0){ writerCfg.append('m'); }
           if((folder.mMainPanel & 4)!=0){ writerCfg.append('r'); }
           writerCfg.append("==\n");
-          for(FavorPath favor: folder.listfavorPaths){
+          for(GralFileSelector.FavorPath favor: folder.listfavorPaths){
             writerCfg.append(favor.selectName).append(", ").append(favor.path).append("\n");
           }
           writerCfg.append("\n");
@@ -413,7 +413,7 @@ class FcmdFavorPathSelector
   
   
   
-  private void XXXwriteCfgLine(FavorPath favorPathInfo) throws IOException
+  private void XXXwriteCfgLine(GralFileSelector.FavorPath favorPathInfo) throws IOException
   {
     writerCfg.append(favorPathInfo.selectName).append(", ").append(favorPathInfo.path);
     /*
@@ -444,7 +444,7 @@ class FcmdFavorPathSelector
   /**Builds a tab for file or command view from a selected line of selection.
    * @param info The selection info
    */
-  void buildTabFromSelection(FcmdFavorPathSelector.FavorPath info, GralPanelContent tabPanel)
+  void buildTabFromSelection(GralFileSelector.FavorPath info, GralPanelContent tabPanel)
   { assert(false);
     /*
     tabPanel.addGridPanel(info.tabName1, info.tabName1,1,1,10,10);
@@ -476,7 +476,7 @@ class FcmdFavorPathSelector
   GralUserAction actionSearchFiles = new GralUserAction("actionSearchFiles"){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        FcmdFileCard fileCard = main.lastFavorCard.fileTable;
+        FcmdFileCard fileCard = main.currentFileCard;
         windSearchFiles.confirmSearchInFiles(fileCard, main.gui.getOutputBox());
       }
       return true;
@@ -484,8 +484,8 @@ class FcmdFavorPathSelector
 
   
   void actionSyncMidRight() {
-    if(!this.bSyncMidRight && this.panelMid.actFileCard !=null && this.panelMid.actFileCard.favorPathInfo !=null 
-        && this.panelRight.actFileCard !=null && this.panelRight.actFileCard.favorPathInfo !=null){
+    if(!this.bSyncMidRight && this.panelMid.actFileCard !=null /*&& this.panelMid.actFileCard.favorPathInfo !=null */ 
+        && this.panelRight.actFileCard !=null /*&& this.panelRight.actFileCard.favorPathInfo !=null */) {
       this.bSyncMidRight = true;
       this.panelRight.actFileCard.syncTabSelection = this.panelMid.actFileCard.syncPartnerTabSelection = this.panelRight.actFileCard.sTabSelection;
       this.panelMid.actFileCard.syncTabSelection = this.panelRight.actFileCard.syncPartnerTabSelection = this.panelMid.actFileCard.sTabSelection;
@@ -516,36 +516,36 @@ class FcmdFavorPathSelector
 
   
   
-  void confirmCreateNewFavor(){
-    FcmdLeftMidRightPanel panel = main.lastFilePanels.get(0);
-    FcmdFileCard fileCard = panel.actFileCard;
-    windAddFavorite.panelInvocation = panel;
-    windAddFavorite.widgLabel.setText(fileCard.label);
-    windAddFavorite.widgShortName.setText("alias");
-    File directory = fileCard.getCurrentDir();
-    //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
-    windAddFavorite.widgPath.setText(directory.getPath());
-    windAddFavorite.window.setFocus(); //WindowVisible(true);
-    
-  }
-  
-  
-  GralUserAction actionCreateFavor = new GralUserAction(""){
-    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
-      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        confirmCreateNewFavor();
-      }
-    return true;
-  } };
-  
+//  void confirmCreateNewFavor(){
+//    FcmdLeftMidRightPanel panel = main.lastFilePanels.get(0);
+//    FcmdFileCard fileCard = panel.actFileCard;
+//    windAddFavorite.panelInvocation = panel;
+//    windAddFavorite.widgLabel.setText(fileCard.label);
+//    windAddFavorite.widgShortName.setText("alias");
+//    File directory = fileCard.getCurrentDir();
+//    //String pathDir = FileSystem.getCanonicalPath(lastSelectedFile.getParentFile());
+//    windAddFavorite.widgPath.setText(directory.getPath());
+//    windAddFavorite.window.setFocus(); //WindowVisible(true);
+//    
+//  }
+//  
+//  
+//  GralUserAction actionCreateFavor = new GralUserAction(""){
+//    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
+//      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+//        confirmCreateNewFavor();
+//      }
+//    return true;
+//  } };
+//  
   
   
   
   GralUserAction actionDelTab = new GralUserAction(""){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){
-      if(main.lastFavorCard !=null){
-        FcmdFavorCard favorCard = main.lastFavorCard;
-        FcmdFileCard fileCard = favorCard.fileTable;
+      if(main.currentFileCard !=null){
+        //FcmdFavorCard favorCard = main.lastFavorCard;
+        FcmdFileCard fileCard = main.currentFileCard; //favorCard.fileTable;
         FcmdLeftMidRightPanel panel = fileCard.mainPanel;
         if(fileCard !=null){
           fileCard.remove();
@@ -554,7 +554,7 @@ class FcmdFavorPathSelector
         }
         String nameWidgFavorCard = FcmdWidgetNames.tabFavorites + fileCard.nameFilePanel;
         String nameWidgFileCard = FcmdWidgetNames.tabFile + fileCard.nameFilePanel;
-        panel.tabbedPanelFavorCards.removeWidget(nameWidgFavorCard);
+        //panel.tabbedPanelFavorCards.removeWidget(nameWidgFavorCard);
         panel.tabbedPanelFileCards.removeWidget(nameWidgFileCard);
         panel.cardFavorThemes.setFocus();
       }
@@ -618,7 +618,7 @@ class FcmdFavorPathSelector
         if(infos.sCmd.equals("ok") || infos.sCmd.equals("temp")){
           String path = windAddFavorite.widgPath.getText();
           String selectName = windAddFavorite.widgShortName.getText();
-          FavorPath favorite = new FavorPath(selectName, path, main.fileCluster);
+          GralFileSelector.FavorPath favorite = new GralFileSelector.FavorPath(selectName, path, main.fileCluster);
           String tablabel = windAddFavorite.widgLabel.getText();
           favorite.mMainPanel = 1<< (windAddFavorite.panelInvocation.cNr - '1');
           FcmdFavorPathSelector.FavorFolder tabDst = null;

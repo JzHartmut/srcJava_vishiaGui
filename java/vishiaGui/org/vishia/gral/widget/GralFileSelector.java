@@ -660,13 +660,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param columns
    * @param size
    */
-  public GralFileSelector(GralPos refPosParent, String posName, int rows, int[] columns, int[] columnsFavorlist)
+  public GralFileSelector(GralPos refPosParent, String posName, int rows, int[] columns, boolean bWithFavor)
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPosParent, posName, null);
     GralMng panelMng = this.gralMng;
     GralPos refPos = this._wdgPos.clone().setAsFrame(); //panelMng.getPositionInPanel();
     GralWidgetBase_ifc panel = refPos.parent;
-    if(columnsFavorlist !=null) {
+    if(bWithFavor) {
       this.indexFavorPaths = new TreeMap<String, FavorPath>();
       
       this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@4..0,0..0=" + this.name +".favor", 50, new int[] {10, 20, -20});
@@ -791,7 +791,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     new GralFileSelectWindow(posName, mng);
     int windProps = GralWindow_ifc.windResizeable;
     GralWindow wind = new GralWindow(pos, posName, null, windProps);
-    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, null);
+    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, false);
     return thiz;
   }
   
@@ -906,7 +906,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   }
   
   
-  void clear()
+  public void clear()
   {
     this.indexFavorPaths.clear();
     this.wdgFavorTable.clearTable();
@@ -943,7 +943,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   /**Add all favor paths from the SelectTab newly
    * @param favorTabInfo
    */
-  void fillFavorPaths(List<FavorPath> listfavorPaths)
+  public void fillFavorPaths(List<FavorPath> listfavorPaths)
   {
     clear();
     int lineCt =0;
@@ -959,9 +959,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         lineCt +=1;
       }
       this.wdgFavorTable.setCurrentLine(currentLine, 3, 1);
-      this.wdgFavorTable.setVisible(true);
-      this.wdgSelectList.wdgdTable.setVisible(false);
-      this.widgBtnFavor.setState(GralButton.State.On);
+      doActivateFavor();
     }
 
   }
@@ -1374,6 +1372,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   }
   
   
+  
+  public String getLabelCurrFavor ( ) { return this.sCurrFavor; }
+  
   //public FileRemote getCurrentDir(){ return currentDir; }
 
   
@@ -1472,7 +1473,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  public void setFocus(){ this.wdgSelectList.wdgdTable.setFocus(); }
+  public void setFocus(){ 
+    if(this.widgBtnFavor.isOn()) {
+      this.wdgFavorTable.setFocus();
+    } else {
+      this.wdgSelectList.wdgdTable.setFocus(); 
+    }
+  }
   
   @Override public boolean isInFocus(){ return this.wdgSelectList.wdgdTable.isInFocus(); }
   
@@ -1499,7 +1506,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
 
   
-  protected void doSelectFavor ( ) {
+  /**Shows the favor selection table.
+   * 
+   */
+  public void doSelectFavor ( ) {
     this.widgBtnFavor.setState(GralButton.State.Off);
     this.wdgFavorTable.setVisible(false);
     GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
@@ -1526,7 +1536,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
 
-  protected void doActivateFavor ( ) {
+  /**Activates the favor card.
+   * If a file on file card was selected before, its path is stored in the favor table as current one.
+   */
+  public void doActivateFavor ( ) {
     this.widgBtnFavor.setState(GralButton.State.On);
     this.wdgSelectList.wdgdTable.setVisible(false);
     if(this.currentFile !=null) {
@@ -1534,7 +1547,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
       favorLine.setCellText(sCurrFile, 2);
     }
+    this.wdgFavorTable.redraw(100, 100);
     this.wdgFavorTable.setVisible(true);
+    this.wdgFavorTable.setFocus();
   }
   
   
@@ -1582,16 +1597,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   /**Entry in the favorite list. */
   public static class FavorPath
   { /**The path of directory to select. */
-    final String path;
+    public final String path;
     /**The name shown in the list. */
-    final String selectName;
+    public final String selectName;
     
-    final FileCluster fileCluster;
+    public final FileCluster fileCluster;
     /**The label on the tab in tabbed panel. */
     //String label;
     /**bit 0..2 present this favorite on the designated main panel 1..3 or l, m, r,
      * it means, a tab with the label will be created. */
-    int mMainPanel;
+    public int mMainPanel;
 
     /**Origin dir adequate {@link #path}. It is null on initialization, but build on call of
      * {@link #getOriginDir()}. */
