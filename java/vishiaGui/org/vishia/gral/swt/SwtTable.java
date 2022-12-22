@@ -243,6 +243,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);
+    table.repaintGthread();
     //mng.gralMng.registerWidget(gralTable);
     //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
     return table;

@@ -1807,10 +1807,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       Assert.check(outer.gralMng.currThreadIsGraphic());
       GralTable<UserData>.TableLineData/*<?>*/ line;
       
-      if(outer.bPrepareVisibleArea){
+      //todo if(outer.bPrepareVisibleArea){
         outer.fillVisibleArea();  //show the selected line at line 3 in graphic or before 0..2
         outer.bPrepareVisibleArea = false;
-      }
+      //}
       
       //Now draw:
       //
@@ -1824,7 +1824,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         drawCellContent(ix, cells[ix], null, linePresentation);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
-      //System.out.println("GralTable - redraw;" + timeLastRedraw - dbgTime);
+      System.out.println("GralTable.updateGraphicCellContent(): " + GralTable.this.name + + timeLastRedraw);
     }
 
     
@@ -1904,6 +1904,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       int yPixelUnit = itsMng().propertiesGui().yPixelUnit();
       outer.zLineVisible = pixTable.dy / yPixelUnit / 2;   // height of one cell always 2
       if(outer.zLineVisible > outer.zLineVisibleMax){ outer.zLineVisible = outer.zLineVisibleMax; }
+      if(outer.zLineVisible < 2)
+        Debugutil.stop();
+      System.err.println("GralTable zLineVisible = " + outer.zLineVisible + " name " + name);
       int xPixTable = pixTable.dx - xPixelUnit;
       int xPixTable2 = xPixTable;                          // available sum of pixel of the columns which are proportional
       xyVscrollbar.x = xPixTable;

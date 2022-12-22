@@ -960,6 +960,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       }
       this.wdgFavorTable.setCurrentLine(currentLine, 3, 1);
       doActivateFavor();
+      System.out.println("GralFileSelector - fillFavorPaths: " + this.wdgFavorTable.name);
+      //this.wdgFavorTable.bPrepareVisibleArea = true;
+      this.wdgFavorTable.redraw(0, 0);
     }
 
   }

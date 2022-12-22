@@ -71,16 +71,21 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
     super(wdgg);
     final SwtMng swtMng = (SwtMng) wdgg.gralMng()._mngImpl;
     final Composite parent = SwtMng.getSwtParent(wdgg.pos());
-    final Rectangle areaParent = parent.getClientArea();
+    
+    
+    
+    //final Rectangle areaParent = parent.getClientArea();
     if (wdgg.isTabbed()) {
       final TabFolder tabFolder = new TabFolder(parent, 0);
+      //faulty: super.panelSwtImpl.setBounds(areaParent);  // The tab folder should fill the whole area. Without the setBounds the
+                                                 // TabFolder is not visible.
+      swtMng.setPosAndSizeSwt(wdgg.pos(), tabFolder,0,0);  //area of tabFolder adequate pos
+      SwtMng.storeGralPixBounds(this, tabFolder);          // store the pixel size in the ImplAccess level
+      final Font fontTab = new Font(swtMng.displaySwt, "Arial", 10, SWT.ITALIC);
+      tabFolder.setFont(fontTab);
       super.panelSwtImpl = tabFolder;            // typed access in SwtPanel
       super.wdgimpl = tabFolder;                 // unified access in GraLWidget
-      super.panelSwtImpl.setBounds(areaParent);  // The tab folder should fill the whole area. Without the setBounds the
-                                                 // TabFolder is not visible.
-      SwtMng.storeGralPixBounds(this, tabFolder);// store the pixel size in the ImplAccess level
-      final Font fontTab = new Font(swtMng.displaySwt, "Arial", 10, SWT.ITALIC);
-      super.panelSwtImpl.setFont(fontTab);
+      
     } 
     else {
       GralCanvasStorage canvasStore = wdgg.canvas();
@@ -99,7 +104,6 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       }
       panel.setData(this);
       panel.setLayout(null);
-    
       //this.XXXcurrColor = panel.getForeground();
       panel.setBackground(swtMng.getColorImpl(wdgg.getBackColor(0)));
     }
@@ -119,15 +123,18 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       areaTab = super.panelSwtImpl.getClientArea();
       @SuppressWarnings("unused") Rectangle boundsTab = super.panelSwtImpl.getBounds();
       if (parentPanel._panel.pixelTab == 0) {              // on the first tab panel
+        final Rectangle areaParent = parent.getBounds();
         parentPanel._panel.pixelTab = (short) (areaParent.height - areaTab.height);
         //super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
       } else {
-        //super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
+        super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
       }
     } else {
-      super.panelSwtImpl.setBounds(areaParent);
+      swtMng.setPosAndSizeSwt(wdgg.pos(), super.panelSwtImpl, 0,0);  //area of panel adequate pos
+      //super.panelSwtImpl.setBounds(areaParent);
       swtMng.listVisiblePanels_add(wdgg);
     }
+    SwtMng.storeGralPixBounds(this, super.panelSwtImpl);
     this.panelSwtImpl.setVisible(true);
   }
 
