@@ -410,7 +410,7 @@ public final class InspcCurveView
       iTrack +=1;
     }
     widgTableVariables.setVisible(true);
-    widgTableVariables.repaint(500,500);
+    widgTableVariables.redraw(500,500);
 
   }
   
@@ -480,7 +480,7 @@ public final class InspcCurveView
         if(newline !=null && ixnewline >=0) {
           table.setCurrentLine(newline, ixnewline, 0);
         }
-        table.repaint();
+        table.redraw();
       } else {
         System.out.printf("InspcCurveView - invalid widget to drop; %s\n", variableWidget.toString());
       }
@@ -509,7 +509,7 @@ public final class InspcCurveView
           
       } }
      
-      table.repaint();
+      table.redraw();
     }
     return true;
     
@@ -672,7 +672,7 @@ public final class InspcCurveView
         GralCurveView.Track track2 = (GralCurveView.Track)line.getData();  //the same ---
         track.setLineProperties(null, 3, 0);
       }
-      widgCurve.repaint();
+      widgCurve.redraw();
       return true;
     }
   };
@@ -689,7 +689,7 @@ public final class InspcCurveView
       }
       GralTable<GralCurveViewTrack_ifc>.TableLineData line = widgTableVariables.getCurrentLine();
       actionSelectVariableInTable.exec(KeyCode.F2, widgTableVariables, line);
-      widgCurve.repaint();
+      widgCurve.redraw();
       return true;
     }
   };
@@ -969,7 +969,7 @@ public final class InspcCurveView
             if(dst == null){
               dst = widgCurve.addTrack(sName, null, trackScale.getLineColor(), 0, 50, 5000.0f, 0.0f);
             }
-            widgCurve.repaint(500,500);
+            widgCurve.redraw(500,500);
             dst.setTrackScale(scale, scale0, line0);
             widgBtnScale.setTextColor(GralColor.getColor("lgn"));
           }
@@ -1021,7 +1021,7 @@ public final class InspcCurveView
                 line1.setBackColor(colorTrackOtherScale, colorTrackOtherScaleSelected, colorTrackOtherScaleSelected, colorTrackOtherScaleSelected, colorTrackOtherScaleSelected, -1);
               }
             }
-            widgTableVariables.repaint(500,500);
+            widgTableVariables.redraw(500,500);
           }
           if(trackScale !=null && trackScale !=null){      // set the line from the last selection to normal
             trackScale.setLineProperties(trackScale.getLineColor(), 1, 0);
@@ -1040,7 +1040,7 @@ public final class InspcCurveView
           }
           actionShowCursorValues(track);                   // show the values of this variable on cursor position
           System.out.println("InspcCurveView.action - SelectVariableInTable");
-          widgCurve.repaint(500, 0);                       // repaint after ...1 second to have time to select in the table.
+          widgCurve.redraw(500, 0);                       // repaint after ...1 second to have time to select in the table.
         }
       }
       return true;
@@ -1487,7 +1487,7 @@ public final class InspcCurveView
     widgScale.setText("" + trackScale.getScale7div());
     widgScale0.setText("" + trackScale.getOffset());
     widgline0.setText("" + trackScale.getLinePercent());
-    widgCurve.repaint(100, 200);
+    widgCurve.redraw(100, 200);
 
   }
   

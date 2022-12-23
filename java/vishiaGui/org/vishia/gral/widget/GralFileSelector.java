@@ -925,7 +925,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       GralTableLine_ifc<FavorPath> line = this.wdgFavorTable.addLine(null, null, favorPathInfo);
       line.setCellText(favorPathInfo.selectName, 0);
       line.setCellText(favorPathInfo.path, 1);
-      line.repaint(100,0);
+      line.redraw(100,0);
       return line;
     }
     else return null;
@@ -962,7 +962,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       doActivateFavor();
       System.out.println("GralFileSelector - fillFavorPaths: " + this.wdgFavorTable.name);
       //this.wdgFavorTable.bPrepareVisibleArea = true;
-      this.wdgFavorTable.redraw(0, 0);
+      this.wdgFavorTable.redraw1(0, 0);
     }
 
   }
@@ -1205,7 +1205,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.wdgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
       this.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
     }
-    this.wdgSelectList.wdgdTable.repaint(100, 200);
+    this.wdgSelectList.wdgdTable.redraw(100, 200);
     this.fillinPending = false;
     
   }
@@ -1550,7 +1550,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
       favorLine.setCellText(sCurrFile, 2);
     }
-    this.wdgFavorTable.redraw(100, 100);
+    this.wdgFavorTable.redraw1(100, 100);
     this.wdgFavorTable.setVisible(true);
     this.wdgFavorTable.setFocus();
   }

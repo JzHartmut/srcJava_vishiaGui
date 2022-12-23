@@ -87,7 +87,7 @@ public class GralLed extends GralWidget
   public void setColor(GralColor colorBorder, GralColor colorInner){
     dyda.lineColor = colorBorder;
     dyda.backColor = colorInner;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
   }
 
   /**Sets the color both inner and border with the given value

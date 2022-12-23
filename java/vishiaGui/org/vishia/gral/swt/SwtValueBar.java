@@ -72,7 +72,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
 	
 	
 	
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     widgetSwt.redraw();
   }
 

@@ -9,7 +9,7 @@ import org.vishia.gral.ifc.GralRectangle;
  * capabilities of its derived classes, for example {@link GralWidget#setText(CharSequence)}
  * or {@link GralWidget#setBackColor(org.vishia.gral.ifc.GralColor, int)}. That methods 
  * stores the text, color etc. in graphic-independent attributes. The method 
- * {@link #repaintGthread()} is the central method to realize that user stimuli for the
+ * {@link #redrawGthread()} is the central method to realize that user stimuli for the
  * implementation graphic layer. That method can use especially the {@link GralWidget.DynamicData}
  * and there quest method {@link GralWidget.DynamicData#whatIsChanged}.
  * There is no needing of methods such as <code>setText(String)</code> etc. because the user
@@ -94,7 +94,7 @@ public interface GralWidgImplAccess_ifc
    * See {@link #repaintRequ}
    * 
    */
-  void repaintGthread ( );
+  void redrawGthread ( );
 
   
   /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,

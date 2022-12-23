@@ -25,7 +25,7 @@ public class SwtWidgetSimpleWrapper extends GralWidget.ImplAccess  //implements 
   }
 
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     widgetSwt.redraw();
   }
 

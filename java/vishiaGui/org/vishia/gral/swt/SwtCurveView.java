@@ -114,7 +114,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   }
   
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     int chg = dyda().getChanged();  //impl.getChanged();
     int acknChg = 0;
     if((chg & chgVisible)!=0){
@@ -569,7 +569,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     
     
     /**The paint event is forced by an handling on operation system, for example hide or show a window, resize etc. pp.
-     * It is also forced by new data, from calling of {@link #repaintGthread()}. 
+     * It is also forced by new data, from calling of {@link #redrawGthread()}. 
      */
     PaintListener paintListener = new PaintListener()
     {

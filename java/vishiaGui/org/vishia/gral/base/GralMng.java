@@ -567,7 +567,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     } else {
       System.out.println("no Gral implementor, faulty String: " + implementor);
     }
-    this.windPrimary.repaint();
+    this.windPrimary.redraw();
   }
   
   
@@ -2208,7 +2208,7 @@ public GralButton addCheckButton(
   {
     GralWidgetBase_ifc panel = pos().pos.parent;
     if(panel instanceof GralPanelContent) {
-      ((GralPanelContent)panel).repaint();
+      ((GralPanelContent)panel).redraw();
     }
   }
   
@@ -2295,7 +2295,7 @@ public GralButton addCheckButton(
      */
     public void focusLostGral(GralWidget widgg){
       GralWidget.ImplAccess.setFocused(widgg, false);  //denotes that the GralWidget has lost the focus
-      widgg.repaint();  //maybe changed outfit on focus lost.
+      widgg.redraw();  //maybe changed outfit on focus lost.
       if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusLost, widgg); }
       //CharSequence text = Assert.stackInfo("", 1, 5);
       //System.out.println("GralMng - widget focus lost;" + widgg.name + text);
@@ -2312,7 +2312,7 @@ public GralButton addCheckButton(
     public void focusGainedGral(GralWidget widgg){
       GralMng.this.notifyFocus(widgg);
       GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
-      widgg.repaint();  //maybe changed outfit on focus gained.
+      widgg.redraw();  //maybe changed outfit on focus gained.
       System.out.println("focusGainedGral: " + widgg.getName() + ":" + widgg.pos());
       String htmlHelp = widgg.getHtmlHelp();
       if(htmlHelp !=null && htmlHelp.startsWith(":FcmdNew.html")) { 

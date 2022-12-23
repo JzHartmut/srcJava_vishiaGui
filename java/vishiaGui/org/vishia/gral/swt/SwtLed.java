@@ -201,7 +201,7 @@ private class SwtLedImpl extends Canvas
   @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); wdgh.setVisibleGThread(bVisible); }
 
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     widgSwt.redraw();
   }
 

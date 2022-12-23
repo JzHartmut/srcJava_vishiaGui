@@ -610,7 +610,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     bColumnEditable[column] = val;
     if(((GralWidget)this)._wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgEditableColumn);
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
   }
   
@@ -707,7 +707,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         this.colSelectedixCellC = ixcolumn;
       }
       bPrepareVisibleArea = true;
-      repaint();
+      redraw();
     } else {
       this.gralMng().log().writeWarning("table not visiable");
     }
@@ -720,7 +720,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   public void setColorBackSelectedLine(GralColor color){ 
     colorBackSelect = color; 
-    repaint(100, 0);
+    redraw(100, 0);
   }
 
   
@@ -828,7 +828,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     }
     bPrepareVisibleArea = true;
-    repaint(100, 0);
+    redraw(100, 0);
     return line;
   }
 
@@ -864,7 +864,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     }
     bPrepareVisibleArea = true;
-    repaint();
+    redraw();
     return line;
   }
 
@@ -915,7 +915,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     bChangedLinesForCell = true;
     rootLine.clear();
     bPrepareVisibleArea = true;
-    repaint(200,200);
+    redraw(200,200);
   }
 
   
@@ -1093,7 +1093,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected void mouseDown(int key, CellData cell){
     lineSelectedNew = linesForCell[cell.ixCellLine]; 
-    repaint(0,0);  //immediately, it is in the graphic thread.
+    redraw(0,0);  //immediately, it is in the graphic thread.
   }
 
 
@@ -1109,7 +1109,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
       colSelectedixCellC = cell.ixCellColumn;
       actionOnLineSelected(KeyCode.userSelect, lineSelected);
-      repaint();
+      redraw();
     }
   }
 
@@ -1344,13 +1344,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             keyCode &= ~KeyCode.shiftDigit;  //The keycode is valid without shift-designation.
             searchChars.appendCodePoint(keyCode);
             searchContent(false);
-            repaint();
+            redraw();
           } else if(keyCode == KeyCode.esc){
             searchChars.setLength(0);
-            repaint();
+            redraw();
           } else if(keyCode == KeyCode.back && searchChars.length() >0){
             searchChars.setLength(searchChars.length()-1);
-            repaint();
+            redraw();
           } else if(lineSelected !=null && keyCode == keyOpenChild){
             if(lineSelected.tbl_lineCanHaveChildren){
               actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
@@ -1365,7 +1365,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             if(lineSelected !=null && lineSelected.tbl_showChildren){
               lineSelected.showChildren(false, false);
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
-              repaint();
+              redraw();
             }
           } else {
             done = false;
@@ -1428,7 +1428,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override
     public void executeOrder() {
       gi.bFocused = true;  //to focus while repainting
-      _wdgImpl.repaintGthread();
+      _wdgImpl.redrawGthread();
       keyDone = true;
       //System.out.println("Key done");
     }
@@ -1859,7 +1859,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
 
     /**This method have to be called before the vertical scroll bar is painted
-     * in the {@link GralWidgImplAccess_ifc#repaintGthread()} routine..
+     * in the {@link GralWidgImplAccess_ifc#redrawGthread()} routine..
      * It checks whether the {@link GralTable#nLineCurr} and the shown number of lines
      * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#tbl_zLineUnfolded}
      * is given, e.g. >=0. If one of them is <0 or lines are countered
@@ -2067,7 +2067,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           gralMng.gralFocusListener.focusGainedGral(GralTable.this);
           //super.focusGained();
           //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
-          repaint(50,100);
+          redraw(50,100);
         }
       }
     }
@@ -2080,7 +2080,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected void focusLostTable(){ 
       bFocusLost = true;
-      repaint(50,100);  //NOTE: bFocusLost =false will be set in repaint.
+      redraw(50,100);  //NOTE: bFocusLost =false will be set in repaint.
     }
     
 
@@ -2243,7 +2243,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         nLineFirst = -1;  //get new, undefined elsewhere.
       }
       line1.detach();
-      repaint();
+      redraw();
     }
     
     
@@ -2402,7 +2402,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         nLineFirst = rootLine.tbl_zLineUnfolded;  //store the number of current line if given.
       }
       if(showChildren1) {
-        repaint();
+        redraw();
       }
     }
     
@@ -2484,7 +2484,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(oldText ==null || !oldText.equals(text)) {
         cellTexts[column] = text;
         bChangedSet[column] = true;
-        GralTable.this.repaint();
+        GralTable.this.redraw();
       }
       return oldText;
     }
@@ -2523,14 +2523,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override @Deprecated public GralColor setBackgroundColor(GralColor color) {
       GralColor ret = colorBackground;
       colorBackground = color;
-      repaint(50, 50);
+      redraw(50, 50);
       return ret;
     }
 
     @Override @Deprecated public GralColor setForegroundColor(GralColor color) {
       GralColor ret = colorForeground;
       colorForeground = color;
-      repaint(50, 50);
+      redraw(50, 50);
       return ret;
     }
 
@@ -2549,7 +2549,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         if(cellColorBack == null){ cellColorBack = new GralColor[cellTexts.length]; }
         cellColorBack[ix] = color;
       }
-      repaint();
+      redraw();
     }
     
     @Override public GralColor getBackColor(int ix)
@@ -2591,19 +2591,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         this.colorBackSelectSomeMarked = colorSomeMarked;
         this.colorBackSelectMarked = colorSelectMarked;
       }
-      repaint();
+      redraw();
     }
     
     @Override public void setLineColor(GralColor color, int ix)
     { 
       colorForeground = color;
-      repaint(50, 50);
+      redraw(50, 50);
     }
 
     @Override public void setTextColor(GralColor color)
     { 
       colorForeground = color;
-      repaint(50, 50);
+      redraw(50, 50);
     }
 
     @Override public void setText(CharSequence text){
@@ -2637,19 +2637,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       showChildren(show, bLeftGrandChildrenOpen);
       countChildren(bLeftGrandChildrenOpen, nLineFirst);  //count the children.
       fillVisibleAreaBehind(this, lineSelectedixCell);
-      repaint();
+      redraw();
     }      
     
     
     @Override
-    public void repaint() {
+    public void redraw() {
       ctRepaintLine.addAndGet(1);
-      GralTable.this.repaint(); 
+      GralTable.this.redraw(); 
     }
 
-    @Override public void repaint(int delay, int latest){
+    @Override public void redraw(int delay, int latest){
       ctRepaintLine.addAndGet(1);
-      GralTable.this.repaint(delay, latest); 
+      GralTable.this.redraw(delay, latest); 
       //itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
     }
     

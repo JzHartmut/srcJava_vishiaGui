@@ -184,7 +184,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     } else {
       ixDstItem = ixActItem; //unchanged
     }
-    repaint(100, 300);
+    redraw(100, 300);
   }
   
   

@@ -95,7 +95,7 @@ import org.vishia.util.MinMaxTime;
  *   which changes the same widget, the last wins. That may be a non-usual case. If one thread changes a text
  *   and another thread changes a color, it may be okay. There is no necessity to make it thread-safe. 
  *   But if it may be necessity, the user can wrap the access with specific synchronized methods.
- *   After any changing of content, {@link GralWidget#repaint(int, int)} should be invoked with a suitable
+ *   After any changing of content, {@link GralWidget#redraw(int, int)} should be invoked with a suitable
  *   delay. That queues the repaint instance
  *   <ul><li>{@link GralWidget#repaintRequ} (it is private) in the queue
  *   <li>{@link #queueDelayedGraphicOrders}
@@ -107,9 +107,9 @@ import org.vishia.util.MinMaxTime;
  * can be shelved if there are queued and re-instruct further time. This is necessary because some 
  * graphic appearance changing requests may be given in any thread one after another, and the graphic thread
  * should be invoked not for any one request, but only if all requests are given. It saves thread switch activity.
- * Especially if some data are changed and a {@link GralWidget#repaint()} request only applies the data 
+ * Especially if some data are changed and a {@link GralWidget#redraw()} request only applies the data 
  * to the widgets, that 'repaint()' should be invoked only if all data are given. But any data changing
- * don't may know whether it is the last one. Therefore {@link GralWidget#repaint(int, int)} can be called
+ * don't may know whether it is the last one. Therefore {@link GralWidget#redraw(int, int)} can be called
  * after any data changing with shelving the repaint time. The repaint is executed not till the activity
  * of data changing is finished.
  *  

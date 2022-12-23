@@ -1274,7 +1274,7 @@ public class GitGui
           lineTexts[2] = entry.commitTitle;
           lineTexts[3] = entry.author;
           GralTableLine_ifc<RevisionEntry> line = wdgTableVersion.addLine(hash, lineTexts, entry);  
-          line.repaint();
+          line.redraw();
         }
         entryLast = entry;
       } //
@@ -1283,7 +1283,7 @@ public class GitGui
       }
     } while(contCommits);
     //wdgTableVersion.
-    wdgTableVersion.repaint();
+    wdgTableVersion.redraw();
   }
 
 
@@ -1550,7 +1550,7 @@ public class GitGui
   void fillFileTable4Revision() {
     wdgTableFiles.clearTable();
     GralTableLine_ifc<String> line = wdgTableFiles.addLine("*", new String[] {"!","(all files)",""}, "*");  
-    wdgTableFiles.repaint();
+    wdgTableFiles.redraw();
     gitOut.firstlineMaxpart();
     do {
       String sLine = gitOut.getCurrentPart().toString();
@@ -1571,7 +1571,7 @@ public class GitGui
           Debugutil.stop();
         }
         line = wdgTableFiles.addLine(key, col, sLine);  
-        line.repaint();
+        line.redraw();
       }
     } while(gitOut.nextlineMaxpart().found());
     if(this.sLocalFile !=null) {

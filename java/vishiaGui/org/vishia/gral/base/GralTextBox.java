@@ -98,7 +98,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   { synchronized(newText) {
       newText.append(arg0);
       dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
-      repaint();
+      redraw();
     }
     return this;
   }
@@ -112,7 +112,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   { synchronized(newText) {
     newText.append(arg0);
     dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
-    repaint();
+    redraw();
   }
   return this;
 }
@@ -145,7 +145,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   @Override public void setEditable(boolean editable){
     dyda.setChanged(editable ? GraphicImplAccess.chgEditable : GraphicImplAccess.chgNonEditable);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
   }
 
@@ -168,7 +168,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   {
     dyda.setChanged(GraphicImplAccess.chgViewTrail);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
     
   }

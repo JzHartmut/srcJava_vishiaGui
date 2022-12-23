@@ -107,7 +107,7 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	{
 		if(_wdgImpl !=null){
 		  if(((GraphicImplAccess)_wdgImpl).setValue(value)) {
-        this.repaint();
+        this.redraw();
 		  }
 		}
 	}

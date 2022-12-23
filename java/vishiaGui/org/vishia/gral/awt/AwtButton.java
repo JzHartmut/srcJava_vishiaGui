@@ -205,7 +205,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
 
 
   @Override
-  public void repaintGthread() {
+  public void redrawGthread() {
     // TODO Auto-generated method stub
     
   };

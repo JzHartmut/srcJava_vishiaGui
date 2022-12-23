@@ -191,7 +191,7 @@ public class AwtPanel  extends GralPanelContent.ImplAccess
     
   }
 
-  @Override public void repaintGthread () {
+  @Override public void redrawGthread () {
     // TODO Auto-generated method stub
     
   }

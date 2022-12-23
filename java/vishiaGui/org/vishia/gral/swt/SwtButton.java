@@ -152,7 +152,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
     swtWidgHelper.setVisibleGThread(bVisible);
   }
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     super.prepareWidget();
     GralWidget.DynamicData dyda = dyda();
     int chg = dyda.getChanged();

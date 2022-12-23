@@ -129,7 +129,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   
   /**State of visible, fullScreen, close set by {@link #setVisible(boolean)}, {@link #setFullScreen(boolean)},
    * {@link #closeWindow()} called in another thread than the graphic thread. It is stored here
-   * and executed in the {@link GralWidgImplAccess_ifc#repaintGthread()}. */
+   * and executed in the {@link GralWidgImplAccess_ifc#redrawGthread()}. */
   protected boolean XXXbVisible, bFullScreen, bShouldClose;
   
 
@@ -325,7 +325,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   {
     dyda.displayedText = sTitle;
     dyda.setChanged(ImplAccess.chgText); 
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
   }
 
   
@@ -333,7 +333,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   public void setFullScreen(boolean val){
     if(bFullScreen !=val){
       bFullScreen = val;
-      repaint();
+      redraw();
     }
   }
 

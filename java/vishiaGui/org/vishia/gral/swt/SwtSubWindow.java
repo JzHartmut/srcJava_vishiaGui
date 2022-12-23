@@ -319,7 +319,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     this.window.setVisible(bVisible); 
   }
 
-  @Override public void repaintGthread() {
+  @Override public void redrawGthread() {
     int chg = getChanged();
     int acknChg = 0;
     if(!this.bHasResizeAction && this.resizeAction() != null){

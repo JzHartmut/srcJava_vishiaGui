@@ -98,7 +98,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     //widgg.setText(widgg.getText() + " dy=" + rectangle.dy + " height=" + height);
     //on SWT it invokes the resize listener if given.
     //swtMng.gralMng.registerWidget(widgg);
-    repaintGthread();  //to set text etc.
+    redrawGthread();  //to set text etc.
   }
 
 
@@ -117,7 +117,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override
-  public void repaintGthread()
+  public void redrawGthread()
   {
     if(labelSwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();

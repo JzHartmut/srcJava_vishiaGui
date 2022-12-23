@@ -92,7 +92,7 @@ public class AwtTextBox extends GralTextBox.GraphicImplAccess
 
 
   
-  @Override public void repaintGthread(){  textFieldSwt.repaint();  }
+  @Override public void redrawGthread(){  textFieldSwt.repaint();  }
 
   
 

@@ -235,7 +235,7 @@ public class GralButton extends GralWidget
     }//switch
     if(bChanged){
       dyda.setChanged(ImplAccess.chgColorBack); 
-      repaint();
+      redraw();
     }
   }
 
@@ -263,7 +263,7 @@ public class GralButton extends GralWidget
     
     if(sButtonTextDisabled == null){ sButtonTextDisabled = sButtonText; }
     if(sButtonTextOn == null){ sButtonTextOn = sButtonText; }
-    repaint(100, 100);
+    redraw(100, 100);
   }
   
   /**Show the button in an activated state. This method is called especially 
@@ -273,7 +273,7 @@ public class GralButton extends GralWidget
     this.isPressed = value;
     this.wasPressed = value;
     this.wasReleased = !value;
-    repaint(100, 100);
+    redraw(100, 100);
   }
   
   
@@ -292,7 +292,7 @@ public class GralButton extends GralWidget
     if(action !=null){
       action.action().exec(KeyCode.enter, this, action.args());
     }
-    repaint();
+    redraw();
   }
   
   
@@ -314,7 +314,7 @@ public class GralButton extends GralWidget
   
   public void XXXsetDisabled(boolean value){
     this.switchState = value ? State.Disabled: State.On; //kDisabled : kOn;
-    repaint(100, 100);
+    redraw(100, 100);
   }
   
   
@@ -383,7 +383,7 @@ public class GralButton extends GralWidget
         switchState = State.Off;
       }
     }
-    repaint(100,100);
+    redraw(100,100);
   }
   
 
@@ -395,7 +395,7 @@ public class GralButton extends GralWidget
   public void setState(State state){
     //if(state == kOn || state == kOff || state ==kDisabled){
       switchState = state;
-      repaint(100,100);
+      redraw(100,100);
     //} else {
     //  throw new IllegalArgumentException("faulty state: " + state);
     //}
@@ -472,7 +472,7 @@ public class GralButton extends GralWidget
           action.action().exec(keyCode, widgg, args2); 
         }
       }*/
-      widgg.repaint(); //100, 200);
+      widgg.redraw(); //100, 200);
     }
 
 

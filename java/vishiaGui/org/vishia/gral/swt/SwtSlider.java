@@ -35,7 +35,7 @@ public class SwtSlider extends GralSlider._GraphicImplAccess_
     
   }
 
-  @Override public void repaintGthread()
+  @Override public void redrawGthread()
   {
     // TODO Auto-generated method stub
     

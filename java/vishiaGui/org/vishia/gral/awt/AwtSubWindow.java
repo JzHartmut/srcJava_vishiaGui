@@ -109,7 +109,7 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
 
 
   @Override
-  public void repaintGthread() {
+  public void redrawGthread() {
     Debugutil.stop();
     
   }

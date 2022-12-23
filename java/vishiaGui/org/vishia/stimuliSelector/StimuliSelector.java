@@ -385,7 +385,7 @@ public class StimuliSelector
             System.out.println(listElement.toString());
           }
         }
-        this.wdgTables[iList].repaint();
+        this.wdgTables[iList].redraw();
       }
       level.close();
     }
@@ -578,7 +578,7 @@ public class StimuliSelector
               }
             }
             if(bSomeMarked && bMarkLinesInTable) {
-              table.repaint();
+              table.redraw();
             }
             else if(!bSomeMarked && !bMarkLinesInTable) {
               GralTable<Map<String, DataAccess.Variable<Object>>>.TableLineData line = table.getCurrentLine();
@@ -754,7 +754,7 @@ public class StimuliSelector
         }
       }
       if(bSomeDone) {
-        this.wdgTables[ixTable].repaint();
+        this.wdgTables[ixTable].redraw();
       }
     }
   }  

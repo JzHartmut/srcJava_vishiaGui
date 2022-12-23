@@ -80,7 +80,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
     labelAwt.setAlignment(mode);
     mng.setBounds_(widgg.pos(), labelAwt);
     mng.gralMng.registerWidget(widgg);
-    repaintGthread();  //to set text etc.
+    redrawGthread();  //to set text etc.
   }
 
 
@@ -99,7 +99,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override
-  public void repaintGthread()
+  public void redrawGthread()
   {
     if(labelAwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();

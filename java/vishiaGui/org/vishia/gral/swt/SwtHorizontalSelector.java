@@ -100,7 +100,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
 
   
   
-  @Override public void repaintGthread(){ swtWdgW.swtUpdateRedraw(); }
+  @Override public void redrawGthread(){ swtWdgW.swtUpdateRedraw(); }
 
   
   @Override public Object getWidgetImplementation(){ return swtWdgW.widgetSwt; }

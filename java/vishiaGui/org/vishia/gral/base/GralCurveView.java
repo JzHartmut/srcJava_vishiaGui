@@ -82,7 +82,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * <li>2014-03-14 Hartmut new: {@link CommonCurve#timeVariable} for time from target. 
    * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
    * <li>2014-01-29 Hartmut new: Comment in Datapath supported. For nice presentation in list on long variable paths. 
-   * <li>2013-11-19 Hartmut new: {@link #repaint(int, int)} overridden forces paint of the whole curve
+   * <li>2013-11-19 Hartmut new: {@link #redraw(int, int)} overridden forces paint of the whole curve
    *   by setting {@link #bPaintAllCmd}, whereby in {@link #setSample(float[], int)} super.repaint is invoked, 
    *   which does not set {@link #bPaintAllCmd} and paints therefore only the new data. 
    * <li>2013-07-25 Hartmut new AutoSave capabilities.
@@ -1078,7 +1078,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       synchronized(this){
         if(super._wdgImpl !=null) ((GraphicImplAccess)(super._wdgImpl)).redrawBecauseNewData = true;
       }
-      super.repaint(50,100);
+      super.redraw(50,100);
     }
   }
 
@@ -1505,16 +1505,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Forces repaint of the whole curves. It sets the internal flag {@link #bPaintAllCmd} which is checked
    * in the paint event routine. In opposite {@link #setSample(float[], int)} invokes
-   * super.repaint of {@link GralWidget#repaint(int, int)} without setting that flag. Therefore the graphic
+   * super.repaint of {@link GralWidget#redraw(int, int)} without setting that flag. Therefore the graphic
    * will be shifted to left only with paint of only the new data.
-   * @see org.vishia.gral.base.GralWidget#repaint(int, int)
+   * @see org.vishia.gral.base.GralWidget#redraw(int, int)
    */
-  @Override public void repaint(int delay, int latest){
+  @Override public void redraw(int delay, int latest){
     System.out.println("GralCurveView.Info - repaint all Trigger;");
     if(_wdgImpl == null) return;
     ((GraphicImplAccess)_wdgImpl).bPaintAllCmd = true;      //used in implementation level to force a paint of the whole curves.
     bNewGetVariables= true;   //used to get faulty variables newly with an error message.
-    super.repaint(delay, latest);
+    super.redraw(delay, latest);
   }
   
   
@@ -1774,7 +1774,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         }
       }
       bRedrawAll = true;
-      widgg.repaint(0,0);
+      widgg.redraw(0,0);
       //repaint(50,100);
       if(widgg.actionMoveCursor !=null){
         widgg.actionMoveCursor.exec(0, widgg);
@@ -1786,11 +1786,11 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(bMouseDownCursor1){
         xpCursor1New = xr;  //from right;
         //System.out.println("SwtCurveView.mouseMove - cursor1; xr=" + xr);
-        widgg.repaint(50,100);
+        widgg.redraw(50,100);
       } else if(bMouseDownCursor2){
         xpCursor2New = xr;  //from right;
         //System.out.println("SwtCurveView.mouseMove - cursor2; xr=" + xr);
-        widgg.repaint(50,100);
+        widgg.redraw(50,100);
       } else {
         //System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
           
@@ -1814,7 +1814,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(widgg.timeorg.timeSpread > 100) { widgg.timeorg.timeSpread /=2; }
       else { widgg.timeorg.timeSpread = 100; }
       bPaintAllCmd = true;
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     }
 
     /**Zooms the curve presentation with same index right with a greater time spread. 
@@ -1833,7 +1833,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(widgg.timeorg.timeSpread < 0x3fffffff) { widgg.timeorg.timeSpread *=2; }
       else { widgg.timeorg.timeSpread = 0x7fffffff; }
       bPaintAllCmd = true;
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     
     }
 
@@ -1856,7 +1856,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         widgg.stop();
       }
       xpCursor1New = xpCursor2New = cmdSetCursor;  
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     
     }
 
@@ -1894,7 +1894,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       */
       Assert.check(widgg.timeorg.timeSpread >0);
       xpCursor1New = xpCursor2New = cmdSetCursor;  
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     }
 
     /**Shifts the curve presentation to the present (actual values).
@@ -1925,7 +1925,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           //ixDataShowRight1 = ixDataWr + ixdDataSpread;
         //}
         //ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
-        widgg.repaint(100, 200);
+        widgg.redraw(100, 200);
     
       } else {
         setPaintAllCmd();  //refresh
@@ -1952,7 +1952,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           ixDataShowRight = widgg.ixDataWr + ixdDataSpread;
         }
       }
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
       //System.out.println("left-bottom");
     
     }

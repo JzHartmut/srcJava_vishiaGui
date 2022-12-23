@@ -68,7 +68,7 @@ public class SwtCanvasArea extends GralCanvasArea._GraphicImplAccess_
   
   
   
-  @Override public void repaintGthread ( ) {
+  @Override public void redrawGthread ( ) {
     this.swtCanvas.redraw();
   }
 

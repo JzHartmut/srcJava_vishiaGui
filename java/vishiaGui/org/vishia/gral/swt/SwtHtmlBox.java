@@ -128,7 +128,7 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
   @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); boxSwt.setVisible(bVisible); }
 
 
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     if(boxSwt !=null){ boxSwt.redraw(); }
   }
 

@@ -19,7 +19,7 @@ public class SwtFactory extends GralFactory
    * till the point where the {@link GralGraphicThread#orderList}
    * is started to run. Then the {@link GralGraphicThread#waitForStart()} is fulfilled,
    * and this operation returns with the {@link GralGraphicThread} instance to use for further orders.
-   * The orders are given to the GraphicThread usual by {@link GralWidget#repaint()} requested with the changed data of the widget.
+   * The orders are given to the GraphicThread usual by {@link GralWidget#redraw()} requested with the changed data of the widget.
    * It means nothing is necessary with the GralGraphicThread from user level.
    */
   @Override public void createGraphic(GralMng gralMng, char sizeShow){

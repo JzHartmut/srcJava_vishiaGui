@@ -243,7 +243,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);
-    table.repaintGthread();
+    table.redrawGthread();
     //mng.gralMng.registerWidget(gralTable);
     //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
     return table;
@@ -293,9 +293,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
 
   /** TODO implement in {@link GralTable.GraphicImplAccess}
-   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#repaintGthread()
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#redrawGthread()
    */
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     if(bFocusLost){
       //this is about 50 ms after focus lost, the focus has lost really.
       bFocused = false;
@@ -368,7 +368,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocusGThread()
-  { repaintGthread();  //to set the focus of the cell
+  { redrawGthread();  //to set the focus of the cell
     return true;
   }
 
@@ -381,7 +381,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         cell.setVisible(bVisible);
       }
     }
-    repaintGthread();
+    redrawGthread();
   }
 
 
@@ -423,7 +423,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     GralTable.CellData data = (GralTable.CellData)cell.getData();
     data.bSetFocus = true;
     if(super.redrawTableWithFocusedCell(data)){
-      repaintGthread();
+      redrawGthread();
       //((Table)swtWidgWrapper.widgetSwt).redrawGthread();
     }
   }

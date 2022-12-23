@@ -55,7 +55,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * <li>2012-06-30 Hartmut new actionChange called on typing inside a field.
    * <li>2012-06-30 Hartmut new {@link #swtKeyListener}. The [Enter] key will be send to the User
    *   in opposite to {@link SwtTextBox}.
-   * <li>2012-06-08 Hartmut chg: {@link #repaintGthread()} does not do anything if the textFieldSwt is removed 
+   * <li>2012-06-08 Hartmut chg: {@link #redrawGthread()} does not do anything if the textFieldSwt is removed 
    *   because the widget was removed. Prevent null-Pointer exception.
    * <li>2012-04-10 Hartmut chg: A key listener, only for experience
    * <li>2012-03-17 Hartmut bugfix: adjustment of prompt for top prompt
@@ -241,7 +241,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     int catastrophicalCount = 0;
     int chg;
     if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.

@@ -137,12 +137,12 @@ public class GralScreen implements GralPanel_ifc {
     return null;
   }
 
-  @Override public void repaint () {
+  @Override public void redraw () {
  
     
   }
 
-  @Override public void repaint ( int delay, int latest ) {
+  @Override public void redraw ( int delay, int latest ) {
  
     
   }

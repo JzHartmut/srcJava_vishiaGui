@@ -170,7 +170,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     this.sPrompt = sPrompt;
     if(_wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgPrompt);
-      repaint();
+      redraw();
     } else {
       this.sPromptStylePosition = "t";
     }
@@ -545,8 +545,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   { setText(arg, 0);
   }
   
-  /**Sets the textual content. This method sets the text and invokes a {@link #repaint(int, int)} in 100 ms 
-   * if the content is changed in another thread than the graphical thread. It invokes a {@link #repaintGthread()}
+  /**Sets the textual content. This method sets the text and invokes a {@link #redraw(int, int)} in 100 ms 
+   * if the content is changed in another thread than the graphical thread. It invokes a {@link #redrawGthread()}
    * if the content was changed in the graphical thread.
    * Note: If the current content is equals with the new one, a repaint request is not forced.
    * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
@@ -564,7 +564,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       dyda.displayedText = arg.toString();
       this.caretPos = caretPos;
       dyda.setChanged(GralWidget.ImplAccess.chgText);
-      repaint();
+      redraw();
     } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
   }
   
@@ -603,7 +603,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     if(pos != caretPos){
       caretPos = pos;
       dyda.setChanged(GraphicImplAccess.chgCursor);
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
     return pos9;  //the old
   }
@@ -615,7 +615,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     dyda.textColor = color;
     dyda.setChanged(GralWidget.ImplAccess.chgColorText);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
   }
   
@@ -625,7 +625,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     dyda.textColor = GralColor.getColor(color);
     dyda.setChanged(GralWidget.ImplAccess.chgColorText);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
   }
   
@@ -644,7 +644,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     borderwidth = width;
     dyda.setChanged(GralWidget.ImplAccess.chgColorLine);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
     return widthLast;
   }

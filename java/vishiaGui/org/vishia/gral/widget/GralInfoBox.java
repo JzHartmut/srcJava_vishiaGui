@@ -267,10 +267,10 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   
 
-  @Override public void repaint(){ repaint(0,0); }
+  @Override public void redraw(){ redraw(0,0); }
 
-  @Override public void repaint(int delay, int latest){
-    window.repaint(delay, latest);
+  @Override public void redraw(int delay, int latest){
+    window.redraw(delay, latest);
   }
   
   

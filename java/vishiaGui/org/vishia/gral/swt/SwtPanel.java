@@ -123,7 +123,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     if(this.panelSwtImpl !=null) {
       int mChanged;
       if( (mChanged = getChanged()) !=0) {

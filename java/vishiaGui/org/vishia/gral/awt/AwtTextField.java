@@ -156,7 +156,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
 
 
 
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     GralWidget.DynamicData dyda = dyda();
     int chg = dyda.getChanged();
     if((chg & chgText) !=0  && dyda.displayedText !=null){ 

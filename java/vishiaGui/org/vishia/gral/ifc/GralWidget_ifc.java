@@ -26,7 +26,7 @@ import org.vishia.util.Removeable;
  *   or {@link org.vishia.gral.base.GralTable#setColorCurrLine(GralColor)}.
  * <li>That methods store the given data either in the common {@link GralWidget.DynamicData} {@link GralWidget#dyda} of the widget
  *   or in specific data of a GralWidget implementation.
- * <li>That method calls {@link #repaint(int, int)} with a proper millisecond delay (usual 100).
+ * <li>That method calls {@link #redraw(int, int)} with a proper millisecond delay (usual 100).
  *   The graphic implementation widget is not touched in this time. Usual it is not necessary to show information
  *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
  *   saves calculation time if more as one property is changed on the same widget.
@@ -39,7 +39,7 @@ import org.vishia.util.Removeable;
  *   The graphic thread organizes it in a proper kind of time.
  * <li>If a {@link org.vishia.gral.base.GralGraphicTimeOrder} is dequeued in the graphic thread, 
  *   its method {@link org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)} is invoked. 
- *   This method calls {@link GralWidgImplAccess_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
+ *   This method calls {@link GralWidgImplAccess_ifc#redrawGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
  *   stored in {@link org.vishia.gral.base.GralWidget#dyda} to the special implementation widget method invocations
@@ -78,7 +78,7 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
    * <li>2012-04-25 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}: Capability for any widget
    *   to update its content from its associated variables described in its sDataPath.
    * <li>2012-03-31 Hartmut new: {@link #isVisible()}
-   * <li>2012-01-16 Hartmut new: Concept {@link #repaint()}, can be invoked in any thread. With delay possible.
+   * <li>2012-01-16 Hartmut new: Concept {@link #redraw()}, can be invoked in any thread. With delay possible.
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -269,16 +269,16 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
    * for all methods to set something like {@link #setBackColor(GralColor, int)} etc.
    * <br><br>
    * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
-   * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
+   * {@link #redraw(int, int)} is invoked with the standard delay of {@link #redrawtDelay} and {@link #redrawDelayMax}.
    * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
    * in the {@link GralGraphicThread#addTimeOrder(GralGraphicTimeOrder)}. In the requested time that 
-   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImplAccess_ifc#repaintGthread()}. 
+   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImplAccess_ifc#redrawGthread()}. 
    * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
    * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
    * <br><br>
    * If more as one attribute is changed one after another, only one instance of the {@link GralGraphicTimeOrder}
    * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
-   * {@link GralWidgImplAccess_ifc#repaintGthread()} quests all changes one after another. 
+   * {@link GralWidgImplAccess_ifc#redrawGthread()} quests all changes one after another. 
    * It means that a thread switch is invoked only one time per widget for more as one change.
    * <br>
    * See {@link DynamicData}. That composite part of a widget stores all standard dynamic data of a widget. 
@@ -300,9 +300,9 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
    * in the standard repaint time (about 100 ms). If this routine is invoked more as one time 
    * before the standard repaint time expires and not in the graphic thread,
    * then the repaint is executed only one time after the given delay with the last set data.
-   * See {@link #repaint(int, int)}
+   * See {@link #redraw(int, int)}
    */
-  public void repaint();
+  public void redraw();
   
   /**Possible delayed repaint, can be called in any thread.
    * If this method is re-called in the time where the delay is not elapsed
@@ -315,7 +315,7 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
    *   With the latest argument for this time the repaint is always executing independent of new calls.
    *   
    */
-  public void repaint(int delay, int latest);
+  public void redraw(int delay, int latest);
   
   /**This operation is used if the pixel are calculated on gral level.
    * Intrinsic this operation is not system-conform, instead use grid units here. 

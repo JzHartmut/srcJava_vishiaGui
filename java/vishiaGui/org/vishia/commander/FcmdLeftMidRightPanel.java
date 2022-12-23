@@ -359,7 +359,7 @@ public class FcmdLeftMidRightPanel
         //line.setUserData(favorTabInfo);
         //line.setCellText(favorTabInfo.label, 0);
         //line.setCellText(favorTabInfo.selectNameTab, 1);
-        line.repaint(100, 0);
+        line.redraw(100, 0);
       }
     }
     
