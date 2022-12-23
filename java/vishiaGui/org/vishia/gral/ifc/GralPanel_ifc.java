@@ -17,7 +17,7 @@ import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 public interface GralPanel_ifc extends GralWidget_ifc {
 
   
-  void setPrimaryWidget(GralWidget widg);
+  void setPrimaryWidget(GralWidgetBase_ifc widg);
   
   GralWidget getPanelWidget();
   

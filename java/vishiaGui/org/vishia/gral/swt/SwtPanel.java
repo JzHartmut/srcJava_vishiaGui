@@ -26,6 +26,7 @@ import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.Debugutil;
 
 public class SwtPanel extends GralPanelContent.ImplAccess
@@ -123,8 +124,27 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   
   @Override public void repaintGthread(){
-    if(panelSwtImpl !=null){
-      ((Composite)panelSwtImpl).redraw();
+    if(this.panelSwtImpl !=null) {
+      int mChanged;
+      if( (mChanged = getChanged()) !=0) {
+        if(  (mChanged & GralWidget.ImplAccess.chgCurrTab) !=0
+          && this.panelSwtImpl instanceof TabFolder) {     // change the tab, it is the focused widget of the panel
+          Object oTab = this.gralPanel.getFocusedWidget().getImplAccess().getWidgetImplementation();
+          //                   // the oTab is the Composite which is aggregated from any of the TabItems
+          TabFolder tabFolder = (TabFolder)this.panelSwtImpl;
+          boolean itemFound = false;
+          for(TabItem tabItem : tabFolder.getItems()) {    // check the given TabItem
+            if(tabItem.getControl() == oTab) {             // whether it associates the tab panel as Composite panel
+              tabFolder.setSelection(tabItem);             // and set this tab as selected.
+              itemFound = true;
+              break;  // from for
+            }
+          }
+          assert(itemFound);   // elsewhere the aggregation situation is faulty.
+        }
+        acknChanged(mChanged);
+      }
+      this.panelSwtImpl.redraw();
       SwtMng.storeGralPixBounds(this, (Composite)panelSwtImpl);
     }
   }
@@ -304,8 +324,9 @@ public class SwtPanel extends GralPanelContent.ImplAccess
             GralPanelContent gralPanel = (GralPanelContent)(swtPanel.gralPanel);
             List<GralWidget> widgetInfos = gralPanel.getWidgetList(); 
             //widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
-            if(gralPanel.getFocusedWidget() !=null){
-              gralPanel.getFocusedWidget().setVisibleState(false);  //the last focused tab.
+            GralWidgetBase_ifc focusedWidget = gralPanel.getFocusedWidget();
+            if(focusedWidget !=null && focusedWidget instanceof GralWidget){
+              ((GralWidget)focusedWidget).setVisibleState(false);           //deactivate the last focused tab.
             }
             gralPanel.setPrimaryWidget( gralPanel );
             //done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.

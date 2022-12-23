@@ -12,6 +12,7 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralVisibleWidgets_ifc;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Debugutil;
 
@@ -89,13 +90,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     /**The widget which should be focused if the panel is focused. 
      * It is possible to set any actual widget to store the focus situation,
      * It is possible too to have only one widget to focus. if the panel gets the focus. */
-    protected GralWidget primaryWidget;
-    
+    protected GralWidgetBase_ifc primaryWidget;
+
     /**List of all widgets which are contained in this panel or Window, to refresh the graphic.
      * This list is used in the communication thread to update the content of all widgets in the panel.
      */
     //private List<GralWidget> _wdgList = new ArrayList<GralWidget>();
-  
+
     /**List of all widgets which are contained in this panel.
      * This list is used in the communication thread to update the content of all widgets in the panel.
      */
@@ -241,7 +242,15 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   
   
   
-  public void setPrimaryWidget(GralWidget widg){ this._panel.primaryWidget = widg; }
+  /**The primary widget is that widget which should be focused if the panel is focused. 
+   * If this is a tabed panel the focused widget is the current opened tab.
+   * It is possible to set any actual widget to store the focus situation,
+   * It is possible too to have only one widget to focus. if the panel gets the focus. */
+  @Override public void setPrimaryWidget(GralWidgetBase_ifc widg){ 
+    this._panel.primaryWidget = widg; 
+    this.dyda.setChanged(GralWidget.ImplAccess.chgCurrTab);
+    redraw(100,100);
+  }
   
   
   public void setPanelVisible ( boolean bVisible) {
@@ -454,7 +463,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   }
 
 
-  public GralWidget getFocusedWidget() { return this._panel.primaryWidget; }
+  public GralWidgetBase_ifc getFocusedWidget() { return this._panel.primaryWidget; }
 
   /**
    * @deprecated use {@link #getWidgetList()}

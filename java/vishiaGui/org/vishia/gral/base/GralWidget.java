@@ -656,9 +656,9 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
       int catastrophicalCount = 1000;
       boolean bOk;
       do {
-        int act =whatIsChanged.get();
+        int act =this.whatIsChanged.get();
         int newValue = act & ~mask;
-        bOk = whatIsChanged.compareAndSet(act, newValue);
+        bOk = this.whatIsChanged.compareAndSet(act, newValue);
       } while(!bOk && --catastrophicalCount >= 0);
     }
     
@@ -1815,9 +1815,13 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * @param latest 
    */
   public void setFocus(int delay, int latest){
-    if(delay >0 || !gralMng.currThreadIsGraphic() || _wdgImpl == null) {
+    this.bVisibleState = true;
+    if(_wdgImpl == null) {
+      this.bHasFocus = true;                     // on instantiate the implementation grapic: Set this focus.
+    }
+    else if(delay >0 || !gralMng.currThreadIsGraphic()) {
       dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
-      repaint(delay, latest);
+      repaint(delay, latest);                    // do the following action in the graphic thread.
     } else {
       //action in the graphic thread.
       if(!bHasFocus) {
@@ -1835,7 +1839,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
               //TabbedPanel: The tab where the widget is member of have to be set as active one.
               GralPanelContent panel = (GralPanelContent)parent;
               panel.setVisibleStateWidget(true);
-              panel.setPrimaryWidget(this);
+              panel.setPrimaryWidget(child);
 //              if(child instanceof GralPanelContent) {
 //                panelTabbed.selectTab(child.getName());
 //              }
@@ -1853,18 +1857,18 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
         _wdgImpl.setFocusGThread();  //sets the focus to the
         bVisibleState = true;
       } 
-      GralWidget parent = this;
-      GralWidget child;
+      GralWidgetBase_ifc parent = this;
+      GralWidgetBase_ifc child;
       GralPanelContent panel;
+      GralWidget.ImplAccess childImplAccess;
       while(parent instanceof GralPanelContent
         && (child = (panel = (GralPanelContent)parent)._panel.primaryWidget) !=null
-        && child._wdgImpl !=null
-        && !child.bHasFocus
+        && (childImplAccess = child.getImplAccess()) !=null
+        && !child.isInFocus()
         ) {
-        child.setFocus();
-        child._wdgImpl.setFocusGThread();
-        child.bVisibleState = true;
-        child._wdgImpl.repaintGthread();
+        child.setFocus();                        // recursively call
+        childImplAccess.setFocusGThread();
+        childImplAccess.repaintGthread();
         List<GralWidget> listWidg = panel.getWidgetList();
         for(GralWidget widgChild : listWidg) {
           widgChild._wdgImpl.setVisibleGThread(true);
@@ -2015,13 +2019,13 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
     public static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
     
-    public static final int chgEditable = 0x20;
+    public static final int chgEditable = 0x20, chgPos = 0x80 ;
     
     public static final int chgVisibleInfo = 0x10000, chgObjects = 0x20000, chgFloat = 0x40000, chgIntg = 0x80000;
     
-    public static final int chgFocus = 0x10000000; 
+    public static final int chgFocus = 0x10000000, chgCurrTab = 0x20000000; 
     
-    public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
+    public static final int chgVisible = 0x40000000, chgInvisible = 0x80000000;
     
     /**This is only documentation. These bits are used specialized in derived classes.*/
     public static final int chgBitsDerived = 0x0ff0ff00;

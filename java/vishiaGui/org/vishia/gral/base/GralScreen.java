@@ -7,6 +7,7 @@ import org.vishia.gral.base.GralWidget.ImplAccess;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 
 /**Dummy implementation of the Screen as top level panel.
  * Only to prevent a null pointer. May be used more elaborately in future
@@ -196,10 +197,8 @@ public class GralScreen implements GralPanel_ifc {
     return false;
   }
 
-  @Override public void setPrimaryWidget (
-      GralWidget widg ) {
- 
-    
+  @Override public void setPrimaryWidget ( GralWidgetBase_ifc widg ) {
+      // nothing, left empty
   }
 
   @Override public GralWidget getPanelWidget () {

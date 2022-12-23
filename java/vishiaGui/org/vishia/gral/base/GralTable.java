@@ -681,7 +681,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   @Override public void setFocus(int delay, int latest){
     if(gi !=null){
       gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true;  //will be processed on redraw
-      super.setFocus(delay, latest);
+      super.setFocus(delay, latest);   // From GralWidget
     }
   }
   
