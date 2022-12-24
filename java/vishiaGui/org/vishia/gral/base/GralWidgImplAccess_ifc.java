@@ -84,7 +84,7 @@ public interface GralWidgImplAccess_ifc
   
   /**This method should be implemented in all Widget implementations of the adapter for the
    * underlying graphic system. 
-   * <br>Implementation hints: In SWT it should call redraw(). 
+   * <br>Implementation hints: In SWT it should call redraw(). In AWT this is named 'repaint()'-
    * <br>It is possible that the widget
    * consists of more as one graphical widget, then all of it should be redrawn. 
    * It is possible that some data are set in another thread, they should be applied to the widgets firstly.

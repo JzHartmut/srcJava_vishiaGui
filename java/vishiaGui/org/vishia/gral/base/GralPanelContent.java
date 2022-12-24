@@ -249,7 +249,8 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   @Override public void setPrimaryWidget(GralWidgetBase_ifc widg){ 
     this._panel.primaryWidget = widg; 
     this.dyda.setChanged(GralWidget.ImplAccess.chgCurrTab);
-    redraw1(100,100);
+    
+    redraw1(-50,100);
   }
   
   

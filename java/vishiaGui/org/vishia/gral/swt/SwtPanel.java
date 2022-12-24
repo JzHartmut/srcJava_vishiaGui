@@ -123,6 +123,11 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   
   
+  /**This routine takes care about tabbed panels. 
+   * If {@link GralPanelContent#setPrimaryWidget(GralWidgetBase_ifc)} was called
+   * and the primary widget is a tab, this tab is activated on this panel, which is a tab folder.
+   *
+   */
   @Override public void redrawGthread(){
     if(this.panelSwtImpl !=null) {
       int mChanged;

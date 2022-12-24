@@ -72,7 +72,7 @@ import org.vishia.util.ObjectVishia;
  *                                             |<*>------------------------>swt.Canvas
  *                                             |                                  |
  *                                             |                                  |
- *                                          -paintRoutine <-------paintListener---|
+ *                                          -drawRoutine <-------drawListener---|
  *                                          -mouseListener<-------mouseListener---|
  *                                          -etc.                          
  *                                      
@@ -90,10 +90,10 @@ import org.vishia.util.ObjectVishia;
  * <br><br>
  * The SwtHorizontalSelector refers the platform-specific widget Object (Swing: javax.swing.JComponent, 
  * org.eclipse.swt.widgets.Control etc.), in this case a {@link org.eclipse.swt.widgets.Canvas}. 
- * It contains the special paint routines, mouse handling etc. 
+ * It contains the special draw routines, mouse handling etc. 
  * <br><br>
  * The platform-specific widget has a reference to the GralWidget, in this case the {@link GralHorizontalSelector}
- * stored as Object-reference. This reference can be used in the paintRoutine, mouseListerner etc. to get
+ * stored as Object-reference. This reference can be used in the drawRoutine, mouseListerner etc. to get
  * information about the GralWidget.  
  * <br><br> 
  * The second form takes most of the characteristics as parameters for the creating method. 
@@ -192,7 +192,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * <li>2022-09-13 {@link ImplAccess#setPosBounds()} now regard the tab panel on resize.
    * <li>2022-09-13 new {@link #toString(Appendable)} usable for comprehensive reports and toString() 
    * <li>2022-08 new {@link GralWidget#GralWidget(GralPos, String, char)} for the new concept, some more adaptions. 
-   * <li>2016-09-30 Hartmut improved: {@link #redraw(int, int)} now the second argument can be really 0 to prevent a not required repaint from the first repaint call
+   * <li>2016-09-30 Hartmut improved: {@link #redraw(int, int)} now the second argument can be really 0 to prevent a not required redraw from the first redraw call
    *   if some more replaints are registered per delay.
    * <li>2016-09-30 Hartmut bugfix: {@link #setFocus()} has set the default focus of the primaryWindow if the focus of a window was set.
    * <li>2016-09-30 Hartmut New idea, concept: {@link ImplAccess#wdgimpl}: That refers an implementation of a WidgetHelper class of the implementation layer
@@ -234,7 +234,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    *   if any editing key was received. Then the GUI-operator may mark a text or make an input etc. The setting of the text
    *   from a cyclically thread should be prevented then to prevent disturb the GUI-operation. If the focus was lost then this bit
    *   is reseted. It is an important feature for GUI-handling which was missed up to now. 
-   *   Yet only used for {@link GralTextField#setText(CharSequence, int)}. It may prevent repaint for universally usage for all widgets.
+   *   Yet only used for {@link GralTextField#setText(CharSequence, int)}. It may prevent redraw for universally usage for all widgets.
    * <li>2015-01-27 Hartmut new: method {@link #getVariable(VariableContainer_ifc)} instead {@link #getVariableFromContentInfo(VariableContainer_ifc)}.
    *   The last one method is used in an application but it does not run well for all requirements. The code of {@link #getVariable(VariableContainer_ifc)}
    *   is copied from the well tested {@link #refreshFromVariable(VariableContainer_ifc)} as own routine and then used in a new application.    
@@ -281,10 +281,10 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * <li>2012-01-04 Hartmut new: {@link #redrawtDelay}, use it.  
    * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link ImplAccess#setVisibleState(boolean)}.
    *   renamed: {@link #implMethodWidget_} instead old: 'gralWidgetMethod'.
-   * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
+   * <li>2012-03-08 Hartmut chg: {@link #redrawRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
    * <li>2012-02-22 Hartmut new: catch on {@link #redrawGthread()} and continue the calling level
-   *   because elsewhere the repaint order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicTimeOrder)}-queue.
+   *   because elsewhere the redraw order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicTimeOrder)}-queue.
    * <li>2012-02-22 Hartmut new: implements {@link GralSetValue_ifc} now.
    * <li>2012-01-16 Hartmut new Concept {@link #redraw()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #redrawGthread()}.
@@ -600,12 +600,12 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   protected boolean bShouldInitialize = true;
   
   
-  /**Standard delay to repaint if {@link #redraw()} is called without arguments. 
-   * It delays a few time because an additional process can be occur in a short time after, and only one repaint should be invoked.
-   * The repaintDelayMax limits are shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
+  /**Standard delay to redraw if {@link #redraw()} is called without arguments. 
+   * It delays a few time because an additional process can be occur in a short time after, and only one redraw should be invoked.
+   * The redrawDelayMax limits are shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
    * 
    */
-  protected int redrawtDelay = 30, redrawDelayMax = 100;
+  protected int redrawtDelay = 50, redrawDelayMax = 100;
 
   /**The time when the bVisible state was changed. */
   long lastTimeSetVisible = 0;
@@ -624,7 +624,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   public final static class DynamicData {
     
     /**32 bit what is changed, see {@link GralWidget.ImplAccess#chgColorText} etc. 
-     * with this information the repaint in the implementing level can see what is to do. */
+     * with this information the redraw in the implementing level can see what is to do. */
     private AtomicInteger whatIsChanged = new AtomicInteger(); 
     
     /**Sets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
@@ -649,7 +649,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     public int getChanged(){ return whatIsChanged.get(); }
     
     /**Resets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
-     * This routine should be called in the paint routine whenever the change was succeeded.
+     * This routine should be called in the draw routine whenever the change was succeeded.
      * @param mask one bit or some bits. ImplAccess.chgXYZ
      */
     public void acknChanged(int mask){
@@ -663,7 +663,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
     }
     
     
-    /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
+    /**Three colors for background, line and text should be convert to the platforms color and used in the draw routine. 
      * If this elements are null, the standard color should be used. */
     public GralColor backColor = GralColor.getColor("wh")  // proper for show fields
       , backColorNoFocus = GralColor.getColor("lgr")
@@ -1816,16 +1816,13 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    */
   public void setFocus(int delay, int latest){
     this.bVisibleState = true;
-    if(_wdgImpl == null) {
-      this.bHasFocus = true;                     // on instantiate the implementation grapic: Set this focus.
-    }
-    else if(delay >0 || !gralMng.currThreadIsGraphic()) {
+    if(delay >0 || !gralMng.currThreadIsGraphic() || _wdgImpl == null) {
       dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
-      redraw(delay, latest);                    // do the following action in the graphic thread.
+      redraw(delay, latest);                     // do the following action in the graphic thread.
     } else {
       //action in the graphic thread.
       if(!bHasFocus) {
-        GralWidgetBase_ifc child = this;
+        GralWidgetBase_ifc child = this;         // sets all parent visible
         if(! (child instanceof GralWindow)) {
           GralWidgetBase_ifc parent = _wdgPos.parent;
           int catastrophicalCount = 100;
@@ -1834,7 +1831,9 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
               && !parent.isInFocus()
               && parent.getImplAccess() !=null
               && --catastrophicalCount >=0){
-            parent.getImplAccess().setFocusGThread();
+            //this is false, because sets the focus of the first widget of the panel.
+            //parent.getImplAccess().setFocusGThread();
+            parent.getImplAccess().setVisibleGThread(true);// parent should be visible.
             if((parent instanceof GralPanelContent)){ // && ((GralPanelContent)parent).isTabbed()) {
               //TabbedPanel: The tab where the widget is member of have to be set as active one.
               GralPanelContent panel = (GralPanelContent)parent;
@@ -1898,17 +1897,17 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   
   
   /* (non-Javadoc)
-   * @see org.vishia.gral.ifc.GralWidget_ifc#repaint()
+   * @see org.vishia.gral.ifc.GralWidget_ifc#redraw()
    */
   @Override public void redraw(){ 
-    //without arguments: latest with repaintDelayMax.
+    //without arguments: latest with redrawDelayMax.
     redraw(this.redrawtDelay, this.redrawDelayMax);
     /*chg 2015-06-25 it is twice and not complete. An order was delayed in the future always.
     if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
       if(itsMng.currThreadIsGraphic()){
-        repaintGthread();     //do it immediately if no thread switch is necessary.
+        redrawGthread();     //do it immediately if no thread switch is necessary.
       } else {
-        repaintRequ.activateAt(System.currentTimeMillis() + repaintDelay);  //TODO repaintDelayMax
+        redrawRequ.activateAt(System.currentTimeMillis() + redrawDelay);  //TODO redrawDelayMax
       }
     }
     */
@@ -1916,10 +1915,12 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   
   
   /**The Implementation of redraw calls {@link #redrawGthread()} if it is the graphic thread and the delay is 0.
-   * Elsewhere the {@link #repaintRequ} is added as request to the graphic thread. 
+   * Elsewhere the {@link #redrawRequ} is added as request to the graphic thread. 
    * @see org.vishia.gral.ifc.GralWidget_ifc#redraw(int, int)
    *
    * @param delay in ms to prevent too much calls of the graphic system
+   *   If delay is negative, and this operation is called in the graphic thread, it is executed immediately.
+   *   Else the absolute is used as delay.
    * @param latest in ms to prevent to much procrastination on repeated calls with delay.
    *   The current time of the first call of this redraw + latest is the latest time to activate the redraw event
    *   though delay was given by newer calls.
@@ -1930,11 +1931,11 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   public void redraw ( int delay, int latest, boolean onlyDynamics ){
     if(gralMng !=null && gralMng._mngImpl !=null && this._wdgImpl!=null ) { //NOTE: set of changes is possible before setToPanel was called. 
       this._wdgImpl.bRedrawOnlyDynamics = onlyDynamics;
-      if(delay == 0 && gralMng.currThreadIsGraphic() && _wdgImpl !=null){
+      if(delay <= 0 && gralMng.currThreadIsGraphic() && _wdgImpl !=null){
         _wdgImpl.redrawGthread();
       } else {
         long time = System.currentTimeMillis();
-        repaintRequ.activateAt(time + delay, latest ==0 ? 0 : time + latest);
+        redrawRequ.activateAt(time + Math.abs(delay), latest ==0 ? 0 : time + latest);
       }
     }
   }
@@ -2230,19 +2231,19 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    */
   public ImplAccess getImplAccess(){ return _wdgImpl; }
   
-  //tag::repaintRequ[]
+  //tag::redrawRequ[]
   /**This time order calls the {@link #redrawGthread()} in the graphical thread for this widget.
    * It is used with delay and wind up whenever {@link #redraw1(int, int)} with an delay is called.
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
    * till the next request of {@link #redraw1(int, int)} or {@link #redraw()}.
    */
-  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ", this.gralMng){
+  private final GralGraphicTimeOrder redrawRequ = new GralGraphicTimeOrder("GralWidget.redrawRequ", this.gralMng){
     @Override public void executeOrder() {
       if(_wdgImpl !=null) { _wdgImpl.redrawGthread(); }//Note: exception thrown in GralGraphicThread
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
-  //end::repaintRequ[]
+  //end::redrawRequ[]
   
   
   

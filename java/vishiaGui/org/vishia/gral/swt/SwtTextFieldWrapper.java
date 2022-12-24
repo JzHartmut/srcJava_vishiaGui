@@ -240,17 +240,19 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   
 
   
-  
+  //tag::redrawGthread[]
   @Override public void redrawGthread(){
     int catastrophicalCount = 0;
     int chg;
     if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();
       while( (chg = getChanged()) !=0){ //widgg.dyda.whatIsChanged.get();
-        if(++catastrophicalCount > 10000) 
-          throw new RuntimeException("atomic failed");
+        if(++catastrophicalCount > 10000) {
+          throw new RuntimeException("acknowledge failed");
+        }
         if((chg & chgText) !=0 && dyda.displayedText !=null){ 
           textFieldSwt.setText(dyda.displayedText);
+          //end::redrawGthread[]
           final int selectionStart, selectionEnd;
           final int zText = dyda.displayedText.length();
           if(caretPos() <0){
@@ -313,6 +315,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         if((chg & chgColorText) !=0){ 
           textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); 
         }
+        //tag::redrawGthreadEnd[]
         if((chg & chgColorBack) !=0){ 
           textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); 
         }
@@ -321,6 +324,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         acknChanged(chg);
       }
     }
+    //end::redrawGthreadEnd[]
   }
 
   

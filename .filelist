@@ -103,7 +103,7 @@
 2022-12-23 17:22:13  x     GralMng.java                             ::        106.340  1585574627 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
-2022-12-23 17:20:43  x     GralPanelContent.java                    ::         26.345  2134604042 
+2022-12-24 10:51:23  x     GralPanelContent.java                    ::         26.350  0651886631 
 2022-12-21 17:02:30  x     GralPos.java                             ::         78.159  1109017046 
 2022-12-23 17:22:13  x     GralScreen.java                          ::          4.124  0138752575 
 2022-11-13 19:23:26  x     GralShowMethods.java                     ::         11.736 -0385445325 
@@ -112,8 +112,8 @@
 2022-12-23 17:22:13  x     GralTextBox.java                         ::          7.699 -0404541197 
 2022-12-23 17:25:42  x     GralTextField.java                       ::         34.143 -2125240944 
 2022-12-23 17:22:14  x     GralValueBar.java                        ::          6.217  0388024784 
-2022-12-23 17:15:34  x     GralWidgImplAccess_ifc.java              ::          5.922  0211034112 
-2022-12-23 17:25:42  x     GralWidget.java                          ::        109.615 -0086944583 
+2022-12-23 17:34:07  x     GralWidgImplAccess_ifc.java              ::          5.955  1380544306 
+2022-12-24 10:51:03  x     GralWidget.java                          ::        109.834  0004587431 
 2022-12-21 22:22:28  x     GralWidgetBase.java                      ::         13.864 -0875884897 
 2012-07-14 22:23:42  x     GralWidgetHelper.java                    ::          1.980 -1293053732 
 2022-12-23 17:25:42  x     GralWindow.java                          ::         18.648 -1630556640 
@@ -211,7 +211,7 @@
 2022-12-23 17:15:34  x     SwtLed.java                              ::          6.430 -0013055396 
 2022-11-12 22:31:49  x     SwtMenu.java                             ::          6.305 -0292587232 
 2022-12-20 09:57:05  x     SwtMng.java                              ::         55.821 -2078667756 
-2022-12-23 17:15:34  x     SwtPanel.java                            ::         12.114 -0757667829 
+2022-12-24 11:12:00  x     SwtPanel.java                            ::         12.355 -1333125305 
 2022-11-12 14:43:11  x     SwtPanelArea9.java                       ::          1.265 -1367296154 
 2022-11-19 14:16:09  x     SwtProperties.java                       ::          5.859 -1304357244 
 2013-10-05 22:28:54  x     SwtSetValue_ifc.java                     ::           .374  1688335866 
@@ -219,12 +219,12 @@
 2022-12-23 17:15:34  x     SwtSubWindow.java                        ::         24.224  1832937151 
 2022-12-23 17:15:34  x     SwtTable.java                            ::         41.300  0687249839 
 2022-01-31 19:48:38  x     SwtTextBox.java                          ::         14.779 -0197457034 
-2022-12-23 17:15:34  x     SwtTextFieldWrapper.java                 ::         22.690 -1331662534 
+2022-12-23 19:12:39  x     SwtTextFieldWrapper.java                 ::         22.825 -0359167951 
 2022-12-18 14:26:18  x     SwtTransparentLabel.java                 ::          1.917  0729056109 
 2021-10-04 14:29:49  x     SwtTraverseListener.java                 ::          1.382 -0922202695 
-2022-12-23 17:15:34  x     SwtValueBar.java                         ::          6.167 -1482448617 
+2022-12-23 19:53:20  x     SwtValueBar.java                         ::          6.305 -1205138721 
 2022-11-19 14:19:05  x     SwtWdgCanvas.java                        ::         16.024 -1507671322 
-2022-11-13 21:39:18  x     SwtWidgetHelper.java                     ::          7.475  0290667785 
+2022-12-23 20:46:34  x     SwtWidgetHelper.java                     ::          7.590 -1709879120 
 2022-12-23 17:15:34  x     SwtWidgetSimpleWrapper.java              ::          2.639  0347831400 
 2022-11-01 12:53:08  x     XXXSwtCanvasStorePanel.java              ::          2.895  1659465107 
 2012-03-28 07:42:16  x     package-info.java                        ::           . 64  2134856555 

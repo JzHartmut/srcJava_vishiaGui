@@ -117,7 +117,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
     if(control == null){
       return false;         //TODO should not be.
     }
-    control.forceFocus();
+    //control.forceFocus();    //??https://stackoverflow.com/questions/4619704/what-is-the-difference-between-forcefocus-and-setfocus-in-swt
     return control.setFocus();
 
     

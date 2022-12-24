@@ -21,36 +21,36 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
    */
   private final SwtWidgetHelper wdgh;
   
-	//final SwtMng mng;
+  //final SwtMng mng;
 
-	protected BarWidget widgetSwt;
-	
-	final Color black;
-	//final Color colorValueOk, colorValueMinLimit, colorValueMaxLimit;
-	//final Color white;
-	
-	private Color[] colorBorder;
-	
-	/**Creates a value bar.
-	 * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
-	 * @param size The size of text in button, use 'A' or 'B' for small - bold
-	 */
-	public SwtValueBar(GralValueBar widgg, SwtMng mng)
-	{
+  protected SwtBarCanvas widgetSwt;
+  
+  final Color black;
+  //final Color colorValueOk, colorValueMinLimit, colorValueMaxLimit;
+  //final Color white;
+  
+  private Color[] colorBorder;
+  
+  /**Creates a value bar.
+   * @param mng The Gui-panel-manager contains information about the graphic frame and properties.
+   * @param size The size of text in button, use 'A' or 'B' for small - bold
+   */
+  public SwtValueBar(GralValueBar widgg, SwtMng mng)
+  {
     widgg.super(mng.gralMng);
     //mng.mng.setNextPosition();
     super.wdgimpl = this.wdgh = new SwtWidgetHelper(widgetSwt, mng);
-    this.widgetSwt = this.new BarWidget();
-		this.widgetSwt.setData(this);
-		this.widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
-		//Control xx = mng.currPanel.panelComposite;
-		black = mng.propertiesGuiSwt.colorSwt(0);
-		//white = mng.propertiesGui.color(0xffffff);
-		//colorValueOk = mng.propertiesGui.color(0xff4000);
-		//colorValueMinLimit = mng.propertiesGui.color(0xff4000);
-		//colorValueMaxLimit = mng.propertiesGui.color(0xff4000);
-		colorBorder = new Color[1];  //at least 1 color, if not parametrized
-		colorBorder[0] = mng.getColorImpl(GralColor.getColor("red"));
+    this.widgetSwt = this.new SwtBarCanvas();
+    this.widgetSwt.setData(this);
+    this.widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackgroundSwt());
+    //Control xx = mng.currPanel.panelComposite;
+    black = mng.propertiesGuiSwt.colorSwt(0);
+    //white = mng.propertiesGui.color(0xffffff);
+    //colorValueOk = mng.propertiesGui.color(0xff4000);
+    //colorValueMinLimit = mng.propertiesGui.color(0xff4000);
+    //colorValueMaxLimit = mng.propertiesGui.color(0xff4000);
+    colorBorder = new Color[1];  //at least 1 color, if not parametrized
+    colorBorder[0] = mng.getColorImpl(GralColor.getColor("red"));
     //widget.setPanelMng(this);
   //  widget.setShowMethod(sShowMethod);
     //widget.widget.setData(widgetInfos);
@@ -58,35 +58,36 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
     setBounds();
     
     mng.gralMng.registerWidget(widgg);
-	}
+  }
 
   
-	
-	public void setBounds(){
+  
+  public void setBounds(){
     pixBounds = wdgh.mng.calcWidgetPosAndSizeSwt(widgg.pos(), widgetSwt.getParent(), 10, 100);
     //mng.setPosAndSize_(widgetSwt);
     widgetSwt.setBounds(pixBounds.x, pixBounds.y, pixBounds.dx, pixBounds.dy);
     horizontal = pixBounds.dx > pixBounds.dy;
-	  
-	}
-	
-	
-	
-  @Override public void redrawGthread(){
-    widgetSwt.redraw();
+    
   }
+  
+  
+  //tag::redrawGthread[]
+  @Override public void redrawGthread(){
+    this.widgetSwt.redraw();
+  }
+  //end::redrawGthread[]
 
   
   @Override
   public void setBorderAndColorsImpl(String[] sColorLevels)
   {
-  	colorBorder = new Color[sColorLevels.length];
-  	int ix = -1;
-  	for(String sColor: sColorLevels){
-  		colorBorder[++ix] = wdgh.mng.getColorImpl(GralColor.getColor(sColor));
-  	}
+    colorBorder = new Color[sColorLevels.length];
+    int ix = -1;
+    for(String sColor: sColorLevels){
+      colorBorder[++ix] = wdgh.mng.getColorImpl(GralColor.getColor(sColor));
+    }
   }
-	
+  
   @Override public Object getWidgetImplementation() { return widgetSwt; }
   
   
@@ -95,7 +96,7 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
   @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); wdgh.setVisibleGThread(bVisible); }
 
   
-  protected void paintRoutine(BarWidget wdgs, PaintEvent e){
+  protected void redrawRoutine(SwtBarCanvas wdgs, PaintEvent e){
     // TODO Auto-generated method stub
     GC gc = e.gc;
     //gc.d
@@ -155,33 +156,26 @@ public class SwtValueBar extends GralValueBar.GraphicImplAccess // implements Gr
     
   
   
-  
-  public class BarWidget extends Canvas
-	{
-		BarWidget()
-		{
-			super(wdgh.mng.getCurrentPanel(), 0);  //Canvas
-			wdgh.widgetSwt = this;
-			addPaintListener(paintListener);	
-			
-		}
-		
-		
-	  final PaintListener paintListener = new PaintListener(){
-			@Override
-			public void paintControl(PaintEvent e) { paintRoutine(BarWidget.this,e); }
-	  };
+  //tag::SwtBarCanvas[]
+  private class SwtBarCanvas extends Canvas
+  {
+    SwtBarCanvas()
+    {
+      super(SwtMng.getSwtParent(SwtValueBar.this.widgg.pos()), 0);  //Canvas
+      SwtValueBar.this.wdgh.widgetSwt = this;
+      addPaintListener(this.paintListener);  
+    }
+    
+    
+    final PaintListener paintListener = new PaintListener(){
+      @Override
+      public void paintControl(PaintEvent e) { redrawRoutine(SwtBarCanvas.this,e); }
+    };
 
-	  final Runnable redraw = new Runnable(){
-			@Override public void run()
-			{ redraw();
-			}
-		};
-		
-
-	}  
-	  
-	void stop(){}
+  }  
+  //end::SwtBarCanvas[]
+    
+  void stop(){}
 
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy)
