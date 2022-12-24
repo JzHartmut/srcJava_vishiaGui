@@ -79,7 +79,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   /**Version, history and license:
    * <ul>
    * <li>2016-08-31 Hartmut chg: Now disposes the window in {@link #shellListener} 
-   * <li>2015-05-31 Hartmut {@link #setFocusGThread()} now regards the {@link GralPanelContent#setPrimaryWidget(GralWidget)}.
+   * <li>2015-05-31 Hartmut {@link #setFocusGThread()} now regards the {@link GralPanelContent#setFocusedWidget(GralWidget)}.
    * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
@@ -302,15 +302,10 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   @Override
   public boolean setFocusGThread()
   { 
-    setVisibleState(true);  //has focus, 
-    window.setVisible(true);
-    //if(gralPanel().setFocusGThread()){   //sets the focus of the primary widget.
-      //return true;  //if any element of the panel was set to focus, the window has the focus already.
-      //Especially the primaryWidget should be focused.
-    //} else {
-      //no primary window etc.
-      return window.setFocus();  
-    //}
+    //setVisibleState(true);  //has focus, 
+    this.window.setVisible(true);
+    this.window.setFocus();
+    return true;
   }
 
   @Override public void setVisibleGThread(boolean bVisible) { 

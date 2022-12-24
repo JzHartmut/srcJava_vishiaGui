@@ -49,7 +49,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
    * <li>2012-04-22 Hartmut new: {@link #canvas} as property maybe null for each panel to support stored graphics.
    * <li>2012-03-31 Hartmut new: {@link #implMethodPanel_} and {@link MethodsCalledbackFromImplementation#setVisibleState(boolean)}.
-   * <li>2012-01-14 Hartmut new: {@link #setPrimaryWidget(GralWidget)} for panel focus.
+   * <li>2012-01-14 Hartmut new: {@link #setFocusedWidget(GralWidget)} for panel focus.
    * <li>2012-01-08 Hartmut new: {@link #remove()}
    * <li>2011-11-19 Hartmut chg: The 'itsTabSwt' is moved to {@link org.vishia.gral.swt.SwtPanel} now.
    * <li>2011-11-12 Hartmut new: {@link #getPixelPositionSize()}.
@@ -246,10 +246,11 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * If this is a tabed panel the focused widget is the current opened tab.
    * It is possible to set any actual widget to store the focus situation,
    * It is possible too to have only one widget to focus. if the panel gets the focus. */
-  @Override public void setPrimaryWidget(GralWidgetBase_ifc widg){ 
+  @Override public void setFocusedWidget(GralWidgetBase_ifc widg){ 
     this._panel.primaryWidget = widg; 
-    this.dyda.setChanged(GralWidget.ImplAccess.chgCurrTab);
-    
+    if(isTabbed()) {
+      this.dyda.setChanged(GralWidget.ImplAccess.chgCurrTab);
+    }
     redraw1(-50,100);
   }
   
@@ -523,7 +524,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   /**Sets the focus to the primary widget if it is set.
    * Elsewhere do nothing and returns false. 
    * The focus may be set then by the inherit implementation class.
-   * <br>See {@link #setPrimaryWidget(GralWidget)}.
+   * <br>See {@link #setFocusedWidget(GralWidget)}.
    * @return true if the focus is set to the primary widget. 
    */
   //@Override 

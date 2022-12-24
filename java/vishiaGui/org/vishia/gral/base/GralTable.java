@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
@@ -2510,6 +2511,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
     @Override public void setVisibleStateWidget(boolean bVisible) { GralTable.this.setVisibleStateWidget(bVisible); }
+    
+    @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) { } // unreleavant
+    
+    @Override public GralWidgetBase_ifc getFocusedWidget() { return null; }
+
     
     @Override public void setFocus() { GralTable.this.setFocus(); }
 

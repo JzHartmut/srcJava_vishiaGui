@@ -866,10 +866,10 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     }
     widget.setSize(textSize);
     //guiContent.add(widget);
-    GralWidget widg = new GralWidget("labelText-" + sText, 'S', gralMng);
-    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, widget, this);
+//    GralWidget widg = new GralWidget("labelText-" + sText, 'S', gralMng);
+//    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, widget, this);
     //widg.implMethodWidget_.setWidgetImpl(widgswt);
-    return widg;
+    return null; //widg;
   }
 
   
@@ -950,17 +950,17 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   	Slider control = new Slider(getCurrentPanel(), SWT.VERTICAL);
   	control.setBackground(propertiesGuiSwt.colorBackground);
   	setPosAndSize_(gralMng.getPosOldPositioning(), control);
-    GralWidget widg = new GralWidget(sName, 'V', gralMng);
-    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, control, this);
-    //widg.implMethodWidget_.setWidgetImpl(widgswt);
-    if(action != null){
-  		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widg, action);
-  		control.addSelectionListener(actionSlider);
-  	}
-    widg.setDataPath(sDataPath);
-    control.setData(widg);
-    control.addMouseListener(mouseClickForInfo);
-    return widg;
+//    GralWidget widg = new GralWidget(sName, 'V', gralMng);
+//    SwtWidgetSimpleWrapper widgswt = new SwtWidgetSimpleWrapper(widg, control, this);
+//    //widg.implMethodWidget_.setWidgetImpl(widgswt);
+//    if(action != null){
+//  		SelectionListenerForSlider actionSlider = new SelectionListenerForSlider(widg, action);
+//  		control.addSelectionListener(actionSlider);
+//  	}
+//    widg.setDataPath(sDataPath);
+//    control.setData(widg);
+//    control.addMouseListener(mouseClickForInfo);
+    return null; //widg;
   	
   }
   

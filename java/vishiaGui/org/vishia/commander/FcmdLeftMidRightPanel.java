@@ -142,7 +142,7 @@ public class FcmdLeftMidRightPanel
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
-      //tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+      this.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
       mng.setPosition(2, -2, 0, -0, 1, 'd');
       //main.executer.cmdSelector.createImplWidget_Gthread();
     }
@@ -156,6 +156,17 @@ public class FcmdLeftMidRightPanel
       this.actFileCard.setFocus();
     } else {
       this.cardFavorThemes.setFocus();
+    }
+  }
+  
+
+  
+  void setFocus(int delay, int latest){
+    this.main.setLastSelectedPanel(this);
+    if(this.actFileCard !=null){
+      this.actFileCard.setFocus(delay, latest);
+    } else {
+      this.cardFavorThemes.setFocus(delay, latest);
     }
   }
   
@@ -367,6 +378,11 @@ public class FcmdLeftMidRightPanel
     @Override public void setFocus(){
       mainPanel.bFavorThemeCardHasFocus = true;
       super.setFocus();
+    }
+    
+    @Override public void setFocus(int delay, int latest){
+      mainPanel.bFavorThemeCardHasFocus = true;
+      super.setFocus(delay, latest);
     }
     
     void clear()

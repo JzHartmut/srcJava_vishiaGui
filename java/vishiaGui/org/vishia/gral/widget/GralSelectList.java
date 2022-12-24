@@ -10,6 +10,7 @@ import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.Assert;
@@ -168,7 +169,19 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  @Override public void setFocus(){ wdgdTable.setFocus();  }
+  @Override public void setFocus ( ){ wdgdTable.setFocus();  }
+  
+  
+  
+  @Override public void setFocus ( int delay, int latest){ wdgdTable.setFocus(delay, latest);  }
+  
+  
+  
+  
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {} //nothing, not for here.
+  
+  @Override public GralWidgetBase_ifc getFocusedWidget() { return null; }
+
   
   /**Removes all data and all widgets of this class. */
   @Override public boolean remove(){

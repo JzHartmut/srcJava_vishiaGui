@@ -33,7 +33,7 @@ public interface GralWidgetBase_ifc {
    */
   void setFocus();
   
-
+  void setFocus(int delay, int latest);
   
   /**Returns true if this widget is the focused one.
    */
@@ -59,7 +59,17 @@ public interface GralWidgetBase_ifc {
   boolean isVisible();
   
 
+  /**If this widget is a comprehensive widget or a panel, it sets one of the content as focused.
+   * @param widg The sub widget which should be focused.
+   * It influences for example the current tab of a tabbed panel,
+   * or influences which widget of a comprehensive widget is first focused.
+   * On a panel it determines which widget should get the focus if the panel gets the focus.
+   */
+  void setFocusedWidget ( GralWidgetBase_ifc widg);
   
+  
+  GralWidgetBase_ifc getFocusedWidget ( );
+
   
   /**Returns the associated GralMng. The GralMng is associated by construction,
    */

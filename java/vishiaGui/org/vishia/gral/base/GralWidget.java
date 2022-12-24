@@ -175,7 +175,7 @@ import org.vishia.util.ObjectVishia;
  * @author Hartmut Schorrig
  *
  */
-public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
+public abstract class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Version, history and license.
@@ -919,7 +919,7 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   
   
   public void setPrimaryWidgetOfPanel(){
-    ((GralPanelContent)_wdgPos.parent).setPrimaryWidget(this);
+    ((GralPanelContent)_wdgPos.parent).setFocusedWidget(this);
   }
 
   
@@ -1798,15 +1798,21 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
   }
   
   
+  
   /**Standard implementation. Override only if necessary for sepcial handling.
    * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
    */
   public void setFocus(){ setFocus(0,0); }
   
-  
+  /**The default implementation is empty.
+   * It is valid for simple widgets which have not sub widgets. 
+   *
+   */
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {}
+
   
   /**Sets the focus to this widget. This method is possible to call in any thread.
-   * If it is called in the graphic thread and the delay = 0, then it is executed immediately.
+   * If it is called in the graphic thread and the delay = 0 or negative, then it is executed immediately.
    * Elsewhere the request is stored in the graphic thread execution queue and invoked later.
    * If the widget is inside a tab of a tabbed panel, the tab is designated as currently therewith.
    * That is done in the calling thread because it is a thread safe operation.
@@ -1814,72 +1820,30 @@ public class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSe
    * @param delay Delay in ms for invoking the focus request 
    * @param latest 
    */
-  public void setFocus(int delay, int latest){
-    this.bVisibleState = true;
-    if(delay >0 || !gralMng.currThreadIsGraphic() || _wdgImpl == null) {
-      dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
-      redraw(delay, latest);                     // do the following action in the graphic thread.
-    } else {
-      //action in the graphic thread.
-      if(!bHasFocus) {
-        GralWidgetBase_ifc child = this;         // sets all parent visible
-        if(! (child instanceof GralWindow)) {
-          GralWidgetBase_ifc parent = _wdgPos.parent;
-          int catastrophicalCount = 100;
-          //set the visible state and the focus of the parents.
-          while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
-              && !parent.isInFocus()
-              && parent.getImplAccess() !=null
-              && --catastrophicalCount >=0){
-            //this is false, because sets the focus of the first widget of the panel.
-            //parent.getImplAccess().setFocusGThread();
-            parent.getImplAccess().setVisibleGThread(true);// parent should be visible.
-            if((parent instanceof GralPanelContent)){ // && ((GralPanelContent)parent).isTabbed()) {
-              //TabbedPanel: The tab where the widget is member of have to be set as active one.
-              GralPanelContent panel = (GralPanelContent)parent;
-              panel.setVisibleStateWidget(true);
-              panel.setPrimaryWidget(child);
-//              if(child instanceof GralPanelContent) {
-//                panelTabbed.selectTab(child.getName());
-//              }
-              //String name = panel1.getName();
-              //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
-            }
-            if(parent instanceof GralWindow) {       //This is not the window itself
-              parent = null;
-            } else {
-              child = parent;
-              parent = parent.pos().parent; //
-            }
-          }
-        }
-        _wdgImpl.setFocusGThread();  //sets the focus to the
-        bVisibleState = true;
-      } 
-      GralWidgetBase_ifc parent = this;
-      GralWidgetBase_ifc child;
-      GralPanelContent panel;
-      GralWidget.ImplAccess childImplAccess;
-      while(parent instanceof GralPanelContent
-        && (child = (panel = (GralPanelContent)parent)._panel.primaryWidget) !=null
-        && (childImplAccess = child.getImplAccess()) !=null
-        && !child.isInFocus()
-        ) {
-        child.setFocus();                        // recursively call
-        childImplAccess.setFocusGThread();
-        childImplAccess.redrawGthread();
-        List<GralWidget> listWidg = panel.getWidgetList();
-        for(GralWidget widgChild : listWidg) {
-          widgChild._wdgImpl.setVisibleGThread(true);
-          widgChild.bVisibleState = true;
-        }
-        parent = child;  //loop if more as one GralPanelContent
-      }
+  @Override public void setFocus(int delay, int latest){
+    GralWidgetBase_ifc child = this;
+    GralWidgetBase_ifc parent;
+    while( !(child instanceof GralScreen) ) {
+      parent = child.pos().parent;
+      parent.setVisible(true);
+      parent.setFocusedWidget(child);
+      child = parent;
     }
+    while( !(child instanceof GralWidget)) {
+      child = child.getFocusedWidget();
+    }
+    GralWidget wdgToFocus = (GralWidget)child;
+    wdgToFocus.dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
+    wdgToFocus.redraw(delay, latest);                     // do the following action in the graphic thread.
   }
   
   
   
+  /**Default implementation for a widget without children
+   * @return null, nonsense. 
+   */
+  public GralWidgetBase_ifc getFocusedWidget() { return null; }
+
   
   /**Returns the implementation widget or its Wrapper.
    * Need cast due to implementation level.

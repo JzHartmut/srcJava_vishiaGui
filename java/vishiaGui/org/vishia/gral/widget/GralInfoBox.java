@@ -18,6 +18,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -85,6 +86,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   private GralUserAction actionOk;
   
+  
+  private GralWidgetBase_ifc wdgInFocus;
+  
   public GralInfoBox(GralWindow window, GralTextBox textBox, GralTextField infoLine, GralWidget buttonOk)
   {
     this.window = window;
@@ -92,6 +96,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     this.htmlBox = null;
     this.infoLine = infoLine;
     this.buttonOk = buttonOk;
+    this.wdgInFocus = textBox;
   }
   
   public GralInfoBox(GralWindow window, GralHtmlBox htmlBox, GralTextField infoLine, GralWidget buttonOk)
@@ -101,6 +106,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     this.htmlBox = htmlBox;
     this.infoLine = infoLine;
     this.buttonOk = buttonOk;
+    this.wdgInFocus = textBox;
   }
   
   public static GralInfoBox createTextInfoBox(GralMng mng, String name, String title)
@@ -293,6 +299,16 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return null;
   }
 
+  
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {
+    this.wdgInFocus = widg;
+  }
+  
+  @Override public GralWidgetBase_ifc getFocusedWidget() { 
+    return this.wdgInFocus;
+  }
+
+  
   @Override public void setFocus()
   { if(textBox !=null){ textBox.setFocus(); }
     else if(htmlBox !=null){ htmlBox.setFocus();}
@@ -301,6 +317,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   @Override public void setFocus(int delay, int latest)
   { if(textBox !=null){ textBox.setFocus(delay, latest); }
     else if(htmlBox !=null){ htmlBox.setFocus(delay, latest);}
+    //TODO regard wdgInFocus
   }
   
   

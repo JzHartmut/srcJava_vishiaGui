@@ -20,6 +20,8 @@ public class GralScreen implements GralPanel_ifc {
   private final GralMng gralMng;
   
   
+  private GralWindow focusedWindow;
+  
   public GralScreen(GralMng gralMng) {
     this.gralMng = gralMng;
   }
@@ -60,9 +62,11 @@ public class GralScreen implements GralPanel_ifc {
   }
 
   @Override public void setFocus () {
+    this.focusedWindow.setFocus();
   }
 
   @Override public void setFocus ( int delay, int latest ) {
+    this.focusedWindow.setFocus(delay, latest);
   }
 
   @Override public boolean isInFocus () {
@@ -197,10 +201,18 @@ public class GralScreen implements GralPanel_ifc {
     return false;
   }
 
-  @Override public void setPrimaryWidget ( GralWidgetBase_ifc widg ) {
-      // nothing, left empty
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg ) {
+    assert(widg instanceof GralWindow);
+    this.focusedWindow = (GralWindow) widg;
   }
 
+  @Override public GralWidgetBase_ifc getFocusedWidget() { 
+    return this.focusedWindow;
+  }
+
+
+  
+  
   @Override public GralWidget getPanelWidget () {
  
     return null;

@@ -669,7 +669,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(bWithFavor) {
       this.indexFavorPaths = new TreeMap<String, FavorPath>();
       
-      this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@4..0,0..0=" + this.name +".favor", 50, new int[] {10, 20, -20});
+      this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@2..0,0..0=" + this.name +".favor", 50, new int[] {10, 20, -20});
       this.wdgFavorTable.specifyActionChange(null, this.action.actionFavorTable, null);
       this.wdgFavorTable.setColumnProportional((new int[] { 0, 10, 10}));
       this.wdgFavorTable.setVisible(true);
@@ -684,20 +684,20 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     String sPanel = panel.getName();
     //Text field for path above list
 //    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
-    this.widgdPathDir = new GralTextField(refPos, "@2+2, 0..-6=" + this.name + "_dir");
+    this.widgdPathDir = new GralTextField(refPos, "@0+2, 0..-6=" + this.name + "_dir");
        // panelMng.addTextField(null, true, null, null);
     this.widgdPathDir.specifyActionChange(null, this.action.actionSetPath, null);
     this.widgdPathDir.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
     GralMenu menuFolder = this.widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", this.action.actionRefreshFileTable);
     //panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    this.widgBtnFavor = new GralButton(refPos, "@2+2, -5..0=" + this.name + "favorBtn", "favor", this.action.actionFavorButton);
+    this.widgBtnFavor = new GralButton(refPos, "@0+2, -5..0=" + this.name + "favorBtn", "favor", this.action.actionFavorButton);
     this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
     //widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
     //panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    this.wdgSelectList = new FileSelectList(refPos, this, "@4..0, 0..0=" + this.name, rows, columns, 'A');
+    this.wdgSelectList = new FileSelectList(refPos, this, "@2..0, 0..0=" + this.name, rows, columns, 'A');
     if(this.wdgFavorTable !=null) {
       this.wdgSelectList.setVisible(false);
     }
@@ -1481,6 +1481,18 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.wdgFavorTable.setFocus();
     } else {
       this.wdgSelectList.wdgdTable.setFocus(); 
+      //TODO focus maybe also on widgBtnFavor
+    }
+  }
+  
+  
+  
+  @Override public void setFocus ( int delay, int latest){ 
+    if(this.widgBtnFavor.isOn()) {
+      this.wdgFavorTable.setFocus(delay, latest);
+    } else {
+      this.wdgSelectList.wdgdTable.setFocus(delay, latest); 
+      //TODO focus maybe also on widgBtnFavor
     }
   }
   
@@ -1507,6 +1519,25 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     return true;
   }
   
+
+  
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {
+    if(widg == this.wdgFavorTable) {
+      this.widgBtnFavor.setState(GralButton.State.On);
+    } else {
+      this.widgBtnFavor.setState(GralButton.State.Off);
+      //TODO focus maybe also on widgBtnFavor
+    }
+  }
+
+  @Override public GralWidgetBase_ifc getFocusedWidget() { 
+    if(this.widgBtnFavor.getState() == GralButton.State.On) {
+      return this.wdgFavorTable;
+    } else {
+      return this.wdgSelectList;
+      //TODO focus maybe also on widgBtnFavor
+    }
+  }
 
   
   /**Shows the favor selection table.
