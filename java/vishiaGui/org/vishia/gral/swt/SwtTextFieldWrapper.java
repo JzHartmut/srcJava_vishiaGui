@@ -44,6 +44,9 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-26 Hartmut fix: {@link #updateValuesForAction()} a {@link GralTextField#setText(CharSequence)} was pending
+   *   during a focus lost event. The focus lost calls updateValues... but the new value was not written till yet
+   *   (delayed {@link GralWidget.ImplAccess#redrawGthread()}
    * <li>2015-05-04 Hartmut new: {@link #textFieldFocusLost()} calls {@link org.vishia.gral.base.GralWidgImplAccess_ifc#updateValuesForAction()}.
    *   implemented here in {@link #updateValuesForAction()} which sets the cursor line and column. 
    * <li>2015-05-04 Hartmut new: Contains all also for the TextBox, replaces SwtTextBox.

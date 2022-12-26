@@ -74,6 +74,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2022-12-21 progress, tabs for file cards with {@link GralHorizontalSelector} as before in Fcmd only
    * <li>2022-12-21 progress, now switch between both tables and also [F3] key with a view window.
    * <li>2022-12-20 Favor table activated now at last.
    * <li>2022-12-17 improved while test, positions use now the new {@link GralPos#setAsFrame()}.
@@ -515,6 +516,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   protected char showTime = 'm';
   
   
+  
+  protected final GralHorizontalSelector<Object> wdgCardSelector;
+  
+  
   /**The widget for showing the path. */
   protected GralTextField widgdPathDir;
 
@@ -540,6 +545,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   String sCurrFavor = "";
   
+  /**Association to the current used favor path selection.
+  * Note that this instance is re-used for more as one selection.
+  */
+  FavorPath favorPathInfo;
 
 
   GralColor colorBack, colorBackPending;
@@ -673,7 +682,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(bWithFavor) {
       this.indexFavorPaths = new TreeMap<String, FavorPath>();
       
-      this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@2..0,0..0=favorTable-" + this.name, 50, new int[] {10, 20, -20});
+      this.wdgFavorTable = new GralTable<FavorPath>(refPos, "@4..0,0..0=favorTable-" + this.name, 50, new int[] {10, 20, -20});
       this.wdgFavorTable.specifyActionChange(null, this.action.actionFavorTable, null);
       this.wdgFavorTable.setColumnProportional((new int[] { 0, 10, 10}));
       this.wdgFavorTable.setVisible(true);
@@ -688,7 +697,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     String sPanel = panel.getName();
     //Text field for path above list
 //    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
-    this.widgdPathDir = new GralTextField(refPos, "@0+2, 0..-6=infoLine-" + this.name);
+    this.wdgCardSelector = new GralHorizontalSelector<Object>(refPos, "@0+2, 0..-6=tabs-" + this.name, this.action.actionSetFromTabSelection);
+//  
+    this.widgdPathDir = new GralTextField(refPos, "@2+2, 0..0=infoLine-" + this.name);
        // panelMng.addTextField(null, true, null, null);
     this.widgdPathDir.specifyActionChange(null, this.action.actionSetPath, null);
     this.widgdPathDir.setBackColor(panelMng.getColor("pye"), 0xeeffff);  //color pastel yellow
@@ -701,7 +712,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     //the list
     //on same position as favor table: the file list.
     //panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    this.wdgSelectList = new FileSelectList(refPos, this, "@2..0, 0..0=fileTable-" + this.name, rows, columns, 'A');
+    this.wdgSelectList = new FileSelectList(refPos, this, "@4..0, 0..0=fileTable-" + this.name, rows, columns, 'A');
     if(this.wdgFavorTable !=null) {
       this.wdgSelectList.setVisible(false);
     }
@@ -1548,28 +1559,40 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   }
 
   
-  /**Shows the favor selection table.
-   * 
+  /**Called from click on line in favor table to select this favor
+   * and show the adequate file table.
    */
   public void doSelectFavor ( ) {
+    int nColumnFocus = this.wdgFavorTable.getColumnInFocus();
+    GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
+    FavorPath favor = favorLine.getData();
+    if(nColumnFocus == 1) {
+      favorLine.setCellText("", 2);                      // 2th colum focused, remove the current path, use the standard one.
+      favor.sCurrFile = "";
+    } else {
+      favor.sCurrFile = favorLine.getCellText(2);
+    }
+    selectFavor(favor);
+  }
+
+  
+  /**Called either from tab selection or from a line in the favor table ({@link #doSelectFavor()}.
+   * @param favor The favor of the tab or line.
+   */
+  protected void selectFavor ( FavorPath favor ) {
     this.widgBtnFavor.setState(GralButton.State.Off);
     this.wdgFavorTable.setVisible(false);
-    GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getCurrentLine();
-    int nColumnFocus = this.wdgFavorTable.getColumnInFocus();
-    String sFavor = favorLine.getCellText(0);
-    if(sFavor != this.sCurrFavor || nColumnFocus ==1) {
+    String sFavor = favor.selectName; // favorLine.getCellText(0);
+    if(sFavor != this.sCurrFavor) {
       this.sCurrFavor = sFavor;
-      if(nColumnFocus == 1) {
-        favorLine.setCellText("", 2);                      // 2th colum focused, remove the current path, use the standard one.
+      this.favorPathInfo = favor;
+      if(favor.sCurrFile.length()==0) {
+        favor.sCurrFile = favor.path; //favorLine.getCellText(1);
       }
-      String sCurrPath = favorLine.getCellText(2);
-      if(nColumnFocus == 1) {
-        
+      if( ! this.wdgCardSelector.setActItem(sFavor)){
+        this.wdgCardSelector.addItem(sFavor, -1, this.favorPathInfo);
       }
-      if(sCurrPath.length()==0) {
-        sCurrPath = favorLine.getCellText(1);
-      }
-      File favorfile = new File(sCurrPath);
+      File favorfile = new File(favor.sCurrFile);
       fillIn(FileRemote.fromFile(favorfile), false);
     }
     this.wdgSelectList.wdgdTable.setVisible(true);
@@ -1594,6 +1617,71 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.wdgFavorTable.setFocus();               // set the favor table visiable and in focus
   }
   
+  
+  
+  
+  /**Called if a tab is used to change the selection in the favorTab. 
+   * The adequate action is done too with selection in the favor tab. 
+   * */
+  protected void setFromTabSelection ( GralFileSelector.FavorPath favorPathNew ) {
+    //before changing the content of this fileTable, store the current directory
+    //to restore if this favor respectively selection is used ones more.
+    FileRemote dir = null;
+    String sCurrentDir;
+//    if(GralFileSelector.this.favorPathInfo !=null){
+//      dir = getCurrentDir();
+//      if(dir != null){
+//        sCurrentDir = dir.getAbsolutePath();
+//        if(sCurrentDir !=null){
+//          mainPanel.indexActualDir.put(favorPathInfo.selectName, sCurrentDir);
+//    } } }
+//    //main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
+//    if(favorPathNew == null){
+//      //TODO clear filecard
+//      this.wdgFavorCard.sActSelectedFavorPath = "??NO FavorPath.selectName";
+//      System.out.println("actionSetFromTabSelection: favorPathNew = null");
+//      this.main.favorPathSelector.bSyncMidRight = false;
+//    } else {
+//      this.wdgFavorCard.sActSelectedFavorPath = favorPathNew.selectName;
+//      this.sTabSelection = this.label + "." + favorPathNew.selectName;
+//      this.main.favorPathSelector.bSyncMidRight = 
+//          this.syncTabSelection !=null 
+//          && this.syncPartnerTabSelection !=null 
+//          && this.syncTabSelection.equals(this.sTabSelection)
+//          && this.mainPanel.partnerPanelToSync() !=null
+//          && this.mainPanel.partnerPanelToSync().actFileCard !=null
+//          && this.syncPartnerTabSelection.equals(this.mainPanel.partnerPanelToSync().actFileCard.sTabSelection);
+//      GralColor syncColor = this.main.favorPathSelector.bSyncMidRight ? GralColor.getColor("gn") : GralColor.getColor("wh");
+//      this.main.statusLine.widgSyncInfoLeft.setBackColor(syncColor,0);
+//      this.main.statusLine.widgSyncInfoRight.setBackColor(syncColor,0);
+//      if(this.mainPanel.cc == 'm') {
+//        if(this.syncTabSelection ==null) {
+//          this.main.statusLine.widgSyncInfoRight.setText("");
+//        } else {
+//          this.main.statusLine.widgSyncInfoLeft.setText(this.syncTabSelection);
+//          this.main.statusLine.widgSyncInfoRight.setText(this.syncPartnerTabSelection);
+//        }
+//      }
+//      else if(this.mainPanel.cc == 'r') {
+//        if(this.syncTabSelection ==null) {
+//          this.main.statusLine.widgSyncInfoLeft.setText("");
+//        } else {
+//          this.main.statusLine.widgSyncInfoLeft.setText(this.syncPartnerTabSelection);
+//          this.main.statusLine.widgSyncInfoRight.setText(this.syncTabSelection);
+//        }
+//      }
+//      System.out.println("actionSetFromTabSelection: " + favorPathNew.selectName);
+//      sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
+//      if(sCurrentDir == null){
+//        sCurrentDir = favorPathNew.path;
+//      }
+//      //dir = new FileRemote(currentDir);  
+//      dir = main.fileCluster.getFile(sCurrentDir, null);
+//      FcmdFileCard.this.setNewContent(favorPathNew, dir);
+//    }
+    
+  }
+
   
   protected void switchFileFavor ( ) {
     if(! this.widgBtnFavor.isOn()) {
@@ -1642,6 +1730,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     public final String path;
     /**The name shown in the list. */
     public final String selectName;
+    
+    protected String sCurrFile;
     
     public final FileCluster fileCluster;
     /**The label on the tab in tabbed panel. */
@@ -1961,6 +2051,17 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   
+    /**This action is called if a tab is selected. */
+    GralUserAction actionSetFromTabSelection = new GralUserAction("actionSetFromTabSelection"){
+      @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+        GralFileSelector.FavorPath favor = (GralFileSelector.FavorPath)params[0];
+        selectFavor(favor);
+        return true;      
+    } };
+
+  
+    
+    
 
 
   
