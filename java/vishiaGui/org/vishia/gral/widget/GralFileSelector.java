@@ -1076,16 +1076,19 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(this.originDir == null){ 
       this.originDir = dir;    //should exist in any case.
     }
-    
     fileIn.internalAccess().setRefreshed();
     boolean bSameDirectory = dir == this.currentDir;
+    if(!bSameDirectory){
+      this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin GralFileSelector: " + dir );
+      this.currentDir = dir;
+      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
+    } else {
+      this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin sGralFileSelector: " + dir );
+    }
+    this.widgdPathDir.setText(this.sCurrFavor + ": " + this.sCurrentDir, -1);
     if(!bSameDirectory || !this.fillinPending){  //new request anytime if other directory, or if it is not pending.
       this.fillinPending = true;
       //selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
-      if(!bSameDirectory){
-        this.currentDir = dir;
-        this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
-      }
       System.out.println("FcmdFileCard - start fillin; " + this.sCurrentDir + (bSameDirectory ? "; same" : "; new"));
       final ERefresh eRefresh;
       if(bSameDirectory){
@@ -1123,7 +1126,6 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
           //}
         }
       }
-      this.widgdPathDir.setText(this.sCurrentDir, -1);
       this.sortOrderLast = this.sortOrder;
       ////
       if(bDonotRefrehs) {

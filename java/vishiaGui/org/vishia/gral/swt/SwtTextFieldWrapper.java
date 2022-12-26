@@ -552,11 +552,14 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   @Override
   public void updateValuesForAction() {
-    String text2 = this.textFieldSwt.getText();
+    GralTextField wdg = (GralTextField)SwtTextFieldWrapper.super.widgg;
     GralWidget.DynamicData dyda = SwtTextFieldWrapper.super.dyda();
-    if(! text2.equals(dyda.displayedText)) {
-      dyda.displayedText = text2;
-      setTouched(true);
+    if( wdg.isEditable() && (dyda.getChanged() & (GralTextField.GraphicImplAccess.chgText | GralTextField.GraphicImplAccess.chgText)) ==0) {
+      String text2 = this.textFieldSwt.getText();          // get the text from the graphic and write into dyda
+      if(! text2.equals(dyda.displayedText)) {             // but only if a text change is not pending. 
+        dyda.displayedText = text2;
+        setTouched(true);                                  // mark as changed only if it is changed.
+      }
     }
     //There was a problem. Because of TextFieldModifyListener the field is already set. Newly read of getText() gets the old text. Bug of windows?
     //dyda().displayedText = text2;  //transfer the current text

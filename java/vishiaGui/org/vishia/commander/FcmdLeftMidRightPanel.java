@@ -143,8 +143,8 @@ public class FcmdLeftMidRightPanel
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
     if(cNr == '1'){ //commands only in the left panel.
-      this.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
-      mng.setPosition(2, -2, 0, -0, 1, 'd');
+      //TODO this.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+      //mng.setPosition(2, -2, 0, -0, 1, 'd');
       //main.executer.cmdSelector.createImplWidget_Gthread();
     }
     
@@ -255,7 +255,6 @@ public class FcmdLeftMidRightPanel
       }
     } 
     if(fileCard == null){                                  // not found: create a tab for it.
-      //TODO graphic appearance
       GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, label);
       GralPos refPos;
       try {
@@ -445,7 +444,7 @@ public class FcmdLeftMidRightPanel
       //adds all favorite pathes to it newly.
       mainPanel.actFileCard.fillFavorPaths(favorTabInfo.listfavorPaths);
       if(currentDir !=null) {
-        assert(false);
+        //assert(false);
         mainPanel.indexActualDir.put(mainPanel.actFileCard.getLabelCurrFavor(), currentDir.getPath());
         mainPanel.actFileCard.fillIn(currentDir, false);
         mainPanel.actFileCard.setFocus();

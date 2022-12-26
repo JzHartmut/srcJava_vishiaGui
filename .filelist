@@ -26,7 +26,7 @@
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
 2022-11-20 23:04:10  x     FcmdIdents.java                          ::         14.097  0035476139 
 2021-10-04 14:29:51  x     FcmdKeyActions.java                      ::          2.315 -2032154697 
-2022-12-24 23:19:10  x     FcmdLeftMidRightPanel.java               ::         18.647  1963590777 
+2022-12-26 19:44:04  x     FcmdLeftMidRightPanel.java               ::         18.626 -1208195697 
 2022-11-16 10:00:17  x     FcmdMkDirFile.java                       ::          4.183  0975604639 
 2022-11-19 11:17:38  x     FcmdSettings.java                        ::          9.662 -1342262910 
 2022-11-12 21:15:32  x     FcmdStatus.java                          ::          3.945 -2064914958 
@@ -100,7 +100,7 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-12-23 17:25:42  x     GralLed.java                             ::          5.644  0920501502 
 2022-09-25 19:48:48  x     GralMenu.java                            ::         12.586 -0766242011 
-2022-12-26 11:26:59  x     GralMng.java                             ::        107.143 -1983478450 
+2022-12-26 15:43:06  x     GralMng.java                             ::        107.197  0894789927 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-12-24 15:47:05  x     GralPanelContent.java                    ::         26.374  1885824297 
@@ -219,7 +219,7 @@
 2022-12-24 19:20:02  x     SwtSubWindow.java                        ::         23.945 -1078850713 
 2022-12-25 23:37:29  x     SwtTable.java                            ::         41.416  1259555519 
 2022-01-31 19:48:38  x     SwtTextBox.java                          ::         14.779 -0197457034 
-2022-12-23 19:12:39  x     SwtTextFieldWrapper.java                 ::         22.825 -0359167951 
+2022-12-26 19:52:40  x     SwtTextFieldWrapper.java                 ::         23.249  1369206079 
 2022-12-18 14:26:18  x     SwtTransparentLabel.java                 ::          1.917  0729056109 
 2021-10-04 14:29:49  x     SwtTraverseListener.java                 ::          1.382 -0922202695 
 2022-12-23 19:53:20  x     SwtValueBar.java                         ::          6.305 -1205138721 
@@ -243,7 +243,7 @@
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
 2022-11-24 22:00:00  x     GralCommandSelector.java                 ::          8.641  1402614593 
 2022-12-21 19:15:04  x     GralFileSelectWindow.java                ::          8.755 -0191567318 
-2022-12-25 23:32:48  x     GralFileSelector.java                    ::         80.446  1380990990 
+2022-12-26 16:56:43  x     GralFileSelector.java                    ::         80.686 -2123027045 
 2022-12-23 17:21:05  x     GralHorizontalSelector.java              ::         10.530 -1896136479 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2022-12-24 15:42:58  x     GralInfoBox.java                         ::         15.604  0452517348 
