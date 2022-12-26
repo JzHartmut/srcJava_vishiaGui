@@ -886,6 +886,18 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   
+  /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
+   * a mouse double-click is done on a file.
+   * @param newAction The action to use. The action is invoked with TODO
+   * @return The current assigned action or null.
+   */
+  public void setActionOnFocusedFileTable(GralUserAction newAction) { 
+    //GralUserAction oldAction = this.wdgSelectList.ac;
+    this.wdgSelectList.wdgdTable.specifyActionChange("focused", newAction, null, GralWidget_ifc.ActionChangeWhen.onFocusGained);
+  }
+  
+  
+  
   /**This action will be called on pressing enter or mouse-click on a directory.
    * Usual the directory can be entered and showed. But the user can do any other action.
    * If this action returns false, the default behavior: enter the directory will be done.

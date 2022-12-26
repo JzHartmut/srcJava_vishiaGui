@@ -2323,7 +2323,12 @@ public GralButton addCheckButton(
       if(htmlHelp !=null && applAdapter !=null){
         applAdapter.setHelpUrl(htmlHelp);
       }
-      if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }
+      if(widgg.cfg.actionFocused !=null){ 
+        widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); 
+      }
+      if(widgg.cfg.actionChangeSelect !=null && widgg.cfg.actionChangeSelect.onFocusGained !=null){ 
+        widgg.cfg.actionChangeSelect.onFocusGained.action().exec(KeyCode.focusGained, widgg); 
+      }
     }
   }
   

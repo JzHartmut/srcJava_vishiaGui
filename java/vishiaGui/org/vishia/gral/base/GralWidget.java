@@ -1180,7 +1180,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
       if(when == null || cfg.actionChangeSelect == null) return null;
       switch(when){
       case onAnyChgContent: return cfg.actionChangeSelect.onAnyChangeContent;
-      case onAnyKey: return cfg.actionChangeSelect.onAnyChangeContent;
+      case onAnyKey: return cfg.actionChangeSelect.onAnyKey;
       case onCtrlEnter: return cfg.actionChangeSelect.onCtrlEnter;
       case onFocusGained: return cfg.actionChangeSelect.onFocusGained;
       case onChangeAndFocusLost: return cfg.actionChangeSelect.onChangeAndFocusLost;

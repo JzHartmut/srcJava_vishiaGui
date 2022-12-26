@@ -2068,7 +2068,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           gralMng.gralFocusListener.focusGainedGral(GralTable.this);
           //super.focusGained();
           //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
-          redraw(50,100);
+          redraw(50,100);       //to show all table cells with the focused background color.
         }
       }
     }

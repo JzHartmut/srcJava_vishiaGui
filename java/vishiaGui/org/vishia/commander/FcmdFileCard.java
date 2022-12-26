@@ -89,14 +89,17 @@ public class FcmdFileCard extends GralFileSelector
 //  
 //  /**Table widget for the select table of the file tab.*/
 //  FcmdFavorCard wdgFavorCard;
-//
-//  /**The component */
-//  final Fcmd main;
+
+  /**The component */
+  final Fcmd main;
   
   /**The left, mid or right main panel where this tabbed file table is associated. */
   final FcmdLeftMidRightPanel mainPanel;
   
-//  GralColor[] colorSelectFocused123 = new GralColor[3];
+  /**Three colors for the current line in the file card.
+   * 
+   */
+  GralColor[] colorSelectFocused123 = new GralColor[3];
 //  
 //  /**The organization unit for this FileSelector. */
 //  //final LeftMidRightPanel.FileTabs fileTabs;
@@ -156,12 +159,12 @@ public class FcmdFileCard extends GralFileSelector
   FcmdFileCard(GralPos refPos, FcmdLeftMidRightPanel mainPanelP, String label){
     super(refPos, FcmdWidgetNames.tableFile + label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, true);
     this.label = label;
-//    this.main = mainPanelP.main;
+    this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
     this.nameFilePanel = label+ "." + mainPanelP.cNr;
-//    this.colorSelectFocused123[0] = GralColor.getColor("lgn");
-//    this.colorSelectFocused123[1] = GralColor.getColor("lbl");
-//    this.colorSelectFocused123[2] = GralColor.getColor("lgr");
+    this.colorSelectFocused123[0] = GralColor.getColor("lgn");
+    this.colorSelectFocused123[1] = GralColor.getColor("lbl");
+    this.colorSelectFocused123[2] = GralColor.getColor("lgr");
 //    String namePanelFile = FcmdWidgetNames.tableFile + nameFilePanel;
 //    
 //    main.idxFileSelector.put(namePanelFile, this); //it is WidgetNames.tableFile + label +.123, see super(...) 
@@ -204,7 +207,9 @@ public class FcmdFileCard extends GralFileSelector
 //    //
 //    //sets the action for a simple table: what to do on line selected: Show file names. 
 //    this.specifyActionOnFileSelected(actionOnFileSelection);
-//    wdgSelectList.wdgdTable.setActionFocused(actionFocused);
+
+    setActionOnFocusedFileTable(this.actionFocused);       // sets the current file card from three ones in Fcmd  
+
 //    //Note: some menu entries are set in the super class already.
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
@@ -490,38 +495,38 @@ public class FcmdFileCard extends GralFileSelector
 //    }
 //    
 //  }
-//  
-//  
-//  
-//  
-//  /**Sets the panel which contains this File card as actual, adjust the order of actual file panels
-//   * and sets the color of the current line of table of all 3 current file panels to the 3-stage color
-//   * to see which table has the focus. 
-//   * Sets {@link Fcmd#lastFavorCard}, {@link FcmdLeftMidRightPanel#actFileCard}, 
-//   * {@link Fcmd#lastFilePanels}. 
-//   */
-//  private void setActFilePanel_setColorCurrLine(){
-//    main.lastFavorCard = wdgFavorCard;
-//    main.currentFileCard = this;
-//    mainPanel.actFileCard = FcmdFileCard.this;
-//    main.setLastSelectedPanel(mainPanel);
-//    System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.wdgFavorCard.sActSelectedFavorPath);
-//    //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
-//    int ixMainPanel = -1;
-//    for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
-//      if(ixMainPanel >=2) {
-//        break;
-//      }
-//      if(panel.actFileCard !=null){
-//        panel.actFileCard.wdgSelectList.wdgdTable.setColorBackSelectedLine(colorSelectFocused123[++ixMainPanel]);
-//        panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
-//      } else {
-//        panel.orderMainPanel = 0; //not used.
-//      }
-//    }
-//  }
-//  
-//  
+  
+  
+  
+  
+  /**Sets the panel which contains this File card as actual, adjust the order of actual file panels
+   * and sets the color of the current line of table of all 3 current file panels to the 3-stage color
+   * to see which table has the focus. 
+   * Sets {@link Fcmd#lastFavorCard}, {@link FcmdLeftMidRightPanel#actFileCard}, 
+   * {@link Fcmd#lastFilePanels}. 
+   */
+  private void setActFilePanel_setColorCurrLine(){
+    //main.lastFavorCard = wdgFavorCard;
+    this.main.currentFileCard = this;
+    this.mainPanel.actFileCard = FcmdFileCard.this;
+    this.main.setLastSelectedPanel(mainPanel);
+    //System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.wdgFavorCard.sActSelectedFavorPath);
+    //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
+    int ixMainPanel = -1;
+    for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
+      if(ixMainPanel >=2) {
+        break;
+      }
+      if(panel.actFileCard !=null){                        // mark the current file card with green, last yellow
+        panel.actFileCard.wdgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
+        panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
+      } else {
+        panel.orderMainPanel = 0; //not used.
+      }
+    }
+  }
+  
+  
 //  /**Action to show the file properties in the info line. This action is called anytime if a line
 //   * was changed in the file view table. */
 //  GralUserAction actionOnFileSelection = new GralUserAction("FcmdFileCard-actionOnFileSelection"){
@@ -584,21 +589,21 @@ public class FcmdFileCard extends GralFileSelector
 //  } };  
 //  
 //  
-//  /**This action is bound in the File selection table. If it is focused, the current file tables
-//   * of the other file panels will gotten the {@link #colorSelectNonFocused} to show that are not
-//   * the first one. The file table of this is set with the {@link #colorSelectFocused}.
-//   * Twice the {@link Fcmd#lastFilePanels} list is ordered with this panel as first one. 
-//   * 
-//   */
-//  GralUserAction actionFocused = new GralUserAction("actionFocused"){
-//    @SuppressWarnings("synthetic-access") @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-//      if(actionCode == KeyCode.focusGained){
-//        setActFilePanel_setColorCurrLine();
-//      }
-//      return true;      
-//  } };
-//  
-//
+  /**This action is bound in the File selection table. If it is focused, the current file tables
+   * of the other file panels will gotten the {@link #colorSelectNonFocused} to show that are not
+   * the first one. The file table of this is set with the {@link #colorSelectFocused}.
+   * Twice the {@link Fcmd#lastFilePanels} list is ordered with this panel as first one. 
+   * 
+   */
+  GralUserAction actionFocused = new GralUserAction("actionFocused"){
+    @SuppressWarnings("synthetic-access") @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      if(actionCode == KeyCode.focusGained){
+        setActFilePanel_setColorCurrLine();
+      }
+      return true;      
+  } };
+  
+
 //  /**Called if a tab is used to change the selection in the favorTab. 
 //   * The adequate action is done too with selection in the favor tab. 
 //   * */
