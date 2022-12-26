@@ -83,6 +83,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-14 Hartmut new {@link LogMsg} with some constants for organization of log messages 
+   *   with the {@link LogMessage#sendMsg(int, CharSequence, Object...)} approach. 
+   *   The real logged messages can be filtered with this numbers.
    * <li>2022-11-14 Hartmut new now {@link #reportGralContent(Appendable)} for all existing windows defined here.
    * <li>2022-11-14 Hartmut new now {@link #initScript(CharSequence)} wrapped here for more simple user programming. 
    * <li>2022-11-14 Hartmut rename now {@link #refPos()} instead currPos().
@@ -2313,7 +2316,7 @@ public GralButton addCheckButton(
       GralMng.this.notifyFocus(widgg);
       GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
       widgg.redraw();  //maybe changed outfit on focus gained.
-      System.out.println("focusGainedGral: " + widgg.getName() + ":" + widgg.pos());
+      widgg.gralMng.log.sendMsg(GralMng.LogMsg.evFocused, "ev-focusGained: " + widgg.getName() + ":" + widgg.pos());
       String htmlHelp = widgg.getHtmlHelp();
       if(htmlHelp !=null && htmlHelp.startsWith(":FcmdNew.html")) { 
         Debugutil.stop(); }
@@ -2753,5 +2756,24 @@ public GralButton addCheckButton(
   }
 	
 
+  
+  /**This class defines only static numbers for messages. 
+   * The numbers should be a little bit sorted,
+   * so that dispatching of messages can be done. 
+   *
+   */
+  public static class LogMsg {
+    public static int ctorWdg = 1001;
+    public static int newPanel = 1010;
+    
+    public static int newImplTable = 1051;
+    
+    public static int setVisible = 1130;
+    public static int setFocus = 1131;
+    
+    public static int gralTable_updateCells = 1201;
+    
+    public static int evFocused = 1501;
+  }
 	
 }

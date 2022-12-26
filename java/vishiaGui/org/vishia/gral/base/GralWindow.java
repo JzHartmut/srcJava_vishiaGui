@@ -9,6 +9,7 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -343,6 +344,11 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   {
     return bVisibleState;
   }
+  
+  
+  
+  public GralWidgetBase_ifc getFocusedWidget() { return this.mainPanel; }
+
   
   
   public void reportAllContent(Appendable out) {

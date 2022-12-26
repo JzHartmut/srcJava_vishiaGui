@@ -1280,22 +1280,26 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @return b for concatenate.
    * @throws IOException can be force RuntimeException if a StringBuilder is given as Appendable
    */
-  @Override public Appendable toString(Appendable b, String ... appendPanel) throws IOException 
-  { b.append('@');
-    if(appendPanel !=null && this.parent != null) {
-      b.append(this.parent.getName()).append(", ");
-    }
-    if(this.y.n2 == areaNr) {
-      b.append((char)('A' + this.x.p1)).append((char)('1' + this.y.p1));
-      b.append((char)('A' + this.x.p2-1)).append((char)('1' + this.y.p2-1));
-    } else {
-      appendPos(b, this.y.p1, this.y.p1Frac);
-      b.append("..");
-      appendPos(b, this.y.p2, this.y.p2Frac);
-      b.append(", ");
-      appendPos(b, this.x.p1, this.x.p1Frac);
-      b.append("..");
-      appendPos(b, this.x.p2, this.x.p2Frac);
+  @Override public Appendable toString(Appendable b, String ... appendPanel) { 
+    try {
+      b.append('@');
+      if(appendPanel !=null && this.parent != null) {
+        b.append(this.parent.getName()).append(", ");
+      }
+      if(this.y.n2 == areaNr) {
+        b.append((char)('A' + this.x.p1)).append((char)('1' + this.y.p1));
+        b.append((char)('A' + this.x.p2-1)).append((char)('1' + this.y.p2-1));
+      } else {
+        appendPos(b, this.y.p1, this.y.p1Frac);
+        b.append("..");
+        appendPos(b, this.y.p2, this.y.p2Frac);
+        b.append(", ");
+        appendPos(b, this.x.p1, this.x.p1Frac);
+        b.append("..");
+        appendPos(b, this.x.p2, this.x.p2Frac);
+      }
+    } catch(IOException exc) {
+      throw new RuntimeException("unexpected", exc);
     }
     return b;
   }
@@ -1305,7 +1309,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    */
   @Override public String toString(){
     try { return toString(new StringBuilder(), "p").toString(); }
-    catch(IOException exc) { return "?"; } // does never occur.
+    catch(RuntimeException exc) { return "?"; } // does never occur.
 //    return "@" + (this.parent == null ? "?" : this.parent.getName()) + ", "
 //    +this.y.toString() + ", " + this.x.toString() + " " + this.y.dirNext + this.x.dirNext + this.y.origin + this.x.origin;
   }

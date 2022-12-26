@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -256,9 +257,12 @@ public class FcmdLeftMidRightPanel
     if(fileCard == null){                                  // not found: create a tab for it.
       //TODO graphic appearance
       GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, label);
-      this.main.gui.gralMng.refPos().setParent(tabFileCard);
-      fileCard = new FcmdFileCard(this.main.gui.gralMng.refPos(), this, label);
-      listTabs.add(fileCard);
+      GralPos refPos;
+      try {
+        refPos = new GralPos(tabFileCard, "0..0, 0..0");
+      } catch(ParseException exc) { refPos = null; } // unexpected  
+      fileCard = new FcmdFileCard(refPos, this, label);
+      this.listTabs.add(fileCard);
       this.tabbedPanelFileCards.createImplWidget();
     }
     return fileCard;
@@ -440,13 +444,14 @@ public class FcmdLeftMidRightPanel
       }
       //adds all favorite pathes to it newly.
       mainPanel.actFileCard.fillFavorPaths(favorTabInfo.listfavorPaths);
-      if(currentDir !=null){
+      if(currentDir !=null) {
+        assert(false);
         mainPanel.indexActualDir.put(mainPanel.actFileCard.getLabelCurrFavor(), currentDir.getPath());
         mainPanel.actFileCard.fillIn(currentDir, false);
         mainPanel.actFileCard.setFocus();
       } else { 
-        mainPanel.actFileCard.doActivateFavor();
-        mainPanel.actFileCard.setFocus();
+        //mainPanel.actFileCard.doActivateFavor();
+        //mainPanel.actFileCard.setFocus();
       }
       return true;
     }

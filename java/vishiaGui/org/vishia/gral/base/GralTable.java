@@ -1825,7 +1825,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         drawCellContent(ix, cells[ix], null, linePresentation);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
-      System.out.println("GralTable.updateGraphicCellContent(): " + GralTable.this.name + + timeLastRedraw);
+      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name + timeLastRedraw);
     }
 
     

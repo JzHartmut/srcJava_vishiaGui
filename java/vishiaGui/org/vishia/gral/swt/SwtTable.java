@@ -180,9 +180,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   private final TableKeyListerner myKeyListener;
   
-  public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent)
-  { gralTable.super(gralTable, mng.gralMng);
+  public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent) { 
+    gralTable.super(gralTable, mng.gralMng);
     //super(name, mng, columnWidths);
+    StringBuilder sLog = new StringBuilder(120);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
     //focusListenerCell = this;
@@ -204,6 +205,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     swtWidgHelper.widgetSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     GralRectangle pixTable = swtWidgHelper.mng.setBounds_(widgg.pos(), swtWidgHelper.widgetSwt);
     SwtTable.this.resizeTable(pixTable);
+    mng.gralMng.log.sendMsg(GralMng.LogMsg.newImplTable, sLog);
   }
 
 

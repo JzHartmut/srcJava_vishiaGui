@@ -1613,9 +1613,9 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * @param visible
    * @return the old state.
    */
-  @Override public boolean setVisible(boolean visible){
-    if(this instanceof GralTable)
-      System.out.println("GralTable set " + (visible? "visible: " : "invisible: ") + this.name);
+  @Override public boolean setVisible ( boolean visible){
+    //if(this instanceof GralTable)
+    this.gralMng.log.sendMsg(GralMng.LogMsg.setVisible, "setVisible: " + visible +" §" + this.name + this.pos());
     if(this instanceof GralWindow)
       Debugutil.stop();
     if(_wdgImpl == null) {
@@ -1802,7 +1802,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   /**Standard implementation. Override only if necessary for sepcial handling.
    * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
    */
-  public void setFocus(){ setFocus(0,0); }
+  public void setFocus ( ){ setFocus(0,0); }
   
   /**The default implementation is empty.
    * It is valid for simple widgets which have not sub widgets. 
@@ -1820,19 +1820,29 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * @param delay Delay in ms for invoking the focus request 
    * @param latest 
    */
-  @Override public void setFocus(int delay, int latest){
+  @Override public void setFocus ( int delay, int latest){
     GralWidgetBase_ifc child = this;
     GralWidgetBase_ifc parent;
-    while( !(child instanceof GralScreen) ) {
+    this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "GralWidget.setFocus: " + delay +" §" + this.name);
+//    while( !(child instanceof GralScreen) ) {
+//      parent = child.pos().parent;
+//      parent.setVisible(true);
+//      parent.setFocusedWidget(child);
+//      child = parent;
+//    }
+    do {
       parent = child.pos().parent;
       parent.setVisible(true);
       parent.setFocusedWidget(child);
       child = parent;
+    } while( !(parent instanceof GralScreen) );
+    while( (child = parent.getFocusedWidget()) !=null) {
+      parent = child;
     }
-    while( !(child instanceof GralWidget)) {
-      child = child.getFocusedWidget();
-    }
-    GralWidget wdgToFocus = (GralWidget)child;
+//    while( !(child instanceof GralWidget)) {
+//      child = child.getFocusedWidget();
+//    }
+    GralWidget wdgToFocus = (GralWidget)parent;
     wdgToFocus.dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
     wdgToFocus.redraw(delay, latest);                     // do the following action in the graphic thread.
   }

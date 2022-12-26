@@ -671,6 +671,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   
+  static void logBounds(StringBuilder sLog, Control wdg) {
+    Rectangle xy = wdg.getBounds();
+    sLog.append(" pixy(").append(xy.x).append(" + ").append(xy.width).append(", ").append(xy.y).append(" + ").append(xy.height).append(")");
+  }
+  
   GralRectangle getPixelUseableAreaOfWindow(GralWidget widgg)
   { Object oControl = widgg._wdgImpl.getWidgetImplementation();
     Control control = (Control)oControl;

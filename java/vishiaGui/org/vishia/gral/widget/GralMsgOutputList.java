@@ -89,13 +89,13 @@ public class GralMsgOutputList  extends LogMessageBase
     return true;
   }
 
-  @Override public boolean sendMsg(int identNumber, String text, Object... args) {
+  @Override public boolean sendMsg(int identNumber, CharSequence text, Object... args) {
     // TODO Auto-generated method stub
     return false;
   }
 
   @Override public boolean sendMsgTime(int identNumber, OS_TimeStamp creationTime,
-      String text, Object... args) {
+      CharSequence text, Object... args) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -104,14 +104,13 @@ public class GralMsgOutputList  extends LogMessageBase
    * @see org.vishia.msgDispatch.LogMessage#sendMsgVaList(int, org.vishia.bridgeC.OS_TimeStamp, java.lang.String, org.vishia.bridgeC.Va_list)
    */
   @Override public boolean sendMsgVaList(int identNumber, OS_TimeStamp creationTime,
-    
-    String text, Va_list args) {
+    CharSequence text, Va_list args) {
     String sTime = dateFormat.format(creationTime);
     String state = identNumber <0 ? "-" : "+'";  //going/coming
     int identNumber1 = identNumber < 0 ? -identNumber :identNumber;
     //The configuration for this msg ident.
     String sText;
-    try{ sText = String.format(localization, text,args.get());
+    try{ sText = String.format(localization, text.toString(), args.get());
     }catch(IllegalFormatPrecisionException exc){
       sText = "error-precision in text format: " + text;
     } catch(IllegalFormatConversionException exc){

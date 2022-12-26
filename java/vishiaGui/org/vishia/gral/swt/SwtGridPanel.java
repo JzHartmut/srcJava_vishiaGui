@@ -71,8 +71,9 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
     super(wdgg);
     final SwtMng swtMng = (SwtMng) wdgg.gralMng()._mngImpl;
     final Composite parent = SwtMng.getSwtParent(wdgg.pos());
+    GralMng gralMng = wdgg.gralMng();
     
-    
+    StringBuilder sLog = new StringBuilder();
     
     //final Rectangle areaParent = parent.getClientArea();
     if (wdgg.isTabbed()) {
@@ -85,7 +86,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       tabFolder.setFont(fontTab);
       super.panelSwtImpl = tabFolder;            // typed access in SwtPanel
       super.wdgimpl = tabFolder;                 // unified access in GraLWidget
-      
+      sLog.append("new swt.TabFolder "); wdgg.pos().toString(sLog);
     } 
     else {
       GralCanvasStorage canvasStore = wdgg.canvas();
@@ -102,6 +103,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       if(whatis !='9') {
         panel.addControlListener(this.resizeItemListener);
       }
+      sLog.append("new swt.Panel "); wdgg.pos().toString(sLog);
       panel.setData(this);
       panel.setLayout(null);
       //this.XXXcurrColor = panel.getForeground();
@@ -115,6 +117,7 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       } else {
         tab.setText(wdgg.getName());
       }
+      sLog.insert(0, ":new swt TabItem ").insert(0, tab.getText());
       tab.setControl(this.panelSwtImpl);
       Rectangle areaTab;
       final GralWidgetBase_ifc parentPanelifc = wdgg.pos().parent;
@@ -134,6 +137,9 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       //super.panelSwtImpl.setBounds(areaParent);
       swtMng.listVisiblePanels_add(wdgg);
     }
+    SwtMng.logBounds(sLog, super.panelSwtImpl);
+    gralMng.log.sendMsg(GralMng.LogMsg.newPanel, sLog);
+    
     SwtMng.storeGralPixBounds(this, super.panelSwtImpl);
     this.panelSwtImpl.setVisible(true);
   }
