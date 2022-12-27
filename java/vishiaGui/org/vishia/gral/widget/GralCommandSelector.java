@@ -96,20 +96,12 @@ public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutin
     //this.cmdStore = new CmdStore();
     //this.cmdQueue = cmdQueue;
     this.getterArguments = getterArguments;
+    this.wdgdTable.specifyActionOnLineSelected(this.actionOnLineSelected);
    
   }
   
   
-  @Override
-  public boolean createImplWidget_Gthread(){
-    boolean bCreate = wdgdTable.createImplWidget_Gthread();
-    if(bCreate) {
-      wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
-    }
-    return bCreate;
-  }
-
-  
+   
   
   
   public void clear() { wdgdTable.clearTable(); addJZsub2SelectTable.clear(); }

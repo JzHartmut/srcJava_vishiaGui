@@ -13,6 +13,7 @@ import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
@@ -75,11 +76,11 @@ public class FcmdExecuter
   
   private final GralMng gralMng;
   
-  final GralWindow windConfirmExec;
+  GralWindow windConfirmExec;
 
  // GralTable<CmdBlock> widgSelectExec = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
 
-  final GralTable<JZtxtcmdScript.Subroutine> widgSelectJzExt;
+  GralTable<JZtxtcmdScript.Subroutine> widgSelectJzExt;
 
   /**Store of all possible commands given in the command file. */
   //final CmdStore cmdStore = new CmdStore();
@@ -101,7 +102,7 @@ public class FcmdExecuter
    *   
    * </ul> 
    */
-  final GralCommandSelector cmdSelector;
+  GralCommandSelector cmdSelector;
 
 
   
@@ -109,13 +110,9 @@ public class FcmdExecuter
   { this.main = main;
     this.gralMng = main.gui.gralMng;
     this.console = console;
-    this.gralMng.selectPanel("primaryWindow");
-    this.windConfirmExec = this.gralMng.addWindow("@screen, 20+19,40+47=execWindow", "confirm execute", GralWindow.windConcurrently);
-    this.widgSelectJzExt = new GralTable<JZtxtcmdScript.Subroutine>(this.gralMng.refPos(), "@0..0,0..0=execChoice", 20, new int[]{47});
     //this.cmdQueue = new CmdQueue(outStatus);
     this.cmdExecuter = new CmdExecuter();
     this.cmdExecuter.setEchoCmdOut(main.gui.outputBox);
-    cmdSelector = new GralCommandSelector(this.gralMng.refPos(), "cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
   }
   
   
@@ -170,6 +167,17 @@ public class FcmdExecuter
     return JZtxtcmd.readJZcmdCfg(dst, cmdCfgJbat, log, cmdExecuter);
   }  
 
+  
+  
+  void buildGui ( ) {
+    this.gralMng.selectPanel("primaryWindow");
+    this.windConfirmExec = this.gralMng.addWindow("@screen, 20+19,40+47=execWindow", "confirm execute", GralWindow.windConcurrently);
+    this.widgSelectJzExt = new GralTable<JZtxtcmdScript.Subroutine>(this.gralMng.refPos(), "@0..0,0..0=execChoice", 20, new int[]{47});
+    GralPos refPos = new GralPos(main.favorPathSelector.panelLeft.wdgPanelTabCmds);
+    this.cmdSelector = new GralCommandSelector(refPos, "cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
+    
+  }
+  
   
   /**
    * Action to set the working directory for the next command invocation. The

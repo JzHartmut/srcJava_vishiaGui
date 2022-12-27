@@ -9,14 +9,14 @@
 ============================== java/vishiaGui/org/vishia/ ==========================================
 
 ============================== java/vishiaGui/org/vishia/commander/ ================================
-2022-12-21 18:54:07  x     Fcmd.java                                ::         32.525  0820643756 
+2022-12-27 09:44:22  x     Fcmd.java                                ::         32.643  1127247341 
 2022-11-20 23:06:59  x     FcmdActions.java                         ::         10.031 -0967068095 
 2022-11-20 23:07:55  x     FcmdButtons.java                         ::         18.951 -0940360387 
 2022-11-15 18:54:28  x     FcmdCopyCmprDel.java                     ::         70.184  2114418410 
 2022-11-16 10:01:06  x     FcmdDelete.java                          ::          8.126 -0254186045 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2022-11-19 14:16:42  x     FcmdEdit.java                            ::          8.196  1294045397 
-2022-11-19 14:20:02  x     FcmdExecuter.java                        ::         16.413 -0728050999 
+2022-12-27 09:36:59  x     FcmdExecuter.java                        ::         16.546 -2008977280 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
 2022-12-21 19:23:17  x     FcmdFavorPathSelector.java               ::         31.697  0466510763 
 2022-12-26 21:46:15  x     FcmdFileCard.java                        ::         31.866 -0582505776 
@@ -26,13 +26,13 @@
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
 2022-11-20 23:04:10  x     FcmdIdents.java                          ::         14.097  0035476139 
 2021-10-04 14:29:51  x     FcmdKeyActions.java                      ::          2.315 -2032154697 
-2022-12-26 19:44:04  x     FcmdLeftMidRightPanel.java               ::         18.626 -1208195697 
+2022-12-27 09:19:18  x     FcmdLeftMidRightPanel.java               ::         18.812  1901030875 
 2022-11-16 10:00:17  x     FcmdMkDirFile.java                       ::          4.183  0975604639 
 2022-11-19 11:17:38  x     FcmdSettings.java                        ::          9.662 -1342262910 
 2022-11-12 21:15:32  x     FcmdStatus.java                          ::          3.945 -2064914958 
 2022-11-20 23:07:38  x     FcmdStatusLine.java                      ::          6.867  1091254000 
 2021-10-04 14:29:49  x     FcmdTargetProxy.java                     ::           .103 -0703963512 
-2022-12-17 22:12:05  x     FcmdView.java                            ::         24.626 -0417633707 
+2022-12-26 23:21:56  x     FcmdView.java                            ::         24.628  0762693481 
 2022-12-21 19:51:28  x     FcmdWidgetNames.java                     ::          1.756  1371890618 
 2022-11-15 19:00:09  x     FcmdWindowMng.java                       ::           .889  1905200979 
 2012-03-28 07:42:16  x     package-info.java                        ::           .253 -2063976015 
@@ -241,7 +241,7 @@
 ============================== java/vishiaGui/org/vishia/gral/widget/ ==============================
 2022-11-13 22:38:06  x     GralCanvasArea.java                      ::          4.639  1431383281 
 2022-09-28 23:47:02  x     GralColorSelector.java                   ::          7.362 -2130126692 
-2022-11-24 22:00:00  x     GralCommandSelector.java                 ::          8.641  1402614593 
+2022-12-27 09:41:47  x     GralCommandSelector.java                 ::          8.484  0005583651 
 2022-12-21 19:15:04  x     GralFileSelectWindow.java                ::          8.755 -0191567318 
 2022-12-26 21:37:36  x     GralFileSelector.java                    ::         85.872  0471566739 
 2022-12-23 17:21:05  x     GralHorizontalSelector.java              ::         10.530 -1896136479 

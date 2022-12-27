@@ -309,9 +309,12 @@ public class Fcmd //extends GuiCfg
   GralPanelContent panelButtons;
 
   
+  /**This instance contains the three panels.
+   * 
+   */
   final FcmdFavorPathSelector favorPathSelector = new FcmdFavorPathSelector(this.gui.log(), this);
 
-  final FcmdExecuter executer = new FcmdExecuter(this.gui.log(), this.gui.getOutputBox(), this);
+  FcmdExecuter executer = new FcmdExecuter(this.gui.log(), this.gui.getOutputBox(), this);
 
   final FcmdSettings settings = new FcmdSettings(this);
   
@@ -398,6 +401,8 @@ public class Fcmd //extends GuiCfg
     //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
     this.fcmdActions.actionReadMsgConfig.exec(KeyCode.menuEntered, null);
     
+    
+    
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new TreeMap<String, JZtxtcmdScript.Subroutine>();
     //executer.cmdQueue.setOutput(gui.getOutputBox(), null);
@@ -445,6 +450,8 @@ public class Fcmd //extends GuiCfg
     this.favorPathSelector.panelRight.tabbedPanelFileCards = this.gui.gralMng.addTabbedPanel("@area9,C1C1=File2Tab");
     //gui.addFrameArea("C1C1", this.favorPathSelector.panelRight.tabbedPanelFileCards); // dialogPanel);
     this.favorPathSelector.panelRight.buildInitialTabs();
+
+    this.executer.buildGui();
 
     this.gui.gralMng.selectPanel("primaryWindow");
     panelButtons = this.gui.gralMng.createGridPanel("@area9,A3C3=Buttons", this.gui.gralMng.getColor("gr"), 1, 1, 10, 10);
@@ -505,14 +512,8 @@ public class Fcmd //extends GuiCfg
       this.gui.writeError("Argument sel:SELECTFILE should be given.");
       // mainCmd.e
     } else {
-      String sError;
-      File fileCfg;
-      sError = executer.readCmdCfgSelectList(executer.cmdSelector.addJZsub2SelectTable, fileCfg = cargs.fileCfgCmds, this.gui.log());
-      if(sError !=null) {
-        this.gui.outputBox.setText(sError);   
-      } else {
-        this.gui.outputBox.append("read config cmd");   
-      }
+      String sError = null;
+      File fileCfg = cargs.fileCfgCmds;
       if (sError == null) {
         //sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);
         sError = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
@@ -527,12 +528,19 @@ public class Fcmd //extends GuiCfg
         this.gui.writeError("Error reading " + fileCfg.getAbsolutePath() + ": "
             + sError);
       }
-    }
-    initGuiAreas();
-    this.gui.gralMng.reportGralContent(this.log);
-    this.gui.gralMng.createGraphic("SWT", 'C', null);
+      initGuiAreas();
+      sError = this.executer.readCmdCfgSelectList(executer.cmdSelector.addJZsub2SelectTable, fileCfg, this.gui.log());
+      if(sError !=null) {
+        this.gui.outputBox.setText(sError);   
+      } else {
+        this.gui.outputBox.append("read config cmd");   
+      }
+      
+      this.gui.gralMng.reportGralContent(this.log);
+      this.gui.gralMng.createGraphic("SWT", 'C', null);
     //old: super.initMain(); // starts initializing of graphic. Do it after config
                       // command selector!
+    }
 
   }
 
