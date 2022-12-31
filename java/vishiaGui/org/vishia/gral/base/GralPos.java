@@ -160,6 +160,11 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-12-30 meaningful refactoring. Now the positions are stored with fine grid units in only one number. 
+   *   This makes it more simple for relative calculation. 
+   *   The interpretation of the fractional part follows the direction of the integer value (of course).
+   *   On the old solution the fractional part was oriented sometimes always to right and button, but that was confusing. 
+   *   Now it is even. See also test cases in test_vishiaGral/org/vishia/gral/test/basics/Test_GralPos.java    
    * <li>2022-12-20 Hartmut new {@link #screenPos(int, int, int, int)} to get a pos relative to given widget but for another window.
    * <li>2022-12-20 Hartmut chg {@link #parent} can now be also a comprehensive widget, using {@link GralWidgetBase_ifc}.
    * <li>2022-12-17 Hartmut new {@link #setAsFrame()}
@@ -215,7 +220,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   public static final int version = 20221028;
 
   
-  /**This adding value applied at any coordinate parameter of any setPosition- method means, that the value is 
+  /**This mask 0x8... applied at any coordinate parameter of any setPosition- method means, that the value is 
    * referred to the position of the previous or given position. The referred value may be given as positive or negative number.
    * Adding this constant a value in range 0x7000...0x8000 to 0x8fff results for positions -4096...4095 (usual -100..100)
    * Hint: If only the fractional part is changed, the non-fractional part should be given as refer.
@@ -224,9 +229,8 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   /**This value applied at any coordinate parameter of any setPosition- method means, that the value is 
    * the same as the previous or given position.
-   * Hint: The constant is equal to {@link #refer}. This constant regards the semantic.
    */
-  public final static int same = 0x8000;
+  public final static int same = 0xdffc;
   
   /**Use the next value for the coordinate in relation to the last one for the given direction
    * but the same value for the other coordinate. It is the typical value for both coordinates
@@ -244,17 +248,17 @@ public class GralPos extends ObjectVishia implements Cloneable
    */
   public final static int nextBlock = 0xdffd;
   
-  /**Marker for invalid, to check*/
+  /**0xdffff Marker for invalid, to check*/
   public final static int invalidPos = 0xdfff;
   
-  /**This value at xEnd or yEnd means, that the native size of a widget should be used.
+  /**This value 0x0c000 at xEnd or yEnd means, that the native size of a widget should be used.
    * It is especially to draw images with its native size.
    * This is a bit mask. The nature size is stored in the bits 12..0, that is maximal 8191 pixel 
    */
   public final static int useNatSize = 0xc000;
   
   
-  /**This bit at all coordinates means, that the value is given as ratio from the size.
+  /**This mask 0xa... at all coordinates means, that the value is given as ratio from the size.
    * The bit {@link useNatSize} have to be 0. The ratio is stored as a value from 0 to 999
    * in the bits 9..0. The other bits should be 0.
    */
@@ -272,7 +276,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   /**Use the same size.
    * 
    */
-  public final static int samesize = 0x6000;
+  public final static int samesize = 0xdffb;
   
   
   /**Values 0ex001..0xe003 as number of a {@link GralArea9Panel} A..C for columns, 1..3 for rows */
@@ -369,6 +373,8 @@ public class GralPos extends ObjectVishia implements Cloneable
   /**The values for x and y positions. Note: should be private! Don't use in application furthermore. */
   public final Coordinate x = new Coordinate(), y = new Coordinate();
   
+  public boolean dbg = false;
+  
   /**Creates an position with all values 0 related to the whole screen.
    * The position can be changed after them with {@link #setPosition(float, float)} etc.
    */
@@ -421,8 +427,8 @@ public class GralPos extends ObjectVishia implements Cloneable
   public void set(GralPos pos)
   { this.x.p1 = pos.x.p1; this.x.p2 = pos.x.p2; 
     this.y.p1 = pos.y.p1; this.y.p2 = pos.y.p2;
-    this.x.p1Frac = pos.x.p1Frac; this.x.p2Frac = pos.x.p2Frac; 
-    this.y.p1Frac = pos.y.p1Frac; this.y.p2Frac = pos.y.p2Frac;
+//    this.x.p1Frac = pos.x.p1Frac; this.x.p2Frac = pos.x.p2Frac; 
+//    this.y.p1Frac = pos.y.p1Frac; this.y.p2Frac = pos.y.p2Frac;
     this.x.origin = pos.x.origin; this.y.origin = pos.y.origin; 
     this.x.dirNext = pos.x.dirNext; this.y.dirNext = pos.y.dirNext;
     this.x.n1 = pos.x.n1; this.y.n1 = pos.y.n1;
@@ -449,8 +455,8 @@ public class GralPos extends ObjectVishia implements Cloneable
   public void setFullPanel(GralPanelContent panel) {
     this.x.p1 = 0; this.x.p2 = 0; 
     this.y.p1 = 0; this.y.p2 = 0;
-    this.x.p1Frac = 0; this.x.p2Frac = 0; 
-    this.y.p1Frac = 0; this.y.p2Frac = 0;
+//    this.x.p1Frac = 0; this.x.p2Frac = 0; 
+//    this.y.p1Frac = 0; this.y.p2Frac = 0;
     this.x.origin = 0; this.y.origin = 0; 
     this.x.dirNext = 'R'; this.y.dirNext = 'D';
     this.parent = panel;
@@ -461,14 +467,19 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   public void setPosition(float line, float column)
   {
-    setPosition(this, line, size + same, column, size + same, 0, '.');
+    setPosition(this, line, samesize, column, samesize, 0, '.');
   }
   
   
   
   
-  /* (non-Javadoc)
-   * @see org.vishia.gral.gridPanel.GuiPanelMngBuildIfc#setPosition(int, int, int, int, char)
+  /**Sets a position in full grid coordinates and the size in full grid values.
+   * @param line
+   * @param column
+   * @param height
+   * @param width
+   * @param direction
+   * @param posFrame
    */
   public void setPositionSize(int line, int column, int height, int width, char direction, GralPos posFrame)
   { setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0, 0, posFrame);
@@ -571,7 +582,7 @@ public class GralPos extends ObjectVishia implements Cloneable
             //======>>>>>>
             scanPosition(spPos, col);
           } else {
-            col.p1 = line.p1 == next ? next : refer;         // line.next is set if nothing is scanned on line.
+            col.p1 = line.p1 == next ? next : same;        // line.next is set if '+' is scanned on line.
             col.p2 = samesize;
           }
         }
@@ -585,22 +596,22 @@ public class GralPos extends ObjectVishia implements Cloneable
     if("+-".indexOf(line.dirNext) >=0) {
       direction = line.dirNext == '+' ? 'D' : 'U';
       border = line.pb;
-      borderFrac = line.pbf;
+//      borderFrac = line.pbf;
     }
     else if("+-".indexOf(col.dirNext) >=0) {
       direction = col.dirNext == '+' ? 'R' : 'L';
       border = col.pb;
-      borderFrac = col.pbf;
+//      borderFrac = col.pbf;
     } 
     else if(refPos !=null) {
       if(refPos.y.dirNext != 0) {
         border = refPos.y.pb;
-        borderFrac = refPos.y.pbf;
+//        borderFrac = refPos.y.pbf;
         direction = Character.toUpperCase(refPos.y.dirNext);
       }
       else {
         border = refPos.x.pb;
-        borderFrac = refPos.x.pbf;
+//        borderFrac = refPos.x.pbf;
         direction = Character.toUpperCase(refPos.x.dirNext);
       }
     } else {
@@ -609,7 +620,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       direction = 0;
     }
 
-    setFinePosition(line.p1, line.p1Frac, line.p2, line.p2Frac, col.p1, col.p1Frac, col.p2, col.p2Frac,  origin, direction, border, borderFrac, posParent1);
+    setFinePosition(line.p1, line.p2, col.p1, col.p2, origin, direction, border, posParent1);
   }
   
   
@@ -627,29 +638,38 @@ public class GralPos extends ObjectVishia implements Cloneable
     char sign = spPos.seekNoWhitespace().getCurrentChar();
     int size1; //maybe size for end element, converted to refer for start element.
     co.p1 = invalidPos;                                          // default, next line or next column depending on parent.
-    co.p1Frac = invalidPos;
+//    co.p1Frac = invalidPos;
     co.p2 = invalidPos;                                      // default, same size for heigth or width
-    co.p2Frac = invalidPos;
+//    co.p2Frac = invalidPos;
     final int rel_p1;
     final int[] rel_select = { refer, ratio};
     //------------------------------------------------------- first value
-    int typeFirstChar = "+%".indexOf(sign);
+    int typeFirstChar = "+%".indexOf(sign);                // refer or ratio
+    if(this.dbg) {
+      Debugutil.stop();
+    }
     if(typeFirstChar >=0) {
       rel_p1 = rel_select[typeFirstChar];                  // additional value to p1
-      spPos.seekPos(1);  //skip over first char
+      spPos.seekPos(1).scan().scanStart();                 // skip over first char if recognized, +%
     } else {
       rel_p1 = 0;                                          // absolute value for left.
     }
+    sign = spPos.seekNoWhitespace().getCurrentChar();
     if(spPos.scanInteger().scanOk()) {  //------------------- first value maybe negative scanned  10 or -10
-      co.p1 = rel_p1 + (int)spPos.getLastScannedIntegerNumber();  //higher bits determines rel_p1, lower bits are scanned number
+      co.p1 = 10*(int)spPos.getLastScannedIntegerNumber();  //higher bits determines rel_p1, lower bits are scanned number
+//      if(sign == '-') {                                    // negative number on first position 
+//        co.p1 -=1;                                         // 0 => -1, -1 => -2
+//      }
       if(spPos.scan(".").scanInteger().scanOk()) {
-        co.p1Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+        int frac = ((int)spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+        if(co.p1 >=0) { co.p1 += frac; } else { co.p1 -= frac; }
       } else {
-        co.p1Frac = 0;
+     //   co.p1Frac = 0;
       }
-    } else {
-      co.p1 = next;                                        // nothing given, then the next position should be used
-      co.p1Frac = 0;                                       // respectively the same in the unchanged direction
+      assert(co.p1 <0x1000 && co.p1 > -0x1000);
+      co.p1 += rel_p1;
+    } else {                                               // nothing given, then the same position should be used
+      co.p1 = rel_p1 == refer ? next : same;               // or only "+" (forces refer) then next
     }
     //------------------------------------------------------- second value
     int size2;
@@ -657,78 +677,42 @@ public class GralPos extends ObjectVishia implements Cloneable
     if(spPos.scan("..").scanOk()) {     //------------------- second value absolute position for end is given
       rel_p2 = 0;
     } else {
-      rel_p2 = size;                                       // not .. then size as 2th number
-      spPos.scan("+").scanStart();                         //skip over '+', it is the separator, 
+      rel_p2 = size;                                       // not .. then maybe size as 2th number, or samesize
     }
+    sign = spPos.seekNoWhitespace().getCurrentChar();
     if(spPos.scanInteger().scanOk()) {  //------------------- second value can start with '-' but not with '+'
-      co.p2 = rel_p2 + (int)spPos.getLastScannedIntegerNumber();    // maybe negative, means from right
+      co.p2 = 10*(int)spPos.getLastScannedIntegerNumber();    // maybe negative, means from right
       if(spPos.scan(".").scanInteger().scanOk()) {
-        co.p2Frac = (int)(spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+        int frac = ((int)spPos.getLastScannedIntegerNumber() % 10);  //should be 0..9
+        if(sign =='-') { co.p2 -= frac; } else { co.p2 += frac; }
       } else {
-        co.p2Frac = 0;                                     // frac default 0 if p2 is determined.
+   //     co.p2Frac = 0;                                     // frac default 0 if p2 is determined.
       }
+      assert(co.p2 <0x1000 && co.p2 > -0x1000);
+      co.p2 += rel_p2;
     } else {
       co.p2 = samesize;                                    // not an integer following, nothing given, then samesize as default
-      co.p2Frac = 0;
+//      co.p2Frac = 0;
     }
-    if(spPos.scan("++").scanOk()) {
+    if(spPos.scan("++").scanOk() ) {
       co.dirNext = '+';
       if(spPos.scanInteger().scanOk()) {
-        co.pb = (int)(spPos.getLastScannedIntegerNumber());  //border
+        co.pb = 10*(int)(spPos.getLastScannedIntegerNumber());  //border
         if(spPos.scan(".").scanInteger().scanOk()) {
-          co.pbf = (int)(spPos.getLastScannedIntegerNumber()) %10;  //border fracitonal 0..9
+          co.pb += (int)(spPos.getLastScannedIntegerNumber()) %10;  //border fracitonal 0..9
         }
       }
     }
-    assert(co.p1 != invalidPos && co.p2 != invalidPos && co.p1Frac >=0 && co.p1Frac <=9 && co.p2Frac >=0 && co.p2Frac <=9 );
+    assert(co.p1 != invalidPos && co.p2 != invalidPos  );
   }
   
   
   
-  /**Sets the position absolutely or also relative to the given position with given values.
-   * @param parent The panel which is used as container. If null then left the existing panel unchanged.
-   * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
-   *   it is the bottom line for the position. 
-   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
-   *   with a negative value, the framePos {@link GralPos#y.p2} is used. If it is designated
-   *   with {@link #same} but with any offset, the {@link GralPos#y} is used as refer position, it is the top line position.
-   *   Elsewhere it is the top position.
-   * 
-   * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
-   * @param column
-   * @param columnEndOrSize
-   * @param origin
-   * @param direction
-   */
-  public void setPosition(GralWidget_ifc parent, float line, float lineEndOrSize, float column, float columnEndOrSize
-      , int origin, char direction, float border)
-  {
-    if(parent !=null) { this.parent = parent; }               // change the parent only if given
-    assert(this.parent !=null);                             // should always have a parent information. 
-    int[] pos = new int[10];
-    frac(line, pos, 0);
-    frac(lineEndOrSize, pos, 2);
-    frac(column, pos, 4);
-    frac(columnEndOrSize, pos, 6);
-    frac(border, pos, 8);
-    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], origin, direction, pos[8], pos[9], parent.pos());
-    /*
-    int y1 = (int)(line);
-    int y1f = frac(y1, line);
-    int y2 = (int)(lineEndOrSize);
-    int y2f = frac(y2, lineEndOrSize);
-    int x1 = (int)(column);
-    int x1f = frac(x1, column);  
-    int x2 = (int)(columnEndOrSize);
-    int x2f = frac(x2, columnEndOrSize); 
-    setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, origin, direction, framePos);
-    */
-  }
-
   
   
   
-  /**Sets the position
+  /**Sets the position with given grid coordinates in float.
+   * The first 
    * @param refPos The frame or last pos for relative positions.
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
    *   it is the bottom line for the position. 
@@ -746,24 +730,16 @@ public class GralPos extends ObjectVishia implements Cloneable
   public void setPosition(GralPos refPos, float line, float lineEndOrSize, float column, float columnEndOrSize
       , int origin, char direction, float border)
   {
-    int[] pos = new int[10];
-    frac(line, pos, 0);
-    frac(lineEndOrSize, pos, 2);
-    frac(column, pos, 4);
-    frac(columnEndOrSize, pos, 6);
-    frac(border, pos, 8);
-    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], origin, direction, pos[8], pos[9], refPos);
-    /*
-    int y1 = (int)(line);
-    int y1f = frac(y1, line);
-    int y2 = (int)(lineEndOrSize);
-    int y2f = frac(y2, lineEndOrSize);
-    int x1 = (int)(column);
-    int x1f = frac(x1, column);  
-    int x2 = (int)(columnEndOrSize);
-    int x2f = frac(x2, columnEndOrSize); 
-    setFinePosition(y1, y1f, y2, y2f, x1, x1f, x2, x2f, origin, direction, framePos);
-    */
+    int type = ((int)line & (mSpecialType)) == kSpecialType ? (int)line: ((int)line + kTypAdd_) & mType_;
+    int y = (int)(10* (line-type)) + type;
+    type = ((int)lineEndOrSize & (mSpecialType)) == kSpecialType ? (int)lineEndOrSize: ((int)lineEndOrSize + kTypAdd_) & mType_;
+    int ye = (int)(10* (lineEndOrSize-type)) + type;
+    type = ((int)column & (mSpecialType)) == kSpecialType ? (int)column: ((int)column + kTypAdd_) & mType_;
+    int x = (int)(10 * (column-type)) + type;
+    type = ((int)columnEndOrSize & (mSpecialType)) == kSpecialType ? (int)columnEndOrSize: ((int)columnEndOrSize + kTypAdd_) & mType_;
+    int xe = (int)(10 * (columnEndOrSize - type)) + type;
+    
+    setFinePosition(y, ye, x, xe, origin, direction, (int)(10 * border), refPos);
   }
   
 
@@ -783,13 +759,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param direction
    */
   public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize ) {
-    int[] pos = new int[10];
-    frac(line, pos, 0);
-    frac(lineEndOrSize, pos, 2);
-    frac(column, pos, 4);
-    frac(columnEndOrSize, pos, 6);
-    frac(framePos.x.pb, pos, 8);
-    setFinePosition(pos[0], pos[1], pos[2], pos[3], pos[4], pos[5], pos[6], pos[7], 0, 'r', pos[8], pos[9], framePos);
+    setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, 0, 's', -1);
   }
   
   
@@ -798,34 +768,67 @@ public class GralPos extends ObjectVishia implements Cloneable
    */
   public boolean toResize(){ return x.p1 < 0 || x.p2 <= 0 || y.p1< 0 || y.p2 <=0 || x.n1 >=0 || x.n2 >=0 || y.n1 >=0 || y.n2 >=0; }
   
-  private void frac(float v, int[] pos, int ix){
-    int i, f;
-    i = (int)v;
-    if((i & mValueNegative) !=0){
-      f = (int)((v-i)*10 + 0.5f);
-      if( f == 10){ f = 0; }
-    } 
-    else {
-      f = (int)((v - i)*10 + 0.5f);
-    }
-    if(f < 0){
-      i -=1; f +=10;
-    }
-    assert(f >=0 && f <= 9);
-    pos[ix] = i; pos[ix+1]= f;
-    //return f;
-  }
 
 
   
   
   
-  public void setPosition(GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
+  /**Sets a position with direction, but with border =0
+   * Same as {@link #setPosition(GralPos, float, float, float, float, int, char, float)}
+   * but with 0 as default for border.
+   * @param refPos
+   * @param line
+   * @param lineEndOrSize
+   * @param column
+   * @param columnEndOrSize
+   * @param origin
+   * @param direction
+   */
+  public void setPosition(GralPos refPos, float line, float lineEndOrSize, float column, float columnEndOrSize
     , int origin, char direction)
   {
-    setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, 0);
+    setPosition(refPos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, 0);
   }
   
+  
+  
+  
+  
+  
+  
+  
+  /**Sets a fine position only with integer values, 
+   * instead float as in {@link #setPosition(GralPos, float, float, float, float, int, char, float)}
+   * This operation is not recommended, should use the float version.
+   * @param yPos grid position for line, can also contain {@link #refer} etc.
+   * @param yPosf fine grid position for line always in down direction
+   * @param ye end grid position for line, , can also contain {@link #size} etc.
+   * @param yef end fine grid position for line
+   * @param xPos grid position for column, can also contain {@link #refer} etc
+   * @param xPosf yPosf fine grid position for column always in right direction
+   * @param xe
+   * @param xef
+   * @param origin
+   * @param direction
+   * @param border
+   * @param borderFrac
+   * @param refPos
+   */
+  public void setFinePosition(int line, int yPosf, int lineEndOrSize, int yef
+      , int column, int xPosf, int columnEndOrSize, int xef, int origin, char direction
+      , int border, int borderFrac
+      , GralPos refPos)
+  {
+    int type = (line & (mSpecialType)) == kSpecialType ? line: (line + kTypAdd_) & mType_;
+    int y = (10* (line-type)) + type;
+    type = (lineEndOrSize & (mSpecialType)) == kSpecialType ? lineEndOrSize: (lineEndOrSize + kTypAdd_) & mType_;
+    int ye = (10* (lineEndOrSize-type)) + type;
+    type = (column & (mSpecialType)) == kSpecialType ? column: (column + kTypAdd_) & mType_;
+    int x = (10 * (column-type)) + type;
+    type = (columnEndOrSize & (mSpecialType)) == kSpecialType ? columnEndOrSize: (columnEndOrSize + kTypAdd_) & mType_;
+    int xe = (10 * (columnEndOrSize - type)) + type;
+    setFinePosition(y + yPosf, ye + yef, x + xPosf, xe + xef, origin, direction, 10*border + borderFrac, refPos);
+  }
   
   /**Sets the position for the next widget to add in the container.
    * Implementation note: This is the core function to calculate positions. It is called from all other ones.
@@ -857,21 +860,21 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param bRefFrame true then the given position is the frame for absolute given new positions.
    *   false then the frame is the panel, the positions are written absolutely.
    */
-  public void setFinePosition(int yPos, int yPosf, int ye, int yef
-      , int xPos, int xPosf, int xe, int xef, int origin, char direction
-      , int border, int borderFrac
+  public void setFinePosition(int yPos, int ye
+      , int xPos, int xe, int origin, char direction
+      , int border
       , GralPos refPos)
   {
     //
-    if(yPosf < 0 || yPosf >9){
-      throw new IllegalArgumentExceptionJc("GralPos - yPosFrac error", yPosf);
-    }
-    if(xPosf < 0 || xPosf >9) {
-      throw new IllegalArgumentExceptionJc("GralPos - xPosFrac error", xPosf);
-    }
+//    if(yPosf < 0 || yPosf >9){
+//      throw new IllegalArgumentExceptionJc("GralPos - yPosFrac error", yPosf);
+//    }
+//    if(xPosf < 0 || xPosf >9) {
+//      throw new IllegalArgumentExceptionJc("GralPos - xPosFrac error", xPosf);
+//    }
     //
-    if(ye == (size -1) && yef == 5)
-      stop();
+//    if(ye == (size -1) && yef == 5)
+//      stop();
     if(ye == useNatSize)
       stop();
     //
@@ -888,31 +891,27 @@ public class GralPos extends ObjectVishia implements Cloneable
       this.y.origin = refUse.y.origin;
     }
     
-    this.y.set(yPos, yPosf, ye, yef, "uUdD", refUse.y);    // core of positioning for line and column
-    this.x.set(xPos, xPosf, xe, xef, "lLrR", refUse.x);    // resolves the relative positions to refUse
+    this.y.set(yPos, ye, "uUdD", refUse.y);    // core of positioning for line and column
+    this.x.set(xPos, xe, "lLrR", refUse.x);    // resolves the relative positions to refUse
     
     if("rlRL".indexOf(direction)>=0 ){
       this.x.dirNext = Character.toLowerCase(direction);
       this.y.dirNext = '.';
-      this.x.pb = border;
-      this.x.pbf = borderFrac;
-      this.y.pb = this.y.pbf = 0;
+      this.x.pb = border <0 ? refPos.x.pb : border;
+      this.y.pb = 0;
     } else if("udUD".indexOf(direction)>=0 ){
       this.y.dirNext = Character.toLowerCase(direction);
       this.x.dirNext = '.';
-      this.y.pb = border;
-      this.y.pbf = borderFrac;
-      this.x.pb = this.x.pbf = 0;
+      this.y.pb = border <0 ? refPos.x.pb : border;
+      this.x.pb = 0;
     } else {
       this.x.dirNext = Character.toLowerCase(refUse.x.dirNext);
       this.y.dirNext = Character.toLowerCase(refUse.y.dirNext);
-      this.x.pb = refUse.x.pb; this.x.pbf = refUse.x.pbf;
-      this.y.pb = refUse.y.pb; this.y.pbf = refUse.y.pbf;
+      this.x.pb = refUse.x.pb;
+      this.y.pb = refUse.y.pb;
     }
     assert(".\0lrf".indexOf(this.x.dirNext) >=0);
     assert(".\0udf".indexOf(this.y.dirNext) >=0);
-    assert(this.x.p1Frac >=0 && this.x.p1Frac < 10 && this.y.p1Frac >=0 && this.y.p1Frac < 10 );
-    assert(this.x.p2Frac >=0 && this.x.p2Frac < 10 && this.y.p2Frac >=0 && this.y.p2Frac < 10 );
   
     
   }
@@ -950,7 +949,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   
   /**Sets the position to the next adequate the {@link #pos.dirNext}. */
-  public void setNextPosition()
+  public void XXXsetNextPosition()
   {
     setPosition(this, next, samesize, next, samesize, 0, '.', 0 );
     /*
@@ -1038,9 +1037,19 @@ public class GralPos extends ObjectVishia implements Cloneable
    */
   public void checkSetNext ( ) {
     if("LR".indexOf(this.x.dirNext) >=0 || "UD".indexOf(this.y.dirNext) >=0  ) {
-      setNextPosition();
+      setPosition(this, next, samesize, next, samesize, 0, '.', 0 );
     } 
-    boolean bNext = false;
+  }
+  
+  
+  /**Marks the position as used.
+   * The {@link Coordinate#dirNext} is set to upper case. 
+   * This operation should be called (is called in {@link GralWidgetBase#GralWidgetBase(GralPos, String, GralMng)}) 
+   * if the position is used as reference by any widget. 
+   * If it is used for a next widget without given position string,
+   * then the called {@link #checkSetNext()} calculates the next position in the given direction.  
+   */
+  public void setUsed() {
     switch(this.x.dirNext) {                 // check and set to upper case
     case '\0': break;
     case '.': break;
@@ -1057,8 +1066,8 @@ public class GralPos extends ObjectVishia implements Cloneable
     case '\0': break;
     default: throw new IllegalArgumentException("faulty dirnext" + toString());
     }
+    
   }
-  
   
   
   public void assertCorrectness() {
@@ -1070,27 +1079,27 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   
   public float xGrid() {
-    return x.p1 + x.p1Frac / 10.0f;
+    return x.p1 / 10.0f;
   }
   
   
   public float height()
   { float height;
     if(y.p1 * y.p2 >= 0){
-      height = y.p2 - y.p1;
+      height = (y.p2 - y.p1)/10;
     }
     else{ 
       height = 2.0F;  //not able to determine, use default.
     }
-    height += (y.p2Frac - y.p1Frac) * 0.1F;
+    //height += (y.p2Frac - y.p1Frac) * 0.1F;
     return height;
   }
   
   
   public float width()
   { float width;
-    if(y.p1 > 0 && x.p2 > 0){ width = x.p2 - y.p1 + (x.p2Frac - x.p1Frac) * 0.1F; }
-    else if(x.p1 < 0 && x.p2 < 0){ width = x.p2 - x.p1 + (x.p2Frac - x.p1Frac) * 0.1F; }
+    if(y.p1 > 0 && x.p2 > 0){ width = (x.p2 - y.p1)/10.0f; }
+    else if(x.p1 < 0 && x.p2 < 0){ width = (x.p2 - x.p1)/10.0f; }
     else { width = 0.0F; } //not able to determine, use default.
     return width;
   }
@@ -1141,6 +1150,10 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   
   /**Calculates the position and size of a widget from this given Pos.
+   * This operation is only intend to use internally. 
+   * Call {@link GralMng#calcWidgetPosAndSize(GralPos, int, int, int, int)},
+   * The GralMng instance knows the propertiesGui
+   * 
    * @param propertiesGui The properties for presentation.
    * @param widthParentPixel width of the container. This value will be used if the position is given 
    *   from right with negative numbers.
@@ -1160,8 +1173,10 @@ public class GralPos extends ObjectVishia implements Cloneable
     int xPixelUnit = propertiesGui.xPixelUnit();
     int yPixelUnit = propertiesGui.yPixelUnit();
     //calculate pixel
-    final int x1,y1, x2, y2;
+    int x1,y1, x2, y2;
     ///
+    if(this.dbg)
+      Debugutil.stop();
     if(this.x.n2 == areaNr) {                              // position as area number
       if(! (this.parent instanceof GralArea9Panel)) {
         throw new IllegalArgumentException("position is an area designation, outside of an area panel");
@@ -1178,21 +1193,55 @@ public class GralPos extends ObjectVishia implements Cloneable
       y2 = (int)((float)area9.ypFrameArea[this.y.p2] / area9.ypFrameArea[3] * heightParentPixel);
       
     } else {
-      x1 = xPixelUnit * this.x.p1 + propertiesGui.xPixelFrac(this.x.p1Frac)  //negative if from right
-         + (this.x.p1 < 0 ? widthParentPixel : 0);  //from right
-      y1 = yPixelUnit * this.y.p1 + propertiesGui.yPixelFrac(this.y.p1Frac)  //negative if from right
-         + (this.y.p1 < 0 ? heightParentPixel : 0);  //from right
+      int x1g = this.x.p1 / 10;                            // -5 results in 0
+      int x1i = this.x.p1 - x1g*10;                        // -5 results in -5
+      if(x1i <0) { x1i +=10; x1g -=1; }                    // real: x1g=-1, x1i = 5
+      assert(x1i >=0 && x1i <10);
+//      x1 = this.x.p1 >=0 ?    x1g * xPixelUnit + propertiesGui.xPixelFrac(x1i)
+//         : widthParentPixel - (-x1g * xPixelUnit + propertiesGui.xPixelFrac(x1i));
+      x1 = x1g * xPixelUnit + propertiesGui.xPixelFrac(x1i);
+      if(this.x.p1 <0) {                                   // x1 = -nn is from right side
+        x1 += widthParentPixel;
+      }
+      int y1g = this.y.p1 / 10; 
+      int y1i = this.y.p1 - y1g*10; 
+      if(y1i <0) { y1i +=10; y1g -=1; }
+      assert(y1i >=0 && y1i <10);
+//      y1 = this.y.p1 >=0 ?      y1g * yPixelUnit + propertiesGui.yPixelFrac(y1i)
+//         : widthParentPixel - (-y1g * yPixelUnit + propertiesGui.yPixelFrac(y1i));
+      y1 = y1g * yPixelUnit + propertiesGui.yPixelFrac(y1i);
+      if(this.y.p1 <0) {                                   // y1 = -nn is from bottom
+        y1 += heightParentPixel;
+      }
       if(this.x.p2 == GralPos.useNatSize){
         x2 = x1 + widthWidgetNat; 
       } else {
-        x2 = xPixelUnit * this.x.p2 + propertiesGui.xPixelFrac(this.x.p2Frac)  //negative if from right
-           + (this.x.p2 < 0 || this.x.p2 == 0 && this.x.p2Frac == 0 ? widthParentPixel : 0);  //from right
+        int x2g = this.x.p2 / 10; 
+        int x2i = this.x.p2 - x2g*10;
+        if(x2i <0) { x2i +=10; x2g -=1; }
+        assert(x2i >=0 && x2i <10);
+        x2 = x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i);
+        if(this.x.p2 <=0) {                                // x2 = -nn .. 0 is from right side
+          x2 += widthParentPixel;
+        }
+//        x2 = this.x.p2 >0 ?       x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i)
+//           : widthParentPixel - (-x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i));
       }
-      if(this.x.p2 == GralPos.useNatSize){
+      if(this.y.p2 == GralPos.useNatSize){
         y2 = y1 + heightWidgetNat; 
       } else {
-        y2 = yPixelUnit * this.y.p2 + propertiesGui.yPixelFrac(this.y.p2Frac)  //negative if from right
-           + (this.y.p2 < 0  || this.y.p2 == 0 && this.y.p2Frac == 0 ? heightParentPixel : 0);  //from right
+        int y2g = this.y.p2 / 10; 
+        //int y2i = this.y.p2 >=0 ? this.y.p2 - y2g*10 : this.y.p2 - y2g * 10 +10; 
+        int y2i = this.y.p2 - y2g*10;
+        if(y2i <0) { y2i +=10; y2g -=1; }
+        assert(y2i >=0 && y2i <10);
+        y2 = y2g * yPixelUnit + propertiesGui.yPixelFrac(y2i);
+        if(this.y.p2 <=0) {                                // y2 = -nn .. 0 is from bottom
+          y2 += heightParentPixel;
+        }
+//        
+//        y2 = this.y.p2 >0 ?       y2g * xPixelUnit + propertiesGui.xPixelFrac(y2i)
+//        : widthParentPixel - (-y2g * xPixelUnit + propertiesGui.xPixelFrac(y2i));
       }
     }
     GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
@@ -1239,13 +1288,35 @@ public class GralPos extends ObjectVishia implements Cloneable
 //    return calcWidgetPosAndSize(propertiesGui, widthParentPixel, heightParentPixel, widthWidgetNat, heightWidgetNat);
 //  }
 
-  private static void appendPos(Appendable b, int p, int pFrac) throws IOException
-  {
-    if(pFrac >0) {
-      if(p < 0) { b.append(Integer.toString(p-1)); } else { b.append(Integer.toString(p)); }
-      b.append('.').append(Integer.toString(pFrac));
-    } else {
-      b.append(Integer.toString(p));
+  public static void appendPos(Appendable b, int p) throws IOException {
+    int type = (p & (mSpecialType)) == kSpecialType ? p: (p + kTypAdd_) & mType_;
+    int pn = p - type;
+    if(type !=0) {
+      switch(type) {
+      case refer: b.append("refer"); break;
+      case same: b.append("same"); break;
+      case next: b.append("next"); break;
+      case nextBlock: b.append("nextBlock"); break;
+      case ratio: b.append("%"); break;
+      case samesize: b.append("samesize"); break;
+      case size: b.append("size"); break;
+      case areaNr: b.append("area"); break;
+      case invalidPos: b.append("invalid"); break;
+      case useNatSize: b.append("useNatSize"); break;
+      }
+      if(pn !=0) { b.append(" + "); }
+    }
+    if(pn !=0 || type ==0) {
+      String sp = Integer.toString(pn);
+      int len = sp.length();
+      char cLast = sp.charAt(len-1);
+      b.append(sp.substring(0, len-1));
+      if(len <2 || len <3 && sp.charAt(0) == '-') {          // either nothing in sb, or only a -
+        b.append('0');                                       // then append 0 before .
+      }
+      if(cLast !='0') {
+        b.append('.').append(cLast);
+      }
     }
   }
 
@@ -1262,13 +1333,13 @@ public class GralPos extends ObjectVishia implements Cloneable
       if(this.parent != null) {
         b.append(this.parent.getName()).append(", ");
       }
-      appendPos(b, this.y.p1, this.y.p1Frac);
+      appendPos(b, this.y.p1);
       b.append("..");
-      appendPos(b, this.y.p2, this.y.p2Frac);
+      appendPos(b, this.y.p2);
       b.append(", ");
-      appendPos(b, this.x.p1, this.x.p1Frac);
+      appendPos(b, this.x.p1);
       b.append("..");
-      appendPos(b, this.x.p2, this.x.p2Frac);
+      appendPos(b, this.x.p2);
     } catch(IOException exc) { throw new RuntimeException("unecpected", exc); }
     return b.toString();
   }
@@ -1290,13 +1361,13 @@ public class GralPos extends ObjectVishia implements Cloneable
         b.append((char)('A' + this.x.p1)).append((char)('1' + this.y.p1));
         b.append((char)('A' + this.x.p2-1)).append((char)('1' + this.y.p2-1));
       } else {
-        appendPos(b, this.y.p1, this.y.p1Frac);
+        appendPos(b, this.y.p1);
         b.append("..");
-        appendPos(b, this.y.p2, this.y.p2Frac);
+        appendPos(b, this.y.p2);
         b.append(", ");
-        appendPos(b, this.x.p1, this.x.p1Frac);
+        appendPos(b, this.x.p1);
         b.append("..");
-        appendPos(b, this.x.p2, this.x.p2Frac);
+        appendPos(b, this.x.p2);
       }
     } catch(IOException exc) {
       throw new RuntimeException("unexpected", exc);
@@ -1350,10 +1421,10 @@ public class GralPos extends ObjectVishia implements Cloneable
      * The fractional part counts from left to right respectively top to bottom 
      * independent of the sign of p1, p2.
      */
-    public int p1Frac, p2Frac;
+    //public int p1Frac, p2Frac;
     
     /**Additional border value for {@link GralPos#next}. */
-    public int pb, pbf;
+    public int pb;
     
     /**Attributes of this coordinate. */
     //public int attr;
@@ -1387,7 +1458,7 @@ public class GralPos extends ObjectVishia implements Cloneable
      * @param zeFrac
      * @param refCoord The refer position. Note that parent may be == this because the new position based on the current.
      */
-    protected Coordinate set(final int z, final int zFrac, final int ze, final int zeFrac, String nextPosChars, final Coordinate refCoord)
+    protected Coordinate set(final int z, final int ze, String nextPosChars, final Coordinate refCoord)
     { /**User final local variable to set p, pf, pe, pef to check whether all variants are regarded. */
       int q1 = invalidPos, q1f =0, q2 = invalidPos, q2f =0;
 
@@ -1403,7 +1474,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       final int testCase;                                  // testcase for debug
       final int testType = (zType<<16) + zeType;           // combination of both coord start ...end
       if(refCoord !=this){
-        pb = refCoord.pb; pbf = refCoord.pbf;
+        pb = refCoord.pb;
       }
       boolean bSetEnd = false;                             // true then z determines qe
       switch(zType) {
@@ -1414,28 +1485,34 @@ public class GralPos extends ObjectVishia implements Cloneable
           } else {                                         // -20.. (negative or ..0)
             q1 = refCoord.p2 + z;                          // it is related to the right coord of framePos
           }
-          q1f = refCoord.p1Frac +  zFrac;                  // absolute coord are positive here
         } else {
-          q1 = z; q1f = zFrac;                             // no specific designation: absloute pos
+          q1 = z;                                          // no specific designation: absloute pos
         }
         this.n1 = this.n2 = -1;     
         break;
       case refer:  //same                                  // relative to the reference position
-        q1 = refCoord.p1 + (z - refer); 
-        q1f = refCoord.p1Frac + zFrac;      //q = p + refer 
+        if(zNeg) {
+          q1 = refCoord.p1 + (z - refer); 
+        } else {
+          q1 = refCoord.p2 + (z - refer); 
+        }
+        this.n1 = refCoord.n1;
+        break;
+      case same:                                           // same as the reference position
+        q1 = refCoord.p1; 
         this.n1 = refCoord.n1;
         break;
       case next: {
         int direction = nextPosChars.indexOf(refCoord.dirNext);
         switch(direction) {
         case 0: case 1:                                    // left or up
-          q1 = refCoord.p1 - refCoord.pb; q1f = refCoord.p1Frac + refCoord.pbf;
+          q1 = refCoord.p1 - refCoord.pb;
           break;
         case 2: case 3:                                    // right or down
-          q1 = refCoord.p2 + refCoord.pb; q1f = refCoord.p2Frac + refCoord.pbf;  //add the border to second (right, bottom) to get the next first pos
+          q1 = refCoord.p2 + refCoord.pb;;  //add the border to second (right, bottom) to get the next first pos
           break;
         default:                                           // left same position for this coord (the other may be changed)
-          q1 = refCoord.p1; q1f = refCoord.p1Frac;             // don't change this coordinate. It may be the other one.              
+          q1 = refCoord.p1;;             // don't change this coordinate. It may be the other one.              
         }//switch direction     
         this.n1 = refCoord.n1;
       } break;
@@ -1456,36 +1533,33 @@ public class GralPos extends ObjectVishia implements Cloneable
           } else {                                         // ..-20 (negative or ..0)
             q2 = refCoord.p2 + ze;                          // it is related to the right coord of framePos
           }
-          q2f = refCoord.p2Frac +  zeFrac;                  // absolute coord are positive here
         } else {
-          q2 = ze; q2f = zeFrac;                           // no specific designation: absolute pos
+          q2 = ze;                                         // no specific designation: absolute pos
         }
         break;
       case size:
         int ze2 = (ze - size);                             // relative end position to start pos
         if(zeNeg) { 
-          if(zType == same) {
-            q2 = refCoord.p2;                              // use the bottom / right position 
-            q2f = refCoord.p2Frac;      
-            q1 = q2 + ze2;                                 // calc the top/left position via size
-            q1f = q2f - zeFrac;    //TODO test
-          } else {
-            q2 = q1; q2f = q1f;                              // "10-2": negative size: q2 is the end point, 
-            q1f = q1f -zeFrac; q1 = q1 + ze2;                   // q1 
-            if(q1f <0) { q1f +=10; q1 -=1; }                 // q1 1 gridunit left/top because frac increased the distance
-          }
+//          if(zType == same) {
+//            q2 = q1;                                       // use the given start position for bottom / right 
+//            q2f = q1f;      
+//            q1 = q2 + ze2;                                 // calc the top/left position via size
+//            q1f = q2f - zeFrac;    //TODO test
+//          } else {
+            q2 = q1;                              // "10-2": negative size: q2 is the end point, 
+            q1 = q1 + ze2;                   // q1 
+            //if(q1f <0) { q1f +=10; q1 -=1; }                 // q1 1 gridunit left/top because frac increased the distance
+//          }
         } else { 
-          q2 = q1 + ze2; q2f = q1f + zeFrac;               // "10+2" positive size, end is caculate with size
-          if(q2f >=10) { q2f -=10; q2 +=1; }
+          q2 = q1 + ze2;               // "10+2" positive size, end is caculate with size
+      //    if(q2f >=10) { q2f -=10; q2 +=1; }
         }
         break;
       case same:                                           //"" not textual
         q2 = refCoord.p2 + (ze - refer); 
-        q2f = refCoord.p2Frac + zeFrac;      //q = p + refer 
         break;
       case samesize:
         q2 = q1 + (refCoord.p2 - refCoord.p1);                 // use size of parent to calculate q2 from q1
-        q2f = q1f + (refCoord.p2Frac - refCoord.p1Frac);       // same frac, note: the coord ready to use are absolutely.
         break;
       case areaNr:
         q2 = ze - areaNr;
@@ -1629,30 +1703,31 @@ public class GralPos extends ObjectVishia implements Cloneable
       if(!(q1 <= q2 || q2 <=0)){
         throw new IllegalArgumentException("start > end " + q1 + " > " + q2);
       }
-      if(!(q1 > -1000 && q1 < 1000 && ((q2 > -1000 && q2 < 1000) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
+      if(!(q1 > -4095 && q1 < 4095 && ((q2 > -4095 && q2 < 4095) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
         throw new IllegalArgumentException("positions out of range" + q1 + ", " + q2);
       }
-      if(q1f >= 20){  //can be on adding distance
-        this.p1 = q1 +2; this.p1Frac = q1f -20;
-      } else if(q1f >= 10){
-          this.p1 = q1 +1; this.p1Frac = q1f -10;
-      } else if(q1f < 0){
-        this.p1 = q1 - 1; this.p1Frac = q1f +10;
-      } else {
-        this.p1 = q1; this.p1Frac = q1f;   
-      }
-      if(q2f >= 20){
-        this.p2 = q2 +2; this.p2Frac = q2f -20;
-      } else if(q2f >= 10){
-        this.p2 = q2 +1; this.p2Frac = q2f -10;
-      } else if(q2f < 0){
-        this.p2 = q2 - 1; this.p2Frac = q2f +10;
-      } else {
-        this.p2 = q2; this.p2Frac = q2f;   
-      }
-      if(!(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 )){
-        throw new IllegalArgumentException("Fractional position failure: " + p1Frac + ", " + p2Frac);
-      }
+      this.p1 = q1; this.p2 = q2;
+//      if(q1f >= 20){  //can be on adding distance
+//        this.p1 = q1 +2; this.p1Frac = q1f -20;
+//      } else if(q1f >= 10){
+//          this.p1 = q1 +1; this.p1Frac = q1f -10;
+//      } else if(q1f < 0){
+//        this.p1 = q1 - 1; this.p1Frac = q1f +10;
+//      } else {
+//        this.p1 = q1; this.p1Frac = q1f;   
+//      }
+//      if(q2f >= 20){
+//        this.p2 = q2 +2; this.p2Frac = q2f -20;
+//      } else if(q2f >= 10){
+//        this.p2 = q2 +1; this.p2Frac = q2f -10;
+//      } else if(q2f < 0){
+//        this.p2 = q2 - 1; this.p2Frac = q2f +10;
+//      } else {
+//        this.p2 = q2; this.p2Frac = q2f;   
+//      }
+//      if(!(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 )){
+//        throw new IllegalArgumentException("Fractional position failure: " + p1Frac + ", " + p2Frac);
+//      }
       return this;
     }//set
 
@@ -1661,8 +1736,8 @@ public class GralPos extends ObjectVishia implements Cloneable
      * @param src
      */
     void set(Coordinate src){
-      this.p1 = src.p1; this.p1Frac = src.p1Frac; this.p2 = src.p2; this.p2Frac = src.p2Frac;
-      this.pb = src.pb; this.pbf = src.pbf;  
+      this.p1 = src.p1; this.p2 = src.p2;
+      this.pb = src.pb;  
       this.n1 = src.n1; this.n2 = src.n2;
       this.origin = src.origin; this.dirNext = Character.toLowerCase(src.dirNext);
     }
@@ -1672,33 +1747,40 @@ public class GralPos extends ObjectVishia implements Cloneable
     /**Calculate from size to pixel. 
      * 
      */
-    void calc(int[] dst, int dparent, int dnat, int xPixelUnit, int[] xPixelFrac){
-      int x1, x2;  //begin, end
-      int min, max;
-      
-      //maximum of width
-      x1 = xPixelUnit * p1 + xPixelFrac[p1Frac]  //negative if from right
-      + (p1 < 0 ? dparent : 0);  //from right
-      if(p2 == GralPos.useNatSize){
-        x2 = x1 + dnat; 
-      } else {
-       x2 = xPixelUnit * p2 + xPixelFrac[p2Frac]  //negative if from right
-          + (p2 < 0 || p2 == 0 && p2Frac == 0 ? dparent : 0);  //from right
-      }
-     
-      
-      if(n1 >=0 && ((1000 * (x2 - x1))/dparent) > (n2 - n1) ){
-        //The percent size is less then the maximum size, use it.
-        x1 = n1 * dparent; 
-        x2 = n2 * dparent;
-        max = xPixelUnit * p2;
-        min = xPixelUnit * p1;
-      }
-    }
-    
-    
+//    void calc(int[] dst, int dparent, int dnat, int xPixelUnit, int[] xPixelFrac){
+//      int x1, x2;  //begin, end
+//      int min, max;
+//      
+//      //maximum of width
+//      x1 = xPixelUnit * p1 + xPixelFrac[p1Frac]  //negative if from right
+//      + (p1 < 0 ? dparent : 0);  //from right
+//      if(p2 == GralPos.useNatSize){
+//        x2 = x1 + dnat; 
+//      } else {
+//       x2 = xPixelUnit * p2 + xPixelFrac[p2Frac]  //negative if from right
+//          + (p2 < 0 || p2 == 0 && p2Frac == 0 ? dparent : 0);  //from right
+//      }
+//     
+//      
+//      if(n1 >=0 && ((1000 * (x2 - x1))/dparent) > (n2 - n1) ){
+//        //The percent size is less then the maximum size, use it.
+//        x1 = n1 * dparent; 
+//        x2 = n2 * dparent;
+//        max = xPixelUnit * p2;
+//        min = xPixelUnit * p1;
+//      }
+//    }
+//    
+//    
     @Override public String toString() {
-      return this.p1 + "." + this.p1Frac + ".." + this.p2 + "." + this.p2Frac;
+      StringBuilder ret = new StringBuilder(20);
+      try{ 
+        appendPos(ret, this.p1);
+        ret.append("..");
+        appendPos(ret, this.p2);
+      } catch(IOException exc) {}
+      return ret.toString();
+//      return this.p1/10 + ".." + this.p2/10;
     }
   }
   

@@ -143,6 +143,27 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     setTextColor(GralColor.getColor("bk"));
   }
 
+  
+  /**Constructs a text field with prompt and given properties
+   * @param posName Position and Name of the field. Maybe null if it is not need in management by name
+   *   See {@link GralWidget#GralWidget(String, char)}.
+   * @param property password, editable, maybe left empty.
+   */
+  /**
+   * @param refPos Reference position
+   * @param posName can contain "@<positionString>=", then the name of the widget
+   * @param sPrompt prompt text
+   * @param promptStylePos "t" or "r"
+   * @param property see {@link Type}, password or editable
+   */
+  public GralTextField(GralPos refPos, String posName, String sPrompt, String promptStylePos, Type... property){
+    this(refPos, posName, property);
+    this.sPrompt = sPrompt;
+    this.sPromptStylePosition = promptStylePos;
+    
+  }
+  
+  
 //  public GralTextField(String posName, Type... property){
 //    this(GralMng.get().pos().pos, posName, property);
 //  }

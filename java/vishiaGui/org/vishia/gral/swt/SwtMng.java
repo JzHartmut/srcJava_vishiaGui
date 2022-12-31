@@ -1340,6 +1340,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     out.append(parent.toString());
     Object data = parent.getData();
     if(data instanceof GralWidget) {
+      String sClass = data.getClass().getName();
+      out.append(" ").append(sClass).append(": ");
       ((GralWidget)data).toString(out);
     } else {
       out.append("data = ").append(data == null ? "null" : data.toString());
@@ -1351,7 +1353,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
         reportContent(out, itemWdg, "tab: ", recursion +1);
       }
     }
-    if(parent instanceof Composite) {
+    if(parent instanceof Composite && !(data instanceof GralTable)) {
       Control[] children = ((Composite)parent).getChildren();
       for(Control child : children) {
         if(child !=null) {

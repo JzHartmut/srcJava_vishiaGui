@@ -19,6 +19,7 @@ import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
@@ -162,22 +163,23 @@ public class GralViewFileContent {
 //    wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
 //    wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
     
-    this.widgFindText = new GralTextField(refPos, "@0.5+2, 2+20=" + name + "_find", GralTextField.Type.editable);
-    
-//    this.main.gui.gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);
-//    btnFind = this.main.gui.gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
-//    btnWholeword = this.main.gui.gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
-//    btnCase = this.main.gui.gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
-//    btnQuickview = this.main.gui.gralMng.addSwitchButton("qview", "qview", "qview", GralColor.getColor("wh"), GralColor.getColor("gn"));
-//    widgShowInfo = this.main.gui.gralMng.addTextField(null,false, null, null);
-//    this.main.gui.gralMng.setPosition(3, 0, 0, 0, 1, 'r');
+    this.widgFindText = new GralTextField(refPos, "@0.5+2, 2+20=find-" + name , GralTextField.Type.editable);
+    this.btnFind = new GralButton(refPos, "@0.5+2, 22+20++=btnfind-" + name, "Search (ctrl-F)", this.actionFind);
+    this.btnWholeword = new GralButton(refPos, "wholeW-" + name, null, null);
+    this.btnWholeword.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.btnWholeword.setSwitchMode("wholeWord - no", "wholeWord- yes");
+    this.btnCase = new GralButton(refPos, "caseS-" + name, null, null);
+    this.btnWholeword.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.btnWholeword.setSwitchMode("case- no", "case- yes");
+    this.btnQuickview = new GralButton(refPos, "btnQuickView-" + name, "quick view", null);
+    this.btnQuickview.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.btnQuickview.setSwitchMode("quick view off", "quick view on");
 
       this.widgContent = new GralTextBox(refPos, "@3..0, 0..0=" + name + "_content");    
 //    widgContent = this.main.gui.gralMng.addTextBox("view-content", false, null, '.');
-//    widgContent.setUser(userKeys);
-//    //widgContent.setTextStyle(GralColor.getColor("bk"), this.main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
-//    windView = wind; 
-    this.windView.specifyActionOnCloseWindow(actionOnSetInvisible);
+    this.widgContent.setUser(userKeys);
+    //this.widgContent.setTextStyle(GralColor.getColor("bk"), this.main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
+    this.windView.specifyActionOnCloseWindow(this.actionOnSetInvisible);
     this.windView.setWindowVisible(false);
     //windView1.
   }

@@ -591,7 +591,7 @@ public class GralCfgZbnf
     
 
     if(cfge.positionString==null) {
-      this.currPos.setNextPosition();
+      this.currPos.checkSetNext();
     } else {
       this.currPos.calcNextPos(cfge.positionString);
     }

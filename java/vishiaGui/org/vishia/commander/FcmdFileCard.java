@@ -206,8 +206,8 @@ public class FcmdFileCard extends GralFileSelector
 //    ((GralPanelContent)super.pos().parent).setPrimaryWidget(super.wdgSelectList.wdgdTable);
 //    //
 //    //sets the action for a simple table: what to do on line selected: Show file names. 
-//    this.specifyActionOnFileSelected(actionOnFileSelection);
 
+    this.specifyActionOnFileSelected(actionOnFileSelection);
     setActionOnFocusedFileTable(this.actionFocused);       // sets the current file card from three ones in Fcmd  
 
 //    //Note: some menu entries are set in the super class already.
@@ -382,119 +382,119 @@ public class FcmdFileCard extends GralFileSelector
 //  }
 //
 //  
-//  
-//  /**This routine is invoked from {@link #actionOnFileSelection} action listener whenever a file in any file card
-//   * will be selected (key up, down, mouse click etc.).
-//   * The routine writes infos about the file and may synchronize with another file card.
-//   * @param file The currently selected file.
-//   * @param sFileName Text in the cell, especially ".." for the parent dir entry.
-//   */
-//  protected void actionOnFileSelection(FileRemote file, String sFileName){
-//    //note the file, able to use for some actions.
-//    this.main.selectedFiles123[this.mainPanel.ixMainPanel] = file;
-//    
-//    if(this.mainPanel.orderMainPanel == 1){
-//      //only if it is the focused panel:
-//      //note the file card in order of usage.
-//      
-//      this.main.lastFavorCard = this.wdgFavorCard;
-//      this.main.currentFileCard = this;
-//      this.mainPanel.actFileCard = this;
-//      this.main.statusLine.setFileInfo(this.sTabSelection, file);
-//      //System.out.println("actionOnFileSelected: " + this.label + ":" + this.favorCard.sActSelectedFavorPath);
-//      String sPath = file.getAbsolutePath();
-//      if(  this.main.favorPathSelector.bSyncMidRight 
-//        && this.mainPanel.actFileCard == this    //from actFileCard to the second one!
-//        && this.mainPanel.orderMainPanel == 1
-//      ){
-//        try{ syncWithSecondPanel(sFileName); }
-//        catch(Exception exc){ 
-//          CharSequence msg = CheckVs.exceptionInfo("Fcmd.actionOnFileSelection.syncWithSecondPanel() - exception, ", exc, 0, 20);
-//          System.out.append(msg);
-//        }
-//        System.out.println("FcmdFileCard - syncWithSecondPanel; " + toString());
-//      }
-//      /*
-//      else {
-//        
-//        boolean bSync = main.filesCp.widgSyncWalk.isOn()
-//          && sDirSync !=null && sPath.length() >= zDirSync;
-//        if(bSync){
-//          sLocalpath = sPath.substring(zDirSync);
-//          String sDir = getCurrentDirPath();
-//          bSync = sDir.length() >= zDirSync;
-//          if(bSync){
-//            sLocaldir = sDir.substring(zDirSync);
-//            String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
-//            String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
-//            if(!sDirOtherSet.equals(sDirOtherAct)){
-//              //bSync = false;
-//              otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
-//            }
-//            String fileName = file.getName();
-//            if(fileName.endsWith(".~1~")){
-//              fileName = fileName.substring(0, fileName.length() -4);
-//            }
-//            otherFileCardtoSync.selectFile(fileName);
-//          }
-//        }
-//      }
-//      */
-//    }
-//  }
-//  
-//  
-//  
-//  void syncWithSecondPanel(String sFileName){
-//    //String fileName = currentFile.getName();
-//    System.out.println("FcmdFileCard -SyncWithSecondPanel;" + mainPanel.cc + ";" + sFileName);
-//    FcmdFileCard otherFileCard;
-//    boolean bFillInReq = false;
-//    if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
-//    else if(mainPanel.cc == 'r'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
-//    else if(mainPanel.cc == 'l'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
-//    else { otherFileCard = null; }
-//    if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
-//      String sDirName = getCurrentDir().getName();
-//      //check whether the other file card contains a entry with this directory name
-//      GralTableLine_ifc<FileRemote> line = otherFileCard.wdgSelectList.wdgdTable.getLine(sDirName);
-//      if(line !=null){
-//        FileRemote dir = line.getUserData();
-//        bFillInReq = true;
-//        otherFileCard.fillIn(dir, false);    //use that directory.
-//      }
-//      boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
-//      if(!bSameFile){
-//        //check whether the file is a directory and it is the directory of the other panel:
-//        boolean bToRoot = false;
-//        if(currentFile.isDirectory()){
-//          FileRemote otherDir = otherFileCard.getCurrentDir();
-//          if(otherDir != null){
-//            String sDirPath = otherDir.getName();
-//            bToRoot = sDirPath.equals(sFileName);
-//            if(bToRoot){
-//              //the directory of other is the current selected dir of this:
-//              FileRemote otherParent = otherDir.getParentFile();
-//              if(!bFillInReq){
-//                otherFileCard.fillIn(otherParent, false);
-//                otherFileCard.selectFile(sFileName);
-//                bFillInReq = true;
-//              }
-//            }
-//          }
-//        }
-//        if(!bToRoot && otherFileCard !=null && otherFileCard.currentFile !=null){
-//          //check whether a sub dir is selected:
-//          String sOtherSelectedFile = otherFileCard.currentFile.getName();
-//          if(sOtherSelectedFile.equals(sDirName) && !bFillInReq){
-//            otherFileCard.fillIn(otherFileCard.currentFile,false);
-//            otherFileCard.selectFile(sFileName);
-//          }
-//        }
-//      }
-//    }
-//    
-//  }
+  
+  /**This routine is invoked from {@link #actionOnFileSelection} action listener whenever a file in any file card
+   * will be selected (key up, down, mouse click etc.).
+   * The routine writes infos about the file and may synchronize with another file card.
+   * @param file The currently selected file.
+   * @param sFileName Text in the cell, especially ".." for the parent dir entry.
+   */
+  protected void actionOnFileSelection(FileRemote file, String sFileName){
+    //note the file, able to use for some actions.
+    this.main.selectedFiles123[this.mainPanel.ixMainPanel] = file;
+    
+    if(this.mainPanel.orderMainPanel == 1){
+      //only if it is the focused panel:
+      //note the file card in order of usage.
+      
+      //this.main.lastFavorCard = this.wdgFavorCard;
+      this.main.currentFileCard = this;
+      this.mainPanel.actFileCard = this;
+      this.main.statusLine.setFileInfo(this.sTabSelection, file);
+      //System.out.println("actionOnFileSelected: " + this.label + ":" + this.favorCard.sActSelectedFavorPath);
+      String sPath = file.getAbsolutePath();
+      if(  this.main.favorPathSelector.bSyncMidRight 
+        && this.mainPanel.actFileCard == this    //from actFileCard to the second one!
+        && this.mainPanel.orderMainPanel == 1
+      ){
+        try{ syncWithSecondPanel(sFileName); }
+        catch(Exception exc){ 
+          CharSequence msg = CheckVs.exceptionInfo("Fcmd.actionOnFileSelection.syncWithSecondPanel() - exception, ", exc, 0, 20);
+          System.out.append(msg);
+        }
+        System.out.println("FcmdFileCard - syncWithSecondPanel; " + toString());
+      }
+      /*
+      else {
+        
+        boolean bSync = main.filesCp.widgSyncWalk.isOn()
+          && sDirSync !=null && sPath.length() >= zDirSync;
+        if(bSync){
+          sLocalpath = sPath.substring(zDirSync);
+          String sDir = getCurrentDirPath();
+          bSync = sDir.length() >= zDirSync;
+          if(bSync){
+            sLocaldir = sDir.substring(zDirSync);
+            String sDirOtherSet = otherFileCardtoSync.sDirSync + sLocaldir;
+            String sDirOtherAct = otherFileCardtoSync.getCurrentDirPath();
+            if(!sDirOtherSet.equals(sDirOtherAct)){
+              //bSync = false;
+              otherFileCardtoSync.fillIn(new FileRemote(sDirOtherSet));
+            }
+            String fileName = file.getName();
+            if(fileName.endsWith(".~1~")){
+              fileName = fileName.substring(0, fileName.length() -4);
+            }
+            otherFileCardtoSync.selectFile(fileName);
+          }
+        }
+      }
+      */
+    }
+  }
+  
+  
+  
+  void syncWithSecondPanel(String sFileName){
+    //String fileName = currentFile.getName();
+    System.out.println("FcmdFileCard -SyncWithSecondPanel;" + mainPanel.cc + ";" + sFileName);
+    FcmdFileCard otherFileCard;
+    boolean bFillInReq = false;
+    if(mainPanel.cc == 'm'){ otherFileCard = main.favorPathSelector.panelRight.actFileCard; }
+    else if(mainPanel.cc == 'r'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
+    else if(mainPanel.cc == 'l'){ otherFileCard = main.favorPathSelector.panelMid.actFileCard;  }
+    else { otherFileCard = null; }
+    if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
+      String sDirName = getCurrentDir().getName();
+      //check whether the other file card contains a entry with this directory name
+      GralTableLine_ifc<FileRemote> line = otherFileCard.wdgSelectList.wdgdTable.getLine(sDirName);
+      if(line !=null){
+        FileRemote dir = line.getUserData();
+        bFillInReq = true;
+        otherFileCard.fillIn(dir, false);    //use that directory.
+      }
+      boolean bSameFile = otherFileCard.selectFile(sFileName);  //".." also
+      if(!bSameFile){
+        //check whether the file is a directory and it is the directory of the other panel:
+        boolean bToRoot = false;
+        if(currentFile.isDirectory()){
+          FileRemote otherDir = otherFileCard.getCurrentDir();
+          if(otherDir != null){
+            String sDirPath = otherDir.getName();
+            bToRoot = sDirPath.equals(sFileName);
+            if(bToRoot){
+              //the directory of other is the current selected dir of this:
+              FileRemote otherParent = otherDir.getParentFile();
+              if(!bFillInReq){
+                otherFileCard.fillIn(otherParent, false);
+                otherFileCard.selectFile(sFileName);
+                bFillInReq = true;
+              }
+            }
+          }
+        }
+        if(!bToRoot && otherFileCard !=null && otherFileCard.currentFile !=null){
+          //check whether a sub dir is selected:
+          String sOtherSelectedFile = otherFileCard.currentFile.getName();
+          if(sOtherSelectedFile.equals(sDirName) && !bFillInReq){
+            otherFileCard.fillIn(otherFileCard.currentFile,false);
+            otherFileCard.selectFile(sFileName);
+          }
+        }
+      }
+    }
+    
+  }
   
   
   
@@ -524,32 +524,36 @@ public class FcmdFileCard extends GralFileSelector
         panel.orderMainPanel = 0; //not used.
       }
     }
+    org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.wdgSelectList.wdgdTable.getCurrentLine();
+    FileRemote fileCurr = line.getData();
+    String fName = line.getCellText(1);
+    actionOnFileSelection(fileCurr, fName);
   }
   
   
-//  /**Action to show the file properties in the info line. This action is called anytime if a line
-//   * was changed in the file view table. */
-//  GralUserAction actionOnFileSelection = new GralUserAction("FcmdFileCard-actionOnFileSelection"){
-//    /**The action called from {@link GralTable}.
-//     * @param params [0] is the Table line. The content of table cells are known here,
-//     *   because it is the file table itself. The {@link GralTableLine_ifc#getUserData()}
-//     *   returns the {@link FileRemote} file Object.
-//     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.base.GralWidget, java.lang.Object[])
-//     */
-//    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-//      mainPanel.bFavorCardHasFocus = false;
-//      mainPanel.bFavorThemeCardHasFocus = false;
-//      GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-//      String sFileCell = line.getCellText(GralFileSelector.kColFilename);
-//      Object oData = line.getUserData();
-//      if(oData instanceof File){
-//        actionOnFileSelection((FileRemote)oData, sFileCell);
-//      }
-//      return true;
-//    }
-//  };
-//  
-//  
+  /**Action to show the file properties in the info line. This action is called anytime if a line
+   * was changed in the file view table. */
+  GralUserAction actionOnFileSelection = new GralUserAction("FcmdFileCard-actionOnFileSelection"){
+    /**The action called from {@link GralTable}.
+     * @param params [0] is the Table line. The content of table cells are known here,
+     *   because it is the file table itself. The {@link GralTableLine_ifc#getUserData()}
+     *   returns the {@link FileRemote} file Object.
+     * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.base.GralWidget, java.lang.Object[])
+     */
+    @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      mainPanel.bFavorCardHasFocus = false;
+      mainPanel.bFavorThemeCardHasFocus = false;
+      GralTableLine_ifc line = (GralTableLine_ifc) params[0];
+      String sFileCell = line.getCellText(GralFileSelector.kColFilename);
+      Object oData = line.getUserData();
+      if(oData instanceof File){
+        actionOnFileSelection((FileRemote)oData, sFileCell);
+      }
+      return true;
+    }
+  };
+  
+  
 //  /**Sets the color of the table line adequate to the select state of the file. */
 //  GralUserAction actionSetFileLineAttrib = new GralUserAction("actionSetFileLineAttrib"){
 //    /**@param params [0] the table line. It contains the file.

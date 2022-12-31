@@ -115,9 +115,10 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
       this.name = sPosName;            // name maybe null
       currPos1 = refPos == null ? this.gralMng.pos().pos : refPos;
       bFramePos = false;
+      currPos1.checkSetNext();                             // If the position was used and not set newly, calc setNext()
     }
     currPos1.assertCorrectness();
-    currPos1.checkSetNext();           //mark "used" for the referred GralPos
+    currPos1.setUsed();           //mark "used" for the referred GralPos
     this._wdgPos = bFramePos ? currPos1 : currPos1.clone();   //use always a clone for the widget.
   }
 

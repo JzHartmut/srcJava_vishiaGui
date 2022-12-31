@@ -227,7 +227,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     //this.checkCreateTabFolder(this.window, mng);
     SwtMng.storeGralPixBounds(this, this.window);
     this.widgg.toString(System.out);
-
+    this.window.setVisible(this.widgg.isVisible());        // sets the window visible due to the Gral state.
     //super.checkCreateTabFolder(this.window, mng);
     assert(gralWindow.mainPanel !=null);
     //if(gralWindow.mainPanel.isTabbed()) {

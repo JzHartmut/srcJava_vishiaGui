@@ -743,20 +743,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * See @link GralPos#setNextPosition(), {@link #posUsed}. TODO remove in AwtMng*/
   @Deprecated public void setNextPosition()
   { PosThreadSafe pos = pos();
-    if(pos.posUsed){
-      pos.pos.setNextPosition();
-    }
-    pos.posUsed = true;
+    pos.pos.checkSetNext();
   }
 
   /**Not for user: Checks whether the position is used, sets the next position then, markes the position as used.
    * See @link GralPos#setNextPosition(), {@link #posUsed}. */
   public void setNextPositionUnused()
   { PosThreadSafe pos = pos();
-    if(pos.posUsed){
-      pos.pos.setNextPosition();
-    }
-    pos.posUsed = false;
+    pos.pos.checkSetNext();
   }
 
   public void registerShowField(GralWidget widg){
@@ -775,11 +769,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   public GralPos getPosCheckNext(){ 
     PosThreadSafe pos = pos();
-    if(pos.posUsed){
-      pos.pos.setNextPosition();
-      pos.posUsed = false;
-    }
-    pos.posUsed = true;
+    pos.pos.checkSetNext();
     return pos.pos.clone(); 
   }
 
@@ -1146,8 +1136,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <br>
    * For positioning of Widgets in the panel:
    * The panel should be associated with a current position which is used to hold the current value for increment.
-   * For that {@link GralPos#setPosition(GralPanel_ifc, float, float, float, float, int, char, float)} 
-   * or {@link GralPos#setPosition(CharSequence, GralPos)} should be used.
+   * For that {@link GralPos#setPosition(CharSequence, GralPos)} should be used.
    * <br>
    * Old positioning, deprecated: After registration, this panel is the current one, stored in {@link #pos()} for this thread. 
    * The panel can be selected with its name calling the {@link #selectPanel(String)} -routine
@@ -1343,6 +1332,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * </ul>  
    * @see java.lang.Runnable#run()
    */
+  //tag::runGraphicThread-start[]
   protected void runGraphicThread() {
     long guiThreadId1 = Thread.currentThread().getId();    // should set firstly because in createImplWidget_Gthread it is necesarry. 
     this.graphicThreadId = guiThreadId1;
@@ -1355,17 +1345,14 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
       GralWindow wind = ewind.getValue();
-      boolean bVisible = wind == this.windPrimary;
+      //boolean bVisible = wind == this.windPrimary;
       //      
       //======>>>> 
       wind.createImplWidget_Gthread();           // creates all widgets of the window.
-      wind.setWindowVisible( bVisible ); 
-      GralPos pos = wind.pos();
-      if(pos.x.p1 ==0 && pos.x.p2 == 0 && pos.y.p1 == 0 && pos.y.p2 == 0){
-        wind.setFullScreen(true);  
-      }
+      //wind.setWindowVisible( bVisible ); 
     }
-    
+    //end::runGraphicThread-start[]
+
     
     this._mngImpl.finishInit();
     if(this.log !=null) {

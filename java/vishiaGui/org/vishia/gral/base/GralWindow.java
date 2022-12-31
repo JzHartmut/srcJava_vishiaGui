@@ -157,9 +157,9 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   
   
   /**Constructs a window with an empty {@link #mainPanel}
-   * @param currPos will be cloned to the widget, either ready to use or base pos with posString.
-   *   The position of a window describes the size and the first position on the screen.
-   * @param refPos reference position for build a relative position
+   * @param refPos The parent will be set related to to the screen: {@link GralMng#screen}. 
+   *   The internal used {@link GralWidget#pos()} is cloned. 
+   *   The refPos will be set to the whole main panel.
    * @param posName possible position and name. Syntax [@<position> =]<$?name>
    *   If name ends with "Win" or "Window" then the panel name is the same without "Win" or "Window".
    *   Else the panel name is the same + "Panel".
@@ -189,7 +189,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     if((windProps & windResizeable)!=0){
       this.resizeAction = new ActionResizeOnePanel();
     }
-    refPos.set(posPanel);
+    refPos.set(posPanel);                                  // at least: the refPos for further usage is the position on the whole panel.
     
   }
 
@@ -374,8 +374,15 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   }
   
   
+  /**Implementation of the creation of implementation graphic for the GralWindow.
+   *
+   */
   @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
     if(super.createImplWidget_Gthread()) {
+      GralPos pos = this.pos();
+      if(pos.x.p1 ==0 && pos.x.p2 == 0 && pos.y.p1 == 0 && pos.y.p2 == 0){
+        this.setFullScreen(true);  
+      }
       this.mainPanel.createImplWidget_Gthread();
       return true;
     } else {

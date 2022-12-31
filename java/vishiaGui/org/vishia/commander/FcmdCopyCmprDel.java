@@ -21,6 +21,7 @@ import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -223,9 +224,67 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   Actions action;
   
   FcmdCopyCmprDel(Fcmd main, Ecmd cmdArg)
-  { super(cmdArg);
+  { super(cmdArg);                         // FcmdActionBase
     this.main = main;
+    String name = cmdArg.name;
+    this.action = new Actions();
+    GralPos refPos = new GralPos(main.gui.gralMng.screen);
+    int windprops = GralWindow_ifc.windConcurrently; // + GralWindow.windResizeable;
+    this.windConfirmCopy = new GralWindow(refPos, "@screen,30+37,30+70=" + name + "Window", cmdArg.name, windprops); 
+    //source path and check:
+    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
+      this.widgButtonModeDst = new GralButton(refPos, "@2.5-2, 1..7.5++=dst-" + name, null, this.actionChgModeDst);
+      this.widgButtonModeDst.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("ye"));
+      this.widgButtonModeDst.setSwitchMode("dst/..", "dst/dst");
+    }
+    this.widgButtonModeDst = new GralButton(refPos, "@2.5-2, 15+12++=setSrc-" + name, "set source", this.actionConfirmCopy);
+    this.widgButtonClearSel = new GralButton(refPos, "clrSel", "clear selection", null);
+    //
+    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
+      this.widgButtonSetDst = new GralButton(refPos, "@,-17..-1=setDst-" + name, "set destination", this.actionSetDst );
+    }
+    //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
+    this.widgShowSrc = new GralTextField(refPos, "@5.5-3.2, 1..-4=showSrc-" + name, "source root path", "t");
+    this.widgShowSrc.setBackColor(GralColor.getColor("am"),0);
+    this.widgButtonShowSrc = new GralButton(refPos, "@+3.4-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
+
+    this.widgFromConditions = new GralTextField(refPos, "@+5.5-3.2, 1..-13++0.3=copyCond-" + name, "select src files: mask* : *.ext ", "t"); 
+    this.widgFromConditions.specifyActionChange(null, this.actionSelectMask, null);
+    this.widgButtonCheck = new GralButton(refPos, "@+3.7-3.5,-13..-1=check" + name, "check", this.actionCheck );
+    
+    //dst path, set dst
+    if(this.cmdWind != Ecmd.delete) {
+      this.widgInputDst = new GralTextField(refPos, "@+3-3.2,1..-4=copyDirDst" + name, "destination:", "t", GralTextField.Type.editable);
+      this.widgInputDst.specifyActionChange(null, this.actionEnterTextInDst, null);
+      this.widgButtonShowDst = new GralButton(refPos, "+0-2.5, -4..-1=showDst" + name, "=>", null );
+    }  
+    
+    if(this.cmdWind == Ecmd.delete) {
+      new GralLabel(refPos, "@+2.0-1.5, 1..18", "Del read only ?", 0);
+    } else if(cmdWind == Ecmd.compare) {
+      //nothing such
+    } else {
+      new GralLabel(refPos, "@+2.0-1.5, 18+17++", "Overwr read only ?", 0);
+      new GralLabel(refPos, null, "Overwr exists ?", 0);
+      new GralLabel(refPos, null, "Create ?", 0);
+    }
+
   }
+  
+  
+  void init ( ) {
+    this.widgButtonSetSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".setSrc.");
+    this.widgButtonSetSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".setSrc.");
+    this.widgButtonSetDst.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".setDst.");
+    this.widgShowSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".pathSrc.");
+    this.widgButtonShowSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".show.");
+    this.widgFromConditions.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".selcond.");
+    widgButtonCheck.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".check.");
+    widgInputDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".setDst.");
+    widgButtonShowDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".show.");
+    
+  }
+  
   
   
   /**Last files which are in copy process. Typical contains one file only. 
@@ -239,7 +298,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   /**Builds the content of the confirm-copy window. The window is created static. It is shown
    * whenever it is used.  */
-  void buildWindowConfirmCopy(String sTitle)
+  void XXXbuildWindowConfirmCopy(String sTitle)
   {
     action = new Actions();
     main.gui.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
@@ -309,6 +368,10 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       main.gui.gralMng.addText("Overwr exists ?");
       main.gui.gralMng.addText("Create ?");
     }
+
+    
+    
+    
     if(cmdWind != Ecmd.compare) {
       main.gui.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, GralPos.size +12, 0, 'r',1);
       widgdChoiceOverwrReadOnly = main.gui.gralMng.addButton("overwritero", actionOverwrReadonly, "overwritero", null,"ask ?yes ?no");
@@ -845,7 +908,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   /**Will be initialized if the main.gralMng is available.
    */
-  private class Actions
+  protected class Actions
   {
     
     @SuppressWarnings("serial") 
@@ -1646,7 +1709,15 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   enum Estate{ inactive, start, checked, busyCheck, busy, quest, error, finit};
   
-  enum Ecmd{ copy, move, delete, compare, search};
+  enum Ecmd{ 
+    copy("copy"), 
+    move("move"), 
+    delete("del"), 
+    compare("cmp"), 
+    search("search");
+    Ecmd(String name){ this.name = name; }
+    public final String name; 
+  };
   
   void stop(){}
   
