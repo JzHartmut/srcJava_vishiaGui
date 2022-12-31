@@ -217,20 +217,20 @@ public class GralPos extends ObjectVishia implements Cloneable
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20221028;
+  public static final int version = 20221231;
 
   
   /**This mask 0x8... applied at any coordinate parameter of any setPosition- method means, that the value is 
    * referred to the position of the previous or given position. The referred value may be given as positive or negative number.
-   * Adding this constant a value in range 0x7000...0x8000 to 0x8fff results for positions -4096...4095 (usual -100..100)
-   * Hint: If only the fractional part is changed, the non-fractional part should be given as refer.
+   * Adding this constant a value in range 0x70000...0x80000 to 0x8ffff results for positions -32767...32767 
+   * or 0x8001..0x7fff (which is ~3200 grid units, used usual -100..100)
    */
-  public final static int refer = 0x8000;
+  public final static int refer = 0x80000;
   
   /**This value applied at any coordinate parameter of any setPosition- method means, that the value is 
    * the same as the previous or given position.
    */
-  public final static int same = 0xdffc;
+  public final static int same = 0xdfffc;
   
   /**Use the next value for the coordinate in relation to the last one for the given direction
    * but the same value for the other coordinate. It is the typical value for both coordinates
@@ -239,30 +239,30 @@ public class GralPos extends ObjectVishia implements Cloneable
    * It uses xEnd for x and yEnd for y with the adequate fractional parts. 
    * The new value for xEnd or yEnd is calculated using the size if this value is applied to them. 
    */
-  public final static int next = 0xdffe;
+  public final static int next = 0xdfffe;
   
   /**Use the next value for the coordinate in relation to the last one. 
    * This value can be applied to x, xEnd, y, yEnd or to the float given arguments of any setPosition- method. 
    * It uses xEnd for x and yEnd for y with the adequate fractional parts. 
    * The new value for xEnd or yEnd is calculated using the size if this value is applied to them. 
    */
-  public final static int nextBlock = 0xdffd;
+  public final static int nextBlock = 0xdfffd;
   
   /**0xdffff Marker for invalid, to check*/
-  public final static int invalidPos = 0xdfff;
+  public final static int invalidPos = 0xdffff;
   
   /**This value 0x0c000 at xEnd or yEnd means, that the native size of a widget should be used.
    * It is especially to draw images with its native size.
    * This is a bit mask. The nature size is stored in the bits 12..0, that is maximal 8191 pixel 
    */
-  public final static int useNatSize = 0xc000;
+  public final static int useNatSize = 0xc0000;
   
   
   /**This mask 0xa... at all coordinates means, that the value is given as ratio from the size.
    * The bit {@link useNatSize} have to be 0. The ratio is stored as a value from 0 to 999
    * in the bits 9..0. The other bits should be 0.
    */
-  public final static int ratio = 0xa000;
+  public final static int ratio = 0xa0000;
   
   
   /**This adding value at xEnd or yEnd or the float presentations of the calling argument of any
@@ -270,17 +270,17 @@ public class GralPos extends ObjectVishia implements Cloneable
    * A size can be positive or negative. A negative size determines, that the origin point for
    * further elements or inner elements is on bottom line or right line of the current widget.
    */
-  public final static int size = 0x4000;  //Note: Bit is contained in useNatSize, (pos = useNatSize | size) == useNatSize
+  public final static int size = 0x40000;  //Note: Bit is contained in useNatSize, (pos = useNatSize | size) == useNatSize
   
   
   /**Use the same size.
    * 
    */
-  public final static int samesize = 0xdffb;
+  public final static int samesize = 0xdfffb;
   
   
   /**Values 0ex001..0xe003 as number of a {@link GralArea9Panel} A..C for columns, 1..3 for rows */
-  public final static int areaNr = 0xe000;
+  public final static int areaNr = 0xe0000;
 
   /**Bits in an integer position value for range and size.
    * of relative position values for size, percent and refer. The mask for the value is 0x1fff.
@@ -291,16 +291,16 @@ public class GralPos extends ObjectVishia implements Cloneable
   /**Bits in an integer position value for the type. 
    * If the type should be tested, the mTypwAdd_ should be added before masking. That is because
    * the negative values for a specific type are disposed type - value */
-  private final static int mType_ = 0xe000, kTypAdd_ = 0x1000;
+  private final static int mType_ = 0xe0000, kTypAdd_ = 0x10000;
   
   /**Bit masks for the special types {@link #next}, {@link #nextBlock}, {@link #useNatSize}. */
-  private final static int  mSpecialType = 0xff00, kSpecialType=0xdf00; 
+  private final static int  mSpecialType = 0xff000, kSpecialType=0xdf000; 
   
   /**Mask to check ratio. This bits should be mask and the ratio value should compare with them. */
-  private final static int XXXmCheckRatio_ = 0xf000;
+  private final static int XXXmCheckRatio_ = 0xf0000;
   
   /**Mask for value of natural size. The maximum size is 16383 pixel. */
-  private final static int XXXmNatSize_ = 0xf001;
+  private final static int XXXmNatSize_ = 0xf0001;
   
   /**Mask bits to designate related position, related end position and size.
    * 
@@ -1491,10 +1491,18 @@ public class GralPos extends ObjectVishia implements Cloneable
         this.n1 = this.n2 = -1;     
         break;
       case refer:  //same                                  // relative to the reference position
-        if(zNeg) {
-          q1 = refCoord.p1 + (z - refer); 
-        } else {
+        //+12..10                 refer to q1
+        //+-2+2                   refer to q1
+        //+2+2                    refer to q1 as top base line for new pos
+        //+2+sameSize             refer to q1
+        //+-2-2                   refer to q1 because q1 will be the baseline for left/up side
+        //+2-2                    refer to q2 as base line for new pos
+        if(  zeNeg                        //+2-2                    refer to p2 as base line for new pos
+          && !zNeg )  {                   //+-2-2                   refer to q1 because q1 will be the baseline for left/up side
+//          || zeType ==0) {                  //+2..10                  refer to p2
           q1 = refCoord.p2 + (z - refer); 
+        } else {
+          q1 = refCoord.p1 + (z - refer); 
         }
         this.n1 = refCoord.n1;
         break;
@@ -1703,7 +1711,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       if(!(q1 <= q2 || q2 <=0)){
         throw new IllegalArgumentException("start > end " + q1 + " > " + q2);
       }
-      if(!(q1 > -4095 && q1 < 4095 && ((q2 > -4095 && q2 < 4095) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
+      if(!(q1 > -32767 && q1 < 32767 && ((q2 > -32767 && q2 < 32767) || ((q2 - useNatSize) >=0 && (q2 - useNatSize) < 8192)))){
         throw new IllegalArgumentException("positions out of range" + q1 + ", " + q2);
       }
       this.p1 = q1; this.p2 = q2;
