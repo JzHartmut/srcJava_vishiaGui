@@ -237,7 +237,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.widgButtonModeDst.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("ye"));
       this.widgButtonModeDst.setSwitchMode("dst/..", "dst/dst");
     }
-    this.widgButtonModeDst = new GralButton(refPos, "@2.5-2, 15+12++=setSrc-" + name, "set source", this.actionConfirmCopy);
+    this.widgButtonSetSrc = new GralButton(refPos, "@2.5-2, 15+12++=setSrc-" + name, "set source", this.actionConfirmCopy);
     this.widgButtonClearSel = new GralButton(refPos, "clrSel", "clear selection", null);
     //
     if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
@@ -246,29 +246,71 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
     this.widgShowSrc = new GralTextField(refPos, "@5.5-3.2, 1..-4=showSrc-" + name, "source root path", "t");
     this.widgShowSrc.setBackColor(GralColor.getColor("am"),0);
-    this.widgButtonShowSrc = new GralButton(refPos, "@+3.4-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
+    this.widgButtonShowSrc = new GralButton(refPos, "@5.5-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
 
-    this.widgFromConditions = new GralTextField(refPos, "@+5.5-3.2, 1..-13++0.3=copyCond-" + name, "select src files: mask* : *.ext ", "t"); 
+    this.widgFromConditions = new GralTextField(refPos, "@+3.5-3.2, 1..-13++0.3=copyCond-" + name, "select src files: mask* : *.ext ", "t"); 
     this.widgFromConditions.specifyActionChange(null, this.actionSelectMask, null);
-    this.widgButtonCheck = new GralButton(refPos, "@+3.7-3.5,-13..-1=check" + name, "check", this.actionCheck );
+    this.widgButtonCheck = new GralButton(refPos, "@+0-3,-12..-1=check" + name, "check", this.actionCheck );
     
     //dst path, set dst
     if(this.cmdWind != Ecmd.delete) {
-      this.widgInputDst = new GralTextField(refPos, "@+3-3.2,1..-4=copyDirDst" + name, "destination:", "t", GralTextField.Type.editable);
+      this.widgInputDst = new GralTextField(refPos, "@+3.5-3.2,1..-4=copyDirDst" + name, "destination:", "t", GralTextField.Type.editable);
       this.widgInputDst.specifyActionChange(null, this.actionEnterTextInDst, null);
       this.widgButtonShowDst = new GralButton(refPos, "+0-2.5, -4..-1=showDst" + name, "=>", null );
     }  
     
     if(this.cmdWind == Ecmd.delete) {
-      new GralLabel(refPos, "@+2.0-1.5, 1..18", "Del read only ?", 0);
+      new GralLabel(refPos, "@+2-2, 1..18", "Del read only ?", 0);
     } else if(cmdWind == Ecmd.compare) {
       //nothing such
     } else {
-      new GralLabel(refPos, "@+2.0-1.5, 18+17++", "Overwr read only ?", 0);
+      new GralLabel(refPos, "@+2-2, 1+17++", "Overwr read only ?", 0);
       new GralLabel(refPos, null, "Overwr exists ?", 0);
       new GralLabel(refPos, null, "Create ?", 0);
     }
 
+    if(this.cmdWind != Ecmd.compare) {
+      this.widgdChoiceOverwrReadOnly = new GralButton(refPos, "@+3-3,1+12++1=overwriter-" + name, "ask ?yes ?no", this.actionOverwrReadonly);
+      this.widgdChoiceOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
+    }
+    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.compare) {
+      this.widgdChoiceOverwrExists = new GralButton(refPos, "@,+13+17=copyOverwriteReadonly", "ask ?newer?older?all ?no", this.actionOverwrDate );
+      this.widgdChoiceOverwrExists.setBackColor(GralColor.getColor("lam"), 0);
+      this.widgdChoiceCreateNew = new GralButton(refPos, "@,+18+13=copyCreate", "yes ?no ?ask", this.actionCreateCopy );
+      this.widgdChoiceCreateNew.setBackColor(GralColor.getColor("lam"), 0);
+    }
+
+    //field for showing the current action or state, not for input:
+    //field for showing the current name, not for input:
+    this.widgCopyDirDst = new GralTextField(refPos, "@+3.5-3.2++,1..-1=copyDirDst" + name, "current directory:", "t");
+    this.widgCopyDirDst.setBackColor(GralColor.getColor("lam"),0);
+    this.widgCopyNameDst = new GralTextField(refPos,"copyNameDst" + name, "current file:", "t");
+    this.widgCopyNameDst.setBackColor(GralColor.getColor("lam"),0);
+    
+    this.widgCopyState = new GralTextField(refPos, "@+,1..-15=copyStatus" + name, "current state:", "t");
+    this.widgCopyState.setBackColor(GralColor.getColor("lam"),0);
+    
+    if(cmdWind == Ecmd.copy) {
+      this.widgButtonMove = new GralButton(refPos, "@-8+2.5++0.3, -12..-1=copyMove", null, this.actionButtonCmprDelMove );
+      this.widgButtonMove.setSwitchMode("move ?", "Move/ ?copy");
+      this.widgButtonMove.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
+    }
+    this.widgButtonEsc = new GralButton(refPos, "@-4+3,1..9=copyEsc-" + name, "esc / close", this.actionButtonAbort);
+    this.widgState = new GralButton(refPos, "@-4+2,9.2+2++1=showState-" + name, "?", this.actionShowState);
+    
+    if(cmdWind != Ecmd.compare){
+      //main.gralMng.setPosition(GralPos.refer+3.5f, GralPos.size -3, 1, 12, 0, 'r', 1);
+      //main.gui.gralMng.setPosition(GralPos.same, GralPos.size +2.5f, GralPos.next, GralPos.size + 11, 0, 'r', 1);
+      //main.gralMng.setPosition(GralPos.same, GralPos.size -3, 16, GralPos.size +14, 0, 'r', 1);
+      this.widgSkipDir = new GralButton(refPos, "@,+2+10++1=copySkipDir"+name, "skip dir", this.actionButtonSkipDir);
+      this.widgSkipFile =new GralButton(refPos,"copyskip"+name, "skip file",  this.actionButtonSkipFile);
+      this.widgOverwrFile = new GralButton(refPos, this.sTextExecuteForFile,  "copyOverwrite", this.actionOverwriteFile);
+      //widgBtnPause = main.gralMng.addButton("pause", null, "pause", null, "pause");
+      //widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".pause.");
+    }  
+    main.gui.gralMng.setPosition(-4, GralPos.size+3.5f, -13f, -1, 0, 'd', 0.4f);
+    this.widgButtonOk = new GralButton(refPos, "@-4+3, -13.-1=copyOk" + name, "ok", this.actionButtonOk);
+ 
   }
   
   
@@ -277,13 +319,29 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.widgButtonSetSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".setSrc.");
     this.widgButtonSetDst.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".setDst.");
     this.widgShowSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".pathSrc.");
+    widgButtonSetSrc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".setSrc.");
     this.widgButtonShowSrc.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".show.");
     this.widgFromConditions.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".selcond.");
     widgButtonCheck.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".check.");
     widgInputDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".setDst.");
     widgButtonShowDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".show.");
+    widgdChoiceOverwrReadOnly.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".ctrl.overwrRo.");
+    widgdChoiceOverwrExists.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".ctrl.overwrExists.");
+    widgdChoiceCreateNew.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".ctrl.createNew.");
+    widgCopyDirDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".currfile.");
+    widgCopyNameDst.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".currfile.");
+    widgCopyState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".state.");
+    widgButtonMove.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".fn.");
+    widgButtonEsc.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".escape.");
+    widgState.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".state.");
     
-  }
+    if(cmdWind != Ecmd.compare){
+      this.widgSkipDir.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".quest.skipDir.");
+      widgSkipFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".quest.skipFile.");
+      widgOverwrFile.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".quest.wr.");
+    }
+    widgButtonOk.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".ok.");
+ }
   
   
   

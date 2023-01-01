@@ -9,16 +9,16 @@
 ============================== java/vishiaGui/org/vishia/ ==========================================
 
 ============================== java/vishiaGui/org/vishia/commander/ ================================
-2022-12-27 09:44:22  x     Fcmd.java                                ::         32.643  1127247341 
+2023-01-01 18:44:36  x     Fcmd.java                                ::         32.793  1631758755 
 2022-11-20 23:06:59  x     FcmdActions.java                         ::         10.031 -0967068095 
 2022-11-20 23:07:55  x     FcmdButtons.java                         ::         18.951 -0940360387 
-2022-12-29 20:40:49  x     FcmdCopyCmprDel.java                     ::         74.188  0353341545 
+2023-01-01 01:27:49  x     FcmdCopyCmprDel.java                     ::         78.914  1008694372 
 2022-11-16 10:01:06  x     FcmdDelete.java                          ::          8.126 -0254186045 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2022-11-19 14:16:42  x     FcmdEdit.java                            ::          8.196  1294045397 
 2022-12-27 09:36:59  x     FcmdExecuter.java                        ::         16.546 -2008977280 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
-2022-12-21 19:23:17  x     FcmdFavorPathSelector.java               ::         31.697  0466510763 
+2023-01-01 18:49:25  x     FcmdFavorPathSelector.java               ::         31.726 -1688593337 
 2022-12-27 10:54:53  x     FcmdFileCard.java                        ::         31.850 -0958269485 
 2022-11-19 11:30:57  x     FcmdFileProps.java                       ::         20.557  0696227384 
 2022-12-21 19:11:24  x     FcmdFilesCp.java                         ::          7.592  0766812261 
@@ -104,13 +104,13 @@
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2022-12-24 15:47:05  x     GralPanelContent.java                    ::         26.374  1885824297 
-2022-12-31 20:40:53  x     GralPos.java                             ::         82.140  0060205058 
+2022-12-31 21:56:47  x     GralPos.java                             ::         82.471  1503361451 
 2022-12-24 15:43:35  x     GralScreen.java                          ::          4.404  0349572232 
 2022-11-13 19:23:26  x     GralShowMethods.java                     ::         11.736 -0385445325 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
 2022-12-26 21:32:32  x     GralTable.java                           ::        117.910 -1855815523 
 2022-12-23 17:22:13  x     GralTextBox.java                         ::          7.699 -0404541197 
-2022-12-29 16:21:26  x     GralTextField.java                       ::         34.935  0145838083 
+2022-12-31 21:38:57  x     GralTextField.java                       ::         35.091 -0674843008 
 2022-12-23 17:22:14  x     GralValueBar.java                        ::          6.217  0388024784 
 2022-12-23 17:34:07  x     GralWidgImplAccess_ifc.java              ::          5.955  1380544306 
 2022-12-26 22:08:47  x     GralWidget.java                          ::        108.265 -0549323088 
@@ -219,7 +219,7 @@
 2022-12-29 12:41:30  x     SwtSubWindow.java                        ::         24.053  1151117600 
 2022-12-25 23:37:29  x     SwtTable.java                            ::         41.416  1259555519 
 2022-01-31 19:48:38  x     SwtTextBox.java                          ::         14.779 -0197457034 
-2022-12-26 20:09:50  x     SwtTextFieldWrapper.java                 ::         23.549  1129416646 
+2022-12-31 21:20:37  x     SwtTextFieldWrapper.java                 ::         23.648  0925090467 
 2022-12-18 14:26:18  x     SwtTransparentLabel.java                 ::          1.917  0729056109 
 2021-10-04 14:29:49  x     SwtTraverseListener.java                 ::          1.382 -0922202695 
 2022-12-23 19:53:20  x     SwtValueBar.java                         ::          6.305 -1205138721 

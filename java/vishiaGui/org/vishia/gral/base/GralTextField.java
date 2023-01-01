@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtTextFieldWrapper;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.DataAccess;
+import org.vishia.util.Debugutil;
 import org.vishia.util.Removeable;
 import org.vishia.util.StringFunctions;
 
@@ -751,6 +752,9 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     protected GraphicImplAccess(GralWidget widgg, GralMng.ImplAccess mngImpl)
     {
       super(widgg, mngImpl);
+      if(widgg.name.startsWith("showSrc"))
+        Debugutil.stop();
+      
       if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {
         //mng.setNextPosition();  //deprecated, done in Widget constructor.
         char sizeFontPrompt;
@@ -784,12 +788,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
               heightPrompt = ySize * 0.4f;;
               heightText = ySize * 0.5f;
             }
+            GralPos refPos = widgg.pos().setAsFrame();
             //from bottom as base line, size of prompt
-            posPrompt.setPosition(widgg.pos(), GralPos.same
-                , GralPos.same - (ySize - heightPrompt)              //negative value means, base line is bottom
+            posPrompt.setPosition(refPos, GralPos.same
+                , GralPos.refer - (ySize - heightPrompt)              //negative value means, base line is bottom
                 , GralPos.same, GralPos.same, 0, '.');
             //from bottom line, size of text
-            posField.setPosition(widgg.pos(), GralPos.same
+            posField.setPosition(refPos, GralPos.same
                 , GralPos.size - heightText                //negative value means, base line is bottom
                 , GralPos.same, GralPos.same, 0, '.');
           //} break;

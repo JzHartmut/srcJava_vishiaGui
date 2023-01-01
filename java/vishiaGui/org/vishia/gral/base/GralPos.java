@@ -286,7 +286,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * of relative position values for size, percent and refer. The mask for the value is 0x1fff.
    * The range of any value is from 0x0 to 0x0fff for positive values and from 0x1fff downto 0x1000
    * for negative values. The value == 0 is designated with 0x0 after mask. */
-  private final static int mValueRange_ = 0x1fff, mValueNegative = 0x1000;
+  private final static int mValueRange_ = 0x7fff, mValueNegative = 0x8000;
   
   /**Bits in an integer position value for the type. 
    * If the type should be tested, the mTypwAdd_ should be added before masking. That is because
@@ -1086,7 +1086,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   public float height()
   { float height;
     if(y.p1 * y.p2 >= 0){
-      height = (y.p2 - y.p1)/10;
+      height = (y.p2 - y.p1)/10.0f;
     }
     else{ 
       height = 2.0F;  //not able to determine, use default.
@@ -1465,12 +1465,27 @@ public class GralPos extends ObjectVishia implements Cloneable
       //check input parameter ze of size and negative size
       
       //The type of input parameter.
-      final boolean zNeg =  (z & mValueNegative) !=0;     // zNeg true for 7000..7fff, 9000...9fff etc.
-      //zType is either 0x2000, 0x4000, 0x6000, 0x8000, 0xa000, 0xc000 for one of the type designations
-      final int zType = (z & mSpecialType) == kSpecialType ? z // 0xdfxx for the specialType. 
-                      : (z + kTypAdd_) & mType_;          // Adding kTypeAdd_ brings forex 7000..8fff to 8000..9fff, mType_ results is 0x8000
-      final boolean zeNeg =  (ze & mValueNegative) !=0;    // same for end coord.
-      final int zeType = (ze & mSpecialType) == kSpecialType ? ze : (ze + kTypAdd_) & mType_;
+      final boolean zNeg;
+      //zType is either 0x20000, 0x40000, 0x60000, 0x80000, 0xa0000, 0xc0000. 0xdfxxx, 0xe0000 for one of the type designations
+      final int zType;
+      if((z & mSpecialType) == kSpecialType) {             // 0xdfxxx for the specialType.
+        zType = z; 
+        zNeg = false;
+      } else {
+        zType = (z + kTypAdd_) & mType_;                   // Adding kTypeAdd_ brings forex 7000..8fff to 8000..9fff, mType_ results is 0x8000
+        zNeg =  (z & mValueNegative) !=0;                  // zNeg true for 7000..7fff, 9000...9fff etc.
+      }
+      //
+      final boolean zeNeg;
+      final int zeType;
+      if((ze & mSpecialType) == kSpecialType) {             // 0xdfxxx for the specialType.
+        zeType = ze; 
+        zeNeg = false;
+      } else {
+        zeType = (ze + kTypAdd_) & mType_;                   // Adding kTypeAdd_ brings forex 7000..8fff to 8000..9fff, mType_ results is 0x8000
+        zeNeg =  (ze & mValueNegative) !=0;                  // zNeg true for 7000..7fff, 9000...9fff etc.
+      }
+      //
       final int testCase;                                  // testcase for debug
       final int testType = (zType<<16) + zeType;           // combination of both coord start ...end
       if(refCoord !=this){
@@ -1547,24 +1562,23 @@ public class GralPos extends ObjectVishia implements Cloneable
         break;
       case size:
         int ze2 = (ze - size);                             // relative end position to start pos
-        if(zeNeg) { 
-//          if(zType == same) {
-//            q2 = q1;                                       // use the given start position for bottom / right 
-//            q2f = q1f;      
-//            q1 = q2 + ze2;                                 // calc the top/left position via size
-//            q1f = q2f - zeFrac;    //TODO test
-//          } else {
-            q2 = q1;                              // "10-2": negative size: q2 is the end point, 
-            q1 = q1 + ze2;                   // q1 
-            //if(q1f <0) { q1f +=10; q1 -=1; }                 // q1 1 gridunit left/top because frac increased the distance
-//          }
-        } else { 
-          q2 = q1 + ze2;               // "10+2" positive size, end is caculate with size
-      //    if(q2f >=10) { q2f -=10; q2 +=1; }
+        if(ze2 <0) { 
+          if(refCoord.dirNext == 'f') {                      // related to given as framePos
+            q2 = refCoord.p2;
+            q1 = q2 + ze2;                                 // ze2 is <0. q1 < q2
+          } else {
+            q2 = q1;                                       // "10-2": negative size: q2 is the end point, 
+            q1 = q1 + ze2;
+          }
+        } else {                                           // ze2 >=0 as size
+          q2 = q1 + ze2;                                   // "10+2" positive size, end is caculate with size
         }
         break;
-      case same:                                           //"" not textual
+      case refer:                                           //"" not textual
         q2 = refCoord.p2 + (ze - refer); 
+        break;
+      case same:                                           //"" not textual
+        q2 = refCoord.p2; 
         break;
       case samesize:
         q2 = q1 + (refCoord.p2 - refCoord.p1);                 // use size of parent to calculate q2 from q1

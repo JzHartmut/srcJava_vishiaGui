@@ -481,7 +481,8 @@ public class Fcmd //extends GuiCfg
     menu.addMenuItem("MenuCommandAbort", "&Command/&Abort", this.executer.actionCmdAbort); // /
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
     menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", this.executer.actionSetCmdCfg); // /
-    
+    menu.addMenuItem("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, this.favorPathSelector.actionSyncMidRight); // /
+
     //TODO menu.addMenuItem("menuAbout", this.idents.menuBarAbout, this.gui.gralMng.actionAbout);
     menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", this.fcmdActions.actionTest); 
     String sHelpUrlDir = this.cargs.dirHtmlHelp.getAbsolutePath();
@@ -537,7 +538,7 @@ public class Fcmd //extends GuiCfg
       }
       
       this.gui.gralMng.reportGralContent(this.log);
-      this.gui.gralMng.createGraphic("SWT", 'C', null);
+      this.gui.gralMng.createGraphic("SWT", this.cargs.sizeShow, null);
     //old: super.initMain(); // starts initializing of graphic. Do it after config
                       // command selector!
     }

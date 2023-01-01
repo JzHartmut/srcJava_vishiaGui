@@ -196,7 +196,8 @@ class FcmdFavorPathSelector
   }
   
 
-  
+  void init() {
+  }
   
   
   /**Builds the content of the add-favorite window. The window is created static. It is shown
@@ -487,8 +488,8 @@ class FcmdFavorPathSelector
     if(!this.bSyncMidRight && this.panelMid.actFileCard !=null /*&& this.panelMid.actFileCard.favorPathInfo !=null */ 
         && this.panelRight.actFileCard !=null /*&& this.panelRight.actFileCard.favorPathInfo !=null */) {
       this.bSyncMidRight = true;
-      this.panelRight.actFileCard.syncTabSelection = this.panelMid.actFileCard.syncPartnerTabSelection = this.panelRight.actFileCard.sTabSelection;
-      this.panelMid.actFileCard.syncTabSelection = this.panelRight.actFileCard.syncPartnerTabSelection = this.panelMid.actFileCard.sTabSelection;
+      this.panelRight.actFileCard.syncTabSelection = this.panelMid.actFileCard.syncPartnerTabSelection = this.panelRight.actFileCard.getLabelCurrFavor();
+      this.panelMid.actFileCard.syncTabSelection = this.panelRight.actFileCard.syncPartnerTabSelection = this.panelMid.actFileCard.getLabelCurrFavor();
       this.main.statusLine.widgSyncInfoLeft.setBackColor(GralColor.getColor("gn"),0);
       this.main.statusLine.widgSyncInfoRight.setBackColor(GralColor.getColor("gn"),0);
       this.main.statusLine.widgSyncInfoLeft.setText(this.panelMid.actFileCard.syncTabSelection);

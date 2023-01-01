@@ -36,6 +36,7 @@ import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFunctions;
 
@@ -129,6 +130,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   private SwtTextFieldWrapper(GralTextField widgg, SwtMng swtMng, boolean bbox)
   {
     widgg.super(widgg, swtMng); //NOTE: superclass is a non static inner class of GralTextField. 
+    if(widgg.name.startsWith("showSrc"))
+      Debugutil.stop();
     this.bbox = bbox;
     Composite panelSwt = SwtMng.getSwtParent(widgg.pos()); //    mng.getCurrentPanel();
     //in ctor: setPanelMng(mng);
