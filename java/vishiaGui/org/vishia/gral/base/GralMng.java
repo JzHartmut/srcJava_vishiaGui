@@ -2765,6 +2765,7 @@ public GralButton addCheckButton(
     
     public static int gralTable_updateCells = 1201;
     public static int gralFileSelector_fillin = 1211;
+    public static final int gralFileSelector_fillinFinished = 1212;
     
     public static int evFocused = 1501;
   }

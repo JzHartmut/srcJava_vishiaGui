@@ -89,8 +89,8 @@ public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutin
   
   final Appendable out;
   
-  public GralCommandSelector(GralPos currPos, String name, int rows, int[] columns, char size, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
-  { super(currPos, name, rows, columns, size);
+  public GralCommandSelector(GralPos currPos, String posName, int rows, int[] columns, char size, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
+  { super(currPos, posName, rows, columns, size);
     this.cmdExecuter = cmdExecuter;
     this.out = out;
     //this.cmdStore = new CmdStore();

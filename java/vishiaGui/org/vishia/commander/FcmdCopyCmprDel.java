@@ -231,6 +231,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     GralPos refPos = new GralPos(main.gui.gralMng.screen);
     int windprops = GralWindow_ifc.windConcurrently; // + GralWindow.windResizeable;
     this.windConfirmCopy = new GralWindow(refPos, "@screen,30+37,30+70=" + name + "Window", cmdArg.name, windprops); 
+    this.windConfirmCopy.setVisible(false);                // invisible per default, activate with setFocus()
     //source path and check:
     if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
       this.widgButtonModeDst = new GralButton(refPos, "@2.5-2, 1..7.5++=dst-" + name, null, this.actionChgModeDst);

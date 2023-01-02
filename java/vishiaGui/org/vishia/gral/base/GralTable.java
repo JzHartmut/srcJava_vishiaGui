@@ -100,6 +100,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-02 Hartmut new: {@link #processKeys(int)}: More detailed association between key and action.  
    * <li>2022-12-12 Hartmut new: {@link #getColumnInFocus()}. why was this not existing till now?
    * <li>2022-12-12 Hartmut new: {@link #setColumnProportional(int[])} and resizing with this proportional values.
    *   This feature was longer plant but never implemented till now. See also changes in {@link GraphicImplAccess#resizeTable(GralRectangle)}. 
@@ -1232,10 +1233,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //NOTE: prevent to fast key action if the last redraw is yet finished.
       //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
       long timeDiff = time - timeLastRedraw;
-      if( keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
-        keyDone = false;
+      if( this.keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
+        this.keyDone = false;                              // execution pending
         switch(keyCode){
-        case KeyCode.tab: {
+        case KeyCode.tab: {                                // tab and sh-tab switches between columns
           if(colSelectedixCellC < columnWidthsGral.length-1) { 
             colSelectedixCellC +=1; 
           }
@@ -1263,7 +1264,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.activate();
         } break;
-        case KeyCode.mouseWheelUp:
+        case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
         case KeyCode.up: {
           if(!searchContent(true)) {
             if(lineSelectedixCell > 2){
@@ -1308,9 +1309,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } break;
         default:
           if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
-            ) {
+            ) {                                            // arrow down, mouse wheel down
             if(keyCode == keyMarkDn && lineSelected !=null){
-              GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
+              GralTableLine_ifc<?> line = lineSelected;    //mark the lines
               if((line.getMark() & FileMark.select)!=0){
                 //it is selected yet
                 line.setNonMarked(FileMark.select, line.getUserData());
@@ -1342,11 +1343,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             
             keyActionDone.activate();
           } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
-            keyCode &= ~KeyCode.shiftDigit;  //The keycode is valid without shift-designation.
+            keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
             searchChars.appendCodePoint(keyCode);
             searchContent(false);
             redraw();
-          } else if(keyCode == KeyCode.esc){
+          } else if(keyCode == KeyCode.esc){               // --- esc cleans the search chars 
             searchChars.setLength(0);
             redraw();
           } else if(keyCode == KeyCode.back && searchChars.length() >0){
@@ -1385,7 +1386,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           done = true;
         }
         if(!done /*&& lineSelected !=null*/){
-          GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey);
+          GralWidget_ifc.ActionChange action = null;
+          if(keyCode == KeyCode.enter) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter); }
+          else if(keyCode == (KeyCode.ctrl + KeyCode.enter)) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onCtrlEnter); }
+          else if(keyCode == KeyCode.mouse1Double) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Double); }
+          if(action ==null) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey); }
+          //?? if(action ==null) { action = getActionChangeStrict(null, false); }  //any action for the table
           if(action !=null){
             Object[] args = action.args();
             if(args == null){ done = action.action().exec(keyCode, this, lineSelected); }
@@ -1396,7 +1402,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           done = gralMng.userMainKeyAction().exec(keyCode, getCurrentLine());
         }
         if(!done){
-          //if actionChanging.userAction() returns false 
           GralUserAction mainKeyAction = gralMng.getRegisteredUserAction("KeyAction");
           if(mainKeyAction !=null){
             //old form called because compatibility, if new for with int-parameter returns false.
@@ -1903,7 +1908,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     protected void resizeTable(GralRectangle pixTable) {
       int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
       int yPixelUnit = itsMng().propertiesGui().yPixelUnit();
-      outer.zLineVisible = pixTable.dy / yPixelUnit / 2;   // height of one cell always 2
+      outer.zLineVisible = (pixTable.dy +1) / yPixelUnit / 2;   // height of one cell always 2
       if(outer.zLineVisible > outer.zLineVisibleMax){ outer.zLineVisible = outer.zLineVisibleMax; }
       if(outer.zLineVisible < 2)
         Debugutil.stop();

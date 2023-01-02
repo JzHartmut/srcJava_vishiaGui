@@ -1163,14 +1163,14 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * @return null if the action is not set.
    */
   public ActionChange getActionChangeStrict(ActionChangeWhen when, boolean strict) {
-    if(cfg.actionChange1 !=null) {
-      if(cfg.actionChange1When == null){ 
+    if(this.cfg.actionChange1 !=null) {
+      if(this.cfg.actionChange1When == null){ 
         return strict && when !=null 
           ? null                //specific action required and strict: returns null though a common action is given.
-          : cfg.actionChange1;  //no specific action required or set, or no specifia action set and not strict: returns the only one action.
+          : this.cfg.actionChange1;  //no specific action required or set, or no specifia action set and not strict: returns the only one action.
       } else {
-        for(ActionChangeWhen when1:cfg.actionChange1When){
-          if(when1 == when) return cfg.actionChange1;
+        for(ActionChangeWhen when1:this.cfg.actionChange1When){
+          if(when1 == when) return this.cfg.actionChange1;
         }
         //not found:
         return null;
@@ -1179,20 +1179,20 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
       //actionChangeSelect is given:
       if(when == null || cfg.actionChangeSelect == null) return null;
       switch(when){
-      case onAnyChgContent: return cfg.actionChangeSelect.onAnyChangeContent;
-      case onAnyKey: return cfg.actionChangeSelect.onAnyKey;
-      case onCtrlEnter: return cfg.actionChangeSelect.onCtrlEnter;
-      case onFocusGained: return cfg.actionChangeSelect.onFocusGained;
-      case onChangeAndFocusLost: return cfg.actionChangeSelect.onChangeAndFocusLost;
-      case onDrag: return cfg.actionChangeSelect.onDrag;
-      case onDrop: return cfg.actionChangeSelect.onDrop;
-      case onEnter: return cfg.actionChangeSelect.onEnter;
-      case onMouse1Double: return cfg.actionChangeSelect.onMouse1Double;
-      case onMouse1Dn: return cfg.actionChangeSelect.onMouse1Dn;
-      case onMouse1Up: return cfg.actionChangeSelect.onMouse1Up;
-      case onMouse1UpOutside: return  cfg.actionChangeSelect.onMouse1UpOutside;
-      case onMouse2Up: return cfg.actionChangeSelect.onMouse2Up;
-      case onMouseWheel: return cfg.actionChangeSelect.onMouseWheel;
+      case onAnyChgContent: return this.cfg.actionChangeSelect.onAnyChangeContent;
+      case onAnyKey: return this.cfg.actionChangeSelect.onAnyKey;
+      case onCtrlEnter: return this.cfg.actionChangeSelect.onCtrlEnter;
+      case onFocusGained: return this.cfg.actionChangeSelect.onFocusGained;
+      case onChangeAndFocusLost: return this.cfg.actionChangeSelect.onChangeAndFocusLost;
+      case onDrag: return this.cfg.actionChangeSelect.onDrag;
+      case onDrop: return this.cfg.actionChangeSelect.onDrop;
+      case onEnter: return this.cfg.actionChangeSelect.onEnter;
+      case onMouse1Double: return this.cfg.actionChangeSelect.onMouse1Double;
+      case onMouse1Dn: return this.cfg.actionChangeSelect.onMouse1Dn;
+      case onMouse1Up: return this.cfg.actionChangeSelect.onMouse1Up;
+      case onMouse1UpOutside: return  this.cfg.actionChangeSelect.onMouse1UpOutside;
+      case onMouse2Up: return this.cfg.actionChangeSelect.onMouse2Up;
+      case onMouseWheel: return this.cfg.actionChangeSelect.onMouseWheel;
       default: throw new IllegalArgumentException("not all when-conditions");
       }
     }
@@ -1831,18 +1831,18 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
 //      child = parent;
 //    }
     do {
-      parent = child.pos().parent;
-      parent.setVisible(true);
-      parent.setFocusedWidget(child);
+      child.setVisible(true);                              // maybe GralWidget is not visible
+      parent = child.pos().parent;                         
+      parent.setFocusedWidget(child);                      // sets the child as focused widget in parent
       child = parent;
-    } while( !(parent instanceof GralScreen) );
-    while( (child = parent.getFocusedWidget()) !=null) {
-      parent = child;
-    }
+    } while( !(parent instanceof GralScreen) );            // the last parent is GralScreen, hence also the window is visible
+//    while( (child = parent.getFocusedWidget()) !=null) {
+//      parent = child;
+//    }
 //    while( !(child instanceof GralWidget)) {
 //      child = child.getFocusedWidget();
 //    }
-    GralWidget wdgToFocus = (GralWidget)parent;
+    GralWidget wdgToFocus = this; //(GralWidget)parent;
     wdgToFocus.dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
     wdgToFocus.redraw(delay, latest);                     // do the following action in the graphic thread.
   }

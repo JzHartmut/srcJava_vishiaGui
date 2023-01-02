@@ -482,7 +482,8 @@ public class Fcmd //extends GuiCfg
     // gui.addMenuItemGThread("&Command/E&xecute", actionSetCmdCurrentDir); ///
     menu.addMenuItem("MenuCmdCfgSet", "&Command/CmdCf&g - read current file", this.executer.actionSetCmdCfg); // /
     menu.addMenuItem("menuBarFolderSyncMidRight", main.idents.menuBarFolderSyncMidRight, this.favorPathSelector.actionSyncMidRight); // /
-
+    menu.addMenuItem("test", main.idents.menuExecuteBar, main.executer.actionExecuteFileByExtension);
+    
     //TODO menu.addMenuItem("menuAbout", this.idents.menuBarAbout, this.gui.gralMng.actionAbout);
     menu.addMenuItem("MenuTestInfo", "&Help/&Infobox", this.fcmdActions.actionTest); 
     String sHelpUrlDir = this.cargs.dirHtmlHelp.getAbsolutePath();
@@ -834,7 +835,12 @@ public class Fcmd //extends GuiCfg
       thiz.finishMain();
   }
 
-
-  
+  /**This class defines only static numbers for messages. 
+   * The numbers should be a little bit sorted,
+   * so that dispatching of messages can be done. 
+   *
+   */
+  public static class LogMsg {
+  }  
 
 }

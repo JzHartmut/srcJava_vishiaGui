@@ -207,7 +207,7 @@ public class FcmdFileCard extends GralFileSelector
 //    //
 //    //sets the action for a simple table: what to do on line selected: Show file names. 
 
-    this.specifyActionOnFileSelected(actionOnFileSelection);
+    this.specifyActionOnFileSelected(this.actionOnFileSelection);
     setActionOnFocusedFileTable(this.actionFocused);       // sets the current file card from three ones in Fcmd  
 
 //    //Note: some menu entries are set in the super class already.
@@ -217,13 +217,13 @@ public class FcmdFileCard extends GralFileSelector
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.fcmdActions.actionEdit);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
-//    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
+    this.wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
 //    //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
 //    wdgFavorCard.wdgdTable.specifyActionOnLineSelected(wdgFavorCard.actionFavorSelected);
 //    //
 //    //sets the action for Select a file: open the execute menu
-//    setActionOnEnterFile(main.executer.actionOnEnterFile);
+    setActionOnEnterFile(this.actionOnEnterFile);
 //    setActionSetFileLineAttrib(actionSetFileLineAttrib);
   }
 
@@ -607,6 +607,23 @@ public class FcmdFileCard extends GralFileSelector
       return true;      
   } };
   
+  
+  
+  /**This action is associated to the {@link FcmdFileCard}
+   * respectively its base class {@link GralFileSelector#setActionOnEnterFile(GralUserAction)} 
+   * It calls {@link FcmdExecuter#executeFileByExtension(File)}.
+   */
+  private GralUserAction actionOnEnterFile = new GralUserAction("actionOnEnterFile")
+  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
+    { FileRemote file = (FileRemote)params[0]; 
+      FcmdFileCard.this.main.executer.executeFileByExtension(file);  
+      return true;
+    }
+  };
+  
+  
+
+
 
 //  /**Called if a tab is used to change the selection in the favorTab. 
 //   * The adequate action is done too with selection in the favor tab. 

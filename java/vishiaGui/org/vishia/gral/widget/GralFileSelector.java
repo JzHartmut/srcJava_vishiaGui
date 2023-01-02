@@ -1209,7 +1209,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   void finishShowFileTable()
   {
-    System.out.println("FcmdFileCard - finish fillin; " + this.sCurrentDir);
+    this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillinFinished, "GralFileSelector - finish fillin; " + this.sCurrentDir);
     Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = this.idxLines.entrySet().iterator();
     while(iter.hasNext()){
       Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
@@ -1580,9 +1580,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     FavorPath favor = favorLine.getData();
     if(nColumnFocus == 1) {
       favorLine.setCellText("", 2);                      // 2th colum focused, remove the current path, use the standard one.
-      favor.sCurrFile = "";
+      favor.sCurrDir = "";
     } else {
-      favor.sCurrFile = favorLine.getCellText(2);
+      favor.sCurrDir = favorLine.getCellText(2);
     }
     selectFavor(favor);
   }
@@ -1595,17 +1595,19 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.widgBtnFavor.setState(GralButton.State.Off);
     this.wdgFavorTable.setVisible(false);
     String sFavor = favor.selectName; // favorLine.getCellText(0);
-    if(sFavor != this.sCurrFavor) {
+    if(sFavor != this.sCurrFavor) {                        // only fillin newly if it is another favor
       this.sCurrFavor = sFavor;
       this.favorPathInfo = favor;
-      if(favor.sCurrFile.length()==0) {
-        favor.sCurrFile = favor.path; //favorLine.getCellText(1);
+      if(favor.sCurrDir.length()==0) {
+        favor.sCurrDir = favor.path;                      // use an existing favor
       }
       if( ! this.wdgCardSelector.setActItem(sFavor)){
         this.wdgCardSelector.addItem(sFavor, -1, this.favorPathInfo);
       }
-      File favorfile = new File(favor.sCurrFile);
-      fillIn(FileRemote.fromFile(favorfile), false);
+      FileRemote fStart = favor.fileCluster.getDir(favor.sCurrDir);
+      fillIn(fStart, false);       //bDoNotRefresh = false, refresh it in another thread
+      //File favorfile = new File(favor.sCurrFile);
+      //fillIn(FileRemote.fromFile(favorfile), false);
     }
     this.wdgSelectList.wdgdTable.setVisible(true);
     this.wdgSelectList.wdgdTable.setFocus();
@@ -1743,7 +1745,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     /**The name shown in the list. */
     public final String selectName;
     
-    protected String sCurrFile;
+    protected String sCurrDir;
     
     public final FileCluster fileCluster;
     /**The label on the tab in tabbed panel. */

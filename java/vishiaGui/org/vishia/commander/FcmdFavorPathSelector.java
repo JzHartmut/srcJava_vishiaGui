@@ -203,7 +203,7 @@ class FcmdFavorPathSelector
   /**Builds the content of the add-favorite window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindowAddFavorite(){ 
-
+    assert(false);
     windSearchFiles = GralFileSelector.createWindowConfirmSearchGthread(mng);
     
     //main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
