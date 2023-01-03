@@ -745,7 +745,9 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     
   }
 
-  
+  @Override protected void closeImplGraphic ( )
+  {
+  }
   
   @Override
   protected boolean dispatchOsEvents()

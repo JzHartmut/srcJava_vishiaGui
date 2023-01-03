@@ -1237,7 +1237,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
     this.wdgSelectList.wdgdTable.redraw(100, 200);
     this.wdgSelectList.wdgdTable.fillinPending(false);
-    this.actionOnFileSelected.exec(KeyCode.activated, tline, tline);
+    if(this.actionOnFileSelected !=null) {
+      this.actionOnFileSelected.exec(KeyCode.activated, tline, tline);
+    }
   }
   
   
@@ -1734,6 +1736,22 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       return true;
     }
     else return false;
+  }
+
+  
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    this.wdgSelectList.removeImplWidget_Gthread();                     // recursively call of same
+    this.wdgCardSelector.removeImplWidget_Gthread();                     // recursively call of same
+    this.wdgFavorTable.removeImplWidget_Gthread();                     // recursively call of same
+    this.widgBtnFavor.removeImplWidget_Gthread();                     // recursively call of same
+    this.widgdPathDir.removeImplWidget_Gthread();                     // recursively call of same
+    //TODO this.windSearch.removeImplWidget_Gthread();                     // recursively call of same
+    this.windView.removeImplWidget_Gthread();
   }
 
   

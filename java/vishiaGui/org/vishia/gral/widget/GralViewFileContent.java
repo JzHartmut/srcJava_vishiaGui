@@ -18,10 +18,12 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
@@ -29,7 +31,7 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
 import org.vishia.util.StringFunctions_C;
 
-public class GralViewFileContent {
+public class GralViewFileContent extends GralWidgetBase {
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
@@ -70,7 +72,7 @@ public class GralViewFileContent {
   final LogMessage log;
   
   /**The window of this functionallity. */
-  private GralWindow_ifc windView;
+  private GralWindow windView;
 
   /**The widget to show content. */
   private GralTextBox widgContent;
@@ -142,7 +144,8 @@ public class GralViewFileContent {
   private final StringFormatter formatterHex = new StringFormatter(120);
   
   public GralViewFileContent ( GralPos refPosP, String posName )
-  { this.gralMng = refPosP.parent.gralMng();
+  { super(refPosP, posName, null);
+    this.gralMng = refPosP.parent.gralMng();
     this.log = this.gralMng.log();
     //
     GralPos refPos = refPosP.screenPos(20, 20, 100, 80);
@@ -495,6 +498,69 @@ public class GralViewFileContent {
   }
   
   
+  @Override public void setFocus () {
+    this.windView.setFocus();
+  }
+
+
+
+
+  @Override public void setFocus ( int delay, int latest ) {
+    this.windView.setFocus(delay, latest);
+  }
+
+
+
+
+  @Override public boolean isInFocus () {
+    return this.windView.isInFocus();
+  }
+
+
+
+
+  @Override public boolean isVisible () {
+    return this.windView.isVisible();
+  }
+
+
+
+
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg ) {
+    this.windView.setFocusedWidget(widg);
+  }
+
+
+
+
+  @Override public GralWidgetBase_ifc getFocusedWidget () {
+    return this.windView.getFocusedWidget();
+  }
+
+
+
+
+  @Override public boolean setVisible ( boolean visible ) {
+    this.windView.setVisible(visible);
+    return true;
+  }
+
+
+
+
+  @Override public boolean createImplWidget_Gthread () throws IllegalStateException {
+    this.windView.createImplWidget_Gthread();
+    return true;
+  }
+
+
+
+
+  @Override public void removeImplWidget_Gthread () {
+    this.windView.removeImplWidget_Gthread();
+    
+  }
+
 
   
   

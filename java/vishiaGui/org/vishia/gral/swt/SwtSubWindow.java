@@ -462,11 +462,9 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     @Override
     public void widgetDisposed(DisposeEvent e)
     {
-      Widget swtWidg = e.widget;
-      GralWidget_ifc gralWidg = (GralWidget_ifc)swtWidg.getData();
-      GralMng gralMng = gralWidg.gralMng();
-      gralWidg.remove();
-      gralMng.closeGral();
+      GralMng gralMng = SwtSubWindow.this.swtWidgWrapper.mng.gralMng;
+      gralMng.closeImplGraphic();                          // this forces exit of the graphic thread.
+      // whats happen with the application, is programmed in the main thread. 
     }
   };
   

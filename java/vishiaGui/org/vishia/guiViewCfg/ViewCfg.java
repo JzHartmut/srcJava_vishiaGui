@@ -470,7 +470,7 @@ The positions are related to the start of the Inspector item @ 0x18, first with 
       if(main.oamRcvUdpValue !=null) {  
         main.oamRcvUdpValue.stopThread();
       }
-      main.gralMng.closeGral();
+      main.gralMng.closeApplication();
     } catch(Exception exc) {
       System.err.println("Unexpected exception: " + exc.getMessage());
       exc.printStackTrace(System.err);

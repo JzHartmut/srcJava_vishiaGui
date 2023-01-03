@@ -384,6 +384,20 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     } else return false;
   }  
   
+  
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    for(GralWidget widg: this._panel.widgetList) {
+      widg.removeImplWidget_Gthread();                     // recursively call of same
+    }
+    super.removeImplWidget_Gthread();
+  }
+  
+  
   /**Removes this widget from the lists in this panel. This method is not intent to invoke
    * by an application. It is only used in {@link GralWidget#remove()}. Use the last one method
    * to remove a widget includint is disposition and remove from the panel.

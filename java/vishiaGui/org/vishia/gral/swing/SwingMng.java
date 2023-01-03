@@ -182,6 +182,11 @@ public class SwingMng  extends GralMng.ImplAccess {
     
   }
 
+  @Override protected void closeImplGraphic () {
+    // TODO Auto-generated method stub
+    
+  }
+
   @Override protected boolean dispatchOsEvents () {
     // TODO Auto-generated method stub
     return false;

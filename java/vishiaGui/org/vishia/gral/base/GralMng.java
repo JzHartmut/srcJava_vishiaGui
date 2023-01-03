@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.EventObject;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -464,8 +465,16 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   /**True if the startup of the main window is done and the main window is visible. */
   protected boolean bStarted = false; 
 
-  /** set to true to exit in main*/
-  protected boolean bExit = false;
+  /** set to true to exit the graphic thread and dispose the implementation graphic */
+  protected boolean bShouldExitImplGraphic = false;
+  
+  protected boolean bIsExitImplGraphic = false;
+  
+  /**Set to true to finish the main. Set from the graphic thread. */
+  protected boolean bExitMain = false;
+  
+  /**Set to true to finish the main. Maybe on dispose the implementation graphic. */
+  protected boolean bShouldExitMain = false;
   
   /**Instance to measure execution times.
    * 
@@ -563,6 +572,9 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public void createGraphic(String implementor, char sizeShow, LogMessage log) {
     if(log != null) { this.log = log; }
+    this.bShouldExitImplGraphic = false;                   // important on second call
+    this.bIsExitImplGraphic = false;
+    this.bStarted = false;
     this.gralProps.setSizeGui(sizeShow);
     GralFactory factory = GralFactory.getFactory(implementor);
     if(factory !=null) {
@@ -1306,12 +1318,20 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
   }
   
-  public boolean isStarted(){ return bStarted; }
+  public boolean isStarted(){ return this.bStarted; }
   
-  public boolean isRunning(){ return bStarted && !bExit; }
+  /**Returns true so long the application should run (indpendent of implementation graphic)
+   * @return false then exit the implementation
+   */
+  public boolean isRunning(){ return !this.bExitMain; }
   
-  public boolean isTerminated(){ return bStarted && bExit; }
+  public boolean isImplementationGraphicTerminated(){ return this.bIsExitImplGraphic; }
 
+  /**Terminates the run loop of the graphic thread*/
+  public void closeImplGraphic ( ){ this.bShouldExitImplGraphic = true; }
+
+  
+  public void closeApplication ( ) { this.bShouldExitImplGraphic = true; this.bShouldExitMain = true; }
 
   
   /**The run method of the graphic thread. This method is started in the constructor of the derived class
@@ -1319,7 +1339,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * <ul>
    * <li>{@link #initGraphic()} will be called firstly. It is overridden by the graphic system implementing class
    *   and does some things necessary for the graphic system implementing level.
-   * <li>The routine runs so long as {@link #bExit} is not set to false. bExit may be set to false 
+   * <li>The routine runs so long as {@link #bShouldExitImplGraphic} is not set to false. bExit may be set to false 
    *   in a window close listener of the graphic system level. It means, it is set to false especially 
    *   if the windows will be closed from the operation system. If the window is closed because the application
    *   is terminated by any application command the window will be closed, and the close listerer sets bReady
@@ -1368,10 +1388,19 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     checkTimes.init();
     checkTimes.adjust();
     checkTimes.cyclTime();
-    while (!bExit) {
+    while (!bShouldExitImplGraphic) {
       step();
     }
     orderList.close();
+    for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
+      GralWindow wind = ewind.getValue();
+      wind.removeImplWidget_Gthread();
+    }
+    this._mngImpl.closeImplGraphic();
+    this._mngImpl = null;
+    this.bStarted = false;
+    this.bIsExitImplGraphic = true;
+    this.bExitMain = this.bShouldExitMain;
     //displaySwt.dispose ();
     //bExit = true;
     //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
@@ -1412,7 +1441,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     checkTimes.calcTime();
     isWakedUpOnly = false;
     //System.out.println("dispatched");
-    if(!bExit){
+    if(!bShouldExitImplGraphic){
       if(isWakedUpOnly){
         Assert.stop();
       }
@@ -2541,7 +2570,10 @@ public GralButton addCheckButton(
     /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
      * and returned when finished. This routine is called as the first routine in the Graphic thread's
      * method {@link #runGraphicThread()}. See {@link org.vishia.gral.swt.SwtGraphicThread}. */
-    protected abstract void initGraphic();
+    protected abstract void initGraphic ( );
+    
+    
+    protected abstract void closeImplGraphic ( );
     
     /**Calls the dispatch routine of the implementation graphic.
      * @return true if dispatching should be continued.
@@ -2556,11 +2588,6 @@ public GralButton addCheckButton(
     /**This method should be implemented by the graphical base. It should be waked up the execution 
      * of the graphic thread because some actions are registered.. */
     public abstract void wakeup();
-    
-    /**Terminates the run loop if val == true.
-     * @param val
-     */
-    protected void setClosed(boolean val){ gralMng.bExit = val; }
     
     //protected char sizeCharProperties(){ return gralGraphicThread.sizeCharProperties; }
 
@@ -2691,11 +2718,6 @@ public GralButton addCheckButton(
   
   
 
-  /**Must only invoke from the Main window close listener. */
-  public void closeGral() {
-    this.bExit = true; 
-  }
-  
 
 
   /**Creates only the GralWindow with position in GralMng

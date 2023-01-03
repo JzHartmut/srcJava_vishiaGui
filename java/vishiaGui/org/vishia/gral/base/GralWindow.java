@@ -390,7 +390,16 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     }
   }
   
-  
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    this.mainPanel.removeImplWidget_Gthread();                     // recursively call of same
+    super.removeImplWidget_Gthread();
+  }
+
   /**This class is not intent to use from an application.
    * It is instantiated with the implementation graphic, 
    * for SWT especially aggregated from {@link org.vishia.gral.swt.SwtPanel}.

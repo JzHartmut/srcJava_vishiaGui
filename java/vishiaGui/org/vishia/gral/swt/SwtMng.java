@@ -1307,7 +1307,11 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     
   }
 
-
+  /**Called as last operation in the Graphic thread see {@link GralMng#runGraphicThread()}
+   */
+  @Override protected void closeImplGraphic(){
+    this.displaySwt.dispose();
+  }
   
   @Override public void finishInit() {
     Debugutil.stop();
@@ -1476,11 +1480,13 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    * Only if the main window is closed, bExit should be set to true.
    * */
   public final class WindowsCloseListener implements Listener{
-    /**Invoked when the window is closed; it sets {@link #bExit}, able to get with {@link #isRunning()}.
+    /**Invoked when the window is closed; it sets {@link #bShouldExitImplGraphic}, able to get with {@link #isRunning()}.
      * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
      */
     @Override public void handleEvent(Event event) {
-      setClosed( event.widget == getSwtImpl(SwtMng.this.gralMng.getPrimaryWindow())); //close if the main window was closed.
+      if( event.widget == getSwtImpl(SwtMng.this.gralMng.getPrimaryWindow())) {
+        SwtMng.this.gralMng.closeApplication(); //close if the main window was closed.
+      }
     }
   }
 

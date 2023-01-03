@@ -293,6 +293,15 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
     else return false; // no gralMng implementation.
   }
 
+
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  abstract public void removeImplWidget_Gthread();
+
+  
   
   
   @Override public GralWidget.ImplAccess getImplAccess() {

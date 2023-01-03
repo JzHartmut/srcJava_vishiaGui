@@ -902,7 +902,17 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   }
   
   
-  
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    if(this._wdgImpl !=null) {
+      this._wdgImpl.removeWidgetImplementation();
+      this._wdgImpl = null;
+    }
+  }
   
   
   /**Returns this.
@@ -1930,7 +1940,10 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    */
   @Override public boolean remove()
   {
-    if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
+    if(this._wdgImpl !=null) { 
+      this._wdgImpl.removeWidgetImplementation();
+      this._wdgImpl = null;
+    }
     if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent) {
       ((GralPanelContent)_wdgPos.parent).removeWidget(this);
     }

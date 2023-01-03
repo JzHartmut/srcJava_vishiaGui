@@ -148,7 +148,15 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
     return ret;
   }
   
- 
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    this.wdgdTable.removeImplWidget_Gthread();                     // recursively call of same
+  }
+
   
   public void set(List<String[]> listData)
   {
