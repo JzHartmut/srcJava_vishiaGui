@@ -192,6 +192,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     int zColumn = zColumn();
     Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
+    //The background of the panel, which does not contain cells of Text:
+    swtTable.setBackground(mng.getColorImpl(GralColor.getColor("pgr")));
     initSwtTable(swtTable, zColumn, mng);
     vScrollBar = new Vscrollbar(swtTable);
     super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
@@ -434,7 +436,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected int getVisibleLinesTableImpl(){
     Rectangle size = swtWidgHelper.widgetSwt.getBounds();  
-    return size.height / linePixel;
+    return (size.height+1) / linePixel;
   }  
   
   
@@ -486,7 +488,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       }
     } else {
       //empty line:
-      GralColor colorBack = colorBackTable();
+      GralColor colorBack = linePresentationP.colorBack;  //colorBackTable();
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
         GralTable.CellData cellData = cellLine[col]; //(GralTable.CellData)cellSwt.getData();

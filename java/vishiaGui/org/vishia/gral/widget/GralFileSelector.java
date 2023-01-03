@@ -659,8 +659,6 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   
-  /**Set to true if a fillin is pending. */
-  boolean fillinPending;
 
   
   /**Creates
@@ -1014,7 +1012,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * more as one time after another, for example for all files of a directory without calculation effort.
    */
   public void fillInCurrentDir(){
-    if(this.currentDir !=null && !this.fillinPending) {
+    if(this.currentDir !=null && !this.wdgSelectList.wdgdTable.fillinPending()) {
       //assume that a yet tested directory should not refreshed twice because another thread had refreshed already.
       //yet is 2 seconds.
       boolean bDonotRefresh = this.currentDir.isTested(System.currentTimeMillis() - 2000);
@@ -1070,7 +1068,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   public void forcefillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   {
-    this.fillinPending = false;
+    this.wdgSelectList.wdgdTable.fillinPending(false);
     fillIn(fileIn, bCompleteWithFileInfo);
   }
   
@@ -1109,8 +1107,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin sGralFileSelector: " + dir );
     }
     this.widgdPathDir.setText(this.sCurrFavor + ": " + this.sCurrentDir, -1);
-    if(!bSameDirectory || !this.fillinPending){  //new request anytime if other directory, or if it is not pending.
-      this.fillinPending = true;
+    if(!bSameDirectory || !this.wdgSelectList.wdgdTable.fillinPending()){  //new request anytime if other directory, or if it is not pending.
+      this.wdgSelectList.wdgdTable.fillinPending(true);
       //selectList.wdgdTable.setBackColor(colorBackPending, -1);  //for all cells.
       System.out.println("FcmdFileCard - start fillin; " + this.sCurrentDir + (bSameDirectory ? "; same" : "; new"));
       final ERefresh eRefresh;
@@ -1138,7 +1136,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
           tline.setCellText("..", kColFilename);
           tline.setCellText("", kColLength);
           tline.setCellText("", kColDate);
-          tline.setBackColor(this.colorBack, -1);
+          //tline.setBackColor(this.colorBackPending, -1);
           this.idxLines.put("..", tline);
         }
         //Build the table lines newly.
@@ -1171,6 +1169,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(file !=null) {
       selectFile(file.getName());
     }
+    this.wdgSelectList.wdgdTable.redraw(-50,100);
   }
   
   
@@ -1230,15 +1229,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       String key = buildKey(this.currentFile, true, null);
       tline = this.idxLines.search(key); //maybe line before
     } else {
-      tline = null;  //first line is selected
+      tline = this.wdgSelectList.wdgdTable.getFirstLine();  //first line is selected
     }
     if(tline !=null){
       this.wdgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
       this.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
     }
     this.wdgSelectList.wdgdTable.redraw(100, 200);
-    this.fillinPending = false;
-    
+    this.wdgSelectList.wdgdTable.fillinPending(false);
+    this.actionOnFileSelected.exec(KeyCode.activated, tline, tline);
   }
   
   

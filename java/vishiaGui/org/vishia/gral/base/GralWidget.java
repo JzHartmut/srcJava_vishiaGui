@@ -1619,7 +1619,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
     if(this instanceof GralWindow)
       Debugutil.stop();
     if(_wdgImpl == null) {
-      bVisibleState = true;  //without graphic yet now
+      bVisibleState = visible;  //without graphic yet now
     } else {
       if(gralMng.currThreadIsGraphic()) {
         _wdgImpl.setVisibleGThread(visible);   //sets the implementation widget visible.

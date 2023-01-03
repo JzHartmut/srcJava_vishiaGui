@@ -400,7 +400,7 @@ public class FcmdFileCard extends GralFileSelector
       //this.main.lastFavorCard = this.wdgFavorCard;
       this.main.currentFileCard = this;
       this.mainPanel.actFileCard = this;
-      this.main.statusLine.setFileInfo(this.sTabSelection, file);
+      this.main.statusLine.setFileInfo(this.getLabelCurrFavor(), file);
       //System.out.println("actionOnFileSelected: " + this.label + ":" + this.favorCard.sActSelectedFavorPath);
       String sPath = file.getAbsolutePath();
       if(  this.main.favorPathSelector.bSyncMidRight 

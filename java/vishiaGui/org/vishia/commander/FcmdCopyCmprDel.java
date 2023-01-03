@@ -309,7 +309,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //widgBtnPause = main.gralMng.addButton("pause", null, "pause", null, "pause");
       //widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".pause.");
     }  
-    main.gui.gralMng.setPosition(-4, GralPos.size+3.5f, -13f, -1, 0, 'd', 0.4f);
     this.widgButtonOk = new GralButton(refPos, "@-4+3, -13.-1=copyOk" + name, "ok", this.actionButtonOk);
  
   }

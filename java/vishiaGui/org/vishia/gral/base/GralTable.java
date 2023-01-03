@@ -100,6 +100,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-02 Hartmut new: {@link #getFirstLine()} sometimes necessary, why this was not existing till now?
+   *   {@link #fillVisibleArea()} has had a problem if the #lineSelected was =null, 
+   *   occurring on click on a non existing line in the table. now fixed.
+   * <li>2023-01-02 Hartmut new: {@link #fillinPending(boolean)} especially for color to show,
+   *   now first time it is really obviously how long or whether a file panel will be filled in another thread.
    * <li>2023-01-02 Hartmut new: {@link #processKeys(int)}: More detailed association between key and action.  
    * <li>2022-12-12 Hartmut new: {@link #getColumnInFocus()}. why was this not existing till now?
    * <li>2022-12-12 Hartmut new: {@link #setColumnProportional(int[])} and resizing with this proportional values.
@@ -254,7 +259,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  protected final static String sVersion = "2018-10-28";
+  protected final static String sVersion = "2023-01-02";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -319,6 +324,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**The line which is selected by mouse pressing, for right mouse menu. */
   protected TableLineData lineSelectedNew;
   
+  /**Set to true if a fillin is pending. */
+  protected boolean fillinPending;
+
   
   /**Number of lines and columns of data. */
   protected int zLine, zColumn;
@@ -391,6 +399,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   protected GralColor colorBackSelectNew;
   protected GralColor colorBackSelectNewMarked;
+  
+  protected GralColor colorBackFillPending;
   
   protected GralColor colorTextSelect;
   protected GralColor colorTextMarked;
@@ -630,42 +640,43 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   void setColors(){
-    colorBackSelect = GralColor.getColor("lam");
-    colorBackSelectNew = GralColor.getColor("lbl");
+    this.colorBackSelect = GralColor.getColor("lam");
+    this.colorBackSelectNew = GralColor.getColor("lbl");
     
-    colorBackMarked = GralColor.getColor("lrd");
-    colorBackSelectMarked = GralColor.getColor("rd");
+    this.colorBackMarked = GralColor.getColor("lrd");
+    this.colorBackSelectMarked = GralColor.getColor("rd");
     
-    colorBackSomeMarked = GralColor.getColor("pma");
-    colorBackSelectSomeMarked = GralColor.getColor("lma");
+    this.colorBackSomeMarked = GralColor.getColor("pma");
+    this.colorBackSelectSomeMarked = GralColor.getColor("lma");
     
-    colorBackSelectNewMarked = GralColor.getColor("lpu");
-    dyda.backColor = GralColor.getColor("wh");
-    dyda.backColorNoFocus = GralColor.getColor("pgr");
+    this.colorBackSelectNewMarked = GralColor.getColor("lpu");
+    this.colorBackFillPending = GralColor.getColor("ma");
+    this.dyda.backColor = GralColor.getColor("wh");
+    this.dyda.backColorNoFocus = GralColor.getColor("lgr");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
     //colorBackTableNonFocused = GralColor.getColor("gr");
-    dyda.textColor = GralColor.getColor("bk");
-    colorSelectCharsBack = GralColor.getColor("lgr");
-    colorSelectChars = GralColor.getColor("wh");
-    colorBackVscrollbar = GralColor.getColor("lgr");
+    this.dyda.textColor = GralColor.getColor("bk");
+    this.colorSelectCharsBack = GralColor.getColor("lgr");
+    this.colorSelectChars = GralColor.getColor("wh");
+    this.colorBackVscrollbar = GralColor.getColor("lgr");
     int rd1,gn1, bl1, rd2, gn2, bl2;
-    bl1 = colorBackVscrollbar.getColorValue();
+    bl1 = this.colorBackVscrollbar.getColorValue();
     rd1 = (bl1 >>16) & 0xff;
     gn1 = (bl1 >>8) & 0xff;
     bl1 = bl1 & 0xff;
-    colorSliderVscrollbar[0] = GralColor.getColor("bl");
-    bl2 = colorSliderVscrollbar[0].getColorValue();
+    this.colorSliderVscrollbar[0] = GralColor.getColor("bl");
+    bl2 = this.colorSliderVscrollbar[0].getColorValue();
     rd2 = (bl1 >>16) & 0xff;
     gn2 = (bl1 >>8) & 0xff;
     bl2 = bl1 & 0xff;
     
-    for(int ix=1; ix < colorSliderVscrollbar.length; ++ix){
-      float r = 0.8f * ((float)(ix)) / (colorSliderVscrollbar.length);  //max. 0.8
+    for(int ix=1; ix < this.colorSliderVscrollbar.length; ++ix){
+      float r = 0.8f * ((float)(ix)) / (this.colorSliderVscrollbar.length);  //max. 0.8
       int rd = rd2 + (int)((rd1 - rd2) * r);
       int gn = gn2 + (int)((gn1 - gn2) * r);
       int bl = bl2 + (int)((bl1 - bl2) * r);
-      colorSliderVscrollbar[ix] = GralColor.getColor(rd, gn, bl);
+      this.colorSliderVscrollbar[ix] = GralColor.getColor(rd, gn, bl);
     }
   }
   
@@ -725,7 +736,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     redraw(100, 0);
   }
 
+  /**Quest whether the table is in a fillin pending state,
+   * see {@link #fillinPending(boolean)}.
+   * @return the state true if pending. 
+   */
+  public boolean fillinPending() { return this.fillinPending; }
   
+  /**Sets the table to a fillin pending state or in a not pending state 
+   * This is if another thread sets the line data, or create new lines,
+   * which may need a while. 
+   * @param set true: set to pending, false: set to ready.
+   * @return pending state before. 
+   */
+  public boolean fillinPending(boolean set) {
+    boolean ret = this.fillinPending;
+    this.fillinPending = set;
+    return ret;
+  }
 
   
   /**Returns the current selected line. */
@@ -747,10 +774,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
 
   @SuppressWarnings("unchecked") @Override
-  public GralTableLine_ifc<UserData> getLine(String key) {
-    Object oRootline = rootLine.getNode(key, keySeparator);
+  public GralTableLine_ifc<UserData> getLine ( String key) {
+    Object oRootline = this.rootLine.getNode(key, keySeparator);
     if(oRootline instanceof GralTableLine_ifc){ return (GralTableLine_ifc<UserData>) oRootline; }
     else return null;
+  }
+
+
+  
+  public GralTableLine_ifc<UserData> getFirstLine ( ) {
+    return this.rootLine.firstChild();
   }
 
 
@@ -967,7 +1000,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   private void fillVisibleArea(){
+    if(this.lineSelected ==null) {
+      this.lineSelected = (TableLineData)getFirstLine();
+    }
     TableLineData line = lineSelected;
+    
     int ix = lineSelectedixCell;
     while(ix >0 && line !=null){
       line = prevLine(line);
@@ -1823,7 +1860,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       int ix = -1;
       while(++ix < outer.zLineVisible) {
         line = outer.linesForCell[ix];
-        setLinePresentation(line);
+        setLineColors(line);
         drawCellContent(ix, cells[ix], line, linePresentation);
       }
       if(++ix < outer.zLineVisibleMax){  //a half visible line
@@ -1835,10 +1872,29 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     
     
-    private void setLinePresentation(TableLineData/*<?>*/ line){
+    /**Sets the colors of the given line depending on the state
+     * <ul>
+     * <li>line == {@link GralTable#lineSelected} : 
+     *   <ul><li>marked: {@link TableLineData#colorBackSelectMarked} or {@link GralTable#colorBackSelectMarked}
+     *   <li>childrenMarked: {@link TableLineData#colorBackSelectSomeMarked} or {@link GralTable#colorBackSelectSomeMarked}
+     *   <li>not marked: {@link TableLineData#colorBackSelect} or {@link GralTable#colorBackSelect}
+     *   </ul>
+     * <li>selected new: {@link GralTable#colorBackSelectNewMarked} or {@link GralTable#colorBackSelectNew}
+     * <li>normal non selected line:
+     *   <ul><li>marked: {@link TableLineData#colorBackSelectMarked} or {@link GralTable#colorBackSelectMarked}
+     *   <li>childrenMarked: {@link TableLineData#colorBackSelectSomeMarked} or {@link GralTable#colorBackSelectSomeMarked}
+     *   <li>not focused: {@link GralWidget.DynamicData#backColorNoFocus} 
+     *   <li>not marked: {@link TableLineData#colorBackSelect} or {@link GralTable#colorBackSelect}
+     *   </ul>
+     * </ul> 
+     * @param line
+     */
+    private void setLineColors(TableLineData/*<?>*/ line){
       boolean marked = line !=null && (line.getMark() & 1)!=0;
       boolean childrenMarked = line !=null && (line.getMark() & 2)!=0;
-      if(line == outer.lineSelected){
+      if(outer.fillinPending) {                            // a temporary situation 
+        linePresentation.colorBack = outer.colorBackFillPending;
+      } else if(line !=null && line == outer.lineSelected){               // only one line
         if(marked){
           linePresentation.colorBack = line.colorBackSelectMarked !=null ? line.colorBackSelectMarked : outer.colorBackSelectMarked;
         } else if(childrenMarked){
@@ -1846,7 +1902,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } else {
           linePresentation.colorBack = line !=null && line.colorBackSelect !=null ? line.colorBackSelect : outer.colorBackSelect;
         }
-      } else if(line == outer.lineSelectedNew){
+      } else if(line !=null && line == outer.lineSelectedNew){
         linePresentation.colorBack = marked ? outer.colorBackSelectNewMarked : outer.colorBackSelectNew;
       } else {
         if(marked){
