@@ -203,7 +203,7 @@ public class GralColor
       addColor("lbk", 0x404040);
       
       //pastel colors, especially for background color
-      addColor("pgr", 0xf0f0f0);
+      addColor("pgr", 0xe8e8e8);
       addColor("prd", 0xffe0e0);
       addColor("pgn", 0xe0ffe0);
       addColor("pbl", 0xe0e0ff);

@@ -652,7 +652,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     this.colorBackSelectNewMarked = GralColor.getColor("lpu");
     this.colorBackFillPending = GralColor.getColor("ma");
     this.dyda.backColor = GralColor.getColor("wh");
-    this.dyda.backColorNoFocus = GralColor.getColor("lgr");
+    this.dyda.backColorNoFocus = GralColor.getColor("pgr");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
     //colorBackTableNonFocused = GralColor.getColor("gr");

@@ -16,7 +16,7 @@
 2022-11-16 10:01:06  x     FcmdDelete.java                          ::          8.126 -0254186045 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2022-11-19 14:16:42  x     FcmdEdit.java                            ::          8.196  1294045397 
-2023-01-02 11:25:33  x     FcmdExecuter.java                        ::         16.186  2143408689 
+2023-01-03 12:39:56  x     FcmdExecuter.java                        ::         16.565 -1406113007 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
 2023-01-01 23:13:17  x     FcmdFavorPathSelector.java               ::         31.744 -0029832125 
 2023-01-02 23:41:04  x     FcmdFileCard.java                        ::         32.414 -0825256106 
@@ -26,7 +26,7 @@
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
 2022-11-20 23:04:10  x     FcmdIdents.java                          ::         14.097  0035476139 
 2021-10-04 14:29:51  x     FcmdKeyActions.java                      ::          2.315 -2032154697 
-2022-12-27 09:19:18  x     FcmdLeftMidRightPanel.java               ::         18.812  1901030875 
+2023-01-03 12:40:08  x     FcmdLeftMidRightPanel.java               ::         18.701  1087358588 
 2022-11-16 10:00:17  x     FcmdMkDirFile.java                       ::          4.183  0975604639 
 2022-11-19 11:17:38  x     FcmdSettings.java                        ::          9.662 -1342262910 
 2022-11-12 21:15:32  x     FcmdStatus.java                          ::          3.945 -2064914958 
@@ -108,7 +108,7 @@
 2022-12-24 15:43:35  x     GralScreen.java                          ::          4.404  0349572232 
 2022-11-13 19:23:26  x     GralShowMethods.java                     ::         11.736 -0385445325 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
-2023-01-03 11:27:21  x     GralTable.java                           ::        121.727 -0328299100 
+2023-01-03 12:14:48  x     GralTable.java                           ::        121.727 -0619875523 
 2022-12-23 17:22:13  x     GralTextBox.java                         ::          7.699 -0404541197 
 2022-12-31 21:38:57  x     GralTextField.java                       ::         35.091 -0674843008 
 2022-12-23 17:22:14  x     GralValueBar.java                        ::          6.217  0388024784 
@@ -149,7 +149,7 @@
 2022-11-13 17:52:25  x     GralActionJztc.java                      ::          5.666 -1417442834 
 2021-10-04 14:29:49  x     GralButtonKeyMenu.java                   ::          3.248 -0638490188 
 2022-10-29 10:29:42  x     GralCanvas_ifc.java                      ::          2.535  0854497272 
-2022-10-13 18:37:03  x     GralColor.java                           ::         18.438 -1358590836 
+2023-01-03 12:14:33  x     GralColor.java                           ::         18.438 -2034927554 
 2021-10-04 14:29:52  x     GralCurveViewTrack_ifc.java              ::          4.578 -1455091053 
 2022-09-28 16:22:10  x     GralCurveView_ifc.java                   ::          6.191 -0611928841 
 2022-11-13 18:15:16  x     GralFactory.java                         ::          8.624 -0755545689 

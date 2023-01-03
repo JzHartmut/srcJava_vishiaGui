@@ -13,6 +13,7 @@ import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
@@ -90,6 +91,13 @@ public class FcmdExecuter
   /**The command queue to execute */
   
   final CmdExecuter cmdExecuter;
+
+  
+  /**This is the panel for command selection used by {@link FcmdExecuter}
+   * as one tab of the left only instance of this.
+   */
+  GralPanelContent wdgPanelTabCmds;
+
 
   /**Table contains some commands, can be selected and executed.
    * <ul>
@@ -175,7 +183,9 @@ public class FcmdExecuter
     this.widgSelectJzExt = new GralTable<JZtxtcmdScript.Subroutine>(refPos, "@0..4,0..0=execChoice", 20, new int[]{47});
     this.widgSelectJzExt.specifyActionChange("exec", this.actionJZextAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     //The GralCommandSelector is a table.
-    this.cmdSelector = new GralCommandSelector(refPos, "@4..0,0..0=cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
+    this.wdgPanelTabCmds = this.main.favorPathSelector.panelLeft.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+    refPos = new GralPos(this.wdgPanelTabCmds);
+    this.cmdSelector = new GralCommandSelector(refPos, "@0..0,0..0=cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
     this.windConfirmExec.setVisible(false);
   }
   

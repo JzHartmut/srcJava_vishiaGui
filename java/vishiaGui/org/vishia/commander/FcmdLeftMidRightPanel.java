@@ -51,10 +51,6 @@ public class FcmdLeftMidRightPanel
   /**Table widget for the select table.*/
   FcmdFavorThemeCard cardFavorThemes;
   
-  /**This is the panel for command selection used by {@link FcmdExecuter}
-   * as one tab of the left only instance of this.
-   */
-  GralPanelContent wdgPanelTabCmds;
 
   /**List of all Tabs of this Panel, used and unused. This tabs are presented in the {@link FcmdFavorThemeCard} table*/
   List<FcmdFileCard> listTabs = new LinkedList<FcmdFileCard>();
@@ -147,11 +143,10 @@ public class FcmdLeftMidRightPanel
     //.createImplWidget_Gthread();
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
-    if(cNr == '1'){ //commands only in the left panel.
-      this.wdgPanelTabCmds = this.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
-      //mng.setPosition(2, -2, 0, -0, 1, 'd');
-      //main.executer.cmdSelector.createImplWidget_Gthread();
-    }
+//    if(cNr == '1'){                                        // command tab only in the left panel.
+//      //----------------------------------------------------- It will be filled in the FcmdExecuter
+//      this.main.executer.wdgPanelTabCmds = this.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+//    }
     
   }
   
