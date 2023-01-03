@@ -25,6 +25,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileFunctions;
@@ -150,7 +151,7 @@ public class GitGui
   }
 
 
-  protected GralMng gralMng = new GralMng(null);
+  protected GralMng gralMng = new GralMng(new LogMessageStream(System.out));
 
 
   /**Action for open the commit text. 
@@ -664,7 +665,7 @@ public class GitGui
   
   String sTypeOfImplementation = "SWT";  //default
   
-  final GralWindow window = this.gralMng.addWindow("0+60, 0+90=GitGui", "Git vishia");
+  final GralWindow window = this.gralMng.addWindow("@screen,10+60, 10+90=GitGui", "Git vishia");
 
   final GralTextField wdgCmd = this.gralMng.addTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
   
