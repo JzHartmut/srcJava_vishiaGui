@@ -160,6 +160,8 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-03 chg: Now the origin parameter is removed. It is non sensible and never used for positions.
+   *   Only for a text label it is sensible.  
    * <li>2022-12-30 meaningful refactoring. Now the positions are stored with fine grid units in only one number. 
    *   This makes it more simple for relative calculation. 
    *   The interpretation of the fractional part follows the direction of the integer value (of course).
@@ -267,8 +269,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   /**This adding value at xEnd or yEnd or the float presentations of the calling argument of any
    * setPosition- method means, that the value is the size, not the position.
-   * A size can be positive or negative. A negative size determines, that the origin point for
-   * further elements or inner elements is on bottom line or right line of the current widget.
+   * A size can be positive or negative. 
    */
   public final static int size = 0x40000;  //Note: Bit is contained in useNatSize, (pos = useNatSize | size) == useNatSize
   
@@ -429,7 +430,6 @@ public class GralPos extends ObjectVishia implements Cloneable
     this.y.p1 = pos.y.p1; this.y.p2 = pos.y.p2;
 //    this.x.p1Frac = pos.x.p1Frac; this.x.p2Frac = pos.x.p2Frac; 
 //    this.y.p1Frac = pos.y.p1Frac; this.y.p2Frac = pos.y.p2Frac;
-    this.x.origin = pos.x.origin; this.y.origin = pos.y.origin; 
     this.x.dirNext = pos.x.dirNext; this.y.dirNext = pos.y.dirNext;
     this.x.n1 = pos.x.n1; this.y.n1 = pos.y.n1;
     this.x.n2 = pos.x.n2; this.y.n2 = pos.y.n2;
@@ -457,7 +457,6 @@ public class GralPos extends ObjectVishia implements Cloneable
     this.y.p1 = 0; this.y.p2 = 0;
 //    this.x.p1Frac = 0; this.x.p2Frac = 0; 
 //    this.y.p1Frac = 0; this.y.p2Frac = 0;
-    this.x.origin = 0; this.y.origin = 0; 
     this.x.dirNext = 'R'; this.y.dirNext = 'D';
     this.parent = panel;
     this.x.n1 = -1; this.y.n1 = -1;
@@ -467,7 +466,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   public void setPosition(float line, float column)
   {
-    setPosition(this, line, samesize, column, samesize, 0, '.');
+    setPosition(this, line, samesize, column, samesize, '.', 0);
   }
   
   
@@ -482,7 +481,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param posFrame
    */
   public void setPositionSize(int line, int column, int height, int width, char direction, GralPos posFrame)
-  { setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0, 0, posFrame);
+  { setFinePosition(line, 0, height + GralPos.size, 0, column, width + GralPos.size, 0, 1, direction, 0, 0, posFrame);
   }
 
   
@@ -521,12 +520,8 @@ public class GralPos extends ObjectVishia implements Cloneable
    */
   public void setPosition(CharSequence sPos, GralPos refPos) throws ParseException {
     GralPos posParent1;
-    //int line =0, yPosFrac =0, ye =0, yef =0, column =0, xPosFrac =0, xe =0, xef =0, origin =0, border =0, borderFrac =0;
     Coordinate line = new Coordinate(), col = new Coordinate();
     boolean bRefFrame = false;         // true then the refPos gives the frame coordinates.
-    if(refPos !=null) {
-      //  origin = 0;  // do not change, get from parent.
-    }
     if(sPos ==null) {
       //position text not given, use refer and same size
       line.p1 = next;
@@ -591,7 +586,6 @@ public class GralPos extends ObjectVishia implements Cloneable
       }
     }
     final int border, borderFrac;
-    int origin = 0;
     final char direction;
     if("+-".indexOf(line.dirNext) >=0) {
       direction = line.dirNext == '+' ? 'D' : 'U';
@@ -620,7 +614,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       direction = 0;
     }
 
-    setFinePosition(line.p1, line.p2, col.p1, col.p2, origin, direction, border, posParent1);
+    setFinePosition(line.p1, line.p2, col.p1, col.p2, direction, border, posParent1);
   }
   
   
@@ -724,11 +718,10 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
    * @param column
    * @param columnEndOrSize
-   * @param origin
    * @param direction
    */
   public void setPosition(GralPos refPos, float line, float lineEndOrSize, float column, float columnEndOrSize
-      , int origin, char direction, float border)
+      , char direction, float border)
   {
     int type = ((int)line & (mSpecialType)) == kSpecialType ? (int)line: ((int)line + kTypAdd_) & mType_;
     int y = (int)(10* (line-type)) + type;
@@ -739,7 +732,7 @@ public class GralPos extends ObjectVishia implements Cloneable
     type = ((int)columnEndOrSize & (mSpecialType)) == kSpecialType ? (int)columnEndOrSize: ((int)columnEndOrSize + kTypAdd_) & mType_;
     int xe = (int)(10 * (columnEndOrSize - type)) + type;
     
-    setFinePosition(y, ye, x, xe, origin, direction, (int)(10 * border), refPos);
+    setFinePosition(y, ye, x, xe, direction, (int)(10 * border), refPos);
   }
   
 
@@ -755,11 +748,10 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
    * @param column
    * @param columnEndOrSize
-   * @param origin
    * @param direction
    */
   public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize ) {
-    setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, 0, 's', -1);
+    setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, 's', -1);
   }
   
   
@@ -770,30 +762,6 @@ public class GralPos extends ObjectVishia implements Cloneable
   
 
 
-  
-  
-  
-  /**Sets a position with direction, but with border =0
-   * Same as {@link #setPosition(GralPos, float, float, float, float, int, char, float)}
-   * but with 0 as default for border.
-   * @param refPos
-   * @param line
-   * @param lineEndOrSize
-   * @param column
-   * @param columnEndOrSize
-   * @param origin
-   * @param direction
-   */
-  public void setPosition(GralPos refPos, float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction)
-  {
-    setPosition(refPos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, 0);
-  }
-  
-  
-  
-  
-  
   
   
   
@@ -808,14 +776,13 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param xPosf yPosf fine grid position for column always in right direction
    * @param xe
    * @param xef
-   * @param origin
    * @param direction
    * @param border
    * @param borderFrac
    * @param refPos
    */
   public void setFinePosition(int line, int yPosf, int lineEndOrSize, int yef
-      , int column, int xPosf, int columnEndOrSize, int xef, int origin, char direction
+      , int column, int xPosf, int columnEndOrSize, int xef, char direction
       , int border, int borderFrac
       , GralPos refPos)
   {
@@ -827,7 +794,7 @@ public class GralPos extends ObjectVishia implements Cloneable
     int x = (10 * (column-type)) + type;
     type = (columnEndOrSize & (mSpecialType)) == kSpecialType ? columnEndOrSize: (columnEndOrSize + kTypAdd_) & mType_;
     int xe = (10 * (columnEndOrSize - type)) + type;
-    setFinePosition(y + yPosf, ye + yef, x + xPosf, xe + xef, origin, direction, 10*border + borderFrac, refPos);
+    setFinePosition(y + yPosf, ye + yef, x + xPosf, xe + xef, direction, 10*border + borderFrac, refPos);
   }
   
   /**Sets the position for the next widget to add in the container.
@@ -852,7 +819,6 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param xPosf
    * @param xe
    * @param xef
-   * @param origin 0 then get from parent or left as is, 1 2 3 on top-left, -mid, -right 4 5 6 mid, 7-8-9 bottom left to right 
    * @param direction
    * @param border
    * @param borderFrac
@@ -861,7 +827,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    *   false then the frame is the panel, the positions are written absolutely.
    */
   public void setFinePosition(int yPos, int ye
-      , int xPos, int xe, int origin, char direction
+      , int xPos, int xe, char direction
       , int border
       , GralPos refPos)
   {
@@ -881,15 +847,6 @@ public class GralPos extends ObjectVishia implements Cloneable
     final GralPos refUse = refPos == null ? this : refPos;
     //
     if(this.parent ==null) { this.parent = refPos.parent; }
-    if(origin >0 && origin <=9) {                          // newly given
-      int yOrigin = (origin-1) /3;
-      int xOrigin = origin - yOrigin -1; //0..2
-      this.x.origin = "lmr".charAt(xOrigin);
-      this.y.origin = "tmb".charAt(yOrigin);
-    } else {                                               // origin == 0: take from parent or from this.
-      this.x.origin = refUse.x.origin;                  // from this means, left it as is.
-      this.y.origin = refUse.y.origin;
-    }
     
     this.y.set(yPos, ye, "uUdD", refUse.y);    // core of positioning for line and column
     this.x.set(xPos, xe, "lLrR", refUse.x);    // resolves the relative positions to refUse
@@ -919,24 +876,6 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   
   
-  public void setSize(int height, int ySizeFrac, int width, int xSizeFrac)
-  {
-    if(height !=0){
-      //ySize = height >0 ? height : -height;
-      //this.ySizeFrac = ySizeFrac;
-    }
-    if(width !=0){
-      //xSize = width >0 ? width: -width;
-      //this.xSizeFrac = xSizeFrac;
-    }
-    if(height >0){ this.y.origin = 't'; }
-    else if(height < 0){ this.y.origin = 'b'; }
-    else; //let it unchanged if height == 0
-    if(width >0){ this.x.origin = 'l'; }
-    else if(width < 0){ this.x.origin = 'r'; }
-    else; //let it unchanged if width == 0
-  }
-  
   
   public void setSize(float height, float width, GralPos frame)
   { 
@@ -944,29 +883,10 @@ public class GralPos extends ObjectVishia implements Cloneable
     int y2f = y2 >=0 ? (int)((height - y2)* 10.001F) : (int)((height - y2)* -10.001F);  
     int x2 = (int)(width);
     int x2f = x2 >=0 ? (int)((width - x2)* 10.001F) : (int)((width - x2)* -10.001F); 
-    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, 0, '.', 0, 0, frame);
+    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, '.', 0, 0, frame);
   }
   
   
-  /**Sets the position to the next adequate the {@link #pos.dirNext}. */
-  public void XXXsetNextPosition()
-  {
-    setPosition(this, next, samesize, next, samesize, 0, '.', 0 );
-    /*
-    float dx3 = this.width();
-    float dy3 = this.height();
-    int dx = (int)dx3;
-    int dxf = (int)((dx3 - dx) * 10.001F) + this.x.p2Frac;
-    if(dxf >= 10){ dxf -=10; dx +=1; }
-    int dy = (int)dy3;
-    int dyf = (int)((dy3 - dy) * 10.001F) + this.y.p2Frac;
-    if(dyf >= 10){ dyf -=10; dy +=1; }
-    switch(this.dirNext){
-    case 'r': this.x = this.x.p2; this.x.p1Frac = this.x.p2Frac; this.x.p2 = this.x + dx; this.x.p2Frac = dxf; break;
-    case 'd': this.y = this.y.p2; this.y.p1Frac = this.y.p2Frac; this.y.p2 = this.y + dy; this.y.p2Frac = dyf; break;
-    }
-    */
-  }
   
 
   /**Mark the position as frame position for some other derived positions. 
@@ -1037,7 +957,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    */
   public void checkSetNext ( ) {
     if("LR".indexOf(this.x.dirNext) >=0 || "UD".indexOf(this.y.dirNext) >=0  ) {
-      setPosition(this, next, samesize, next, samesize, 0, '.', 0 );
+      setPosition(this, next, samesize, next, samesize, '.', 0 );
     } 
   }
   
@@ -1134,7 +1054,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   public GralPos calcNextPos(String posString) throws ParseException {
     if(posString.equals("!")) {  //new window, initialize the position without parent because it is top.
       parent = null;
-      setFinePosition(0,0,0,0,0,0,0,0,0,'d', 0,0, null);
+      setFinePosition(0,0,0,0,0,0,0,0,'d', 0,0, null);
     } else {
       setPosition(posString, this);
       //TODO change pos:
@@ -1381,8 +1301,6 @@ public class GralPos extends ObjectVishia implements Cloneable
   @Override public String toString(){
     try { return toString(new StringBuilder(), "p").toString(); }
     catch(RuntimeException exc) { return "?"; } // does never occur.
-//    return "@" + (this.parent == null ? "?" : this.parent.getName()) + ", "
-//    +this.y.toString() + ", " + this.x.toString() + " " + this.y.dirNext + this.x.dirNext + this.y.origin + this.x.origin;
   }
 
   
@@ -1428,11 +1346,6 @@ public class GralPos extends ObjectVishia implements Cloneable
     
     /**Attributes of this coordinate. */
     //public int attr;
-    
-    /**Origin point of the pos in the widget.
-     * Use l m, r, t, m, b for x and y (left, mid, right, top, bottom)
-     */
-    char origin;
     
     /**direction of the next element. Use r, d, l, u for right, down, left, up.
      * If this characters are in upper case R D L U, then the position is not set newly since usage. 
@@ -1761,7 +1674,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       this.p1 = src.p1; this.p2 = src.p2;
       this.pb = src.pb;  
       this.n1 = src.n1; this.n2 = src.n2;
-      this.origin = src.origin; this.dirNext = Character.toLowerCase(src.dirNext);
+      this.dirNext = Character.toLowerCase(src.dirNext);
     }
     
     

@@ -113,13 +113,13 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   {
     GralWindow window = mng.createWindow(name, title, GralWindow_ifc.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
-    mng.setPosition(0, -3, 0, 0, 0, '.');
+    mng.setPosition(0, -3, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
-    mng.setPosition(0, -4, -4, -2, 0, '.');
+    mng.setPosition(0, -4, -4, -2, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
-    mng.setPosition(-3, 0, -6, 0, 0, '.');
+    mng.setPosition(-3, 0, -6, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
-    mng.setPosition(-3, 0, -16, -10, 0, '.');
+    mng.setPosition(-3, 0, -16, -10, '.');
     GralWidget buttonClear = mng.addButton(name + "-Info-clear", null, "clear");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonOk.setActionChange(box.actionOkButton);
@@ -148,14 +148,14 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     GralWindow window = mng.addWindow(posName, title, props); //mng.createWindow(name, title, props);
     //window.setToPanel(mng);
     //TODO the position frame (size) regards the title bar, it should not do so!
-    mng.setPosition(0, -3, 0, 0, 0, '.');
+    mng.setPosition(0, -3, 0, 0, '.');
     GralHtmlBox text = new GralHtmlBox(currPos, window.name + "-text"); //     mng.addHtmlBox(name);
     //text.setToPanel(mng);
-    mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
+    mng.setPosition(-2.5f, -0.5f, 0, -14, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
-    mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 0, 'r', 0.5f);
+    mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 'r', 0.5f);
     GralButton buttonLock = mng.addSwitchButton(window.name + "-Info-ok", "following", "locked", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 0, 'r', 0.5f);
+    mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 'r', 0.5f);
     GralWidget buttonOk = mng.addButton(window.name + "-Info-ok", null, "close");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonLock = buttonLock;

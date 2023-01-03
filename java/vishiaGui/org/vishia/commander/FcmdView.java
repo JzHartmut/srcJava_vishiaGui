@@ -152,7 +152,7 @@ public class FcmdView
   void buildWindowView()
   {
     this.main.gui.gralMng.selectPanel("primaryWindow");
-    this.main.gui.gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    this.main.gui.gralMng.setPosition(10, 0, 10, 0, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable
                   | GralWindow.windOnTop;
     GralWindow wind =  this.main.gui.gralMng.createWindow("windView", "view - The.file.Commander", windProps);
@@ -167,15 +167,15 @@ public class FcmdView
     wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionSetTextViewISO8859_1);
     wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
     wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
-    this.main.gui.gralMng.setPosition(0.5f, 2.5f, 1, 20, 0, 'r');
+    this.main.gui.gralMng.setPosition(0.5f, 2.5f, 1, 20, 'r');
     widgFindText = this.main.gui.gralMng.addTextField(null, true, null, null);
-    this.main.gui.gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);
+    this.main.gui.gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 'r', 1);
     btnFind = this.main.gui.gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
     btnWholeword = this.main.gui.gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
     btnCase = this.main.gui.gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
     btnQuickview = this.main.gui.gralMng.addSwitchButton("qview", "qview", "qview", GralColor.getColor("wh"), GralColor.getColor("gn"));
     widgShowInfo = this.main.gui.gralMng.addTextField(null,false, null, null);
-    this.main.gui.gralMng.setPosition(3, 0, 0, 0, 1, 'r');
+    this.main.gui.gralMng.setPosition(3, 0, 0, 0, 'r');
     widgContent = this.main.gui.gralMng.addTextBox("view-content", false, null, '.');
     widgContent.setUser(userKeys);
     //widgContent.setTextStyle(GralColor.getColor("bk"), this.main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
@@ -477,7 +477,7 @@ public class FcmdView
     if(widgQuickView == null){
       //creates an grid panel and select its in gralMng:
       main.favorPathSelector.panelRight.tabbedPanelFileCards.addTabPanel("qview", "qview");
-      this.main.gui.gralMng.setPosition(1, -1, 0, 0, 1, 'd');
+      this.main.gui.gralMng.setPosition(1, -1, 0, 0, 'd');
       //adds a textBox in that grid panel.
       widgQuickView = this.main.gui.gralMng.addTextBox("qview-content", false, null, '.');
       widgQuickView.setText("quick view");

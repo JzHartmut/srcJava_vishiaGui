@@ -22,7 +22,10 @@ import org.vishia.util.KeyCode;
 //tag::classHead[]
 public class ExampleSimpleButton
 {
-  protected final LogMessage log;
+  /**A log mechanism nice to have and necessary for GRAL built,
+   * writes firstly to the console out on built of the graphic. 
+   * Changeable later of the graphic runs. */
+  protected LogMessage log;
   //end::classHead[]
   
   /**Version, history and license.
@@ -61,26 +64,30 @@ public class ExampleSimpleButton
    */
   protected class GuiElements
   {
+    /**The central Gral management instance:*/
+    final GralMng gralMng = new GralMng(ExampleSimpleButton.this.log);
   
-    final GralMng gralMng = new GralMng(null);             // on Gral widget structuring no log necessary. 
-  
+    /**Intermediate Position instance as helper for positioning. */
     GralPos refPos = new GralPos(this.gralMng);            // use an own reference position to build
     
-    final GralWindow window = new GralWindow(this.refPos, "@10+30,20+80=mainWin"
+    /**The Window of the application. */
+    final GralWindow window = new GralWindow(this.refPos, "@screen, 10+30,20+80=mainWin"
                             , "ExampleSimpleTextButton"
                             , GralWindow.windRemoveOnClose | GralWindow.windResizeable);
-    
+    /**A text field.*/
     final GralTextField wdgInputText = new GralTextField(this.refPos, "@main, 2+2, 2+20=input"
                                      , GralTextField.Type.editable);
-    
+    /*A button. */
     final GralButton wdgButton1 = new GralButton(this.refPos, "@8-3, 2+10++2.5 =button1"
         , "press me", ExampleSimpleButton.this.actionButton); //Position string: next to right with 2 units space
 
     final GralButton wdgButton2 = new GralButton(this.refPos, "button2"
-        , "Button 2", null); //without action,                //without position string, automatic right side
+        , "Button 2", null); //without action,              //without position string, automatic right side
 
+    /**Textbox for output texts, can be also used for log. */
     GralTextBox widgOutput = new GralTextBox(this.refPos, "@-10..0,0..0=output");
-  
+    
+    /**Empty ctor, formally. */
     GuiElements() { }                                      // empty ctor, only formally
   }
   //end::guiClass[]
@@ -96,7 +103,8 @@ public class ExampleSimpleButton
   ExampleSimpleButton ( String[] args )
   {
     this.log = new LogMessageStream(System.out);  // may also write to a file, use calling arguments
-    this.gui = new GuiElements();                 // initialize the graphic Gral Widgets (not the implementig graphic).
+    //----------------------------------   initialize the graphic Gral Widgets (not the implementing graphic).
+    this.gui = new GuiElements();       // because the log is set, GuiElements construction uses it. 
   }
   //end::fieldsCtor[]
   
@@ -125,11 +133,17 @@ public class ExampleSimpleButton
     //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
     //
     while(this.gui.gralMng.isRunning()) {
-      if(gui.wdgButton2.wasReleased()) {
-        String textOfField = this.gui.wdgInputText.getText();
-        this.gui.widgOutput.append("Button2 " + (++this.ctKeyStroke2) + " time, text=" + textOfField + "\n");
+      try {
+        if(this.gui.wdgButton2.wasReleased()) {
+          String textOfField = this.gui.wdgInputText.getText();
+          this.gui.widgOutput.append("Button2 " + (++this.ctKeyStroke2) + " time, text=" + textOfField + "\n");
+          throw new Exception("test");
+        }
+        Thread.sleep(100); 
+      } catch(Exception exc){
+        CharSequence sText = org.vishia.util.ExcUtil.exceptionInfo("unexpected: ", exc, 1, 10);
+        this.log.sendMsg(9999, sText);
       }
-      try{ Thread.sleep(100); } catch(InterruptedException exc){}
       
     }
   }

@@ -792,11 +792,11 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
             //from bottom as base line, size of prompt
             posPrompt.setPosition(refPos, GralPos.same
                 , GralPos.refer - (ySize - heightPrompt)              //negative value means, base line is bottom
-                , GralPos.same, GralPos.same, 0, '.');
+                , GralPos.same, GralPos.same, '.', 0);
             //from bottom line, size of text
             posField.setPosition(refPos, GralPos.same
                 , GralPos.size - heightText                //negative value means, base line is bottom
-                , GralPos.same, GralPos.same, 0, '.');
+                , GralPos.same, GralPos.same, '.', 0);
           //} break;
         //}
       

@@ -90,18 +90,18 @@ public final class FcmdFilesCp {
   void buildGraphic(){
     main.gui.menuBar.addMenuItem("menuFilesCpBar", main.idents.menuFilesCpBar, actionConfirmCp);
     main.gui.gralMng.selectPanel("primaryWindow");
-    main.gui.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gui.gralMng.setPosition(-19, 0, -47, 0, 'r'); //right buttom, about half less display width and hight.
     
     windConfirmCompare = main.gui.gralMng.createWindow("windConfirmCompare", main.idents.windConfirmCompare, GralWindow.windConcurrently);
     //System.out.println(" window: " + main.gralMng.pos.panel.getPixelPositionSize().toString());
     
-    main.gui.gralMng.setPosition(4, GralPos.size -3.5f, 1, -1, 0, 'd', 0.5f);
+    main.gui.gralMng.setPosition(4, GralPos.size -3.5f, 1, -1, 'd', 0.5f);
     widgPath1 = main.gui.gralMng.addTextField("comparePath1", true, "compare:", "t");
     widgPath1.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");
     widgPath2 = main.gui.gralMng.addTextField("comparePath2", true, "with:", "t");
     widgPath2.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");
     
-    main.gui.gralMng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
+    main.gui.gralMng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 'r',2);
     main.gui.gralMng.addButton(null, actionFilesCp, "esc", null, "esc");
     //widgSyncWalk = main.gralMng.addSwitchButton(null, null, "sync", null, null, "sync", "wh", "gn");
     //widgSyncWalk.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.folderCmp.");

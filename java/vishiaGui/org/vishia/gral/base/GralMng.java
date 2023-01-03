@@ -699,45 +699,39 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   { PosThreadSafe pos = pos();
     if(line < 0){ line = pos.posUsed? GralPos.next: GralPos.same; }
     if(column < 0){ column = pos.posUsed? GralPos.next: GralPos.same; }
-    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, 1, direction, 0 ,0 , pos.pos);
+    setFinePosition(line, 0, height + GralPos.size, 0, column, 0, width + GralPos.size, 0, direction, 0 ,0 , pos.pos);
   }
 
   @Override public void setPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction)
-  { setPosition(pos().pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+    , char direction)
+  { setPosition(pos().pos, line, lineEndOrSize, column, columnEndOrSize, direction);
   }
 
   @Override public void setPosition ( float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction, float border)
+    , char direction, float border)
   { PosThreadSafe pos = pos();
-    pos.pos.setPosition(pos.pos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+    pos.pos.setPosition(pos.pos, line, lineEndOrSize, column, columnEndOrSize, direction, border);
     pos.posUsed = false;
   }
 
   @Override public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction)
+    , char direction)
   { PosThreadSafe pos = pos();
-    pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction);
+    pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, direction, 0);
     pos.posUsed = false;
   }
 
   @Override public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction, float border)
+    , char direction, float border)
   { PosThreadSafe pos = pos();
-      pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, origin, direction, border);
+      pos.pos.setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, direction, border);
       pos.posUsed = false;
   }
 
   @Override public void setFinePosition ( int line, int yPosFrac, int ye, int yef
-    , int column, int xPosFrac, int xe, int xef, int origin, char direction, int border, int borderFrac, GralPos frame)
+    , int column, int xPosFrac, int xe, int xef, char direction, int border, int borderFrac, GralPos frame)
   { PosThreadSafe pos = pos();
-    pos.pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, origin, direction, border, borderFrac, frame);
-    pos.posUsed = false;
-  }
-
-  @Override public void setSize ( int height, int ySizeFrac, int width, int xSizeFrac)
-  { PosThreadSafe pos = pos();
-    pos.pos.setSize(height, ySizeFrac, width, xSizeFrac);  //NOTE: setSize sets the next pos 
+    pos.pos.setFinePosition(line, yPosFrac, ye, yef, column, xPosFrac, xe, xef, direction, border, borderFrac, frame);
     pos.posUsed = false;
   }
 
@@ -826,11 +820,11 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    */
   public void createHtmlInfoBoxes(MainCmd mainCmd)
   {
-    setPosition(10, 0, 10, 0, 0, 'd');
+    setPosition(10, 0, 10, 0, 'd', 0);
     infoBox = createTextInfoBox("infoBox", "Info");
     //
     selectPanel("primaryWindow");
-    setPosition(0,40,10,0,0,'.');
+    setPosition(0,40,10,0,'.', 0);
     infoHelp = GralInfoBox.createHtmlInfoBox(this, refPos(), "Help", "Help", true);
     if(mainCmd !=null) {
       try{
@@ -1007,7 +1001,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
 //    }
-    setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
+    setPosition(0,0,0,0,'d',0);  //set the position to default, full panel because the panel was selected newly.
     return panel;
   }
   
@@ -1016,7 +1010,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   @Override public void selectPanel(GralPanel_ifc panel) {
     pos().pos.parent = panel;
     sCurrPanel = panel == null ? null: panel.getName();
-    setPosition(0,0,0,0,0,'d');  //set the position to default, full panel because the panel was selected newly.
+    setPosition(0,0,0,0,'d',0);  //set the position to default, full panel because the panel was selected newly.
   }
   
   /**Selects the primary window as current panel to build some content. */
@@ -1169,7 +1163,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     GralMng.PosThreadSafe pos = pos();
     pos.pos.parent = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
-    pos.pos.setFinePosition(0,0,0,0,0,0,0,0,0,'d',0,0, pos.pos);
+    pos.pos.setFinePosition(0,0,0,0,0,0,0,0,'d',0,0, pos.pos);
     sCurrPanel = panel.getName();
   }
   
@@ -2055,7 +2049,7 @@ public GralButton addCheckButton(
     //The macro widget consists of more as one widget. Position the inner widgets:
     GralPos posAll = getPositionInPanel(); //saved whole position.
     //reduce the length of the text field:
-    setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 1, 'r');
+    setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 'r', 0);
     
     //xSize -= ySize;
     GralTextField widgd = addTextField(name, true, prompt, promptStylePosition );

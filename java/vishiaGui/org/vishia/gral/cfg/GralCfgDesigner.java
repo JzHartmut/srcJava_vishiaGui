@@ -106,7 +106,7 @@ public class GralCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.selectPanel("primaryWindow");
-    mng.setPosition(-38, GralPos.size +38, -40, GralPos.size +40, 1, 'r');
+    mng.setPosition(-38, GralPos.size +38, -40, GralPos.size +40, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     
     mng.setPositionSize(1, 0, 3, 34, 'd');
@@ -236,7 +236,7 @@ public class GralCfgDesigner
         dialogFieldName.setText( "ERROR cfge");
       }
     }
-    //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
+    //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
     dialogWindowProps.setFocus(); //Visible(true);

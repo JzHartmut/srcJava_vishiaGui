@@ -221,7 +221,7 @@ public class StimuliSelector
     for(int iTable = 0; iTable < this.wdgTables.length; ++iTable) {
       int xtable = iTable %3;
       int ytable = iTable /3;
-      this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 0, 'd');
+      this.gralMng.setPosition(21*ytable + 10, 21*ytable + 30, xtable * 40, xtable * 40 +40, 'd');
       String name = "table" + iTable;
       int[] columnWidths = new int[2];
       columnWidths[0] = 15;
@@ -235,12 +235,12 @@ public class StimuliSelector
       //this.wdgTables[iTable].specifyContextMenu(null);
     }
     this.wdgLastSelectedTable = this.wdgTables[0]; //default
-    this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
+    this.gralMng.setPosition(2, 5, 1, 12, 'r', 1);
     this.btnCleanOut = this.gralMng.addButton("cleanOut", this.actionCleanOut, "clean output");
     this.btnReadConfig = this.gralMng.addButton("readConfig", this.actionReadConfig, "read config");
-    StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
+    StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 'r', 1);
     this.btnGenTestcases = this.gralMng.addButton("genTestCase", this.actionGenTestcases, "gen test cases");
-    StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
+    StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 'r', 1);
     this.btnGenSelection = this.gralMng.addButton("genSelection", new GralUserActionButton("btnGenSelection"), "gen selection");
     JZtxtcmdScript.Subroutine sub1 = this.script.getSubroutine("btnExec1");
     if(sub1 !=null) {
@@ -266,17 +266,17 @@ public class StimuliSelector
       if(btnText == null) { btnText = sub4.name; }
       this.btnExecSelection[3] = this.gralMng.addButton("btnExec4", btnText, new GralUserActionButton("btnExec4"));
     }
-    StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 0, 'd');
+    StimuliSelector.this.gralMng.setPosition(2, 10, 40, 104, 'd');
     this.wdgSelects = StimuliSelector.this.gralMng.addTextBox("test", true, null, 'r');
     this.wdgSelects.setText("");
     this.wdgSelects.specifyActionChange("actionTouchTestCaseString", StimuliSelector.this.actionTouchTestcaseString, null);
-    this.gralMng.setPosition(2, 5, 105, 112, 0, 'r');
+    this.gralMng.setPosition(2, 5, 105, 112, 'r');
     this.btnAddTestcase = this.gralMng.addButton("addTestCase", "add sel", this.actionAddTestcases);
     this.btnHelp = this.gralMng.addButton("help", "help", null);   //this.actionHelp);
-    this.gralMng.setPosition(6, 9, 105, 112, 0, 'r');
+    this.gralMng.setPosition(6, 9, 105, 112, 'r');
     this.btnExampleSel = this.gralMng.addButton("exmpl", "show", this.actionShowSel);
     this.btnDeselectLines = this.gralMng.addButton("cleanSelTable ", "clean", this.actionDeselectLines);
-    this.gralMng.setPosition(52, 0, 0, 0, 0, 'U');
+    this.gralMng.setPosition(52, 0, 0, 0, 'U');
     this.output = this.gralMng.addTextBox("output");
     this.outOld = System.out; this.errOld = System.err;
     System.setOut(this.outNew = new PrintStreamAdapter("", StimuliSelector.this.output));
@@ -975,14 +975,14 @@ public class StimuliSelector
     @Override public void executeOrder()
     { 
       // gralMng.selectPanel(window);
-//      StimuliSelector.this.gralMng.setPosition(2, 5, 1, 12, 0, 'r', 1);
+//      StimuliSelector.this.gralMng.setPosition(2, 5, 1, 12, 'r', 1);
 //      StimuliSelector.this.btnCleanOut.createImplWidget_Gthread();
 //      StimuliSelector.this.btnReadConfig.createImplWidget_Gthread();
 //      
-//      StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 0, 'r', 1);
+//      StimuliSelector.this.gralMng.setPosition(2, 5, 27, 39, 'r', 1);
 //      StimuliSelector.this.btnGenTestcases.createImplWidget_Gthread();
 //      
-//      StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 0, 'r', 1);
+//      StimuliSelector.this.gralMng.setPosition(6, 9, 1, 12, 'r', 1);
 //      StimuliSelector.this.btnGenSelection.createImplWidget_Gthread();
 //      for(GralButton execBtn : StimuliSelector.this.btnExecSelection) {
 //        if(execBtn !=null) {

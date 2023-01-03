@@ -228,27 +228,27 @@ class FcmdFavorPathSelector
     
     main.gui.gralMng.selectPanel("primaryWindow"); //"output"); //position relative to the output panel
     //panelMng.setPosition(1, 30+GralGridPos.size, 1, 40+GralGridPos.size, 1, 'r');
-    main.gui.gralMng.setPosition(-19, 0, -47, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    main.gui.gralMng.setPosition(-19, 0, -47, 0, 'r'); //right buttom, about half less display width and hight.
     
 
     windAddFavorite.window = main.gui.gralMng.createWindow("addFavoriteWindow", "add favorite", GralWindow.windConcurrently);
         
-    main.gui.gralMng.setPosition(4, GralPos.size -4, 1, GralPos.size +34, 0, 'r');
+    main.gui.gralMng.setPosition(4, GralPos.size -4, 1, GralPos.size +34, 'r');
     windAddFavorite.widgLabel = main.gui.gralMng.addTextField("addFavoriteTab", true, "label", "t");
     windAddFavorite.widgLabel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.tab.");
-    main.gui.gralMng.setPosition(4, GralPos.size -4, 35, GralPos.size +10, 0, 'r');
+    main.gui.gralMng.setPosition(4, GralPos.size -4, 35, GralPos.size +10, 'r');
     windAddFavorite.widgPersistent = main.gui.gralMng.addTextField("addFavoriteTab", true, "lmr ?", "t");
     windAddFavorite.widgLabel.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.persist.");
     
-    main.gui.gralMng.setPosition(8, GralPos.size -4, 1, GralPos.size +45, 0, 'd');
+    main.gui.gralMng.setPosition(8, GralPos.size -4, 1, GralPos.size +45, 'd');
     windAddFavorite.widgShortName = main.gui.gralMng.addTextField("addFavoriteAlias", true, "alias (show in list)", "t");
     windAddFavorite.widgShortName.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.alias.");
     windAddFavorite.widgPath = main.gui.gralMng.addTextField("addFavoritePath", true, "the directory path", "t");
     windAddFavorite.widgPath.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.dir.");
     
-    main.gui.gralMng.setPosition(-4, -1, 1, 6, 0, 'r');
+    main.gui.gralMng.setPosition(-4, -1, 1, 6, 'r');
     main.gui.gralMng.addButton("addFavoriteEsc", actionAddFavorite, "esc", null, "esc");
-    main.gui.gralMng.setPosition(-4, -1, -14, GralPos.size +6, 0, 'r',1);
+    main.gui.gralMng.setPosition(-4, -1, -14, GralPos.size +6, 'r',1);
     GralWidget widg = main.gui.gralMng.addButton("addFavoriteOk", actionAddFavorite, "temp", null, "temp");
     widg.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.favorNew.temp.");
     widg = main.gui.gralMng.addButton("addFavoriteOk", actionAddFavorite, "ok", null, "Save");

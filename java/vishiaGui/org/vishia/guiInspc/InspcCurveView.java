@@ -261,8 +261,8 @@ public final class InspcCurveView
     this.colorSelector = new GralColorSelector("colorSelector", this.gralMng);
     //need a panel and position:
     gralMng.selectPanel("curveView");
-    //gralMng.setPosition(4, 0, 4, 0, 0, '.');
-    gralMng.setPosition(44, 56, 94, 104, 0, '.');
+    //gralMng.setPosition(4, 0, 4, 0, '.');
+    gralMng.setPosition(44, 56, 94, 104, '.');
     //this.widgFileSelector = null;
     this.windFileSelector = new GralFileSelectWindow("FileSelection", gralMng);   //"@screen, 50+40, 50+80"
 //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
@@ -286,37 +286,37 @@ public final class InspcCurveView
    */
   public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common, TimedValues tracksValues)
   { gralMng.selectPanel(this.sName);
-    //gralMng.setPosition(4, 0, 4, 0, 0, '.');
-    gralMng.setPosition(4, 56, 4, 104, 0, '.');
+    //gralMng.setPosition(4, 0, 4, 0, '.');
+    gralMng.setPosition(4, 56, 4, 104, '.');
     //int windProps = GralWindow.windConcurrently | GralWindow.windOnTop | GralWindow.windResizeable;
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop; // | GralWindow.windResizeable;
     //windVariables = gralMng.createWindow("windMapVariables", sName, windProps);
-    //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 0, 'd');
+    //gralMng.setPosition(2, GralGridPos.size-1.6f, 0, 3.8f, 'd');
     int posright = -20;
     gralMng.selectPanel(this.sName);
     
-    gralMng.setPosition(0, -4, 0, posright, 0, 'd');
+    gralMng.setPosition(0, -4, 0, posright, 'd');
 //    widgFileSelector.createImplWidget_Gthread();
 //    widgFileSelector.setVisible(false);
     //widgFileSelector.set
     //widgFileSelector.specifyActionOnFileSelected(actionSelectFile);
     //widgFileSelector.setActionOnEnterFile(actionOk);
-    gralMng.setPosition(-4, -2, 0, posright, 0, 'd');
+    gralMng.setPosition(-4, -2, 0, posright, 'd');
 //    widgFilename.createImplWidget_Gthread();
     widgFilename.setVisible(false);
     widgFilename.setText("TEST xyz");
-    gralMng.setPosition(0, -2, 0, posright, 0, 'd');
+    gralMng.setPosition(0, -2, 0, posright, 'd');
     widgCurve = gralMng.addCurveViewY(sName, 15000, common, tracksValues);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
     widgCurve.setActionTrackSelected(actionTrackSelectedFromGralCurveViewCtrlMousePressed);
-    gralMng.setPosition(3, GralPos.size -3, posright, -6, 0, 'r', 0);
+    gralMng.setPosition(3, GralPos.size -3, posright, -6, 'r', 0);
     gralMng.addText("curve variable");
     if(this.sHelpDir !=null) {
-      gralMng.setPosition(3, GralPos.size -3, -6, 0, 0, 'r', 0);
+      gralMng.setPosition(3, GralPos.size -3, -6, 0, 'r', 0);
       widgBtnHelp = gralMng.addButton("btnHelp", this.gralMng.actionHelp, "help", null, "help");
     }
     widgTableVariables = new GralTable<GralCurveViewTrack_ifc>(gralMng.refPos(), "@3..-22, -19..0=variables", 20, new int[]{-posright});
-    gralMng.setPosition(3, GralPos.size +20, posright, 0, 0, 'd', 0);
+    gralMng.setPosition(3, GralPos.size +20, posright, 0, 'd', 0);
     widgTableVariables.setColumnEditable(0, true);
     //widgTableVariables.setToPanel(gralMng);
     widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
@@ -332,7 +332,7 @@ public final class InspcCurveView
     widgTableVariables.addContextMenuEntryGthread(0, null, "group scale", this.actionShareScale);
     widgTableVariables.addContextMenuEntryGthread(0, null, "ungroup scale", this.actionUnshareScale);
     widgTableVariables.addContextMenuEntryGthread(0, null, "bold all selected", this.actionBoldSelected);
-    gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 0, 'd', 0);
+    gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
     widgScale.setActionFocused(actionFocusScaling);         //store which field, set color
     widgScale.setActionChange(actionSetScaleValues2Track);  //on enter
@@ -343,37 +343,37 @@ public final class InspcCurveView
     widgline0 = gralMng.addTextField("line0", true, "line-%", "t");
     widgline0.setActionFocused(actionFocusScaling);         //store which field, set color
     widgline0.setActionChange(actionSetScaleValues2Track);  //on enter
-    gralMng.setPosition(/*32*/-9, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
+    gralMng.setPosition(/*32*/-9, GralPos.size +2, -10, GralPos.size +2, 'r', 1);
     /*
-    gralMng.setPosition(-23, GralPos.size +1, -10, 0, 0, 'd', 2);
+    gralMng.setPosition(-23, GralPos.size +1, -10, 0, 'd', 2);
     gralMng.addText("scale/div");
     gralMng.addText("mid");
     gralMng.addText("line-%");
-    gralMng.setPosition(-22, GralPos.size +2, -10, 0, 0, 'd', 1);
+    gralMng.setPosition(-22, GralPos.size +2, -10, 0, 'd', 1);
     widgScale = gralMng.addTextField("scale", true, null, "t");
     widgScale0 = gralMng.addTextField("scale0", true, null, "t");
     widgline0 = gralMng.addTextField("line0", true, null, "t");
-    gralMng.setPosition(-12, GralPos.size +2, -10, GralPos.size +2, 0, 'r', 1);
+    gralMng.setPosition(-12, GralPos.size +2, -10, GralPos.size +2, 'r', 1);
     */
     widgBtnDn = gralMng.addButton("btnDn", actionSetScaleValues2Track, "-", null,  "-");
     widgBtnUp = gralMng.addButton("btnUp", actionSetScaleValues2Track, "+", null, "+");
-    gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 0, 'r', 1);
+    gralMng.setPosition(GralPos.same, GralPos.size +2, GralPos.next, GralPos.size +4, 'r', 1);
     gralMng.addButton("btnScale", actionColorSelectorOpen, "!", null,  "color");  
-    gralMng.setPosition(/*35*/ -6, GralPos.size +2, -10, GralPos.size +6, 0, 'r', 1);
+    gralMng.setPosition(/*35*/ -6, GralPos.size +2, -10, GralPos.size +6, 'r', 1);
     widgBtnScale = gralMng.addButton("btnScale", actionSetScaleValues2Track, "!", null,  "set");
-    gralMng.setPosition(-22, GralPos.size +3, posright, GralPos.size +9, 0, 'r', 2);
+    gralMng.setPosition(-22, GralPos.size +3, posright, GralPos.size +9, 'r', 2);
     widgValCursorLeft = gralMng.addTextField(null, true, "cursor left", "t");
     widgValCursorRight = gralMng.addTextField(null, true, "cursor right", "t");
-    gralMng.setPosition(-19, GralPos.size +3, posright, GralPos.size +8, 0, 'r', 0);
+    gralMng.setPosition(-19, GralPos.size +3, posright, GralPos.size +8, 'r', 0);
     widgValdTime = gralMng.addTextField(null, true, "dtime", "t");
-    gralMng.setPosition(-15, GralPos.size +2, posright, GralPos.size +8, 0, 'd', 1);
+    gralMng.setPosition(-15, GralPos.size +2, posright, GralPos.size +8, 'd', 1);
     widgBtnReadCfg = gralMng.addButton("btnReadCfg", actionReadCfg, sBtnReadCfg, null, sBtnReadCfg);
     widgBtnSaveCfg = gralMng.addButton("btnSaveCfg", actionOpenFileDialog, sBtnSaveCfg, null, sBtnSaveCfg);
     widgBtnReadValues = gralMng.addButton("btnReadValues", actionReadValues, sBtnReadValues, null, sBtnReadValues);
     widgBtnSaveValues = gralMng.addButton("btnSaveValues", actionOpenFileDialog, sBtnSaveValues, null, sBtnSaveValues);
     wdgButtonAutosave = gralMng.addSwitchButton("btnAutoSaveValues", "off-autosave", "on-autosave", GralColor.getColor("lgn"), GralColor.getColor("am") );
     
-    gralMng.setPosition(-3, GralPos.size +2, -9, -1, 0, 'd', 0);
+    gralMng.setPosition(-3, GralPos.size +2, -9, -1, 'd', 0);
     widgBtnOff = gralMng.addSwitchButton(sName + "btnOff", "off / ?on", "on / ?off", GralColor.getColor("lgn"), GralColor.getColor("am"));
   
     if(this.sHelpDir !=null) {

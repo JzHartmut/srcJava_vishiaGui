@@ -229,24 +229,6 @@ public class InspcFieldTable
   }
   
   
-  public void XXXsetToPanel(GralMng mng){
-//    wind.createImplWidget_Gthread();
-//    mng.setPosition(0, 2, 0, 3, 0, 'd');
-//    btnBack.createImplWidget_Gthread();
-//    mng.setPosition(0, 2, 3, 0, 0, 'd');
-//    widgPath.createImplWidget_Gthread();
-    mng.setPosition(2, -4, 0, 0, 0, 'd');
-    widgTable.createImplWidget_Gthread();
-    mng.setPosition(-2, 0, 0, 9, 0, 'r');
-    btnHelp.createImplWidget_Gthread();
-    btnRefresh.createImplWidget_Gthread();
-    mng.setPosition(-2, 0, sizeName, sizeName + 12, 1, 'r');
-    btnSetValue.createImplWidget_Gthread();
-    //mng.setPosition(-2, 0, sizeName+13, sizeName + 23, 0, 'r');
-    btnRepeat.createImplWidget_Gthread();
-    //mng.setPosition(-2, 0, sizeName + 13, sizeName + 23, 0, 'r');
-    btnShowAll.createImplWidget_Gthread();
-  }
   
   
   

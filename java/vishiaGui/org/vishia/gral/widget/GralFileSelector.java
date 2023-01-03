@@ -821,16 +821,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   public static WindowConfirmSearch createWindowConfirmSearchGthread(GralMngBuild_ifc mng){
     WindowConfirmSearch wind = new WindowConfirmSearch();
     mng.selectPanel("primaryWindow");
-    mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
+    mng.setPosition(-24, 0, -67, 0, 'r'); //right buttom, about half less display width and hight.
     wind.windConfirmSearch = mng.createWindow("windConfirmSearch", "search in file tree", GralWindow.windConcurrently);
-    mng.setPosition(4, GralPos.size -3.5f, 1, -1, 0, 'd', 0.5f);
+    mng.setPosition(4, GralPos.size -3.5f, 1, -1, 'd', 0.5f);
     wind.widgPath = mng.addTextField("path", true, "path", "t");
     wind.widgMask = mng.addTextField("mask", true, "search name/mask:", "t");
     wind.widgText = mng.addTextField("containsText", true, "contains text:", "t");
     
-    mng.setPosition(-5, GralPos.size - 1, 1, -1, 0, 'r',2);
+    mng.setPosition(-5, GralPos.size - 1, 1, -1, 'r',2);
     wind.widgProgression = mng.addValueBar(null, null);
-    mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 0, 'r',2);
+    mng.setPosition(-1, GralPos.size - 3, 1, GralPos.size + 8, 'r',2);
     mng.addButton(null, wind.actionFileSearch, "esc", null, "esc");
     wind.widgSubdirs = mng.addSwitchButton(null, null, "subdirs", null, "subdirs", GralColor.getColor("wh"), GralColor.getColor("gn"));
     wind.widgSearch = mng.addButton(null, wind.actionFileSearch, "search", null, "search");

@@ -82,7 +82,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    */
    public GralFileSelectWindow(String name, GralMng mng){
      mng.selectPanel("primaryWindow");
-     mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
+     mng.setPosition(-24, 0, -67, 0, 'r'); //right buttom, about half less display width and hight.
      this.wind = mng.createWindow(name + "Window", "select file", GralWindow_ifc.windExclusive | GralWindow_ifc.windResizeable );
      //mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
      String posName = "@0..-3,0..0=" + name;
@@ -92,7 +92,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
      this.fileSelector.setActionOnEnterFile(this.actionOk);
      String posText = "@-3..0, 0..-9=" + name +"-fname";
      this.widgFilename = mng.addTextField(posText, true, null, null);
-     mng.setPosition(-3, 0, -8, GralPos.size + 7, 0, 'r',1);
+     mng.setPosition(-3, 0, -8, GralPos.size + 7, 'r',1);
      String posBtnOk = "@-3..0, -8..-1=" + name + "-ok";
      this.widgButtonOk = new GralButton(mng.refPos(), posBtnOk, "Ok", this.actionOk);
      

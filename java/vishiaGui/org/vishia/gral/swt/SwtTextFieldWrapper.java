@@ -186,6 +186,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
     swtMng.gralMng.registerWidget(widgg);
     setPosBounds();
+    redrawGthread();
     
   }
 

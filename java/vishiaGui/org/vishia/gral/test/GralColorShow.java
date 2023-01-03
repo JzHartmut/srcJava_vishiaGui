@@ -960,25 +960,25 @@ public class GralColorShow
       for(int ixRow = 0; ixRow < lightSat.length; ++ixRow){ //cells in columns, vertical
         LightSat ls = lightSat[ixRow];
         String text = ls.lName; //String.format("%s %1.1f,%1.1f", ls.lName, ls.light, ls.sat);
-        gralMng.setPosition(6+3*ixRow, GralPos.size -2, 0, GralPos.size+2, 0, 'd', 0);
+        gralMng.setPosition(6+3*ixRow, GralPos.size -2, 0, GralPos.size+2, 'd', 0);
         GralLabel label = new GralLabel(gralMng.refPos(), null, text,0);
         label.createImplWidget_Gthread();
       }
       for(int ixCol=0; ixCol<colHue.length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = colHue[ixCol].colorName;
-        gralMng.setPosition(2.5f, GralPos.size -2, 4*ixCol +3, GralPos.size+4, 0, 'd', 0);
+        gralMng.setPosition(2.5f, GralPos.size -2, 4*ixCol +3, GralPos.size+4, 'd', 0);
         GralLabel label = new GralLabel(gralMng.refPos(), null, nameShow,0);
         label.createImplWidget_Gthread();
       }
-      gralMng.setPosition(2.5f, GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 0, 'r', 0);
+      gralMng.setPosition(2.5f, GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 'r', 0);
       for(int ixCol=0; ixCol<namesGray[0].length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = namesGray[0][ixCol];
         GralLabel label = new GralLabel(gralMng.refPos(), null, nameShow,0);
         label.createImplWidget_Gthread();
       }
-      gralMng.setPosition(5.5f + 3* gray1Sat.length , GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 0, 'r', 0);
+      gralMng.setPosition(5.5f + 3* gray1Sat.length , GralPos.size -2, 4 + 4 * colHue.length, GralPos.size+4, 'r', 0);
       for(int ixCol=0; ixCol<namesGray[1].length; ++ixCol) { //the column, for horizontal
         String nameShow;
         nameShow = namesGray[1][ixCol];
@@ -988,8 +988,8 @@ public class GralColorShow
       for(int ixRow = 0; ixRow < colorF.length; ++ixRow){ //cells in columns, vertical
         
         colorF[ixRow] = new ColorWithField[colorV[ixRow].length];
-        gralMng.setPosition(6 + 3 * ixRow, GralPos.size -3, 2, GralPos.size+4, 0, 'r', 0);
-        //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 0, 'd', 1);
+        gralMng.setPosition(6 + 3 * ixRow, GralPos.size -3, 2, GralPos.size+4, 'r', 0);
+        //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 'd', 1);
         //out.append(", \"");
         //int pline = 0;
         for(int ixCol=0; ixCol < colorF[ixRow].length; ++ixCol) { //the column, for horizontal
@@ -1015,7 +1015,7 @@ public class GralColorShow
       colorFocus = colorF[0][0];
       colorFocus2 = colorF[0][1];
       
-      gralMng.setPosition(4 + 3 * colorV.length /*GralPos.refer+4*/, GralPos.size +10, 1, GralPos.size+15, 0, 'r');
+      gralMng.setPosition(4 + 3 * colorV.length /*GralPos.refer+4*/, GralPos.size +10, 1, GralPos.size+15, 'r');
       //
       wdgTest1 = gralMng.addTextField("test1");
       wdgTest2 = gralMng.addTextField("test2");
@@ -1029,7 +1029,7 @@ public class GralColorShow
       wdgTest2.setText("XYZ");
       wdgTest = wdgTest1;
       
-      gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 0, 'r');
+      gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 'r');
       wdgHexValue = gralMng.addTextField("hex");
       wdgHexValue.setEditable(true);
       wdgHexValue.setActionChange(actionEnterHex);
@@ -1038,12 +1038,12 @@ public class GralColorShow
       wdgShortname.setEditable(true);
       wdgShortname.setActionChange(actionEnterShortname);
       wdgShortname.setToPanel(gralMng);
-      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 0, 'r');
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 'r');
       wdgName = gralMng.addTextField("name");
       wdgName.setEditable(true);
       wdgName.setActionChange(actionEnterName);
       wdgName.setToPanel(gralMng);
-      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 'r',1);
       wdgHue = gralMng.addTextField("name");
       wdgHue.setEditable(true);
       wdgHue.setActionChange(new ActionEnterHSB(0));
@@ -1056,7 +1056,7 @@ public class GralColorShow
       wdgSat.setEditable(true);
       wdgSat.setActionChange(new ActionEnterHSB(1));
       wdgSat.setToPanel(gralMng);
-      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 'r',1);
       wdgHue2 = gralMng.addTextField("name");
       wdgHue2.setEditable(true);
       wdgHue2.setActionChange(new ActionEnterHLS(0));
@@ -1078,11 +1078,11 @@ public class GralColorShow
     {
       String[][] colors = colors4;
       colorF = new ColorWithField[colors.length][];
-      gralMng.setPosition(4, -2, 2, -2, 0, 'd');
+      gralMng.setPosition(4, -2, 2, -2, 'd');
       for(int ixRow = 0; ixRow < colors.length; ++ixRow){ //fill cells of columns.
         colorF[ixRow] = new ColorWithField[colors[ixRow].length];
-        gralMng.setPosition(4 + 3*ixRow, GralPos.size -3, 1, GralPos.size+4, 0, 'r', 0);
-        //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 0, 'd', 1);
+        gralMng.setPosition(4 + 3*ixRow, GralPos.size -3, 1, GralPos.size+4, 'r', 0);
+        //gralMng.setPosition(3, GralPos.size -2, 9*col, GralPos.size+8, 'd', 1);
         ColorWithField colorF1 = null;
         for(int ixCol=0; ixCol<colors[ixRow].length; ++ixCol) { //create columns
           GralColor colText;
@@ -1103,7 +1103,7 @@ public class GralColorShow
       colorFocus = colorF[0][0];
       colorFocus2 = colorF[0][1];
       
-      gralMng.setPosition(GralPos.refer+4, GralPos.size +10, 1, GralPos.size+15, 0, 'r');
+      gralMng.setPosition(GralPos.refer+4, GralPos.size +10, 1, GralPos.size+15, 'r');
       //
       wdgTest1 = gralMng.addTextField("test1");
       wdgTest2 = gralMng.addTextField("test2");
@@ -1117,7 +1117,7 @@ public class GralColorShow
       wdgTest2.setText("XYZ");
       wdgTest = wdgTest1;
       
-      gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 0, 'r');
+      gralMng.setPosition(GralPos.refer, GralPos.size +2, 40, GralPos.size+10, 'r');
       wdgHexValue = gralMng.addTextField("hex");
       wdgHexValue.setEditable(true);
       wdgHexValue.setActionChange(actionEnterHex);
@@ -1126,12 +1126,12 @@ public class GralColorShow
       wdgShortname.setEditable(true);
       wdgShortname.setActionChange(actionEnterShortname);
       wdgShortname.setToPanel(gralMng);
-      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 0, 'r');
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+20, 'r');
       wdgName = gralMng.addTextField("name");
       wdgName.setEditable(true);
       wdgName.setActionChange(actionEnterName);
       wdgName.setToPanel(gralMng);
-      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 'r',1);
       wdgHue = gralMng.addTextField("name");
       wdgHue.setEditable(true);
       wdgHue.setActionChange(new ActionEnterHSB(0));
@@ -1144,7 +1144,7 @@ public class GralColorShow
       wdgSat.setEditable(true);
       wdgSat.setActionChange(new ActionEnterHSB(1));
       wdgSat.setToPanel(gralMng);
-      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 0, 'r',1);
+      gralMng.setPosition(GralPos.refer +3, GralPos.size +2, 40, GralPos.size+12, 'r',1);
       wdgHue2 = gralMng.addTextField("name");
       wdgHue2.setEditable(true);
       wdgHue2.setActionChange(new ActionEnterHLS(0));

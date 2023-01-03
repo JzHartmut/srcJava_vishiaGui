@@ -89,30 +89,30 @@ public class FcmdSettings
     GralWindow window =  main.gui.gralMng.addWindow("@10+29, 10+47 = windSettings", "Settings - The.file.Commander", windProps);
     //window.createImplWidget_Gthread();
     windSettings = window; 
-    main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
+    main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 'd');
     widgRefreshTime = main.gui.gralMng.addTextField(null, true, "refresh time file panel", "t");
     widgEditorPath = main.gui.gralMng.addTextField(null, true, "standard editor path", "t");
     widgCfgPath = main.gui.gralMng.addTextField(null, false, "configuration directory path", "t");
     
-    //main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    main.gui.gralMng.setPosition(-7, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    //main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
+    main.gui.gralMng.setPosition(-7, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
     widgEditCmd = main.gui.gralMng.addButton("editCmd", actionEditCfgFile, "cmdjz.cfg", null, "edit");
     widgApplyCmd = main.gui.gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmdjz.cfg", null, "apply");
     main.gui.gralMng.addText("cmd cfg file");
     
-    main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
     widgEditCmd = main.gui.gralMng.addButton("editCmd", actionEditCfgFile, "extjz.cfg", null, "edit");
     widgApplyCmd = main.gui.gralMng.addButton("applyExt", actionApplyCfgExt, "extjz.cfg", null, "apply");
     main.gui.gralMng.addText(".ext cfg file");
     
-    main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
+    main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
     widgEditCmd = main.gui.gralMng.addButton("editPaths", actionEditCfgFile, "path.cfg", null, "edit");
     widgApplyCmd = main.gui.gralMng.addButton("applyPaths", actionApplyCfgPath, "path.cfg", null, "apply");
     main.gui.gralMng.addText("favor paths file");
     
-    main.gui.gralMng.setPosition(-10, GralPos.size -2, -18, -1, 0, 'd', 0.5f);
+    main.gui.gralMng.setPosition(-10, GralPos.size -2, -18, -1, 'd', 0.5f);
     widgOkError = main.gui.gralMng.addButton("ok_error", actionOpenInfo, "infoBox");
-    main.gui.gralMng.setPosition(-1, GralPos.size -2.5f, -9, -1, 0, 'd', 0.5f);
+    main.gui.gralMng.setPosition(-1, GralPos.size -2.5f, -9, -1, 'd', 0.5f);
     widgOk = main.gui.gralMng.addButton("close", actionButton, "close");
     widgOk.setCmd("close");
   }
