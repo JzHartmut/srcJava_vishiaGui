@@ -18,15 +18,15 @@
 2023-01-03 23:42:37  x     FcmdEdit.java                            ::          8.193 -1780324974 
 2023-01-07 08:14:23  x     FcmdExecuter.java                        ::         16.560  0712638834 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
-2023-01-05 00:51:41  x     FcmdFavorPathSelector.java               ::         31.648  0717419318 
-2023-01-07 11:14:08  x     FcmdFileCard.java                        ::         32.694 -0336753948 
+2023-01-07 13:41:16  x     FcmdFavorPathSelector.java               ::         31.648  0717419318 
+2023-01-07 13:44:53  x     FcmdFileCard.java                        ::         33.481 -1541648307 
 2023-01-03 23:32:20  x     FcmdFileProps.java                       ::         20.501  0433014205 
 2023-01-03 23:40:17  x     FcmdFilesCp.java                         ::          7.583  0779419410 
 2023-01-07 08:37:24  x     FcmdGui.java                             ::          1.292  1271697535 
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
 2022-11-20 23:04:10  x     FcmdIdents.java                          ::         14.097  0035476139 
 2021-10-04 14:29:51  x     FcmdKeyActions.java                      ::          2.315 -2032154697 
-2023-01-07 08:13:52  x     FcmdLeftMidRightPanel.java               ::         18.696  0515804178 
+2023-01-07 13:29:42  x     FcmdLeftMidRightPanel.java               ::         18.799  1500015839 
 2023-01-03 23:33:20  x     FcmdMkDirFile.java                       ::          4.174 -0811395311 
 2023-01-03 23:40:40  x     FcmdSettings.java                        ::          9.641  2046582417 
 2023-01-03 23:33:38  x     FcmdStatus.java                          ::          3.939  0001135777 
@@ -243,7 +243,7 @@
 2023-01-03 23:29:42  x     GralColorSelector.java                   ::          7.355  1841523366 
 2023-01-07 08:13:26  x     GralCommandSelector.java                 ::          8.473  1777158701 
 2023-01-05 20:49:42  x     GralFileSelectWindow.java                ::          8.915 -1622746957 
-2023-01-07 10:14:14  x     GralFileSelector.java                    ::         92.194  1822890873 
+2023-01-07 11:22:07  x     GralFileSelector.java                    ::         92.196  1465215511 
 2022-12-23 17:21:05  x     GralHorizontalSelector.java              ::         10.530 -1896136479 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2023-01-03 23:37:09  x     GralInfoBox.java                         ::         15.580 -1967797956 

@@ -221,13 +221,13 @@ public class FcmdLeftMidRightPanel
       int mMainTab = 0x1 << (cNr-'1');  //1, 2 or 4
       if((favorFolder.mMainPanel & mMainTab) !=0 && favorFolder.label !=null && favorFolder.label.length() >0){
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
-        FcmdFileCard fileTab = searchOrCreateFileCard(favorFolder.label);
+        FcmdFileCard fileTab = searchOrCreateFileCard(favorFolder);
           //Favor select list of the associated File table
         fileTab.fillFavorPaths(favorFolder.listfavorPaths);
       } else {
         //The fileTable may be existend, then 
         FcmdFileCard fileTab = searchFileCard(favorFolder.label);
-        if(fileTab !=null && fileTab.label.equals(favorFolder.label)){
+        if(fileTab !=null && fileTab.favorFolder.label.equals(favorFolder.label)){
           fileTab.fillFavorPaths(favorFolder.listfavorPaths);
         }
       }
@@ -245,22 +245,22 @@ public class FcmdLeftMidRightPanel
    *   This label is searched in #listTabs  
    * @return the file card either as existing or new created.
    */
-  FcmdFileCard searchOrCreateFileCard(String label){
+  FcmdFileCard searchOrCreateFileCard(FcmdFavorPathSelector.FavorFolder favorFolder){
   //search or create the tab
     FcmdFileCard fileCard = null;
-    String labelTab = label + "." + cNr;
+    String labelTab = favorFolder.label + "." + cNr;
     for(FcmdFileCard item: this.listTabs){                 // search list opened file cards for this favor
       if(item.nameFilePanel.equals(labelTab)){ 
         fileCard = item; break;                            // found: use it
       }
     } 
     if(fileCard == null){                                  // not found: create a tab for it.
-      GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, label);
+      GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, favorFolder.label);
       GralPos refPos;
       try {
         refPos = new GralPos(tabFileCard, "0..0, 0..0");
       } catch(ParseException exc) { refPos = null; } // unexpected  
-      fileCard = new FcmdFileCard(refPos, this, label);
+      fileCard = new FcmdFileCard(refPos, this, favorFolder);
       this.listTabs.add(fileCard);
       this.tabbedPanelFileCards.createImplWidget();
     }
@@ -405,7 +405,7 @@ public class FcmdLeftMidRightPanel
         label = favorTabInfo.label;  //from favorite list
         //label is known in the favorite list, use it. The panel should be existing or it is created.
         //search or create the tab, representing by its fileTable:
-        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(label);
+        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(favorTabInfo);
         //before changing the content of this fileTable, store the current directory
         //to restore if this favor respectively selection is used ones more.
 //        if(mainPanel.actFileCard.favorPathInfo !=null){
@@ -422,8 +422,8 @@ public class FcmdLeftMidRightPanel
         assert(false);
         final FcmdLeftMidRightPanel panel = (FcmdLeftMidRightPanel)oLineData;  //from left, from mid etc
         final FcmdFileCard fileCard = panel.actFileCard;  //the current filecard in the other panel
-        label = fileCard.label;   
-        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(label);     //search or create such filecard with this label here.
+        label = fileCard.favorFolder.label;   
+        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(fileCard.favorFolder);     //search or create such filecard with this label here.
         mainPanel.actFileCard = fileCard;  //copy it, it is the same instance for all 3 panels.
         //mainPanel.actFileCard.currentFile = fileCard.currentFile();      //select the same file.
         mainPanel.actFileCard.fillIn(fileCard.currentDir(), false);      //select the same file.

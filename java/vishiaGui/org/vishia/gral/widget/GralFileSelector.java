@@ -994,7 +994,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       GralTableLine_ifc<FavorPath> line = this.wdgFavorTable.addLine(favorPathInfo.selectName, null, favorPathInfo);
       line.setCellText(favorPathInfo.selectName, 0);
       line.setCellText(favorPathInfo.path, 1);
-      line.redraw(100,0);
+      line.redraw(100,100);
       return line;
     }
     else return null;

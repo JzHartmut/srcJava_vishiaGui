@@ -1,6 +1,8 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
@@ -8,6 +10,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralTable;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextField_ifc;
@@ -96,6 +99,9 @@ public class FcmdFileCard extends GralFileSelector
   /**The left, mid or right main panel where this tabbed file table is associated. */
   final FcmdLeftMidRightPanel mainPanel;
   
+  /**Aggregation to the appropriate entry of the favors. */
+  final FcmdFavorPathSelector.FavorFolder favorFolder;
+  
   /**Three colors for the current line in the file card.
    * 
    */
@@ -107,11 +113,6 @@ public class FcmdFileCard extends GralFileSelector
   /**The search-name of the tabbed file panel where this Table is placed on. 
    * It is the visible label of the tab, following by ".1" till ".3" for the three panels. */
   final String nameFilePanel;
-  
-  /**The label which is written in the line of favor file after l:label m:label r:label
-   * It is the label on the tab.
-   */
-  final String label;
   
   
   /**It is build from the {@link #label} and the {@link #favorPathInfo}. {@link FavorPath#selectName}
@@ -156,12 +157,12 @@ public class FcmdFileCard extends GralFileSelector
    * @param mainPanelP The left, mid or right panel where this cards are assigned to
    * @param label The label of the tab, it builds the name of all widgets.
    */
-  FcmdFileCard(GralPos refPos, FcmdLeftMidRightPanel mainPanelP, String label){
-    super(refPos, FcmdWidgetNames.tableFile + label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, true, mainPanelP.main.fileViewer);
-    this.label = label;
+  FcmdFileCard(GralPos refPos, FcmdLeftMidRightPanel mainPanelP, FcmdFavorPathSelector.FavorFolder favorFolder){
+    super(refPos, FcmdWidgetNames.tableFile + favorFolder.label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, true, mainPanelP.main.fileViewer);
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
-    this.nameFilePanel = label+ "." + mainPanelP.cNr;
+    this.favorFolder = favorFolder;
+    this.nameFilePanel = favorFolder.label+ "." + mainPanelP.cNr;
     this.colorSelectFocused123[0] = GralColor.getColor("lgn");
     this.colorSelectFocused123[1] = GralColor.getColor("lbl");
     this.colorSelectFocused123[2] = GralColor.getColor("lgr");
@@ -625,6 +626,13 @@ public class FcmdFileCard extends GralFileSelector
   
   GralUserAction actionSaveFavors = new GralUserAction("actionSaveFavors"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+      List<GralFileSelector.FavorPath> listfavorPaths = FcmdFileCard.this.favorFolder.listfavorPaths;
+      listfavorPaths.clear();                              // Build this list newly with all entries in the table.
+      for(GralTable<GralFileSelector.FavorPath>.TableLineData line : FcmdFileCard.this.wdgFavorTable.iterLines()) {
+        GralFileSelector.FavorPath favor = line.getData();
+        listfavorPaths.add(favor);
+      }                                                    // and also write the file to disk for all favors (only one file for all).
+      FcmdFileCard.this.main.favorPathSelector.writeCfg(FcmdFileCard.this.main.favorPathSelector.fileCfg);
       return true;      
   } };
 
