@@ -827,7 +827,7 @@ public class Fcmd //extends GuiCfg
       Fcmd thiz = new Fcmd(cargs); //, cmdgui);
       thiz.initMain();
       //main.msgDisp = MsgDispatchSystemOutErr.create();
-      while(thiz.gui.gralMng.isRunning()) {
+      while(thiz.gui.gralMng.isRunning() && !thiz.gui.gralMng.isImplementationGraphicTerminated()) {
         thiz.stepMain();
       }
 //      main.execute();

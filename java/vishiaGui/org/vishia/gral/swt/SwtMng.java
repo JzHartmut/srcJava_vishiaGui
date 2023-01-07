@@ -1485,7 +1485,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
      */
     @Override public void handleEvent(Event event) {
       if( event.widget == getSwtImpl(SwtMng.this.gralMng.getPrimaryWindow())) {
-        SwtMng.this.gralMng.closeApplication(); //close if the main window was closed.
+        //see GralMng#actionClose and GralMng.closeApplication(), shellListeners
+        //SwtMng.this.gralMng.closeApplication(); //close if the main window was closed.
       }
     }
   }

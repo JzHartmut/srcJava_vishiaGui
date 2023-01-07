@@ -2272,10 +2272,16 @@ public GralButton addCheckButton(
 
 
   
+  /**This is one action to close the whole application. Especially close via menu,
+   * not closing with mouse via the [X] right on title bar. 
+   * Note that a window may be created using {@link GralWindow_ifc#windMinimizeOnClose}.
+   * Then close is possible only and especially here.
+   */
   public final GralUserAction actionClose = new  GralUserAction("actionClose")
   { 
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { GralMng.this.closeMainWindow();
+    { //GralMng.this.closeMainWindow();
+      GralMng.this.closeApplication();
       return true; 
   } };
 

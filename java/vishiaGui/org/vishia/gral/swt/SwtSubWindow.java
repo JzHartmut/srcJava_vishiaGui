@@ -414,6 +414,10 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
         SwtSubWindow.this.widgg._wdgImpl = null;  //therewith garbage this class.
 
         SwtSubWindow.this.gralWindow.remove();  //remove the window as widget.
+        GralWindow windg = (GralWindow)SwtSubWindow.this.widgg;
+        if( windg == windg.gralMng.getPrimaryWindow()) {
+          windg.gralMng.closeApplication();
+        }
         e.doit = true;
       } else {
         e.doit = false;

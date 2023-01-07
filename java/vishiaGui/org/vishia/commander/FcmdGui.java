@@ -5,6 +5,7 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 
@@ -13,7 +14,8 @@ public class FcmdGui {
   final GralMng gralMng = new GralMng(new LogMessageStream(System.out));
   
   
-  final GralWindow fcmdWindow = this.gralMng.addWindow("@screen,10+80, 20+120=mainWin", "The.file.Commander");
+  final GralWindow fcmdWindow = this.gralMng.addWindow("@screen,16+80, 20+120=mainWin", "The.file.Commander new"
+      , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
   
   final GralMenu menuBar = this.fcmdWindow.getMenuBar();
   
