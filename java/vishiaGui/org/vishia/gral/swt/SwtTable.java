@@ -194,7 +194,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
     //The background of the panel, which does not contain cells of Text:
     swtTable.setBackground(mng.getColorImpl(GralColor.getColor("pgr")));
-    initSwtTable(swtTable, zColumn, mng);
+    GralMenu[] contextMenuColumns = super.getContextMenuColumns();
+    GralMenu contextMenu = gralTable.getContextMenu();
+    initSwtTable(swtTable, zColumn, mng, contextMenu, contextMenuColumns);
     vScrollBar = new Vscrollbar(swtTable);
     super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
@@ -697,10 +699,16 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * @param zColumns
    * @param mng
    */
-  protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
+  protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng, GralMenu contextMenu, GralMenu[] contextMenuColumn ){
     int yPix = 0;
     Font font = mng.propertiesGuiSwt.stdInputFont; //mng.propertiesGuiSwt.getTextFontSwt(2, 'n', 'n');
     Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
+    if(contextMenuColumn !=null || contextMenu !=null) {
+      Debugutil.stop();
+      //new SwtMenu(contextMenu, null, cellsSwt[0][column]);
+      
+    }
+    
     for(int iCol = 0; iCol < zColumns; ++iCol){
       //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng());
     }
@@ -726,7 +734,18 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         cell.setData(cellData);
         super.cells[iRow][iCol] = cellData;                // in GralTable.GraphicImplAccess
         cell.setBackground(colorBackTableSwt);
-        //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
+        if(contextMenu !=null) {
+          if(!contextMenu.hasImplementation()){            // create a implementation with the first cell
+            new SwtMenu(contextMenu, null, cell);          // enters in contectMenu
+          }
+          cell.setMenu((Menu)contextMenu.getMenuImpl());
+        }
+        if(contextMenuColumn !=null && contextMenuColumn[iCol] !=null) {
+          if(!contextMenuColumn[iCol].hasImplementation()){            // create a implementation with the first cell
+            new SwtMenu(contextMenuColumn[iCol], null, cell);          // enters in contectMenu
+          }
+          cell.setMenu((Menu)contextMenuColumn[iCol].getMenuImpl());
+        }
         cellsSwt[iRow][iCol] = cell;                       // The array of swt.Txt
       }
       yPix += linePixel;

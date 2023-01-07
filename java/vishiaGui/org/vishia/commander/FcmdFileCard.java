@@ -209,7 +209,8 @@ public class FcmdFileCard extends GralFileSelector
 
     this.specifyActionOnFileSelected(this.actionOnFileSelection);
     setActionOnFocusedFileTable(this.actionFocused);       // sets the current file card from three ones in Fcmd  
-
+    setActionSaveFavors(this.actionSaveFavors);
+    
 //    //Note: some menu entries are set in the super class already.
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFilePropsContext, main.filePropsCmd.actionOpenDialog);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileViewContext, main.viewCmd.actionOpenView);
@@ -622,6 +623,10 @@ public class FcmdFileCard extends GralFileSelector
   };
   
   
+  GralUserAction actionSaveFavors = new GralUserAction("actionSaveFavors"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+      return true;      
+  } };
 
 
 

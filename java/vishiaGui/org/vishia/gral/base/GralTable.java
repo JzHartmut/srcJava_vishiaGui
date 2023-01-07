@@ -297,7 +297,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   protected boolean[] bColumnEditable;
   
-  protected GralMenu[] menuColumns;
+  protected GralMenu[] contextMenuColumns;
   
 
   
@@ -559,21 +559,21 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @return The menu to add {@link GralMenu#addMenuItem(String, String, GralUserAction)}.
    */
   public GralMenu getContextMenuColumn(int col){
-    if(menuColumns == null){
-      menuColumns = new GralMenu[zColumn];
+    if(contextMenuColumns == null){
+      contextMenuColumns = new GralMenu[zColumn];
     }
-    if(menuColumns[col] == null){
-      menuColumns[col] = new GralMenu(); //gi.createColumnMenu(col); //for all cells of this column
+    if(contextMenuColumns[col] == null){
+      contextMenuColumns[col] = new GralMenu(); //gi.createColumnMenu(col); //for all cells of this column
     }
-    return menuColumns[col];
+    return contextMenuColumns[col];
   }
 
   
   public void setContextMenuColumn(int col, GralMenu menu){
-    if(menuColumns == null){
-      menuColumns = new GralMenu[zColumn];
+    if(contextMenuColumns == null){
+      contextMenuColumns = new GralMenu[zColumn];
     }
-    menuColumns[col] = menu; //gi.createColumnMenu(col); //for all cells of this column
+    contextMenuColumns[col] = menu; //gi.createColumnMenu(col); //for all cells of this column
   }
   
   /**Adds a context menu entries to all cells of the designated column. This method can't be used 
@@ -1630,6 +1630,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     protected boolean bColumnEditable(int ix){ return GralTable.this.bColumnEditable[ix]; }
     
+    protected GralMenu[] getContextMenuColumns() { return GralTable.this.contextMenuColumns; }
     
     protected void checkAndUpdateText(String sText, CellData celldata){
       GralTable.this.checkAndUpdateText(sText, celldata);

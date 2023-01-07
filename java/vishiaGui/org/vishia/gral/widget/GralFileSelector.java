@@ -661,7 +661,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   private GralUserAction actionOnEnterPathNewFile;
   
   
-  
+  /**
+   * 
+   */
+  protected GralUserAction actionUserSaveFavors;
   
   GralUserAction actionSetFileAttribs;
   
@@ -707,6 +710,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.wdgFavorTable.setColumnProportional((new int[] { 3, 10}));
       this.wdgFavorTable.setColumnEditable(0, true);
       this.wdgFavorTable.setColumnEditable(1, true);
+      GralMenu menuFavor = this.wdgFavorTable.getContextMenu();
+      menuFavor.addMenuItem("save", this.action.actionSaveFavors);
       this.wdgFavorTable.setVisible(true);
     } else {
       this.indexFavorPaths = null;
@@ -931,6 +936,19 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.actionOnEnterDirectory = newAction;
     return oldAction;
   }
+  
+  
+  /**This action will be called on context menu for the Favor tab to save its content.
+   * It should be implemented at user level, for example save in a file.
+   * It is the opposite to {@link #add(FavorPath)} to fill the favor table. 
+   */
+  public GralUserAction setActionSaveFavors(GralUserAction newAction)
+  { GralUserAction oldAction = this.actionUserSaveFavors;
+    this.actionUserSaveFavors = newAction;
+    return oldAction;
+  }
+  
+
   
   
   /**This action will be called on pressing enter or mouse-click on the path text field
@@ -2138,6 +2156,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
     
+    /**This action is called if a tab is selected. */
+    GralUserAction actionSaveFavors = new GralUserAction("actionSaveFavors"){
+      @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
+        if(GralFileSelector.this.actionUserSaveFavors !=null) {
+          GralFileSelector.this.actionUserSaveFavors.exec(KeyCode.activated, GralFileSelector.this.wdgFavorTable);
+        }
+        return true;      
+    } };
+
+  
     
 
 
