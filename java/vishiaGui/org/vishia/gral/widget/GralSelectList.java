@@ -96,7 +96,7 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  protected GralSelectList(GralPos refPos, String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
+  protected GralSelectList(GralPos refPos, String posName, int rows, int[] columns) //String name, GralWidgetMng mng)
   { super(refPos, posName, null);
     if(posName == null){
       Debugutil.stop();

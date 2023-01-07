@@ -33,6 +33,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileSelector;
+import org.vishia.gral.widget.GralViewFileContent;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.mainCmd.MainCmd_ifc;
@@ -322,7 +323,7 @@ public class Fcmd //extends GuiCfg
   
   final FcmdFileProps filePropsCmd = new FcmdFileProps(this);
   
-  final FcmdView viewCmd = new FcmdView(this);
+  final GralViewFileContent fileViewer = new GralViewFileContent(this.gui.gralMng.refPos(), "@50..100, 50..100=fileViewer" + ".view");
   
   final FcmdEdit editWind = new FcmdEdit(this);
   

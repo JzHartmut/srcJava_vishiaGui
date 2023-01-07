@@ -82,11 +82,14 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    */
    public GralFileSelectWindow(String name, GralMng mng){
      mng.selectPanel("primaryWindow");
+     GralPos refPos = new GralPos(mng);
+     GralViewFileContent fileViewer = new GralViewFileContent(refPos, "@50..100, 50..100=fileViewer" + ".view");
+
      mng.setPosition(-24, 0, -67, 0, 'r'); //right buttom, about half less display width and hight.
      this.wind = mng.createWindow(name + "Window", "select file", GralWindow_ifc.windExclusive | GralWindow_ifc.windResizeable );
      //mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
      String posName = "@0..-3,0..0=" + name;
-     this.fileSelector = new GralFileSelector(mng.refPos(), posName + "-selelector", 100, new int[]{2,0,-6,-12}, true);
+     this.fileSelector = new GralFileSelector(mng.refPos(), posName + "-selelector", 100, new int[]{2,0,-6,-12}, true, fileViewer);
      //fileSelector.setToPanel(mng);
      this.fileSelector.specifyActionOnFileSelected(this.actionSelectFile);
      this.fileSelector.setActionOnEnterFile(this.actionOk);

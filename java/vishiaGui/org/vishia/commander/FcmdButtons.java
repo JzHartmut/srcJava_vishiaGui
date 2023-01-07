@@ -180,8 +180,8 @@ public class FcmdButtons
   {
     //This calls creates the menu entries in the menu bar. The order determines the order in menu bar. It registeres the button strings and keys.
     setBtnMenuAndKeys(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps, main.idents.keyFileProps, main.idents.menuFilePropsBar);
-    setBtnMenuAndKeys(main.viewCmd.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
-    setBtnMenuAndKeys(main.viewCmd.actionQuickView, null, main.idents.key1QuickView, main.idents.key2QuickView, main.idents.menuBarQuickView);
+    setBtnMenuAndKeys(main.fileViewer.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
+    setBtnMenuAndKeys(main.fileViewer.actionQuickView, null, main.idents.key1QuickView, main.idents.key2QuickView, main.idents.menuBarQuickView);
     setBtnMenuAndKeys(main.editWind.actionOpenEdit, main.idents.buttonEditIntern, main.idents.keyEditIntern, main.idents.menuBarEditIntern);
     setBtnMenuAndKeys(main.fcmdActions.actionEdit, main.idents.buttonFileEdit, main.idents.keyFileEdit, main.idents.menuFileEditBar);
     setBtnMenuAndKeys(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy, main.idents.keyFileCopy, main.idents.menuConfirmCopyBar);

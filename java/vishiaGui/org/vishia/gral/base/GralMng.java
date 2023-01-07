@@ -2771,19 +2771,22 @@ public GralButton addCheckButton(
    *
    */
   public static class LogMsg {
-    public static int ctorWdg = 1001;
-    public static int newPanel = 1010;
+    public static final int ctorWdg = 1001;
+    public static final int newPanel = 1010;
     
-    public static int newImplTable = 1051;
+    public static final int newImplTable = 1051;
     
-    public static int setVisible = 1130;
-    public static int setFocus = 1131;
+    public static final int setVisible = 1130;
+    public static final int setFocus = 1131;
     
-    public static int gralTable_updateCells = 1201;
-    public static int gralFileSelector_fillin = 1211;
+    public static final int gralTable_updateCells = 1201;
+    public static final int gralFileSelector_fillin = 1211;
     public static final int gralFileSelector_fillinFinished = 1212;
+    public static final int gralFileSelector_selectFavor = 1213;
+    public static final int gralFileSelector_updateFavor = 1214;
+    public static final int gralFileSelector_setPath = 1215;
     
-    public static int evFocused = 1501;
+    public static final int evFocused = 1501;
   }
 	
 }

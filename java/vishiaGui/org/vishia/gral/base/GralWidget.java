@@ -759,7 +759,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   }
   
   
-  public GralWidget ( GralPos currPos, String sPosName, char whatIs){
+  protected GralWidget ( GralPos currPos, String sPosName, char whatIs){
     this(currPos, sPosName, whatIs, currPos.parent.gralMng());
   }
 

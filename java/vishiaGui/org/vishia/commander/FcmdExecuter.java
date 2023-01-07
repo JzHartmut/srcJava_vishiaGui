@@ -185,7 +185,7 @@ public class FcmdExecuter
     //The GralCommandSelector is a table.
     this.wdgPanelTabCmds = this.main.favorPathSelector.panelLeft.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
     refPos = new GralPos(this.wdgPanelTabCmds);
-    this.cmdSelector = new GralCommandSelector(refPos, "@0..0,0..0=cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
+    this.cmdSelector = new GralCommandSelector(refPos, "@0..0,0..0=cmdSelector", 50, new int[]{0,-10}, cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
     this.windConfirmExec.setVisible(false);
   }
   

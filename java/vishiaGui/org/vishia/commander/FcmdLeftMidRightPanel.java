@@ -340,7 +340,7 @@ public class FcmdLeftMidRightPanel
 
     public FcmdFavorThemeCard(GralPos refPos, Fcmd main, String name, FcmdLeftMidRightPanel panel)
     { //super(name, mng);
-      super(refPos, name, 20, new int[]{10, 30}, 'C');
+      super(refPos, name, 20, new int[]{10, 30});
 
       mainPanel = panel;
     }

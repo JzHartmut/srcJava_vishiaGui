@@ -204,7 +204,6 @@ class FcmdFavorPathSelector
    * whenever it is used.  */
   void buildWindowAddFavorite(){ 
     assert(false);
-    windSearchFiles = GralFileSelector.createWindowConfirmSearchGthread(mng);
     
     //main.gui.addMenuItemGThread("menuFileNaviRefresh", main.idents.menuFileNaviRefreshBar, actionRefreshFileTable); // /
     //main.gui.addMenuItemGThread("menubarFolderCreate", main.idents.menuConfirmMkdirFileBar, main.mkCmd.actionOpenDialog); // /

@@ -31,10 +31,19 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
 import org.vishia.util.StringFunctions_C;
 
+/**This is a comprehensive widget to show the content of files
+ * in some different text coding and also in hexa.
+ * Also support search, also support a simple edit. 
+ * This widget can be used for all situations where file contents should be shown and edit.  
+ * @author Hartmut Schorrig
+ *
+ */
 public class GralViewFileContent extends GralWidgetBase {
 
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2022-12-26 Hartmut moved from FcmdView, can be used commonly outside the.File.commander,
+   *   especially for ordinary file selection and view of its content.  
    * <li>2021-02-05 Hartmut chg for FcmdView, change and write in hex. It is under construction yet now. 
    *     There were no other text editor simply found, which shows characters as hexa, and which allows hexa edit.
    *     Hexa changes should be very interesting for experience. Of course not for the common user.  
@@ -167,7 +176,7 @@ public class GralViewFileContent extends GralWidgetBase {
 //    wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
     
     this.widgFindText = new GralTextField(refPos, "@0.5+2, 2+20=find-" + name , GralTextField.Type.editable);
-    this.btnFind = new GralButton(refPos, "@0.5+2, 22+20++=btnfind-" + name, "Search (ctrl-F)", this.actionFind);
+    this.btnFind = new GralButton(refPos, "@0.5+2, 22+15++1=btnfind-" + name, "Search (ctrl-F)", this.actionFind);
     this.btnWholeword = new GralButton(refPos, "wholeW-" + name, null, null);
     this.btnWholeword.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
     this.btnWholeword.setSwitchMode("wholeWord - no", "wholeWord- yes");
@@ -177,7 +186,7 @@ public class GralViewFileContent extends GralWidgetBase {
     this.btnQuickview = new GralButton(refPos, "btnQuickView-" + name, "quick view", null);
     this.btnQuickview.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
     this.btnQuickview.setSwitchMode("quick view off", "quick view on");
-
+    this.widgShowInfo = new GralTextField(refPos, "info-" + name, "info", "r");
       this.widgContent = new GralTextBox(refPos, "@3..0, 0..0=" + name + "_content");    
 //    widgContent = this.main.gui.gralMng.addTextBox("view-content", false, null, '.');
     this.widgContent.setUser(userKeys);
@@ -566,7 +575,7 @@ public class GralViewFileContent extends GralWidgetBase {
   
   /**Action for Key crl-Q for quick view command. Its like Norton Commander.
    */
-  GralUserAction actionQuickView = new GralUserAction("quick view")
+  public GralUserAction actionQuickView = new GralUserAction("quick view")
   {
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -607,7 +616,7 @@ public class GralViewFileContent extends GralWidgetBase {
   
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionOpenView = new GralUserAction("actionOpenView")
+  public GralUserAction actionOpenView = new GralUserAction("actionOpenView")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction

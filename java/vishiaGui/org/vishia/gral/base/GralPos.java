@@ -426,10 +426,8 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param pos The src pos
    */
   public void set(GralPos pos)
-  { this.x.p1 = pos.x.p1; this.x.p2 = pos.x.p2; 
+  { this.x.p1 = pos.x.p1; this.x.p2 = pos.x.p2;
     this.y.p1 = pos.y.p1; this.y.p2 = pos.y.p2;
-//    this.x.p1Frac = pos.x.p1Frac; this.x.p2Frac = pos.x.p2Frac; 
-//    this.y.p1Frac = pos.y.p1Frac; this.y.p2Frac = pos.y.p2Frac;
     this.x.dirNext = pos.x.dirNext; this.y.dirNext = pos.y.dirNext;
     this.x.n1 = pos.x.n1; this.y.n1 = pos.y.n1;
     this.x.n2 = pos.x.n2; this.y.n2 = pos.y.n2;
@@ -1327,19 +1325,13 @@ public class GralPos extends ObjectVishia implements Cloneable
      */
     public int p2;
     
-    /**Start Position in percent. If -1 then not used.
-     * 
+    /**Start Position as proportionately to the size of the parent (panel). 
+     * If -1 then not used. 0..999, 1000 is the position from left to right or top to bottom border of the parent. 
      */
     int n1 = -1;
-    ///
-    /**End Position in percent. If 0 and n1 ==-1 then p1, p2 are indices to grid values */
-    int n2 = -1;
     
-    /**Fractional parts of position. Use 0..9 only. 
-     * The fractional part counts from left to right respectively top to bottom 
-     * independent of the sign of p1, p2.
-     */
-    //public int p1Frac, p2Frac;
+    /** as proportionately to the size of the parent (panel). */
+    int n2 = -1;
     
     /**Additional border value for {@link GralPos#next}. */
     public int pb;

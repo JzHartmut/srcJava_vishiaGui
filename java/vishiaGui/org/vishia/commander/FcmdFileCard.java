@@ -157,7 +157,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileCard(GralPos refPos, FcmdLeftMidRightPanel mainPanelP, String label){
-    super(refPos, FcmdWidgetNames.tableFile + label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, true);
+    super(refPos, FcmdWidgetNames.tableFile + label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, true, mainPanelP.main.fileViewer);
     this.label = label;
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;

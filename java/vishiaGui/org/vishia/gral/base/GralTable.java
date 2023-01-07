@@ -100,6 +100,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-06 Hartmut new: {@link #setCurrentColumn(int)} important to focus a column,
+   *   if the evaluation of click/enter should depend from the selected column.  At long last it works. 
    * <li>2023-01-02 Hartmut new: {@link #getFirstLine()} sometimes necessary, why this was not existing till now?
    *   {@link #fillVisibleArea()} has had a problem if the #lineSelected was =null, 
    *   occurring on click on a non existing line in the table. now fixed.
@@ -259,7 +261,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  protected final static String sVersion = "2023-01-02";
+  protected final static String sVersion = "2023-01-06";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -305,7 +307,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**The currently selected cell. */
   protected int lineSelectedixCell, colSelectedixCellC;
   
-  protected int lineSelectedNewixCell;
+  protected int lineSelectedNewixCell, colSelectedNewixCellC;
   
   /**Array of lines which are currently associated to the cells of the implementation layer.
    * It means they are the showing lines. Note that the TableLineData referred with the {@link #rootLine}
@@ -727,6 +729,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
 
   
+  public void setCurrentColumn(int col) {
+    this.colSelectedixCellC = col;     // remark the focused column.
+    if(this.gi !=null) {               // the flag bSetFocus sets the focus to this cell on redraw, after them set to false.
+      this.gi.cells[this.lineSelectedixCell][this.colSelectedixCellC].bSetFocus = true;  
+    }
+    redraw();
+  }
+  
   
   /**Sets the color of the currently selected line. 
    * @param color
@@ -774,10 +784,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
 
   @SuppressWarnings("unchecked") @Override
-  public GralTableLine_ifc<UserData> getLine ( String key) {
-    Object oRootline = this.rootLine.getNode(key, keySeparator);
-    if(oRootline instanceof GralTableLine_ifc){ return (GralTableLine_ifc<UserData>) oRootline; }
-    else return null;
+  public TableLineData getLine ( String key) {
+    Object oRootline = this.rootLine.getNode(key, this.keySeparator);
+    if(oRootline instanceof GralTable.TableLineData){ return (TableLineData) oRootline; }
+    else return null;  //unexpected.
   }
 
 
