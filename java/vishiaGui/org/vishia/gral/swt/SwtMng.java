@@ -1013,7 +1013,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override protected GralMenu XXXaddPopupMenu(String sName){
     Control panelSwt = getCurrentPanel(); //(Control)pos().panel.getPanelImpl();
-    GralMenu menu = new GralMenu(); new SwtMenu(menu, null, panelSwt);
+    GralMenu menu = new GralMenu(null); new SwtMenu(menu, null, panelSwt);
     return menu;
   }
   
@@ -1028,7 +1028,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
     Shell windowSwt = (Shell)windg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new SwtMenu(menu, windg, windowSwt);
+    GralMenu menu = new GralMenu(windg); new SwtMenu(menu, windg, windowSwt);
     return menu;
   }
  

@@ -17,6 +17,7 @@ import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 /**This class describes either the menu bar of a window or a context menu of any widget.
@@ -50,13 +51,18 @@ public class SwtMenu extends GralMenu._GraphicImpl
     public void widgetSelected(SelectionEvent e)
     { Object oWidgSwt = e.getSource();
       final GralWidget widgg;
-      if(oWidgSwt instanceof Widget){
+      if(oWidgSwt instanceof Widget){          // a MenuItem is also a widget. it contains data
         Widget widgSwt = (Widget)oWidgSwt;
         Object oGralWidg = widgSwt.getData();
         if(oGralWidg instanceof GralWidget){
           widgg = (GralWidget)oGralWidg;
-        } else { widgg = null; }
-      } else { widgg = null; }
+        } else { 
+          widgg = null;                        // no data assocciated to the MenuItem, no GralWidget 
+        }
+      } else { 
+        assert(false);
+        widgg = null;                          // faulty type
+      }
       try{
         action.exec(KeyCode.menuEntered, widgg);
       } catch(Exception exc){
@@ -82,14 +88,13 @@ public class SwtMenu extends GralMenu._GraphicImpl
    * @param parent
    * @param mng
    */
-  protected SwtMenu(GralMenu gralMenu, GralWidget widgg, Control parent)
+  protected SwtMenu(GralMenu gralMenu, GralWidget widgg, Control swtWidg)
   {
-    gralMenu.super(widgg);
-    this.window = parent.getShell();
-    
-    this.menuSwt = new Menu(parent);
-    parent.setMenu(menuSwt);
-    _implMenu();
+    gralMenu.super(widgg);                 // GralMenu._GraphicImpl as super class
+    this.window = swtWidg.getShell();
+    this.menuSwt = new Menu(swtWidg);       // The SWT main context menu entry.
+    swtWidg.setMenu(menuSwt);               // associated to the SWT widget.
+    createImplMenu();                            // associates all sub menues to the context menu entry.
   }
 
 
@@ -108,74 +113,12 @@ public class SwtMenu extends GralMenu._GraphicImpl
       window.setMenuBar(menuWindow);
     }
     this.menuSwt = menuWindow;
-    _implMenu();
+    createImplMenu();
   }
 
   
   
   
-  
-  
-  
-  /**Adds an action with the menu path to this menu.
-   * This method is package private. It is used by {@link SwtTable} to add a context menu with a special
-   * SelectionListener.
-   * @param nameWidg
-   * @param sMenuPath
-   * @param action
-   */
-  /*package private*/ private void XXXaddMenuItemGthread(GralWidget widggP, String nameWidg, 
-      String sMenuPath, SelectionListener action)
-  {
-    /*
-    String[] names = sMenuPath.split("/");
-    Map<String, GralMenu.MenuEntry> menustore = menus;
-    int ii;
-    Menu parentMenu = menuSwt;  //set initial, it will be a child then
-    for(ii=0; ii<names.length-1; ++ii){
-      //search all pre-menu entries before /. It may be existing, otherwise create it.
-      String name = names[ii];
-      final char cAccelerator;
-      final int posAccelerator = name.indexOf('?');
-      if(posAccelerator >=0){
-        cAccelerator = Character.toUpperCase(name.charAt(posAccelerator));
-        name = name.replace("&", "");
-      } else {
-        cAccelerator = 0;
-      }
-      MenuEntry menuEntry = menustore.get(name);
-      if(menuEntry == null){
-        //create it.
-        menuEntry = new MenuEntry();
-        menustore.put(name, menuEntry);
-        menuEntry.name = name;
-        menuEntry.subMenu = new TreeMap<String, MenuEntry>();
-        MenuItem item = new MenuItem(parentMenu, SWT.CASCADE);
-        item.setText(name);
-        if(cAccelerator !=0){
-          item.setAccelerator(SWT.CONTROL | cAccelerator);
-        }
-        Menu menu = new Menu(window, SWT.DROP_DOWN);
-        item.setMenu(menu);
-        menuEntry.menuImpl = menu;
-      }
-      menustore = menuEntry.subMenu;
-      parentMenu = (Menu)menuEntry.menuImpl;
-    }
-    String name = names[ii];
-    MenuItem item = new MenuItem(parentMenu, SWT.None);
-    if(widggP != null){
-      //An associated GralWidget
-      item.setData(widggP);
-    } else {
-      item.setData(widgg);
-    }
-    item.setText(name);
-    //item.setAccelerator(SWT.CONTROL | 'S');
-    item.addSelectionListener(action);
-    */
-  }
-
 
 
 
@@ -183,12 +126,14 @@ public class SwtMenu extends GralMenu._GraphicImpl
    * @param oParentMenu return value of {@link #getMenuImpl()} or the {@link GralMenu.MenuEntry#menuImpl}, that is a menu node. 
    * @param gralEntry The entry in the menu tree
    */
-  @Override public void _implMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry)
+  @Override public void createImplMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry)
   { assert(gralEntry.menuImpl ==null);
     Menu parentMenu = (Menu) oParentMenu;
     MenuItem item = new MenuItem(parentMenu, gralEntry.subMenu !=null ? SWT.CASCADE : SWT.NONE);
     item.setText(gralEntry.name);
     item.setData(gralEntry.widgg);
+    if(gralEntry.widgg ==null && gralEntry.subMenu ==null) //check whether the end point of a menu has a widgg 
+      Debugutil.stop();
     if(gralEntry.cAccelerator !=0){
       item.setAccelerator(SWT.CONTROL | gralEntry.cAccelerator);
     }

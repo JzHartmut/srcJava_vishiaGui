@@ -1359,7 +1359,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    */
   public GralMenu getContextMenu(){
     if( this.contextMenu == null){
-      this.contextMenu = new GralMenu(); //itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+      this.contextMenu = new GralMenu(this); //itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
     }
     return this.contextMenu;
   }

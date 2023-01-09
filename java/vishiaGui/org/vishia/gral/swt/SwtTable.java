@@ -552,7 +552,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected GralMenu createColumnMenu(int column){
     //GralMenu menuColumn = new SwtMenu(outer, swtWidgWrapper.widgetSwt, itsMng());
-    GralMenu menuColumn = new GralMenu(); 
+    GralTable<?> widgg = (GralTable<?>)super.widgg;
+    GralMenu menuColumn = new GralMenu(widgg); 
     new SwtMenu(menuColumn, null, cellsSwt[0][column]);
     for(int iRow = 1; iRow < cellsSwt.length; ++iRow){
       //uses the same menu instance in all cells of the column.
@@ -701,12 +702,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    */
   protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng, GralMenu contextMenu, GralMenu[] contextMenuColumn ){
     int yPix = 0;
+    GralTable wdgg = (GralTable)super.widgg;
     Font font = mng.propertiesGuiSwt.stdInputFont; //mng.propertiesGuiSwt.getTextFontSwt(2, 'n', 'n');
     Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
     if(contextMenuColumn !=null || contextMenu !=null) {
       Debugutil.stop();
-      //new SwtMenu(contextMenu, null, cellsSwt[0][column]);
-      
     }
     
     for(int iCol = 0; iCol < zColumns; ++iCol){
@@ -735,14 +735,14 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         super.cells[iRow][iCol] = cellData;                // in GralTable.GraphicImplAccess
         cell.setBackground(colorBackTableSwt);
         if(contextMenu !=null) {
-          if(!contextMenu.hasImplementation()){            // create a implementation with the first cell
-            new SwtMenu(contextMenu, null, cell);          // enters in contectMenu
+          if(!contextMenu.hasImplementation()){            // create a implementation with the first cell and the GralTable as widget.
+            new SwtMenu(contextMenu, wdgg, cell);          // aggregates SwtMenu in contectMenu
           }
           cell.setMenu((Menu)contextMenu.getMenuImpl());
         }
         if(contextMenuColumn !=null && contextMenuColumn[iCol] !=null) {
-          if(!contextMenuColumn[iCol].hasImplementation()){            // create a implementation with the first cell
-            new SwtMenu(contextMenuColumn[iCol], null, cell);          // enters in contectMenu
+          if(!contextMenuColumn[iCol].hasImplementation()){   // create a implementation with the first cell and the GralTable as widget.
+            new SwtMenu(contextMenuColumn[iCol], wdgg, cell); // aggregates SwtMenu in contectMenu
           }
           cell.setMenu((Menu)contextMenuColumn[iCol].getMenuImpl());
         }

@@ -295,7 +295,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    */
   @Override public GralMenu getMenuBar(){
     if(this.menuBarGral == null){
-      this.menuBarGral = new GralMenu(); //itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
+      this.menuBarGral = new GralMenu(this); //itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
     }
     return this.menuBarGral;
   }

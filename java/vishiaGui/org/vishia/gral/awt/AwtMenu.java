@@ -22,7 +22,7 @@ public class AwtMenu extends GralMenu._GraphicImpl
 
   public AwtMenu(GralWidget widgg, Component parent, GralMng mng)
   {
-    new GralMenu().super(widgg);
+    new GralMenu(widgg).super(widgg);
     menuBar = null;
     menuAwt = new PopupMenu("test");
     MenuItem item = new MenuItem("Test1");
@@ -33,7 +33,7 @@ public class AwtMenu extends GralMenu._GraphicImpl
 
   public AwtMenu(GralWidget widgg, Frame window, GralMng mng)
   {
-    new GralMenu().super(widgg);
+    new GralMenu(widgg).super(widgg);
     menuAwt = null;
     menuBar = new MenuBar();
     window.setMenuBar(menuBar);   
@@ -45,7 +45,7 @@ public class AwtMenu extends GralMenu._GraphicImpl
    * @param oParentMenu return value of {@link #getMenuImpl()} or the {@link GralMenu.MenuEntry#menuImpl}, that is a menu node. 
    * @param gralEntry The entry in the menu tree
    */
-  @Override public void _implMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry)
+  @Override public void createImplMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry)
   { assert(gralEntry.menuImpl ==null);
     Menu parentMenu = (Menu) oParentMenu;
     //TODO

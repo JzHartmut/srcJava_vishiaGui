@@ -395,7 +395,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new AwtMenu(widg, widgSwt, gralMng);  //TODO
+    GralMenu menu = new GralMenu(widg); new AwtMenu(widg, widgSwt, gralMng);  //TODO
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
 //    widgSwt.add(menuAwt);
 //    menuAwt.show(widgSwt, 10, 10);
@@ -406,7 +406,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
     Frame windowAwt = (Frame)windg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new AwtMenu(windg, windowAwt, gralMng);  //TODO
+    GralMenu menu = new GralMenu(windg); new AwtMenu(windg, windowAwt, gralMng);  //TODO
     return menu;
   }
  
