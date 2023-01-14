@@ -9,7 +9,7 @@
 ============================== java/vishiaGui/org/vishia/ ==========================================
 
 ============================== java/vishiaGui/org/vishia/commander/ ================================
-2023-01-12 23:03:22  x     Fcmd.java                                ::         33.382  1177145959 
+2023-01-14 21:20:09  x     Fcmd.java                                ::         33.514  0611685652 
 2022-11-20 23:06:59  x     FcmdActions.java                         ::         10.031 -0967068095 
 2023-01-09 10:39:03  x     FcmdButtons.java                         ::         18.971  0837127391 
 2023-01-12 11:18:23  x     FcmdCopyCmprDel.java                     ::         78.893 -1205924580 
@@ -18,8 +18,8 @@
 2023-01-03 23:42:37  x     FcmdEdit.java                            ::          8.193 -1780324974 
 2023-01-07 08:14:23  x     FcmdExecuter.java                        ::         16.560  0712638834 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
-2023-01-07 13:41:16  x     FcmdFavorPathSelector.java               ::         31.648  0717419318 
-2023-01-07 13:44:53  x     FcmdFileCard.java                        ::         33.481 -1541648307 
+2023-01-14 20:07:35  x     FcmdFavorPathSelector.java               ::         31.648  0717419318 
+2023-01-14 21:36:10  x     FcmdFileCard.java                        ::         34.557  0239126811 
 2023-01-12 23:07:06  x     FcmdFileProps.java                       ::         20.540 -2023021566 
 2023-01-03 23:40:17  x     FcmdFilesCp.java                         ::          7.583  0779419410 
 2023-01-07 08:37:24  x     FcmdGui.java                             ::          1.292  1271697535 
@@ -99,7 +99,7 @@
 2021-10-04 14:29:58  x     GralKeySpecial_ifc.java                  ::           .643  1703042261 
 2022-12-23 17:25:42  x     GralLed.java                             ::          5.644  0920501502 
 2023-01-09 10:56:17  x     GralMenu.java                            ::         13.516  1052409841 
-2023-01-07 09:39:05  x     GralMng.java                             ::        108.470  1586804426 
+2023-01-14 20:58:45  x     GralMng.java                             ::        108.470  1586804426 
 2021-10-04 14:29:51  x     GralMouseWidgetAction_ifc.java           ::          6.427  1051994076 
 2021-10-04 14:29:48  x     GralPanelActivated_ifc.java              ::          2.046 -1473302430 
 2023-01-03 18:18:32  x     GralPanelContent.java                    ::         26.929 -2107862003 
@@ -108,7 +108,7 @@
 2022-11-13 19:23:26  x     GralShowMethods.java                     ::         11.736 -0385445325 
 2022-10-01 23:10:04  x     GralSlider.java                          ::          1.120 -1628059821 
 2023-01-05 10:05:08  x     GralSwitchButton.java                    ::          1.661 -0898529018 
-2023-01-09 10:34:18  x     GralTable.java                           ::        122.461 -0092763205 
+2023-01-14 20:02:45  x     GralTable.java                           ::        122.605  1157616702 
 2022-12-23 17:22:13  x     GralTextBox.java                         ::          7.699 -0404541197 
 2023-01-14 17:17:50  x     GralTextField.java                       ::         35.268 -1884181200 
 2022-12-23 17:22:14  x     GralValueBar.java                        ::          6.217  0388024784 
@@ -243,8 +243,8 @@
 2023-01-03 23:29:42  x     GralColorSelector.java                   ::          7.355  1841523366 
 2023-01-07 08:13:26  x     GralCommandSelector.java                 ::          8.473  1777158701 
 2023-01-05 20:49:42  x     GralFileSelectWindow.java                ::          8.915 -1622746957 
-2023-01-09 10:35:26  x     GralFileSelector.java                    ::         92.196  1465215511 
-2022-12-23 17:21:05  x     GralHorizontalSelector.java              ::         10.530 -1896136479 
+2023-01-14 21:29:50  x     GralFileSelector.java                    ::         93.162  0239627867 
+2023-01-14 21:32:15  x     GralHorizontalSelector.java              ::         11.036  0123672466 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2023-01-03 23:37:09  x     GralInfoBox.java                         ::         15.580 -1967797956 
 2022-11-20 16:45:53  x     GralLabel.java                           ::          1.639 -1855343261 

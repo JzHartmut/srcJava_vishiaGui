@@ -76,6 +76,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2023-01-14 Now a favor which is selected is marked green, remove of tabs works. (!)
    * <li>2023-01-06 progress, practical usage for The.file.Commander
    * <li>2022-12-21 progress, tabs for file cards with {@link GralHorizontalSelector} as before in Fcmd only
    * <li>2022-12-21 progress, now switch between both tables and also [F3] key with a view window.
@@ -570,6 +571,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   GralColor colorBack, colorBackPending;
   
+  GralColor colorMarkFavor = GralColor.getColor("lgn");
+  
   private final IndexMultiTable<String, GralTableLine_ifc<FileRemote>> idxLines = 
     new IndexMultiTable<String, GralTableLine_ifc<FileRemote>>(IndexMultiTable.providerString);
   
@@ -734,7 +737,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     menuFolder.addMenuItem("x", "refresh [cR]", this.action.actionRefreshFileTable);
     //panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     this.widgBtnFavor = new GralButton(refPos, "@0+2, -5..0=btnFavor-" + this.name, "favor", this.action.actionFavorButton);
-    this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
+    this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), this.colorMarkFavor);
     //widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
@@ -1671,10 +1674,21 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.widgBtnFavor.setState(GralButton.State.On);
     this.wdgSelectList.wdgdTable.setVisible(false);
     if(this.currentFile !=null) {
-      updateFavorWithCurrentDir();
+      updateFavorWithCurrentDir();               // store the current dir of the sCurrFavor before change favor.
     }
     //this.wdgFavorTable.redraw1(100, 100);
     //this.wdgFavorTable.setVisible(true);
+    for(Map.Entry<String, FavorPath> eFavor : indexFavorPaths.entrySet()) {
+      FavorPath favor = eFavor.getValue();
+      GralTable<FavorPath>.TableLineData favorLine = this.wdgFavorTable.getLine(favor.selectName);
+      if(favorLine !=null) {                     // mark the line in left column with green if it is an active favor.
+        if(favor.sCurrDir !=null) {
+          favorLine.setBackColor(this.colorMarkFavor, 0);
+        } else {
+          favorLine.cleanSpecialColorsOfLine();
+        }
+      }
+    }
     this.wdgFavorTable.setCurrentColumn(0);
     this.wdgFavorTable.setFocus();               // set the favor table visiable and in focus
   }
@@ -2149,8 +2163,14 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     GralUserAction actionSetFromTabSelection = new GralUserAction("actionSetFromTabSelection"){
       @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
         GralFileSelector.FavorPath favor = (GralFileSelector.FavorPath)params[0];
-        updateFavorWithCurrentDir();
-        selectFileTableFromFavor(favor);
+        if(actionCode == KeyCode.removed) {
+          favor.sCurrDir = null;                 // deactivated favor
+        } else if(actionCode == KeyCode.activated) {
+          updateFavorWithCurrentDir();
+          selectFileTableFromFavor(favor);
+        } else {
+          assert(false);
+        }
         return true;      
     } };
 

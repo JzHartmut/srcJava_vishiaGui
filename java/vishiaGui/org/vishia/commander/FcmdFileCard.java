@@ -53,42 +53,44 @@ public class FcmdFileCard extends GralFileSelector
 {
 
   
-//  /**Version, history and license
-//   * <ul>
-//   * <li>2012-03-09 Hartmut new: Now the synchronization between 2 panels works independent of
-//   *   the comparison with a improved algorithm. 
-//   * <li>2012-02-04 Hartmut new: {@link #searchCompareResult(File)} supports working with
-//   *   comparison result, used to set equal if a file was copied.
-//   * </ul>
-//   * 
-//   * 
-//   * <b>Copyright/Copyleft</b>:
-//   * For this source the LGPL Lesser General Public License,
-//   * published by the Free Software Foundation is valid.
-//   * It means:
-//   * <ol>
-//   * <li> You can use this source without any restriction for any desired purpose.
-//   * <li> You can redistribute copies of this source to everybody.
-//   * <li> Every user of this source, also the user of redistribute copies
-//   *    with or without payment, must accept this license for further using.
-//   * <li> But the LPGL ist not appropriate for a whole software product,
-//   *    if this source is only a part of them. It means, the user
-//   *    must publish this part of source,
-//   *    but don't need to publish the whole source of the own product.
-//   * <li> You can study and modify (improve) this source
-//   *    for own using or for redistribution, but you have to license the
-//   *    modified sources likewise under this LGPL Lesser General Public License.
-//   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
-//   * </ol>
-//   * If you are intent to use this sources without publishing its usage, you can get
-//   * a second license subscribing a special contract with the author. 
-//   * 
-//   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-//   * 
-//   * 
-//   */
-//  @SuppressWarnings("hiding")
-//  public static final int version = 0x20120626;
+  /**Version, history and license
+   * <ul>
+   * <li>2023-01-14 fixed: Now from begin the current tab is green and recognized as current.
+   * <li>2022-12 Most of content is now in {@link GralFileSelector}, refactoring.  
+   * <li>2012-03-09 Hartmut new: Now the synchronization between 2 panels works independent of
+   *   the comparison with a improved algorithm. 
+   * <li>2012-02-04 Hartmut new: {@link #searchCompareResult(File)} supports working with
+   *   comparison result, used to set equal if a file was copied.
+   * </ul>
+   * 
+   * 
+   * <b>Copyright/Copyleft</b>:
+   * For this source the LGPL Lesser General Public License,
+   * published by the Free Software Foundation is valid.
+   * It means:
+   * <ol>
+   * <li> You can use this source without any restriction for any desired purpose.
+   * <li> You can redistribute copies of this source to everybody.
+   * <li> Every user of this source, also the user of redistribute copies
+   *    with or without payment, must accept this license for further using.
+   * <li> But the LPGL ist not appropriate for a whole software product,
+   *    if this source is only a part of them. It means, the user
+   *    must publish this part of source,
+   *    but don't need to publish the whole source of the own product.
+   * <li> You can study and modify (improve) this source
+   *    for own using or for redistribution, but you have to license the
+   *    modified sources likewise under this LGPL Lesser General Public License.
+   *    You mustn't delete this Copyright/Copyleft inscription in this source file.
+   * </ol>
+   * If you are intent to use this sources without publishing its usage, you can get
+   * a second license subscribing a special contract with the author. 
+   * 
+   * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
+   * 
+   * 
+   */
+  @SuppressWarnings("hiding")
+  public static final int version = 0x20230114;
 //  
 //  /**Table widget for the select table of the file tab.*/
 //  FcmdFavorCard wdgFavorCard;
@@ -393,6 +395,7 @@ public class FcmdFileCard extends GralFileSelector
    */
   protected void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
+    this.gralMng().log().sendMsg(Fcmd.LogMsg.fmcdFileCard_selectFile, "actionOnFileSelected ixMainPanel=%d %s", this.mainPanel.ixMainPanel, file);
     this.main.selectedFiles123[this.mainPanel.ixMainPanel] = file;
     
     if(this.mainPanel.orderMainPanel == 1){
@@ -507,7 +510,7 @@ public class FcmdFileCard extends GralFileSelector
    * Sets {@link Fcmd#lastFavorCard}, {@link FcmdLeftMidRightPanel#actFileCard}, 
    * {@link Fcmd#lastFilePanels}. 
    */
-  private void setActFilePanel_setColorCurrLine(){
+  protected void setActFilePanel_setColorCurrLine(){
     //main.lastFavorCard = wdgFavorCard;
     this.main.currentFileCard = this;
     this.mainPanel.actFileCard = FcmdFileCard.this;
@@ -529,6 +532,14 @@ public class FcmdFileCard extends GralFileSelector
     org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.wdgSelectList.wdgdTable.getCurrentLine();
     FileRemote fileCurr = line.getData();
     String fName = line.getCellText(1);
+    FcmdLeftMidRightPanel p1 = this.main.lastFilePanels.size() <=0 ? null: this.main.lastFilePanels.get(0);
+    FcmdLeftMidRightPanel p2 = this.main.lastFilePanels.size() <=1 ? null: this.main.lastFilePanels.get(1);
+    FcmdLeftMidRightPanel p3 = this.main.lastFilePanels.size() <=2 ? null: this.main.lastFilePanels.get(2);
+    char c1 = p1 == null? '.' : p1.cc;
+    char c2 = p2 == null? '.' : p2.cc;
+    char c3 = p3 == null? '.' : p3.cc;
+    String sOrderFilePanels = "" + c1 + c2 + c3;
+    this.gralMng().log.sendMsg(Fcmd.LogMsg.fmcdFileCard_setCurrFilePanel, "setCurrFilePanel : %s", sOrderFilePanels );
     actionOnFileSelection(fileCurr, fName);
   }
   
@@ -543,6 +554,7 @@ public class FcmdFileCard extends GralFileSelector
      * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.base.GralWidget, java.lang.Object[])
      */
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
+      setActFilePanel_setColorCurrLine();                  // action on this card: It is the first one
       mainPanel.bFavorCardHasFocus = false;
       mainPanel.bFavorThemeCardHasFocus = false;
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
@@ -615,9 +627,10 @@ public class FcmdFileCard extends GralFileSelector
    * respectively its base class {@link GralFileSelector#setActionOnEnterFile(GralUserAction)} 
    * It calls {@link FcmdExecuter#executeFileByExtension(File)}.
    */
-  private GralUserAction actionOnEnterFile = new GralUserAction("actionOnEnterFile")
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { FileRemote file = (FileRemote)params[0]; 
+  private GralUserAction actionOnEnterFile = new GralUserAction("actionOnEnterFile") { 
+    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params) { 
+      setActFilePanel_setColorCurrLine();                  // action on this card: It is the first one
+      FileRemote file = (FileRemote)params[0]; 
       FcmdFileCard.this.main.executer.executeFileByExtension(file);  
       return true;
     }

@@ -2630,6 +2630,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       redraw();
     }
     
+    
+    public void cleanSpecialColorsOfLine ( ) {
+      if(this.cellColorBack !=null) {
+        this.cellColorBack = null;
+      }
+    }
+    
     @Override public GralColor getBackColor(int ix)
     { 
       if(ix <0 || cellColorBack == null) {

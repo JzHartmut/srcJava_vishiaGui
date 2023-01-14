@@ -844,6 +844,10 @@ public class Fcmd //extends GuiCfg
    *
    */
   public static class LogMsg {
+    
+    public static final int fmcdFileCard_selectFile = 2101;
+    public static final int fmcdFileCard_setCurrFilePanel = 2102;
+
   }  
 
 }

@@ -36,6 +36,7 @@ public class GralHorizontalSelector<UserData> extends GralWidget
 {
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2023-01-14 Hartmut remove tabs works, used for {@link GralFileSelector}.
    * <li>2013-06-18 Hartmut created, new idea.
    * </ul>
    * 
@@ -165,24 +166,25 @@ public class GralHorizontalSelector<UserData> extends GralWidget
    * 
    */
   protected void removeTab(){
-    boolean actItemRemoved = ixDstItem == ixActItem;
-    Item<UserData> removed = items.remove(ixDstItem);
-    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
-    /* un-necessary for remove:
-    if(action !=null){
-      Object[] args = action.args();
-      if(args == null){ action.action().exec(KeyCode.activated, GralHorizontalSelector.this, actItem.data); }
-      else { action.action().exec(KeyCode.removed, GralHorizontalSelector.this, args, actItem.data); }
-    }
-    */
-    if(ixDstItem < ixActItem){ ixActItem -=1; }
-    if(actItemRemoved){
-      if(ixActItem >= items.size()){
-        ixDstItem = ixActItem-1;
+    boolean currItemRemoved = this.ixDstItem == this.ixActItem;
+    Item<UserData> removed = this.items.remove(this.ixDstItem);
+    if(this.ixDstItem < this.ixActItem){ this.ixActItem -=1; }
+    if(currItemRemoved){                         // remove the current item
+      if(this.ixActItem >= this.items.size()){
+        this.ixDstItem = this.ixActItem-1;                  // select the item before.
       }
       setDstToActItem();  //calls activation of the yet actual item.
-    } else {
-      ixDstItem = ixActItem; //unchanged
+    } else {                                     // remove another item, not selected yet.
+      if(this.ixActItem > this.ixDstItem) {
+        this.ixActItem -=1;                      // ixActItem -1 because one is removed between
+      }
+      this.ixDstItem = this.ixActItem; //unchanged
+    }
+    GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+    if(action !=null){                           // call the user action for remove
+      Object[] args = action.args();
+      if(args == null){ action.action().exec(KeyCode.removed, GralHorizontalSelector.this, removed.data); }
+      else { action.action().exec(KeyCode.removed, GralHorizontalSelector.this, args, removed.data); }
     }
     redraw(100, 300);
   }
@@ -202,7 +204,9 @@ public class GralHorizontalSelector<UserData> extends GralWidget
 
   GralUserAction actionRemoveTab = new GralUserAction("actionRemoveTab"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
-      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ removeTab(); }
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){ 
+        removeTab(); 
+      }
       return true;
     }
     
