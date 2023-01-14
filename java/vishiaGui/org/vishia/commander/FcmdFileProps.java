@@ -113,6 +113,7 @@ public class FcmdFileProps
     this.formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     evChg = new FileRemote.CallbackEvent(evSrc, null, null, callbackChgProps, null, evSrc);
     evCntLen = new FileRemote.CallbackEvent(evSrc, null, null, callbackCntLen, null, evSrc);
+    buildWindow();
   }
   
   
@@ -133,8 +134,8 @@ public class FcmdFileProps
     main.gui.gralMng.selectPanel("primaryWindow");
     main.gui.gralMng.setPosition(-30, 0, -47, 0, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
-    GralWindow window =  main.gui.gralMng.createWindow("windProp", "file properties - The.file.Commander", windProps);
-    windFileProps = window; 
+    this.windFileProps =  main.gui.gralMng.createWindow("windProp", "file properties - The.file.Commander", windProps);
+    this.windFileProps.setWindowVisible(false);
     main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 'd');
     widgLink = main.gui.gralMng.addTextField("link", false, "symbolic link", "t");
     widgDir = main.gui.gralMng.addTextField("dir", false, "directory path", "t");

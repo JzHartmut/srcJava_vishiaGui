@@ -30,13 +30,6 @@ public class FcmdMkDirFile
   
   public FcmdMkDirFile(Fcmd main)
   { this.main = main;
-  }
-  
-  
-  /**Builds the content of the confirm-delete window. The window is created static. It is shown
-   * whenever it is used.  */
-  void buildWindowConfirmMk()
-  {
     main.gui.gralMng.selectPanel("primaryWindow");
     main.gui.gralMng.setPosition(-19, 0, -47, 0, 'r'); //right buttom, about half less display width and hight.
     int windProps = GralWindow.windConcurrently;
@@ -50,6 +43,13 @@ public class FcmdMkDirFile
     widgButtonMkFile = main.gui.gralMng.addButton(null, actionButton, "f", null, "create file");
     
     windMk = window; 
+  }
+  
+  
+  /**Builds the content of the confirm-delete window. The window is created static. It is shown
+   * whenever it is used.  */
+  void buildWindowConfirmMk()
+  {
  
   }
   

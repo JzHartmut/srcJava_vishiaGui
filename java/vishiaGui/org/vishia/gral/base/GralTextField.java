@@ -814,7 +814,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
  
     protected int borderwidth(){ return GralTextField.this.borderwidth; }
     
-    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
+    /**Access and clear a new Text set in any other thread.
+     * See {@link GralTextBox#append(CharSequence)}
+     * @return the new text.
+     */
+    protected String getAndClearNewText(){ String ret; 
+      synchronized(newText){ 
+        ret = newText.toString(); newText.setLength(0); 
+      } return ret; 
+    }
   
     /**Returns the cursor position in the whole text
      * @return

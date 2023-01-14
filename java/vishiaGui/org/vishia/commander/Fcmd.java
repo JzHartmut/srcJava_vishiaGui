@@ -295,6 +295,8 @@ public class Fcmd //extends GuiCfg
 
   // GralTabbedPanel tabbedPanelsLeft, tabbedPanelsMid, tabbedPanelsRight;
 
+  final FcmdIdents idents = new FcmdIdents(this);
+
   final FcmdWindowMng windMng = new FcmdWindowMng(this);
 
   final FcmdButtons fButtons = new FcmdButtons(this);
@@ -345,7 +347,7 @@ public class Fcmd //extends GuiCfg
 
   /**
    * Note: this should be the last aggregate of Fcmd because it uses some other ones. */
-  final FcmdIdents idents = new FcmdIdents(this);
+//  final FcmdIdents idents = new FcmdIdents(this);
   
   
   /**The current directory of the last selected file. */
@@ -391,7 +393,7 @@ public class Fcmd //extends GuiCfg
   
   
   
-  public Fcmd(CallingArgs cargs) //, GralArea9MainCmd cmdgui)
+  public Fcmd ( CallingArgs cargs) //, GralArea9MainCmd cmdgui)
   {
     //super(cargs, cmdgui, null, null, null);
     this.cargs = cargs;
@@ -402,7 +404,7 @@ public class Fcmd //extends GuiCfg
     //msgDisp.msgDispatcher.setOutputRange(0, 100000, 4, MsgDispatcher.mAdd, 0);
     this.fcmdActions.actionReadMsgConfig.exec(KeyCode.menuEntered, null);
     
-    
+    this.idents.buildDependings();
     
     target = new FcmdtTarget();  //create the target itself, one process TODO experience with remote target.
     buttonCmds = new TreeMap<String, JZtxtcmdScript.Subroutine>();

@@ -702,6 +702,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   final protected void abortCopy(){
     //if(fileSrc !=null ) {fileSrc.abortAction();}
+    this.state = Estate.start;
     for(FileRemote.CallbackEvent ev: listEvCopy){
       //ev.copyAbortAll();
       //ev.sendEvent(FileRemote.cmdAbortAll);

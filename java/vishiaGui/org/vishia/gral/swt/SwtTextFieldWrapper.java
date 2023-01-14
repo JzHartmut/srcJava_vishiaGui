@@ -45,6 +45,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-14 Hartmut fix: after improve of {@link #updateValuesForAction()}: 
+   *   a text changed with {@link org.vishia.gral.base.GralTextBox#append(CharSequence)} was not mirrored in {@link GralWidget.DynamicData#displayedText}.
+   *   The reason was: It was no more updated, before updated not planned on Focus lost. 
+   *   Now the displayedText is updated in {@link #redrawGthread()} on evaluation of dyda().
    * <li>2022-12-26 Hartmut fix: {@link #updateValuesForAction()} a {@link GralTextField#setText(CharSequence)} was pending
    *   during a focus lost event. The focus lost calls updateValues... but the new value was not written till yet
    *   (delayed {@link GralWidget.ImplAccess#redrawGthread()}
@@ -251,14 +255,14 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   @Override public void redrawGthread(){
     int catastrophicalCount = 0;
     int chg;
-    if(textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
+    if(this.textFieldSwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();
       while( (chg = getChanged()) !=0){ //widgg.dyda.whatIsChanged.get();
         if(++catastrophicalCount > 10000) {
           throw new RuntimeException("acknowledge failed");
         }
         if((chg & chgText) !=0 && dyda.displayedText !=null){ 
-          textFieldSwt.setText(dyda.displayedText);
+          this.textFieldSwt.setText(dyda.displayedText);
           //end::redrawGthread[]
           final int selectionStart, selectionEnd;
           final int zText = dyda.displayedText.length();
@@ -273,26 +277,30 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
             selectionEnd = selectionStart =-1;  //dont call
           }
           if(selectionStart >=0){
-            textFieldSwt.setSelection(selectionStart, selectionEnd);
+            this.textFieldSwt.setSelection(selectionStart, selectionEnd);
           }
         }
         if((chg & chgAddText) !=0) {
-          this.textFieldSwt.append(getAndClearNewText());
+          String newText = getAndClearNewText(); // temporary stored in GralTextField#newText 
+          this.textFieldSwt.append(newText);     // update also the text on GralLevel.
+          dyda.displayedText = this.textFieldSwt.getText();  // get the currently text, this is the truth
+          // Hint new since 2023-01, before 2022-12 it was updated on focus lost.
+          
         }
         if((chg & chgColorText)!=0){
-          SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
+          SwtProperties props = this.swtWidgHelper.mng.propertiesGuiSwt;
           if(dyda.textColor !=null){
-            textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
+            this.textFieldSwt.setForeground(props.colorSwt(dyda.textColor));
           }
           if(dyda.backColor !=null){
-            textFieldSwt.setBackground(props.colorSwt(dyda.backColor));
+            this.textFieldSwt.setBackground(props.colorSwt(dyda.backColor));
           }
           if(dyda.textFont !=null){
-            textFieldSwt.setFont(props.fontSwt(dyda.textFont));
+            this.textFieldSwt.setFont(props.fontSwt(dyda.textFont));
           }
         }
         if((chg & chgEditable) !=0){ 
-          textFieldSwt.setEditable(widgg.isEditable());
+          this.textFieldSwt.setEditable(this.widgg.isEditable());
         }
         if((chg & chgNonEditable)!=0){ 
           this.textFieldSwt.setEditable(false); 
@@ -304,29 +312,29 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
           this.textFieldSwt.update();
         }
         if((chg & chgCursor) !=0){ 
-          textFieldSwt.setSelection(caretPos());
+          this.textFieldSwt.setSelection(caretPos());
         }
         if((chg & chgPrompt) !=0){ 
-          promptSwt.setText(this.prompt());
-          promptSwt.redraw();
+          this.promptSwt.setText(this.prompt());
+          this.promptSwt.redraw();
         }
         if((chg & chgFocus) !=0){ 
           this.textFieldSwt.setFocus();
         }
         if((chg & chgVisible) !=0){ 
-          textFieldSwt.setVisible(true);
+          this.textFieldSwt.setVisible(true);
         }
         if((chg & chgInvisible) !=0){ 
-          textFieldSwt.setVisible(false);
+          this.textFieldSwt.setVisible(false);
         }
         if((chg & chgColorText) !=0){ 
-          textFieldSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); 
+          this.textFieldSwt.setForeground(this.swtWidgHelper.mng.getColorImpl(dyda().textColor)); 
         }
         //tag::redrawGthreadEnd[]
         if((chg & chgColorBack) !=0){ 
-          textFieldSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); 
+          this.textFieldSwt.setBackground(this.swtWidgHelper.mng.getColorImpl(dyda().backColor)); 
         }
-        textFieldSwt.redraw();
+        this.textFieldSwt.redraw();
         //textFieldSwt.
         acknChanged(chg);
       }
@@ -561,7 +569,9 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   public void updateValuesForAction() {
     GralTextField wdg = (GralTextField)SwtTextFieldWrapper.super.widgg;
     GralWidget.DynamicData dyda = SwtTextFieldWrapper.super.dyda();
-    if( wdg.isEditable() && (dyda.getChanged() & (GralTextField.GraphicImplAccess.chgText | GralTextField.GraphicImplAccess.chgText)) ==0) {
+    if(  wdg.isEditable()                                  // only call on editable fields, all other cannot be changed.
+      && (dyda.getChanged() & (GralTextField.GraphicImplAccess.chgText | GralTextField.GraphicImplAccess.chgText)) 
+         ==0 ) {                                           // prevent update the Gral text if a chgText (with a new text) is pending!
       String text2 = this.textFieldSwt.getText();          // get the text from the graphic and write into dyda
       if(! text2.equals(dyda.displayedText)) {             // but only if a text change is not pending. 
         dyda.displayedText = text2;
