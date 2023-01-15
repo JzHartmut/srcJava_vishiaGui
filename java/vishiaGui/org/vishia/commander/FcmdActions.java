@@ -268,6 +268,17 @@ public class FcmdActions {
     }
   };
   
+  /**Action for Key F9 for view command. 
+   */
+  GralUserAction actionOpenDialog = new GralUserAction("actionOpenDialog")
+  {
+    @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
+        //TODO openDialog(main.currentFile());
+      }
+      return true;
+    }
+  };
 
   
 }

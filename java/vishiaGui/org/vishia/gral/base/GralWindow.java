@@ -245,7 +245,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
   
 
-  
+  @Override public GralPanelContent getItsPanel(){ return this.mainPanel; }
+
   @Override public void setWindowVisible(boolean visible){
     setVisible(visible);
   }

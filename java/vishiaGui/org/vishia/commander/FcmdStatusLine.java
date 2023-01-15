@@ -132,8 +132,8 @@ public class FcmdStatusLine
       sPath = sPath.replace('/', '\\');
     }
     main.statusLine.widgFilePath.setText(sPath);
-    if(main.filePropsCmd.isVisible){
-      main.filePropsCmd.showFileInfos(file);
+    if(main.fileProps.isVisible()){
+      this.main.fileProps.showFileInfos(file);
     }
     main.fileViewer.quickView();
     

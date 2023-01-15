@@ -134,7 +134,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   private SwtTextFieldWrapper(GralTextField widgg, SwtMng swtMng, boolean bbox)
   {
     widgg.super(widgg, swtMng); //NOTE: superclass is a non static inner class of GralTextField. 
-    if(widgg.name.startsWith("showSrc"))
+    if(widgg.name !=null && widgg.name.startsWith("showSrc"))
       Debugutil.stop();
     this.bbox = bbox;
     Composite panelSwt = SwtMng.getSwtParent(widgg.pos()); //    mng.getCurrentPanel();

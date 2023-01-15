@@ -1877,7 +1877,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   /**Gets the panel where the widget is member of. 
    * @return The panel.
    */
-  public GralPanel_ifc getItsPanel(){ return (GralPanelContent)_wdgPos.parent; }
+  public GralPanelContent getItsPanel(){ return (GralPanelContent)_wdgPos.parent; }
   
   
   /* (non-Javadoc)

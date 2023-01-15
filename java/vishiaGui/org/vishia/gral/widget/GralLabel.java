@@ -15,9 +15,9 @@ public class GralLabel extends GralWidget
    */
   int origin;
 
-  public GralLabel(GralPos currPos, String sName)
+  public GralLabel(GralPos currPos, String sText)
   {
-    super(currPos, sName, 'S');
+    this(currPos, null, sText, 0);
   }
 
 //  public GralLabel(String sName) {

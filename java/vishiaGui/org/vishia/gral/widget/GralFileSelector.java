@@ -20,7 +20,6 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralSwitchButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
@@ -31,16 +30,12 @@ import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
-import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
-import org.vishia.gral.ifc.GralTextField_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 import org.vishia.util.FileSystem;
@@ -49,7 +44,6 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.SortedTreeWalkerCallback;
-import org.vishia.util.Timeshort;
 
 /**This class is a large widget which contains a list to select files in a directory, 
  * supports navigation in the directory tree and shows the current path in an extra text field.
@@ -76,6 +70,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2023-01-15 Now {@link GralFileProperties} is able to aggregate. 
    * <li>2023-01-14 Now a favor which is selected is marked green, remove of tabs works. (!)
    * <li>2023-01-06 progress, practical usage for The.file.Commander
    * <li>2022-12-21 progress, tabs for file cards with {@link GralHorizontalSelector} as before in Fcmd only
@@ -235,6 +230,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.widgSubdirs = new GralSwitchButton(refPos, "subdirs-" + name, "subdirs yes", "subdirs no", GralColor.getColor("gn"), GralColor.getColor("wh"));
       this.widgSearch = new GralButton(refPos, "search-" + name, "search", this.actionFileSearch);
       this.widgSearch.setPrimaryWidgetOfPanel();
+      this.windConfirmSearch.setVisible(false);
+
     }
     
     
@@ -456,9 +453,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     /* (non-Javadoc)
      * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
      */
-    @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc line)
-    { boolean ret = true;
-      ret = this.outer.actionUserKey(keyCode, oData, line);
+    @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc lineP) { 
+      boolean ret = true;
+      if(keyCode == KeyCode.F9) {
+        assert(lineP instanceof GralTable.TableLineData);
+        @SuppressWarnings("unchecked") GralTable<FileRemote>.TableLineData line = (GralTable<FileRemote>.TableLineData) lineP;
+        showFileInfo(line);
+      } else {
+        ret = this.outer.actionUserKey(keyCode, oData, lineP);
+      }
       return ret;
     }
 
@@ -554,6 +557,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   protected final GralTable<FavorPath> wdgFavorTable;
   
   protected final GralViewFileContent windView;
+  
+  protected final GralFileProperties wdgFileProperties;
 
   /**Index of all entries in the visible list. */
   final Map<String, FavorPath> indexFavorPaths;
@@ -693,9 +698,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   TODO proportional determination? 
    * @param bWithFavor true then a favor table is created, select favor. False: prevent this capability
    * @param fileViewer Instance of a file viewer (for content). It is possible to share one fileViewer to more instances of this.
+   * @param wdgFileProperties maybe null, then this fuction is not available. 
+   *   Should be instantiated recommended by {@link GralFileProperties#createWindow(GralPos, String, String)}
+   *   but maybe concurrently used for more as one GralFileSelector. The Key <F9> shows file properties and allows rename and change properties.
+   *    
    */
   public GralFileSelector(GralPos refPosParent, String posName, int rows, int[] columns
-      , boolean bWithFavor, GralViewFileContent fileViewer)
+      , boolean bWithFavor
+      , GralViewFileContent fileViewer
+      , GralFileProperties wdgFileProperties
+      )
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPosParent, posName, null);
     GralMng panelMng = this.gralMng;
@@ -725,24 +737,31 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     //this.mainCmd = mainCmd;
     
     String sPanel = panel.getName();
-    //Text field for path above list
-//    panelMng.setPosition(posAll, GralPos.same, GralPos.size + 2.0F, GralPos.same, GralPos.same-6, 1, 'r');
-    this.wdgCardSelector = new GralHorizontalSelector<FavorPath>(refPos, "@0+2, 0..-6=tabs-" + this.name, this.action.actionSetFromTabSelection);
+    final String posPathDir;
+    if(bWithFavor) {
+      this.wdgCardSelector = new GralHorizontalSelector<FavorPath>(refPos, "@0+2, 0..-6=tabs-" + this.name, this.action.actionSetFromTabSelection);
+      this.widgBtnFavor = new GralButton(refPos, "@0+2, -5..0=btnFavor-" + this.name, "favor", this.action.actionFavorButton);
+      this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), this.colorMarkFavor);
+      posPathDir = "@2+2, 0..0=infoLine-";
+    } else {
+      this.wdgCardSelector = null;
+      this.widgBtnFavor = null;
+      posPathDir = "@0+2, 0..0=infoLine-";
+    }
+    //widgBtnFavor.setVisible(false);
 //  
-    this.widgdPathDir = new GralTextField(refPos, "@2+2, 0..0=infoLine-" + this.name, GralTextField.Type.editable);
+    //Text field for path above list
+    this.widgdPathDir = new GralTextField(refPos, posPathDir + this.name, GralTextField.Type.editable);
        // panelMng.addTextField(null, true, null, null);
     this.widgdPathDir.specifyActionChange(null, this.action.actionSetPath, null);
     this.widgdPathDir.setBackColor(panelMng.getColor("pye"), -1);  //color pastel yellow
     GralMenu menuFolder = this.widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", this.action.actionRefreshFileTable);
     //panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
-    this.widgBtnFavor = new GralButton(refPos, "@0+2, -5..0=btnFavor-" + this.name, "favor", this.action.actionFavorButton);
-    this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), this.colorMarkFavor);
-    //widgBtnFavor.setVisible(false);
     //the list
     //on same position as favor table: the file list.
     //panelMng.setPosition(posAll, GralPos.refer+2, GralPos.same, GralPos.same, GralPos.same, 1, 'd');
-    this.wdgSelectList = new FileSelectList(refPos, this, "@4..0, 0..0=fileTable-" + this.name, rows, columns);
+    this.wdgSelectList = new FileSelectList(refPos, this, "@+2..0, 0..0=fileTable-" + this.name, rows, columns);
     if(this.wdgFavorTable !=null) {
       this.wdgSelectList.setVisible(false);
     }
@@ -777,6 +796,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     //panelMng.selectPanel(sPanel);  //if finished this panel is selected for like entry.
     
     this.windView = fileViewer;
+    this.wdgFileProperties = wdgFileProperties;
     this.windSearch = new WindowConfirmSearch(refPos, "@screen,7+32, 40+40=search-" + name);
   }
   
@@ -834,11 +854,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       pos = new GralPos(mng, "@screen,0..0,0..0");
     } catch(ParseException exc) { ExcUtil.throwUnexpect(exc);}
     GralViewFileContent fileViewer = new GralViewFileContent(pos, "@50..100, 50..100=fileViewer" + ".view");
-
+    GralFileProperties wdgFileProperties = GralFileProperties.createWindow(pos, "fileProperties", "file properties");
     new GralFileSelectWindow(posName, mng);
     int windProps = GralWindow_ifc.windResizeable;
     GralWindow wind = new GralWindow(pos, posName, null, windProps);
-    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, false, fileViewer);
+    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, false, fileViewer, wdgFileProperties);
     return thiz;
   }
   
@@ -1784,6 +1804,18 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
   }
   
+
+  
+  /**If given in ctor, opens the file property window and show file properties.
+   * @param line The line in fileTable
+   */
+  protected void showFileInfo(GralTable<FileRemote>.TableLineData line) {
+    if(GralFileSelector.this.wdgFileProperties !=null) {
+      GralFileSelector.this.wdgFileProperties.setVisible(true);
+      GralFileSelector.this.wdgFileProperties.showFileInfos(line.getData());
+    }
+  }
+  
   /**This method is called on any user key or mouse event while operating in the file table.
    * It should be overwritten by a derived class. This routine is empty.
    * @param key code or mouse code, one of constants from {@link KeyCode}.
@@ -2081,6 +2113,21 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   } };
 
 
+  
+  
+  GralUserAction actionShowFileProps = new GralUserAction("actionShowFileProps") { 
+    @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
+      showFileInfo(null);
+      return true;
+  } };
+
+
+  
+  
+  
+  
+  
+  
   GralUserAction actionDeselectDirtree = new GralUserAction("actionDeselectDirtree")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
     //if(fileCard !=null){

@@ -752,7 +752,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     protected GraphicImplAccess(GralWidget widgg, GralMng.ImplAccess mngImpl)
     {
       super(widgg, mngImpl);
-      if(widgg.name.startsWith("showSrc"))
+      if(widgg.name !=null && widgg.name.startsWith("showSrc"))
         Debugutil.stop();
       
       if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {
