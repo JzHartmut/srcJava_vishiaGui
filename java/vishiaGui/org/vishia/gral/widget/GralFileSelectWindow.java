@@ -91,7 +91,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
      String posName = "@0..-3,0..0=" + name;
      this.fileSelector = new GralFileSelector(mng.refPos(), posName + "-selelector", 100, new int[]{2,0,-6,-12}, true, fileViewer, null);
      //fileSelector.setToPanel(mng);
-     this.fileSelector.specifyActionOnFileSelected(this.actionSelectFile);
+     this.fileSelector.setActionOnFileSelected(this.actionSelectFile);
      this.fileSelector.setActionOnEnterFile(this.actionOk);
      String posText = "@-3..0, 0..-9=" + name +"-fname";
      this.widgFilename = mng.addTextField(posText, true, null, null);

@@ -2791,6 +2791,7 @@ public GralButton addCheckButton(
     public static final int gralFileSelector_selectFavor = 1213;
     public static final int gralFileSelector_updateFavor = 1214;
     public static final int gralFileSelector_setPath = 1215;
+    public static final int gralFileSelector_ClickFile = 1216;
     
     public static final int evFocused = 1501;
   }

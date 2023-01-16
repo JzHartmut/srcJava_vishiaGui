@@ -20,6 +20,7 @@ import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.util.Assert;
 import org.vishia.util.CheckVs;
+import org.vishia.util.Debugutil;
 import org.vishia.util.FileCompare;
 import org.vishia.util.KeyCode;
 
@@ -211,7 +212,7 @@ public class FcmdFileCard extends GralFileSelector
 //    //
 //    //sets the action for a simple table: what to do on line selected: Show file names. 
 
-    this.specifyActionOnFileSelected(this.actionOnFileSelection);
+    this.setActionOnFileSelected(this.actionOnFileSelection);
     setActionOnFocusedFileTable(this.actionFocused);       // sets the current file card from three ones in Fcmd  
     setActionSaveFavors(this.actionSaveFavors);
     
@@ -397,6 +398,8 @@ public class FcmdFileCard extends GralFileSelector
   protected void actionOnFileSelection(FileRemote file, String sFileName){
     //note the file, able to use for some actions.
     this.gralMng().log().sendMsg(Fcmd.LogMsg.fmcdFileCard_selectFile, "actionOnFileSelected ixMainPanel=%d %s", this.mainPanel.ixMainPanel, file);
+    if(sFileName.equals(".filelist"))
+      Debugutil.stop();
     this.main.selectedFiles123[this.mainPanel.ixMainPanel] = file;
     
     if(this.mainPanel.orderMainPanel == 1){

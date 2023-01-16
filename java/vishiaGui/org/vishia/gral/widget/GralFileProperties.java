@@ -221,10 +221,12 @@ public class GralFileProperties extends GralWidgetBase {
       new GralLabel(refPos, "@20-2,1+2++1=rd-" + this.name, "rd", 1);
       new GralLabel(refPos, "wr");
       new GralLabel(refPos, "ex");
-      this.widgRd = new GralButton[3];
+      this.widgRd = new GralButton[1];
+      this.widgWr = new GralButton[1];
+      this.widgEx = new GralButton[1];
       this.widgRd[0] = new GralSwitchButton(refPos, "@22-2,1+2++1=btnro" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      this.widgRd[1] = new GralSwitchButton(refPos, "btnro2" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      this.widgRd[2] = new GralSwitchButton(refPos, "btnro3" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      this.widgWr[0] = new GralSwitchButton(refPos, "btnro2" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
+      this.widgEx[0] = new GralSwitchButton(refPos, "btnro3" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
       
     }
     this.widgCopyFile =  new GralButton(refPos, "@-12+3++1, -16..-1=buttonFilePropsCopy" + this.name, sCmdCopy, this.actionButton);
@@ -529,8 +531,7 @@ public class GralFileProperties extends GralWidgetBase {
   }
 
   @Override public boolean isVisible () {
-    // TODO Auto-generated method stub
-    return false;
+    return this.isVisible;
   }
 
   @Override public void setFocusedWidget ( GralWidgetBase_ifc widg ) {
@@ -539,7 +540,6 @@ public class GralFileProperties extends GralWidgetBase {
   }
 
   @Override public GralWidgetBase_ifc getFocusedWidget () {
-    // TODO Auto-generated method stub
     return null;
   }
 

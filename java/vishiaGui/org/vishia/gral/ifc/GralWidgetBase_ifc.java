@@ -68,6 +68,10 @@ public interface GralWidgetBase_ifc {
   void setFocusedWidget ( GralWidgetBase_ifc widg);
   
   
+  /**Returns the widget which is in focus of a panel or comprehensive widget.
+   * This allows quests about the status of the widget, for example the opened tab on a tabbed panel
+   * of which is in use currently from a comprehensive widget.
+   */
   GralWidgetBase_ifc getFocusedWidget ( );
 
   

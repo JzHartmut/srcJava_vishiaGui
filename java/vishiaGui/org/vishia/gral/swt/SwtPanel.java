@@ -333,7 +333,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
             if(focusedWidget !=null && focusedWidget instanceof GralWidget){
               ((GralWidget)focusedWidget).setVisibleState(false);           //deactivate the last focused tab.
             }
-            gralPanel.setFocusedWidget( gralPanel );
+       //?? gralPanel.setFocusedWidget( gralPanel );
             //done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
             gralPanel.setFocus();
             //System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
