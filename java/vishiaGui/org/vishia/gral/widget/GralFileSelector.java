@@ -45,6 +45,7 @@ import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.SortedTreeWalkerCallback;
+import org.vishia.util.StringFunctions;
 import org.vishia.util.StringFunctions_B;
 
 /**This class is a large widget which contains a list to select files in a directory, 
@@ -72,6 +73,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2023-01-17 save button, function ctrl-N in path field to get the file name 
    * <li>2023-01-15 Now {@link GralFileProperties} is able to aggregate. 
    * <li>2023-01-14 Now a favor which is selected is marked green, remove of tabs works. (!)
    * <li>2023-01-06 progress, practical usage for The.file.Commander
@@ -486,7 +488,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
 
 
-  protected GralButton widgBtnFavor;
+  protected GralButton widgBtnFavor, widgBtnSave;
 
 
 
@@ -595,8 +597,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
 
   /**This action will be called on pressing enter or mouse-click on a simple file.
+   * It is usual for read-file or such.
    */
   private GralUserAction actionOnEnterFile;
+
+  /**This action will be called on pressing the save button or adequate key.
+   * It is usual for write-file handling.
+   * The writing itself will be done in this called routine.
+   */
+  private GralUserAction actionOnSaveButton;
 
   /**This action will be called on pressing enter or mouse-click on a directory.
    * Usual the directory can be entered and showed. But the user can do any other action.
@@ -640,6 +649,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   last is date (timestamp), before last is file size, first is mark. The 0 is the rest length of the file name.
    *   TODO proportional determination? 
    * @param bWithFavor true then a favor table is created, select favor. False: prevent this capability
+   * @param bSave this widget contains a [save] button for file-save action.
    * @param fileViewer Instance of a file viewer (for content). It is possible to share one fileViewer to more instances of this.
    * @param wdgFileProperties maybe null, then this fuction is not available. 
    *   Should be instantiated recommended by {@link GralFileProperties#createWindow(GralPos, String, String)}
@@ -647,7 +657,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *    
    */
   public GralFileSelector(GralPos refPosParent, String posName, int rows, int[] columns
-      , boolean bWithFavor
+      , boolean bWithFavor, boolean bSave
       , GralViewFileContent fileViewer
       , GralFileProperties wdgFileProperties
       )
@@ -680,18 +690,23 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     //this.mainCmd = mainCmd;
     
     String sPanel = panel.getName();
-    final String posPathDir, posFileTable;
+    final String posPathDir, posFileTable, posSave;
     if(bWithFavor) {
       this.wdgCardSelector = new GralHorizontalSelector<FavorPath>(refPos, "@0+2, 0..-6=tabs-" + this.name, this.action.actionSetFromTabSelection);
       this.widgBtnFavor = new GralButton(refPos, "@0+2, -5..0=btnFavor-" + this.name, "favor", this.action.actionFavorButton);
       this.widgBtnFavor.setSwitchMode(GralColor.getColor("wh"), this.colorMarkFavor);
-      posPathDir = "@2+2, 0..0=infoLine-";
+      posPathDir = bSave ? "@2+2, 0..-6=infoLine-" : "@2+2, 0..0=infoLine-";
       posFileTable = "@4..0, 0..0=fileTable-";
+      posSave = "@2+2, -6..0=save-";
     } else {
       this.wdgCardSelector = null;
       this.widgBtnFavor = null;
-      posPathDir = "@0+2, 0..0=infoLine-";
+      posPathDir = bSave ? "@0+2, 0..-6=infoLine-" : "@0+2, 0..0=infoLine-";
+      posSave = "@0+2, -6..0=save-";
       posFileTable = "@2..0, 0..0=fileTable-";
+    }
+    if(bSave) {
+      this.widgBtnSave = new GralButton(refPos, posSave + this.name, "Save", this.action.actionSaveButton);
     }
     //widgBtnFavor.setVisible(false);
 //  
@@ -702,6 +717,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.widgdPathDir.setBackColor(panelMng.getColor("pye"), -1);  //color pastel yellow
     GralMenu menuFolder = this.widgdPathDir.getContextMenu();
     menuFolder.addMenuItem("x", "refresh [cR]", this.action.actionRefreshFileTable);
+    menuFolder.addMenuItem("g", "get filename [cN]", this.action.actionGetFileName);
     //panelMng.setPosition(GralPos.same, GralPos.same, GralPos.next+0.5f, GralPos.size+5.5f, 1, 'd');
     //the list
     //on same position as favor table: the file list.
@@ -796,7 +812,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     new GralFileSelectWindow(posName, mng);
     int windProps = GralWindow_ifc.windResizeable;
     GralWindow wind = new GralWindow(pos, posName, null, windProps);
-    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, false, fileViewer, wdgFileProperties);
+    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", 10, null, false, true, fileViewer, wdgFileProperties);
     return thiz;
   }
   
@@ -888,19 +904,33 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
 
 
-  /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
-   * a mouse double-click is done on a file.
-   * @param newAction The action to use. The action is invoked with TODO
-   * @return The current assigned action or null.
-   */
-  public GralUserAction setActionOnEnterFile(GralUserAction newAction)
-  { GralUserAction oldAction = this.actionOnEnterFile;
-    this.actionOnEnterFile = newAction;
-    return oldAction;
-  }
-  
-  
-  
+    /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
+     * a mouse double-click is done on a file.
+     * @param newAction The action to use. The action is invoked with TODO
+     * @return The current assigned action or null.
+     */
+    public GralUserAction setActionOnEnterFile(GralUserAction newAction)
+    { GralUserAction oldAction = this.actionOnEnterFile;
+      this.actionOnEnterFile = newAction;
+      return oldAction;
+    }
+    
+    
+    
+    /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
+     * a mouse double-click is done on a file.
+     * @param newAction The action to use. The action is invoked with TODO
+     * @return The current assigned action or null.
+     */
+    public GralUserAction setActionOnSaveButton(GralUserAction newAction, String textButton)
+    { GralUserAction oldAction = this.actionOnSaveButton;
+      this.actionOnSaveButton = newAction;
+      this.widgBtnSave.setText(textButton);
+      return oldAction;
+    }
+    
+    
+    
   /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
    * a mouse double-click is done on a file.
    * @param newAction The action to use. The action is invoked with TODO
@@ -1646,6 +1676,44 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
   }
   
+  
+  
+  
+  
+  
+  /**Copies the name of the current selected file as file name into the #widgPathDir
+   * as presetting for save, rename etc. 
+   * @param key unused
+   * @param widgd The widget where the command was invoked from
+   * @param params unused
+   */
+  protected void doActionGetFileName ( int key, GralWidget_ifc widgd, Object... params) {
+    final String sTextPath = this.widgdPathDir.getText();
+    int posSlash = StringFunctions.lastIndexOfAnyChar(sTextPath, 0, -1, "\\/");
+    final String sFile = this.currentFile.getName();
+    String sPath = sTextPath.substring(0, posSlash+1) + sFile;
+    this.widgdPathDir.setText(sPath, posSlash+1, true);
+  }
+  
+  
+  protected void doActionSave ( int key, GralWidget_ifc widgd, Object... params) {
+    if(GralFileSelector.this.actionOnSaveButton !=null) {
+      final String sTextPath = this.widgdPathDir.getText();
+      final String sFile;
+      if(FileFunctions.isAbsolutePath(sTextPath)) {
+        int posSlash = StringFunctions.lastIndexOfAnyChar(sTextPath, 0, -1, "\\/++");
+        sFile = sTextPath.substring(posSlash+1);           // use the file name only
+      } else {
+        sFile = sTextPath;                                 // use the whole input as manual given file path
+      }
+      String sDir = this.currentDir.getAbsolutePath();
+      String sPath = sDir + '/' + sFile;
+      GralFileSelector.this.actionOnSaveButton.exec(key, widgd, sPath);
+    }
+
+  }
+  
+  
   /**Called from click on line in favor table to select this favor
    * and show the adequate file table.
    */
@@ -2080,11 +2148,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     @Override
     public boolean exec(int key, GralWidget_ifc wdgi, Object... params)
     {
-      if(key == KeyCode.enter){
+      if(key == KeyCode.focusGained) {}
+      else if(key == KeyCode.focusLost) {}
+      else if(key == KeyCode.enter){
         GralWidget widg = (GralWidget)wdgi;
         widg.gralMng.log().sendMsg(GralMng.LogMsg.gralFileSelector_setPath, "set Path");
         String sPath = widg.getValue();
         setNewDirFile(sPath);
+        return true;
+      } else if(key == KeyCode.ctrl + 'n'){
+        doActionGetFileName(key, wdgi, params);
         return true;
       }
       stop();
@@ -2247,6 +2320,36 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   };
   
   
+  
+  
+  GralUserAction actionKeyPathField = new GralUserAction("actionKeyPathField"){
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
+      if(key == KeyCode.ctrl + 'N'){
+        doActionGetFileName(key, widgd, params);
+        return true;
+      } else return false;
+    }
+  };
+  
+  
+  GralUserAction actionGetFileName = new GralUserAction("actionGetFileName"){
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        doActionGetFileName(key, widgd, params);
+        return true;
+      } else return false;
+    }
+  };
+  
+  
+  GralUserAction actionSaveButton = new GralUserAction("actionSaveButton"){
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
+        doActionSave(key, widgd, params);
+        return true;
+      } else return false;
+    }
+  };
   
   
   GralUserAction actionFavorButton = new GralUserAction("actionFavorButton"){

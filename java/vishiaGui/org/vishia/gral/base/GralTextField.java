@@ -26,6 +26,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2023-01-17 new {@link #setText(CharSequence, int, boolean)} for unconditional write, this is if a text field itself
+   *   causes the operation which the call setText(). 
    * <li>2022-01-29 Hartmut chg: Now only one implementation {@link GraphicImplAccess} 
    *   by {@link SwtTextFieldWrapper} (and {@link AwtTextField}) 
    *   for a {@link GralTextBox} and this class. Most is the same, few things are tuned.
@@ -208,6 +210,14 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   }
   
   
+  /**Sets a callback instance which is invoked on any key press event except writing keys on a editable field.
+   * The user interface gets the key pressed, the current content of this field, the current caret position 
+   * and also the positions in the text of the selection. 
+   * Hence the user can process a selected text also.   
+   * <br>
+   * This is an alternative to
+   * @param user callback instance due to the interface.
+   */
   public void setUser(GralTextFieldUser_ifc user){
     this.user = user;
   }
@@ -575,20 +585,42 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
    */
   @Override public void setText(CharSequence arg, int caretPos)
-  {
-    bShouldInitialize= false;  //it is done.
-    if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
-      //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
-         //&& 
-        || (  !dyda.bTouchedField  //don't change the text if the field is in focus and anything was moved. Either any copy to clipboard is pending, or it is in editing. 
-           && !StringFunctions.equals(dyda.displayedText,arg) || caretPos != this.caretPos)  //set the text only if it is changed. Prevent effort.
-      ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
-      dyda.displayedText = arg.toString();
-      this.caretPos = caretPos;
-      dyda.setChanged(GralWidget.ImplAccess.chgText);
-      redraw();
-    } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
+  { setText(arg, caretPos, false);
   }
+  
+  
+  
+  /**Sets the textual content. This method sets the text and invokes a {@link #redraw(int, int)} in 100 ms 
+   * if the content is changed in another thread than the graphical thread. It invokes a {@link #redrawGthread()}
+   * if the content was changed in the graphical thread.
+   * Note: If the current content is equals with the new one with the same cursor position, a repaint request is not forced.
+   * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
+   * @param arg the new text
+   * @param caretPos <=0 not used, >=0 the caret position 
+   * @param bSetAlways if not true then the text is not set if typing of the field is in progress.
+   *   Then {@link DynamicData#bTouchedField} is true. set a text from outside will be attack this typing.
+   *   Typing by the user has a higher priority. It is important for example for currently shown values,
+   *   which are also editable. 
+   *   if true than always the text is set. This is especially if this invocation comes from the typing itself,
+   *   for example type a control-Key during edit to force actions on this text field itself. 
+   * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
+   */
+  public void setText(CharSequence arg, int caretPos, boolean bSetAlways)
+  {
+    this.bShouldInitialize= false;  //it is done.
+    if( ( bSetAlways
+        || this.dyda.displayedText == null   //set the text if no text is stored. Initially!
+        || !this.dyda.bTouchedField          //don't change the text if the field is in focus and anything was changed. 
+        )                                    //Either any copy to clipboard is pending, or it is in editing. 
+     && ( !StringFunctions.equals(this.dyda.displayedText,arg) // set the text only if it is changed. Prevent effort. 
+        || caretPos >=0 && caretPos != this.caretPos)          // or also if only the caret position is changed  
+       ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
+      this.dyda.displayedText = arg.toString();
+      if(caretPos >=0 ) { this.caretPos = caretPos; }
+      this.dyda.setChanged(GralWidget.ImplAccess.chgText);
+      redraw(-100, 100);
+    } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
+ }
   
   
 

@@ -539,15 +539,19 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
         bDone = true;
         setTouched(true);
       } else {
-        boolean bUserOk;
+        boolean bUserOk = true;
+        GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey);
+        if(action !=null) {
+          bUserOk = action.action().exec(key, SwtTextFieldWrapper.this.widgg);
+        }
         GralTextFieldUser_ifc user = user();
-        if(user !=null){
+        if(!bUserOk && user !=null){
           Point selection = textFieldSwt.getSelection();
           bUserOk = user.userKey(key
               , textFieldSwt.getText()
               , textFieldSwt.getCaretPosition()
               , selection.x, selection.y);
-        } else bUserOk = false;
+        }
         if(!bUserOk ){
           switch(key){
             case KeyCode.ctrl + 'a': { 
