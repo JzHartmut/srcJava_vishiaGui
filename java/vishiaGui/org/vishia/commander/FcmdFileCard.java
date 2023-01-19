@@ -161,7 +161,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param label The label of the tab, it builds the name of all widgets.
    */
   FcmdFileCard(GralPos refPos, FcmdLeftMidRightPanel mainPanelP, FcmdFavorPathSelector.FavorFolder favorFolder){
-    super(refPos, FcmdWidgetNames.tableFile + favorFolder.label+ "." + mainPanelP.cNr, 50, new int[]{2,0,-6,-12}, true, false
+    super(refPos, FcmdWidgetNames.tableFile + favorFolder.label+ "." + mainPanelP.cNr, null, 50, new int[]{2,0,-6,-12}, true, null
         , mainPanelP.main.fileViewer, mainPanelP.main.fileProps);
     this.main = mainPanelP.main;
     this.mainPanel = mainPanelP;
@@ -223,7 +223,7 @@ public class FcmdFileCard extends GralFileSelector
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.fcmdActions.actionEdit);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
-    this.wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
+    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
 //    //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
 //    wdgFavorCard.wdgdTable.specifyActionOnLineSelected(wdgFavorCard.actionFavorSelected);
@@ -466,7 +466,7 @@ public class FcmdFileCard extends GralFileSelector
     if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
       String sDirName = getCurrentDir().getName();
       //check whether the other file card contains a entry with this directory name
-      GralTableLine_ifc<FileRemote> line = otherFileCard.wdgSelectList.wdgdTable.getLine(sDirName);
+      GralTableLine_ifc<FileRemote> line = otherFileCard.widgSelectList.wdgdTable.getLine(sDirName);
       if(line !=null){
         FileRemote dir = line.getUserData();
         bFillInReq = true;
@@ -527,13 +527,13 @@ public class FcmdFileCard extends GralFileSelector
         break;
       }
       if(panel.actFileCard !=null){                        // mark the current file card with green, last yellow
-        panel.actFileCard.wdgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
+        panel.actFileCard.widgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
         panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
       } else {
         panel.orderMainPanel = 0; //not used.
       }
     }
-    org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.wdgSelectList.wdgdTable.getCurrentLine();
+    org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.widgSelectList.wdgdTable.getCurrentLine();
     FileRemote fileCurr = line.getData();
     String fName = line.getCellText(1);
     FcmdLeftMidRightPanel p1 = this.main.lastFilePanels.size() <=0 ? null: this.main.lastFilePanels.get(0);
@@ -645,7 +645,7 @@ public class FcmdFileCard extends GralFileSelector
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
       List<GralFileSelector.FavorPath> listfavorPaths = FcmdFileCard.this.favorFolder.listfavorPaths;
       listfavorPaths.clear();                              // Build this list newly with all entries in the table.
-      for(GralTable<GralFileSelector.FavorPath>.TableLineData line : FcmdFileCard.this.wdgFavorTable.iterLines()) {
+      for(GralTable<GralFileSelector.FavorPath>.TableLineData line : FcmdFileCard.this.widgFavorTable.iterLines()) {
         GralFileSelector.FavorPath favor = line.getData();
         listfavorPaths.add(favor);
       }                                                    // and also write the file to disk for all favors (only one file for all).

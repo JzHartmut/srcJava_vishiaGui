@@ -104,7 +104,7 @@ public class InspcCurveViewApp
       
     
     } catch(Exception exc) {
-      System.out.println(exc.getMessage());
+      System.out.println(org.vishia.util.ExcUtil.exceptionInfo("unexpected", exc, 1, 10, true));
     } finally {
     }
     

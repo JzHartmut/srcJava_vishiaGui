@@ -118,7 +118,13 @@ public class GralHorizontalSelector<UserData> extends GralWidget
     actItem = item;
   }
   
-  
+  /**Quest the current selected tab independent of its visibility. 
+   * @return the data set with {@link #addItem(String, int, Object)}
+   *   for the current selected item or null.
+   */
+  public Item<UserData> getActItem() {
+    return this.actItem;
+  }
   
   public boolean setActItem(String name){
     int ixItem = 0;
