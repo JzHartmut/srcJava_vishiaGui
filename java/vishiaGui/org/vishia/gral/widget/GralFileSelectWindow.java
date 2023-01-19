@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWindow;
@@ -26,6 +27,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2022-12-11 Hartmut new {@link #closeDialog()} systematically because {@link #openDialog(FileRemote, String, boolean, GralUserAction)} is given. 
    * <li>2013-03-28 Hartmut implements {@link GralFileDialog_ifc} because it should be so. TODO tuning with the
    *   other possibility {@link org.vishia.gral.swt.SwtFileDialog} which uses the standard file dialog of windows or linux
    * <li>2013-03-28 Hartmut creating, it was a static inner class of {@link GralFileSelector}
@@ -59,9 +61,9 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
   public final static int version = 20130328;
 
   
-  private final GralWindow_ifc wind;
+  private final GralWindow wind;
 
-  private final GralFileSelector fileSelector;
+  public final GralFileSelector fileSelector;
   
   private final GralTextField widgFilename;
       
@@ -78,20 +80,24 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    * simultaneously.
    * @return The created window.
    */
-   public GralFileSelectWindow(String name, GralMngBuild_ifc mng){
+   public GralFileSelectWindow(String name, GralMng mng){
      mng.selectPanel("primaryWindow");
-     mng.setPosition(-24, 0, -67, 0, 1, 'r'); //right buttom, about half less display width and hight.
-     wind = mng.createWindow("windSelectFile", "select file", GralWindow.windExclusive | GralWindow.windResizeable );
-     mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
-     fileSelector = new GralFileSelector(name + "-selectFile", 100, new int[]{2,0,-6,-12}, null);
-     fileSelector.setToPanel(mng);
-     fileSelector.specifyActionOnFileSelected(actionSelectFile);
-     fileSelector.setActionOnEnterFile(actionOk);
-     mng.setPosition(-2, 0, 0, -7, 0, 'r',1);
-     widgFilename = mng.addTextField(name+"-name", true, null, null);
-     mng.setPosition(-3, 0, -8, GralPos.size + 7, 0, 'r',1);
-     widgButtonOk = mng.addButton(name+"-ok", null, "Ok");
-     widgButtonOk.setActionChange(actionOk);
+     GralPos refPos = new GralPos(mng);
+     GralViewFileContent fileViewer = new GralViewFileContent(refPos, "@50..100, 50..100=fileViewer" + ".view");
+
+     mng.setPosition(-24, 0, -67, 0, 'r'); //right buttom, about half less display width and hight.
+     this.wind = mng.createWindow(name + "Window", "select file", GralWindow_ifc.windExclusive | GralWindow_ifc.windResizeable );
+     //mng.setPosition(0, -3, 0, 0, 0, 'd', 0.0f);
+     String posName = "@0..-3,0..0=" + name;
+     this.fileSelector = new GralFileSelector(mng.refPos(), posName + "-selelector", this.wind, 100, new int[]{2,0,-6,-12}, true, null, fileViewer, null);
+     //fileSelector.setToPanel(mng);
+     this.fileSelector.setActionOnFileSelected(this.actionSelectFile);
+     this.fileSelector.setActionOnEnterFile(this.actionOk);
+     String posText = "@-3..0, 0..-9=" + name +"-fname";
+     this.widgFilename = mng.addTextField(posText, true, null, null);
+     mng.setPosition(-3, 0, -8, GralPos.size + 7, 'r',1);
+     String posBtnOk = "@-3..0, -8..-1=" + name + "-ok";
+     this.widgButtonOk = new GralButton(mng.refPos(), posBtnOk, "Ok", this.actionOk);
      
    }
    
@@ -114,18 +120,25 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
    *   or a File[] or List<File> if more as one file is selected. 
    */
   public void openDialog(FileRemote startDir, String sTitle, boolean bForWrite, GralUserAction actionSelect){
-    wind.setTitle(sTitle);
-    actionOkForUser = actionSelect;
+    this.wind.setTitle(sTitle);
+    this.actionOkForUser = actionSelect;
     if(bForWrite){
-      widgButtonOk.setText("write");
+      this.widgButtonOk.setText("write");
     } else {
-      widgButtonOk.setText("select");
+      this.widgButtonOk.setText("select");
     }
-    fileSelector.fillIn(startDir, false);
-    wind.setWindowVisible(true);
-    fileSelector.setFocus();
+    this.fileSelector.fillIn(startDir, false);
+    this.wind.setWindowVisible(true);
+    this.fileSelector.setFocus();
   }
   
+  
+  /**Set the window invisible, after select.
+   * 
+   */
+  public void closeDialog ( ) {
+    this.wind.setWindowVisible(false);
+  }
   
   @Override
   public boolean open(String sTitle, int mode)

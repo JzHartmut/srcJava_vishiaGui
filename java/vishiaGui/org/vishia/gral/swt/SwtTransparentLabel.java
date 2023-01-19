@@ -47,6 +47,12 @@ public class SwtTransparentLabel extends Canvas
   }
 
   
+  public void setAlignment(int align) {
+    if(align !=0) {
+      //throw new IllegalArgumentException("not supported");
+    }
+  }
+  
   public String getText(){ return text; }
   
   

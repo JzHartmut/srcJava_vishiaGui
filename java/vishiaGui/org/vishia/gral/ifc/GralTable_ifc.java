@@ -2,6 +2,7 @@ package org.vishia.gral.ifc;
 
 import java.util.List;
 
+import org.vishia.gral.base.GralTable;
 import org.vishia.util.TreeNode_ifc;
 
 
@@ -121,7 +122,7 @@ public interface GralTable_ifc<UserData> extends GralWidget_ifc
    * @param key The key to find out the row.
    * @return null if such line isn't found.
    */
-  public abstract GralTableLine_ifc<UserData> getLine(String key);
+  public abstract GralTable<UserData>.TableLineData getLine(String key);
   
   /**Inserts a line in the table.
    * @param key The key to get it.

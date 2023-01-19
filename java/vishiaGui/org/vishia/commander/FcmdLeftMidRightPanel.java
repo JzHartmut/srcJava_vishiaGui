@@ -1,6 +1,7 @@
 package org.vishia.commander;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,12 +9,14 @@ import java.util.TreeMap;
 
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTabbedPanel;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralSelectList;
 import org.vishia.mainCmd.MainCmd;
 import org.vishia.util.Assert;
@@ -38,15 +41,16 @@ public class FcmdLeftMidRightPanel
   
   /**The container for all tabs of this TabbedPanel. It is a {@link GralPanelContent} of the primaryWindow 
    * associated to one of the frame areas of the GralArea9_ifc. */
-  GralTabbedPanel tabbedPanelFileCards;
+  GralPanelContent tabbedPanelFileCards;
   
   /**The container for the tabs for selection. 
    * It is the first {@link GralPanelContent} inside the {@link #tabbedPanelFileCards} designated with "a-F1" etc. 
    */
-  GralTabbedPanel tabbedPanelFavorCards;
+//  GralPanelContent tabbedPanelFavorCards;
   
   /**Table widget for the select table.*/
   FcmdFavorThemeCard cardFavorThemes;
+  
 
   /**List of all Tabs of this Panel, used and unused. This tabs are presented in the {@link FcmdFavorThemeCard} table*/
   List<FcmdFileCard> listTabs = new LinkedList<FcmdFileCard>();
@@ -97,7 +101,6 @@ public class FcmdLeftMidRightPanel
     this.cc = cc;
     this.cNr = cNr;
     this.ixMainPanel = cNr - '1';
-    cardFavorThemes = new FcmdFavorThemeCard(main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
     this.partnerPanelToSync = partnerPanelToSync;
     if(partnerPanelToSync !=null) {  //only given on one of the panels, set the other.
       partnerPanelToSync.partnerPanelToSync = this;
@@ -111,42 +114,60 @@ public class FcmdLeftMidRightPanel
    */
   void buildInitialTabs()
   {
-    GralMng mng = main._gralMng;
+    GralMng mng = main.gui.gralMng;
+    //GralPos refPos = mng.refPos();
+    //GralPanelContent parentPanel = (GralPanelContent)refPos.parent;
     String sName = "Sel" + cNr;
     //inside the left/mid/right tabbed panel: create the panel which contains a tabbed panel for selection
     String nameGridPanel = FcmdWidgetNames.tabFavoritesLeftMidRight + cNr;
     String tabLabelGridPanel = "a-F"+cNr;
-    mng.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
-    tabbedPanelFileCards.addGridPanel(nameGridPanel, tabLabelGridPanel,1,1,10,10);
-    mng.setPosition(0, 0, 0, -0, 1, 'd');
+    //refPos.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
+    //this.tabbedPanelFavorCards = this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
+    
     //A tabbed panel inside the left, middle or right tab for selection.
     String nameTabPanel = FcmdWidgetNames.panelFavoritesLeftMidRight + cNr;
-    mng.setPosition(tabbedPanelFileCards.pos(), 0, 0, 0, 0, 1, 'd');
-    tabbedPanelFavorCards = mng.addTabbedPanel(nameTabPanel, null, GralMngBuild_ifc.propZoomedPanel);
-    //The panel for selection from all favorites: 
+    //refPos.setFullPanel(parentPanel);;
+    //------------------------------------------------------- add a tabbed panel as tab, favor is a tab of the parent.
+    //this.tabbedPanelFileCards.addTabPanel(nameTabPanel,"favor"); //mng.addTabbedPanel(nameTabPanel);
+    //
     nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
-    tabLabelGridPanel = "a-F"+cNr;
-    mng.setPosition(tabbedPanelFavorCards.pos(), 0, 0, 0, 0, 1, 'd');
-    tabbedPanelFavorCards.addGridPanel(nameGridPanel, tabLabelGridPanel, 1,1,10,10);
-    mng.setPosition(0, 0, 0, -0, 1, 'd'); //inside the new tab
-    cardFavorThemes.createImplWidget_Gthread();
+    tabLabelGridPanel = "a-F"+cNr;                         //The panel for selection from all favorites: 
+    GralPanelContent tabPanelFavorThemes = this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
+    
+    //GralPos refPos = tabPanelFavor1.pos(); //this.main.gui.gralMng.refPos();
+    //try { refPos.setPosition(sPos); } catch (Exception exc) { }
+    mng.selectPanel(tabPanelFavorThemes);
+    this.cardFavorThemes = new FcmdFavorThemeCard(mng.refPos(), main, FcmdWidgetNames.tableFavoritesMain + cNr, this);
+    
+    
+    //.createImplWidget_Gthread();
     fillCards();  //build the rest of all tabs and panels depending on content of favorites.
     
-    if(cNr == '1'){ //commands only in the left panel.
-      tabbedPanelFileCards.addGridPanel("cmd", "Cmd",1,1,10,10);
-      mng.setPosition(2, -2, 0, -0, 1, 'd');
-      main.executer.cmdSelector.createImplWidget_Gthread();
-    }
+//    if(cNr == '1'){                                        // command tab only in the left panel.
+//      //----------------------------------------------------- It will be filled in the FcmdExecuter
+//      this.main.executer.wdgPanelTabCmds = this.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+//    }
     
   }
   
 
   void setFocus(){
-    main.setLastSelectedPanel(this);
-    if(actFileCard !=null){
-      actFileCard.setFocusFavorOrFile();
+    this.main.setLastSelectedPanel(this);
+    if(this.actFileCard !=null){
+      this.actFileCard.setFocus();
     } else {
-      cardFavorThemes.setFocus();
+      this.cardFavorThemes.setFocus();
+    }
+  }
+  
+
+  
+  void setFocus(int delay, int latest){
+    this.main.setLastSelectedPanel(this);
+    if(this.actFileCard !=null){
+      this.actFileCard.setFocus(delay, latest);
+    } else {
+      this.cardFavorThemes.setFocus(delay, latest);
     }
   }
   
@@ -163,8 +184,8 @@ public class FcmdLeftMidRightPanel
     cardFavorThemes.indexFavorFolders.clear();  
     //clear all GUI tables of this main tab.
     for(FcmdFileCard fileTabs: listTabs){
-      fileTabs.favorCard.clear();
-      fileTabs.favorCard.indexFavorPaths.clear();
+      fileTabs.clear(); //wdgFavorCard.clear();
+      //fileTabs.wdgFavorCard.indexFavorPaths.clear();
     }
     //insert from left, from right etc. with the panels as first elements in the list:
     final FcmdLeftMidRightPanel favorFolderFrom1, favorFolderFrom2;
@@ -200,14 +221,14 @@ public class FcmdLeftMidRightPanel
       int mMainTab = 0x1 << (cNr-'1');  //1, 2 or 4
       if((favorFolder.mMainPanel & mMainTab) !=0 && favorFolder.label !=null && favorFolder.label.length() >0){
         //create Panels for the file table and favor path table if not found yet, otherwise search it.
-        FcmdFileCard fileTab = searchOrCreateFileCard(favorFolder.label);
+        FcmdFileCard fileTab = searchOrCreateFileCard(favorFolder);
           //Favor select list of the associated File table
-        fileTab.favorCard.fillFavorPaths(favorFolder);
+        fileTab.fillFavorPaths(favorFolder.listfavorPaths);
       } else {
         //The fileTable may be existend, then 
         FcmdFileCard fileTab = searchFileCard(favorFolder.label);
-        if(fileTab !=null && fileTab.label.equals(favorFolder.label)){
-          fileTab.favorCard.fillFavorPaths(favorFolder);
+        if(fileTab !=null && fileTab.favorFolder.label.equals(favorFolder.label)){
+          fileTab.fillFavorPaths(favorFolder.listfavorPaths);
         }
       }
       cardFavorThemes.addFavorFolder(favorFolder);
@@ -218,18 +239,30 @@ public class FcmdLeftMidRightPanel
   
   
   
-  FcmdFileCard searchOrCreateFileCard(String label){
+  /**Searches or creates a necessary file card
+   * @param label it is the text in favor list.
+   *   The label is completed with ".1"..".3" for the left/mid/right panel.
+   *   This label is searched in #listTabs  
+   * @return the file card either as existing or new created.
+   */
+  FcmdFileCard searchOrCreateFileCard(FcmdFavorPathSelector.FavorFolder favorFolder){
   //search or create the tab
     FcmdFileCard fileCard = null;
-    String labelTab = label + "." + cNr;
-    for(FcmdFileCard item: listTabs){
+    String labelTab = favorFolder.label + "." + cNr;
+    for(FcmdFileCard item: this.listTabs){                 // search list opened file cards for this favor
       if(item.nameFilePanel.equals(labelTab)){ 
-        fileCard = item; break;
+        fileCard = item; break;                            // found: use it
       }
     } 
-    if(fileCard == null){
-      fileCard = new FcmdFileCard(this, label);
-      listTabs.add(fileCard);
+    if(fileCard == null){                                  // not found: create a tab for it.
+      GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, favorFolder.label);
+      GralPos refPos;
+      try {
+        refPos = new GralPos(tabFileCard, "0..0, 0..0");
+      } catch(ParseException exc) { refPos = null; } // unexpected  
+      fileCard = new FcmdFileCard(refPos, this, favorFolder);
+      this.listTabs.add(fileCard);
+      this.tabbedPanelFileCards.createImplWidget();
     }
     return fileCard;
   }
@@ -267,7 +300,7 @@ public class FcmdLeftMidRightPanel
     if(found){
       if(fileTableLeft !=null){
         actFileCard = fileTableLeft;
-        fileTableLeft.setFocusFavorOrFile(); 
+        fileTableLeft.setFocus(); 
       } else {  //left from first is the selectAllTable of this panel.
         cardFavorThemes.setFocus();
       }
@@ -286,7 +319,7 @@ public class FcmdLeftMidRightPanel
     }
     if(fileTableRight !=null){
       actFileCard = fileTableRight;
-      fileTableRight.setFocusFavorOrFile(); 
+      fileTableRight.setFocus(); 
     } else {
       //remain the last
     }
@@ -305,9 +338,9 @@ public class FcmdLeftMidRightPanel
     
     //final int[] widthSelecttableMain = new int[]{10, 30};
 
-    public FcmdFavorThemeCard(Fcmd main, String name, FcmdLeftMidRightPanel panel)
+    public FcmdFavorThemeCard(GralPos refPos, Fcmd main, String name, FcmdLeftMidRightPanel panel)
     { //super(name, mng);
-      super(name, 20, new int[]{10, 30}, 'C');
+      super(refPos, name, 20, new int[]{10, 30});
 
       mainPanel = panel;
     }
@@ -315,10 +348,13 @@ public class FcmdLeftMidRightPanel
     
     
     @Override
-    public void createImplWidget_Gthread(){
-      super.createImplWidget_Gthread();
-      wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
-      wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
+    public boolean createImplWidget_Gthread(){
+      boolean bCreate = super.createImplWidget_Gthread();
+      if(bCreate) {
+        wdgdTable.specifyActionOnLineSelected(actionFavorThemeLineSelected);
+        wdgdTable.setHtmlHelp(mainPanel.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.favorpath.tabSelect.");
+      }
+      return bCreate;
     }
 
     /**Adds a line to this table.
@@ -337,14 +373,19 @@ public class FcmdLeftMidRightPanel
         //line.setUserData(favorTabInfo);
         //line.setCellText(favorTabInfo.label, 0);
         //line.setCellText(favorTabInfo.selectNameTab, 1);
-        line.repaint(100, 0);
+        line.redraw(100, 0);
       }
     }
     
     
-    @Override public boolean setFocus(){
+    @Override public void setFocus(){
       mainPanel.bFavorThemeCardHasFocus = true;
-      return super.setFocus();
+      super.setFocus();
+    }
+    
+    @Override public void setFocus(int delay, int latest){
+      mainPanel.bFavorThemeCardHasFocus = true;
+      super.setFocus(delay, latest);
     }
     
     void clear()
@@ -364,25 +405,26 @@ public class FcmdLeftMidRightPanel
         label = favorTabInfo.label;  //from favorite list
         //label is known in the favorite list, use it. The panel should be existing or it is created.
         //search or create the tab, representing by its fileTable:
-        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(label);
+        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(favorTabInfo);
         //before changing the content of this fileTable, store the current directory
         //to restore if this favor respectively selection is used ones more.
-        if(mainPanel.actFileCard.favorPathInfo !=null){
+//        if(mainPanel.actFileCard.favorPathInfo !=null){
           currentDir = mainPanel.actFileCard.getCurrentDir(); //.getAbsolutePath();
-        } else {
+//        } else {
           //nothing selected, its a new tab. Don't show files.
-          currentDir = null;
+//          currentDir = null;
           //FcmdFavorPathSelector.FavorPath favorPathInfo = favorTabInfo.listfavorPaths.get(0);
           //actFileCard.favorPathInfo = favorPathInfo;
           //currentDir = favorPathInfo.getOriginDir();
-        }
+//        }
       } else {
         //it have to be a:
+        assert(false);
         final FcmdLeftMidRightPanel panel = (FcmdLeftMidRightPanel)oLineData;  //from left, from mid etc
         final FcmdFileCard fileCard = panel.actFileCard;  //the current filecard in the other panel
-        label = fileCard.label;   
-        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(label);     //search or create such filecard with this label here.
-        mainPanel.actFileCard.favorPathInfo = fileCard.favorPathInfo;  //copy it, it is the same instance for all 3 panels.
+        label = fileCard.favorFolder.label;   
+        mainPanel.actFileCard = mainPanel.searchOrCreateFileCard(fileCard.favorFolder);     //search or create such filecard with this label here.
+        mainPanel.actFileCard = fileCard;  //copy it, it is the same instance for all 3 panels.
         //mainPanel.actFileCard.currentFile = fileCard.currentFile();      //select the same file.
         mainPanel.actFileCard.fillIn(fileCard.currentDir(), false);      //select the same file.
         currentDir = fileCard.getCurrentDir(); //.getAbsolutePath();
@@ -399,15 +441,16 @@ public class FcmdLeftMidRightPanel
         }
         Assert.check(favorTabInfo != null);
       }
-    
       //adds all favorite pathes to it newly.
-      mainPanel.actFileCard.favorCard.fillFavorPaths(favorTabInfo);
-      if(currentDir !=null){
-        mainPanel.indexActualDir.put(mainPanel.actFileCard.favorPathInfo.selectName, currentDir.getPath());
+      mainPanel.actFileCard.fillFavorPaths(favorTabInfo.listfavorPaths);
+      if(currentDir !=null) {
+        //assert(false);
+        mainPanel.indexActualDir.put(mainPanel.actFileCard.getLabelCurrFavor(), currentDir.getPath());
         mainPanel.actFileCard.fillIn(currentDir, false);
         mainPanel.actFileCard.setFocus();
       } else { 
-        mainPanel.actFileCard.favorCard.setFocus();
+        //mainPanel.actFileCard.doActivateFavor();
+        //mainPanel.actFileCard.setFocus();
       }
       return true;
     }

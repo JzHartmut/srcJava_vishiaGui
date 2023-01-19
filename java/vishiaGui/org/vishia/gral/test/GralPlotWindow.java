@@ -2,12 +2,13 @@ package org.vishia.gral.test;
 
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.widget.GralPlotArea;
+import org.vishia.gral.widget.GralCanvasArea;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 
-/**A window which contains a {@link GralPlotArea} for simple plot in a window for example able to use in JZcmd.
+/**A window which contains a {@link GralCanvasArea} for simple plot in a window for example able to use in JZcmd.
  * @author Hartmut Schorrig
  *
  */
@@ -45,31 +46,32 @@ public class GralPlotWindow
    */
   public static final String sVersion = "2015-09-26";
 
-  final GralMng gralMng = GralMng.get();
+  public final GralMng gralMng = new GralMng(null);
   
-  final GralWindow window;
+  public final GralWindow window;
   
-  final GralPlotArea canvas;
+  public final GralCanvasArea canvas;
   
   
   public static GralPlotWindow create(String sTitle){
     GralPlotWindow obj = new GralPlotWindow(sTitle);
-    obj.gralMng.gralDevice.addDispatchOrder(obj.initGraphic);
+    obj.gralMng.addDispatchOrder(obj.initGraphic);
     obj.initGraphic.awaitExecution(1, 0);
     return obj;  
   }
 
   
   GralPlotWindow(String sTitle)
-  { window = new GralWindow("10+120, 10+200", "window", sTitle, GralWindow.windResizeable);
-    canvas = new GralPlotArea("@0..0,0..0=canvas");
+  { this.window = new GralWindow(null, "@screen, 10+120, 10+200=canvasWindow", sTitle, GralWindow.windResizeable, this.gralMng);
+    this.canvas = new GralCanvasArea((GralPos)null, "@0..0,0..0=plot");
     LogMessage log = new LogMessageStream(System.out);
-    window.create("SWT", 'B', log, initGraphic);
+    this.gralMng.createGraphic("SWT", 'B', log);
+    //window.create("SWT", 'B', log, initGraphic);
     
   }
   
   public void waitForClose(){
-    while(gralMng.gralDevice.isRunning()){
+    while(gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();
@@ -81,11 +83,11 @@ public class GralPlotWindow
   
   /**To use all methods of GralCanvasArea.
    */
-  public GralPlotArea canvas(){ return canvas; }
+  public GralCanvasArea canvas(){ return canvas; }
     
     
     
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
+  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng) {
     @Override public void executeOrder()
     {
       //canvas.createImplWidget_Gthread();      

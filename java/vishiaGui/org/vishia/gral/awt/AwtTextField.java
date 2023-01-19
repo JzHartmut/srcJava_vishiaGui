@@ -73,23 +73,24 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   /*packagePrivate*/ Label promptSwt;
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final AwtWidgetHelper widgHelper;
   
   StringBuilder editBuffer;
   
   
-  public AwtTextField(GralTextField widgg, AwtWidgetMng mng)
+  public AwtTextField(GralTextField widgg, AwtMng mng)
   { widgg.super(widgg); //NOTE: superclass is a non static inner class of GralTextField. 
     if(widgg.isEditable()){
-      editBuffer = new StringBuilder(20); 
+      editBuffer = new StringBuilder(30); 
       editBuffer.setLength(0); editBuffer.append(dyda().displayedText);
     }
     GralPos pos = widgg.pos();
-    Container panelAwt = (Container)pos.panel.getWidgetImplementation();
+    Container panelAwt = (Container)pos.parent.getImplAccess().getWidgetImplementation();
     
-    widgetAwt = new TextCanvas(); //TextField();
+    widgetAwt = new TextCanvas(); 
+    //Component c = new TextField();
     widgetAwt.setData(widgg);
     widgetAwt.addFocusListener(mng.focusListener);
     widgetAwt.addMouseListener(mng.mouseStdAction);
@@ -126,7 +127,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
   }
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); widgHelper.setVisibleGThread(bVisible); }
 
@@ -155,7 +156,7 @@ public class AwtTextField extends GralTextField.GraphicImplAccess
 
 
 
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     GralWidget.DynamicData dyda = dyda();
     int chg = dyda.getChanged();
     if((chg & chgText) !=0  && dyda.displayedText !=null){ 

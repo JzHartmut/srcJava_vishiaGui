@@ -51,10 +51,11 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
 	
-	public GralValueBar(String name)
-	{ super(name, 'U');
+	public GralValueBar(GralPos currPos, String name)
+	{ super(currPos, name, 'U');
 	}
 
+  //public GralValueBar(String name) { this(null, name); }
 
 	@Override
 	public void setMinMax(float minValue, float maxValue)
@@ -106,7 +107,7 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	{
 		if(_wdgImpl !=null){
 		  if(((GraphicImplAccess)_wdgImpl).setValue(value)) {
-        this.repaint();
+        this.redraw();
 		  }
 		}
 	}
@@ -120,7 +121,7 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	
 	
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
     
     

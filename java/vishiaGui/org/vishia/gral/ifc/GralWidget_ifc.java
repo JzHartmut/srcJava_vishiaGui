@@ -2,7 +2,8 @@ package org.vishia.gral.ifc;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.util.Debugutil;
 import org.vishia.util.Removeable;
@@ -25,20 +26,20 @@ import org.vishia.util.Removeable;
  *   or {@link org.vishia.gral.base.GralTable#setColorCurrLine(GralColor)}.
  * <li>That methods store the given data either in the common {@link GralWidget.DynamicData} {@link GralWidget#dyda} of the widget
  *   or in specific data of a GralWidget implementation.
- * <li>That method calls {@link #repaint(int, int)} with a proper millisecond delay (usual 100).
+ * <li>That method calls {@link #redraw(int, int)} with a proper millisecond delay (usual 100).
  *   The graphic implementation widget is not touched in this time. Usual it is not necessary to show information
  *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
  *   saves calculation time if more as one property is changed on the same widget.
  * <li>The delayed repaint request queues the instance {@link GralWidget#repaintRequ} (only private visible)
  *   of {@link org.vishia.gral.base.GralGraphicTimeOrder} in the central queue of requests using 
  *   {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicTimeOrder)}. 
- *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#itsMng}.
+ *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#gralMng}.
  * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
  *   {@link org.vishia.gral.base.GralGraphicTimeOrder}. Any of them may have a specific delay. 
  *   The graphic thread organizes it in a proper kind of time.
  * <li>If a {@link org.vishia.gral.base.GralGraphicTimeOrder} is dequeued in the graphic thread, 
  *   its method {@link org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)} is invoked. 
- *   This method calls {@link GralWidgImpl_ifc#repaintGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
+ *   This method calls {@link GralWidgImplAccess_ifc#redrawGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
  *   stored in {@link org.vishia.gral.base.GralWidget#dyda} to the special implementation widget method invocations
@@ -55,7 +56,7 @@ import org.vishia.util.Removeable;
  * @author Hartmut Schorrig
  *
  */
-public interface GralWidget_ifc extends Removeable
+public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
 {
   
   /**Version, history and license.
@@ -77,7 +78,7 @@ public interface GralWidget_ifc extends Removeable
    * <li>2012-04-25 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}: Capability for any widget
    *   to update its content from its associated variables described in its sDataPath.
    * <li>2012-03-31 Hartmut new: {@link #isVisible()}
-   * <li>2012-01-16 Hartmut new: Concept {@link #repaint()}, can be invoked in any thread. With delay possible.
+   * <li>2012-01-16 Hartmut new: Concept {@link #redraw()}, can be invoked in any thread. With delay possible.
    * <li>2011-06-00 Hartmut created
    * </ul>
    * 
@@ -134,6 +135,7 @@ public interface GralWidget_ifc extends Removeable
 
   public enum ActionChangeWhen
   { onAnyChgContent
+  , onAnyKey  
   , onEnter
   , onCtrlEnter
   , onFocusGained
@@ -148,8 +150,6 @@ public interface GralWidget_ifc extends Removeable
   , onDrag
   };
 
-  
-  public String getName();
   
   public String getDataPath();
   
@@ -178,50 +178,14 @@ public interface GralWidget_ifc extends Removeable
   
   ActionChange getActionChange(ActionChangeWhen when);
   
-  /**Sets this widget to the current panel at the current given position. 
-   * This routine should be called only one time after the Gral widget was created. 
-   * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
-   * This method invokes {@link GralMng#createImplWidget_Gthread(GralWidget)} which tests the type of the derived GralWidget
-   * to create the correct graphical widget. That method calls the implementing specific {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}
-   * which knows the implementation graphic. 
-   * <br><br><b>Instance structure</b><br>
-   * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
-   * is references because it is the environment class. The core graphical widget is an aggregation in this instance. It is possible 
-   * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
-   * consists of two implementation widgets, the text field and a label for the prompt.
-   * <br><br>
-   * <b>Positioning and Registering the widget:</b>
-   * The registering of a widget is done in {@link GralWidget#initPosAndRegisterWidget(GralPos)} which is called either
-   * on construction of a widget with a String-given position, before it appears on graphic, or on construction of the 
-   * graphic widget. It calls the package private {@link GralWidget#initPosAndRegisterWidget(GralPos)}, which takes the 
-   * given position, stores it in the {@link GralWidget#pos()} and adds the widget both to its panel which is given
-   * with the pos and registers the widget in the GralMng for simple global access. 
-   * If the name of the widget starts with "@" its name in the panel is the part after "@" whereby the global name 
-   * is the "panelname.widgetname". If a widget's position is given from left and from right or with percent, it is resized
-   * on resizing the window and the panel.
-   * <br><br>
-   * 
-   * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
-   *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
-   *   was called. 
-   */
-  void createImplWidget_Gthread();
+  //void createImplWidget_Gthread();
   
   /**Deprecated. Use {@link #createImplWidget_Gthread()}.
    * @param mng not used. It is known as singleton. Use null as argument.
    */
-  void setToPanel(GralMngBuild_ifc mng);
+  //void setToPanel(GralMngBuild_ifc mng);
   
-  /**Returns the associated singleton GralMng. The GralMng is associated only if the widget is setToPanel,
-   * see {@link #setToPanel(GralMngBuild_ifc)}.
-   * @return null if the Widget is created yet without connection to the graphical implementation layer
-   */
-  GralMng gralMng();
-  
-  /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
-   * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
-   */
-  public abstract void setFocus();
+  void setVisibleStateWidget(boolean visible);
   
   /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
    * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.
@@ -232,10 +196,6 @@ public interface GralWidget_ifc extends Removeable
   
   
   
-  /**Returns true if this widget is the focused one.
-   */
-  boolean isInFocus();
-  
   /**Returns true if the graphic implementatin widget was initialized, and then it was disposed. 
    * It is able to use especially to detect whether a sub window is closed or if the primary window was closed,
    * to finish any other (waiting) thread. It may be used on any disposed widget.
@@ -243,25 +203,6 @@ public interface GralWidget_ifc extends Removeable
    */
   boolean isGraphicDisposed();
 
-  
-  /**Sets this widget visible on graphic or invisible. Any widget can be visible or not. More as one widgets
-   * can use the same position, only one of them may set visible. 
-   * For a {@link GralWindow}, its the visibility of the whole window. 
-   * Note that a window which is invisible is not shown in the task bar of the operation system. 
-   * Note that an application can have more as one window. 
-   * Note that a dialog window can be set to invisible if it is not need yet instead destroy and build newly.
-   * @param visible
-   * @return
-   */
-  boolean setVisible(boolean visible);
-  
-  /**Returns whether the widget is visible or not. This method can be invoked in any thread.
-   * It is an estimation because the state of the widget may be changed in the last time or a window
-   * can be covered by another one. The widget is not visible if it is a member of a card in a tabbed
-   * panel and that tab is not the selected one.
-   * @return true if the widget seams to be visible.
-   */
-  boolean isVisible();
   
   /**Sets whether it is able to edit the content of the text field or text box.
    * If a content is not able to edit, it is a showing field or box. The user can't change the
@@ -328,16 +269,16 @@ public interface GralWidget_ifc extends Removeable
    * for all methods to set something like {@link #setBackColor(GralColor, int)} etc.
    * <br><br>
    * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
-   * {@link #repaint(int, int)} is invoked with the standard delay of {@link #repaintDelay} and {@link #repaintDelayMax}.
+   * {@link #redraw(int, int)} is invoked with the standard delay of {@link #redrawtDelay} and {@link #redrawDelayMax}.
    * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
    * in the {@link GralGraphicThread#addTimeOrder(GralGraphicTimeOrder)}. In the requested time that 
-   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImpl_ifc#repaintGthread()}. 
+   * dispatch order is executed in the graphic thread. It calls {@link GralWidgImplAccess_ifc#redrawGthread()}. 
    * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
    * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
    * <br><br>
    * If more as one attribute is changed one after another, only one instance of the {@link GralGraphicTimeOrder}
    * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
-   * {@link GralWidgImpl_ifc#repaintGthread()} quests all changes one after another. 
+   * {@link GralWidgImplAccess_ifc#redrawGthread()} quests all changes one after another. 
    * It means that a thread switch is invoked only one time per widget for more as one change.
    * <br>
    * See {@link DynamicData}. That composite part of a widget stores all standard dynamic data of a widget. 
@@ -351,6 +292,7 @@ public interface GralWidget_ifc extends Removeable
    */
   void setHtmlHelp(String url);
   
+  
   //public abstract GralWidget getGralWidget();
 
   /**repaint request. It can be called in any thread. If it is called in the graphic thread,
@@ -358,9 +300,9 @@ public interface GralWidget_ifc extends Removeable
    * in the standard repaint time (about 100 ms). If this routine is invoked more as one time 
    * before the standard repaint time expires and not in the graphic thread,
    * then the repaint is executed only one time after the given delay with the last set data.
-   * See {@link #repaint(int, int)}
+   * See {@link #redraw(int, int)}
    */
-  public void repaint();
+  public void redraw();
   
   /**Possible delayed repaint, can be called in any thread.
    * If this method is re-called in the time where the delay is not elapsed
@@ -373,8 +315,16 @@ public interface GralWidget_ifc extends Removeable
    *   With the latest argument for this time the repaint is always executing independent of new calls.
    *   
    */
-  public void repaint(int delay, int latest);
+  public void redraw(int delay, int latest);
   
+  /**This operation is used if the pixel are calculated on gral level.
+   * Intrinsic this operation is not system-conform, instead use grid units here. 
+   * TODO look where it is used.
+   * @param x
+   * @param y
+   * @param dx
+   * @param dy
+   */
   void setBoundsPixel(int x, int y, int dx, int dy);
  
   
@@ -406,6 +356,13 @@ public interface GralWidget_ifc extends Removeable
   
   
   Object getContentInfo();
+  
+  /**Returns the implementation widget or its Wrapper.
+   * Need cast due to implementation level.
+   * @return null if implementation is not existing. 
+   */
+  Object getImplWidget ( );
+
 
   /**Capability for any widget to update its content from its associated variables described in its sDataPath.
    * @param container The container is used only if the variable is not known by direct reference
@@ -418,5 +375,14 @@ public interface GralWidget_ifc extends Removeable
   
   
   
+  /**Capability of any widget for {@link #refreshFromVariable(VariableContainer_ifc)}
+   * but additionally the widget is shown as "too old" if the time stored with the variable is old. 
+   * This helps to show the state of fields for updating. 
+   * @param container
+   * @param timeAtleast The absolute time stamp after them the variable should be gotten a new value.
+   *   It may be for example some seconds before the current time. 
+   * @param colorRefreshed show with this background color if refreshed
+   * @param colorOld show with this background color if not refresehed.
+   */
   void refreshFromVariable(VariableContainer_ifc container, long timeAtleast, GralColor colorRefreshed, GralColor colorOld);
 }

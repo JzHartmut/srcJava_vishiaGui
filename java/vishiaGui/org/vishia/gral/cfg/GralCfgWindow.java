@@ -1,54 +1,19 @@
 package org.vishia.gral.cfg;
 
-import java.io.File;
-import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.vishia.gral.base.GralGraphicTimeOrder;
-import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralWindow_ifc;
-import org.vishia.mainCmd.MainCmdLogging_ifc;
-import org.vishia.msgDispatch.LogMessageStream;
-
-/*Test with Jbat: call Jbat with this java file with its full path:
-file: D:/vishia/Java/srcJava_vishiaGui/org/vishia/gral/cfg/GralCfgWindow.java
-==JZcmd==
-java org.vishia.gral.test.HelloWorld.openWindow();                 
-String windowTitle = <:>Test GralCfgWindow<.>;
-String gConfig = 
-<:>
- ##A value to show, following by a label.
- @4+2,2+30:Show("name"); Text("label");
- @6..-2, 2..0: InputBox(box);
-<.>;
-Obj window = java org.vishia.gral.cfg.GralCfgWindow.createWindow("testCfgWind", windowTitle, gConfig, jzcmdsub.currdir, jzcmd.log);
-window.setTextIn("name", "example");
-window.setTextIn("box", "Box input");                 
-java org.vishia.gral.test.HelloWorld.waitForClosePrimaryWindow();
-==endJZcmd==
-*/
-
-/**This is the class to build a graphic window in any application which is configurable.
- * <br><br>
- * Note: See {@link org.vishia.gral.area9.GuiCfg}, that is an application with 9 areas for configuration. 
- * 
- * @author Hartmut Schorrig
- *
+/**ZBNF: Window::= ... ;
  */
-public class GralCfgWindow
+public class GralCfgWindow extends GralCfgData.GuiCfgWidget
 {
-  
-  /**The version, history and license.
+  /**Version, history and license.
    * <ul>
-   * <li>2018-09-17 {@link #GralCfgWindow(String, String, char, CharSequence, File, MainCmdLogging_ifc)}
-   *   with sPosName, also possible give the position, uses this capability from {@link GralWindow#GralWindow(String, String, String, int)} 
-   * <li>2018-09-17 GralCfgWindow: with argument for size and AWT/SWT
-   * <li>2015-04-26 Hartmut created: For usage in Jzcmd-scripts.
+   * <li>2022-11-14 Hartmut created similar GralCfgPanel. 
+   *   Before only one window are used in script configured GUIs. It means the window was not part of the script. 
    * </ul>
    * 
-   * <b>Copyright/Copyleft</b>:
+   * <b>Copyright/Copyleft</b>:<br>
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
    * It means:
@@ -60,114 +25,35 @@ public class GralCfgWindow
    * <li> But the LPGL is not appropriate for a whole software product,
    *    if this source is only a part of them. It means, the user
    *    must publish this part of source,
-   *    but don't need to publish the whole source of the own product.
+   *    but doesn't need to publish the whole source of the own product.
    * <li> You can study and modify (improve) this source
    *    for own using or for redistribution, but you have to license the
    *    modified sources likewise under this LGPL Lesser General Public License.
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
-   * If you are intent to use this sources without publishing its usage, you can get
+   * If you intent to use this source without publishing its usage, you can get
    * a second license subscribing a special contract with the author. 
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
    */
-  public final static String version = "2022-01-29";
+  public static final String sVersion = "2022-11-14";
 
   
-  final private MainCmdLogging_ifc log;
   
-  /**The configuration data for graphical appearance. */
-  final private GralCfgData guiCfgData;
+  /**All elements of this window. If it is a tabbed panel, the elements are only panels. */
+  //final List<GralCfgElement> listElements = new LinkedList<GralCfgElement>();
+  GralCfgPanel panelWin;
 
-  /**Directory for images. */
-  File imgDir;
+  String title;
   
-  final public GralWindow window;
-  
-  /**Creates a new Window or opens the existing one with given name.
-   * @param sPosName Position and Name of the window inside the gral manager to address the window.
-   *   Form: "@LINE+SIZE, COLUMN+SIZE=NAME". If pos is not given, not starts with "@", then a default Pos  "10+50, 10+100" is used.   
-   * @param sTitle text in the title bar
-   * @param size 'A'...'E' as pixel/grid unit for SWT graphic. 'a'...'e' same for AWT-Graphic
-   * @param sCfg textual given configuration for the window.
-   * @param imgDir start directory path where images are located if given with relative path.
-   * @param log interface for logging output of parser and creation.
-   * @throws ParseException on errors in the sCfg
-   */
-  private GralCfgWindow(String sPosName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) throws ParseException {
-    this.log = log !=null ? log : log;
-    this.guiCfgData = new GralCfgData(null);  //no config conditions given.
-    this.imgDir = imgDir;
-    String swtOrawt;
-    char size1;
-    if(size < 'a') { size1 = size; swtOrawt = "SWT"; }
-    else { size1 = (char)(size - 'a'-'A'); swtOrawt = "AWT"; }
-    GralCfgZbnf cfgZbnf = new GralCfgZbnf();  //temporary instance for parsing
-    cfgZbnf.configureWithZbnf(sCfg, this.guiCfgData); //
-    int props = GralWindow_ifc.windRemoveOnClose | GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
-    GralMng mng = GralMng.get();
-    mng.selectPrimaryWindow();
-    String defaultPos = sPosName.startsWith("@") ? null : "10+50, 10+100"; 
-    this.window = new GralWindow(defaultPos, sPosName, sTitle, props);
-    this.configInGthread.getCtDone(0);
-    this.window.create(swtOrawt, size1, log, this.configInGthread);
-    this.configInGthread.awaitExecution(1, 0);
+  public GralCfgWindow(GralCfgElement itsElement){ 
+    super(itsElement, 'w'); 
   }
   
-  /**Creates a window with a given configuration.
-   * The window will be removed on closing.
-   * @param sName Name of the window inside the gral manager to address the window.
-   * @param sTitle text in the title bar
-   * @param size 'A'...'E' as pixel/grid unit for SWT graphic. 'a'...'e' same for AWT-Graphic
-   * @param sCfg textual given configuration for the window.
-   * @param imgDir start directory path where images are located if given with relative path.
-   * @param log log output for status and parse messages
-   * @throws ParseException on errors in the sCfg
-   */
-  public static GralWindow createWindow(String sName, String sTitle, char size, CharSequence sCfg, File imgDir, MainCmdLogging_ifc log) 
-  throws ParseException
-  {
-    GralCfgWindow thiz = new GralCfgWindow(sName, sTitle, size, sCfg, imgDir, log);
-    return thiz.window;
+  public void set_title(String val) {
+    this.title = val;
   }
-  
-  
-  /**Accesses a given widget which is given per name. 
-   * @param name from the config file
-   * @return null if name is faulty.
-   */
-  public GralWidget getWidget(String name) {
-    return this.window.getWidget(name);
-  }
-  
+    //colorName = 
+  @Override public String toString() { return "Window: " + super.name; }
 
-  
-  /**Code snippet to run the ZBNF-configurator (text controlled GUI)
-   * 
-   */
-  @SuppressWarnings("synthetic-access")  
-  GralGraphicTimeOrder configInGthread = new GralGraphicTimeOrder("GralCfgWindow.config")
-  {
-    
-    private static final long serialVersionUID = 1L;
-
-    @Override public void executeOrder(){
-      GralMng mng = GralMng.get();
-      mng.selectPanel("primaryWindow");  //window position relative to the primary window.
-      GralCfgWindow.this.window.setToPanel(mng);
-      GralCfgWindow.this.window.setVisible(true);
-      GralCfgBuilder cfgBuilder = new GralCfgBuilder(GralCfgWindow.this.guiCfgData, mng, GralCfgWindow.this.imgDir);
-      String sError = cfgBuilder.buildGui(GralCfgWindow.this.log, 0);
-      if(sError !=null) {
-        System.err.println(sError);
-      }
-    }
-  ////
-  };
-
-
-  
-  
 }

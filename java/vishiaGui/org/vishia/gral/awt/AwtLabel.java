@@ -46,7 +46,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
   public static final int version = 20120317;
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final AwtWidgetHelper widgHelper;
   
@@ -55,9 +55,9 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
   private Font fontAwt;
   
   
-  AwtLabel(GralLabel widgg, AwtWidgetMng mng)
+  AwtLabel(GralLabel widgg, AwtMng mng)
   {
-    widgg.super(widgg, mng.mng);
+    widgg.super(widgg, mng.gralMng);
     //Container panelSwt = mng.getCurrentPanel();
     //int styleSwt = 0;
     int mode;
@@ -74,13 +74,13 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
     default: mode = 0;
     }
     labelAwt = new Label(dyda().displayedText, mode);
-    Container panelAwt = (Container)widgg.pos().panel.getWidgetImplementation();
+    Container panelAwt = (Container)widgg.pos().parent.getImplAccess().getWidgetImplementation();
     panelAwt.add(labelAwt);
     widgHelper = new AwtWidgetHelper(labelAwt, mng);
     labelAwt.setAlignment(mode);
     mng.setBounds_(widgg.pos(), labelAwt);
-    mng.mng.registerWidget(widgg);
-    repaintGthread();  //to set text etc.
+    mng.gralMng.registerWidget(widgg);
+    redrawGthread();  //to set text etc.
   }
 
 
@@ -99,7 +99,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override
-  public void repaintGthread()
+  public void redrawGthread()
   {
     if(labelAwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();
@@ -153,7 +153,7 @@ public class AwtLabel extends GralLabel.GraphicImplAccess
 
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); widgHelper.setVisibleGThread(bVisible); }
 

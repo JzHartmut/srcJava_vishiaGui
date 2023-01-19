@@ -1,16 +1,17 @@
 package org.vishia.gral.widget;
 
+import org.vishia.gral.base.GralCanvasStorage;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.ifc.GralCanvasStorage;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 
-/**A widget which is a canvas to plot something.
+/**A widget which is a canvas to draw something.
  * @author hartmut Schorrig
  *
  */
-public class GralPlotArea extends GralWidget
+public class GralCanvasArea extends GralWidget
 {
   /**Version, history and license.
    * <ul>
@@ -43,16 +44,31 @@ public class GralPlotArea extends GralWidget
    */
   public static final String sVersion = "2015-09-26";
 
-  protected final GralCanvasStorage canvasStore = new GralCanvasStorage();
+  /**The Store for the figures. Immediately writable.
+   * 
+   */
+  final GralCanvasStorage canvasStore = new GralCanvasStorage();
   
-  public GralPlotArea(String posname) {
-    super(posname, 'P' );
+  /**Constructs
+   * @param currPos may be null, then use the singleton pos in GralMng, else basic and current position
+   * @param posname
+   */
+  public GralCanvasArea(GralPos currPos, String posname) {
+    super(currPos, posname, 'P' );
   }
   
  
   public UserUnits userUnitsPerGrid(float x0, float y0, float xSize, float ySize) {
     return new UserUnits(x0, y0, xSize, ySize, true);
   }
+  
+  
+  /**Gets one of the Canvas Storages.
+   * @param ix yet not used. Possible more as one TODO.
+   * @return
+   */
+  public GralCanvasStorage getCanvasStore ( int ix ) { return canvasStore; }
+  
   
   
   public void drawLine(GralColor color, UserUnits userUnits, float[][] points, int iy) {
@@ -75,7 +91,7 @@ public class GralPlotArea extends GralWidget
      */
     protected UserUnits(float x0, float y0, float x1, float y1, boolean perGridPos){
       this.x0 = x0; this.y0 = y0; this.xmax = x1; this.ymax = y1;
-      GralPos pos = GralPlotArea.super.pos();
+      GralPos pos = GralCanvasArea.super.pos();
       float height, width;
       if(perGridPos){
         height= width = 1; 
@@ -96,12 +112,12 @@ public class GralPlotArea extends GralWidget
    */
   public abstract class _GraphicImplAccess_ extends GralWidget.ImplAccess {
 
-    protected _GraphicImplAccess_(GralWidget widgg)
+    protected _GraphicImplAccess_(GralWidget widgg, GralMng.ImplAccess mngImpl)
     {
-      super(widgg);
+      super(widgg, mngImpl);
     }
 
-    protected GralCanvasStorage canvasStore(){ return GralPlotArea.this.canvasStore; }
+    protected GralCanvasStorage canvasStore(){ return GralCanvasArea.this.canvasStore; }
     
     @Override public boolean setFocusGThread()
     {
@@ -113,18 +129,6 @@ public class GralPlotArea extends GralWidget
     {
       // TODO Auto-generated method stub
       
-    }
-
-    @Override public void repaintGthread()
-    {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override public Object getWidgetImplementation()
-    {
-      // TODO Auto-generated method stub
-      return null;
     }
 
     @Override public void setBoundsPixel(int x, int y, int dx, int dy)

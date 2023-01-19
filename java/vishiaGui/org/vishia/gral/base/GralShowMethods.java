@@ -6,6 +6,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.widget.GralInfoBox;
@@ -206,8 +207,8 @@ public class GralShowMethods
         String nameWindow = (params.length >=1 && (params[0] instanceof String)) ? (String)params[0] : widg.sCmd;  //sCmd for buttons
         if(nameWindow !=null) {
           if(nameWindow.endsWith("wind")) { nameWindow = nameWindow.substring(0, nameWindow.length()-4); }
-          GralMng mng = GralMng.get();
-          GralPanelContent panelWind = mng.getPanel(nameWindow);
+          GralMng mng = widgi.gralMng();
+          GralPanel_ifc panelWind = mng.getPanel(nameWindow);
           if(panelWind !=null) { panelWind.setFocus(); }
           else { System.err.println("action_openWindow: window not found: " + nameWindow); }
         }
@@ -237,7 +238,7 @@ public class GralShowMethods
         File fileCurrdir = new File(".").getAbsoluteFile();
         String sDir = System.getProperty("pwd");
         String path2 = fileCurrdir.getAbsolutePath() + "/" + path;
-        GralMng mng = GralMng.get();
+        GralMng mng = widgi.gralMng();
         GralInfoBox windhelp= mng.infoHelp;
         windhelp.activate();
         windhelp.setUrl(path2);

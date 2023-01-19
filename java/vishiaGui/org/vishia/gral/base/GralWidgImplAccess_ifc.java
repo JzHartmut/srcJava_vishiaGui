@@ -2,14 +2,14 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralRectangle;
 
-/**This interface is used as reference to the implementation layer for all widgets.
+/**This interface is used as reference to the implementation access layer for all widgets.
  * It defines all possible calls from the application to the implementation widget.
  * <br><br>
  * Note that most of user requirements are done by the {@link GralWidget} capability and the
  * capabilities of its derived classes, for example {@link GralWidget#setText(CharSequence)}
  * or {@link GralWidget#setBackColor(org.vishia.gral.ifc.GralColor, int)}. That methods 
  * stores the text, color etc. in graphic-independent attributes. The method 
- * {@link #repaintGthread()} is the central method to realize that user stimuli for the
+ * {@link #redrawGthread()} is the central method to realize that user stimuli for the
  * implementation graphic layer. That method can use especially the {@link GralWidget.DynamicData}
  * and there quest method {@link GralWidget.DynamicData#whatIsChanged}.
  * There is no needing of methods such as <code>setText(String)</code> etc. because the user
@@ -19,7 +19,7 @@ import org.vishia.gral.ifc.GralRectangle;
  * @author Hartmut Schorrig
  *
  */
-public interface GralWidgImpl_ifc
+public interface GralWidgImplAccess_ifc
 {
   
   
@@ -84,7 +84,7 @@ public interface GralWidgImpl_ifc
   
   /**This method should be implemented in all Widget implementations of the adapter for the
    * underlying graphic system. 
-   * <br>Implementation hints: In SWT it should call redraw(). 
+   * <br>Implementation hints: In SWT it should call redraw(). In AWT this is named 'repaint()'-
    * <br>It is possible that the widget
    * consists of more as one graphical widget, then all of it should be redrawn. 
    * It is possible that some data are set in another thread, they should be applied to the widgets firstly.
@@ -94,7 +94,7 @@ public interface GralWidgImpl_ifc
    * See {@link #repaintRequ}
    * 
    */
-  void repaintGthread();
+  void redrawGthread ( );
 
   
   /**Returns the implementation class of the widget. If the widget has more as one implementation widgets,
@@ -106,8 +106,25 @@ public interface GralWidgImpl_ifc
    * */
   Object getWidgetImplementation();
   
+  /**This is called especially on resize from the panel, but also on creation for comprehensive widgets.
+   * If the widget is more comprehensive, consist of more basic widgets,
+   * then this operation should care about the parts of the widget.
+   * @param x
+   * @param y
+   * @param dx
+   * @param dy
+   */
   void setBoundsPixel(int x, int y, int dx, int dy);
  
+  
+  /**This is called especially on resize from the panel, but also on creation for comprehensive widgets.
+   * If the widget is more comprehensive, consist of more basic widgets,
+   * then this operation should care about the parts of the widget.
+   * The position is gotten from the gral widget.
+   */
+  void setPosBounds ( );
+  
+  
   GralRectangle getPixelPositionSize();
   
   /**This operation should be called before any action is invoked in the user space.

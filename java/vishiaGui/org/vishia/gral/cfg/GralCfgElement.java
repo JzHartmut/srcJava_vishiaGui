@@ -73,10 +73,15 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**The position is set in textual form too. It is because [<?Element>...] was written */
   String positionString;
   
+  /**Name given in position string or before type, not in parameter. See also {@link GralCfgData.GuiCfgWidget#name}. */
+  String name;
+  
+  String panel;
+  
   /**ZBNF: Position coordinates will be filled from [<?position>.... 
    * The instance contains only that position data, which are found in the textual config file. 
    * It is important to rewrite only that data, which are contained in the originally one. */
-  final GralCfgPosition positionInput = new GralCfgPosition();
+  final GralCfgPosition XXXpositionInput = new GralCfgPosition();
   
   /**This obj contains all position data. Missed position data in the {@link #positionInput}
    * are completed by knowledge of the position of the previous elements. 
@@ -86,6 +91,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   //private final GralPos posInput = new GralPos();
   
+  /**The particular widget cfg data for this element.  */
   GuiCfgWidget widgetType;
   
   GralCfgElement() //GralCfgData itsCfgData)
@@ -96,7 +102,9 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   public GralCfgElement clone(){ 
     GralCfgElement newObj = new GralCfgElement();  //this.itsCfgData);
     newObj.widgetType = widgetType.clone(); ///use a new cloned instance (use data).
-    newObj.positionInput.set(this.positionInput);
+    //newObj.positionInput.set(this.positionInput);
+    newObj.positionString = positionString;
+    newObj.panel = panel;
     /*NOTE: don't use super.clone() because it copies the references to final elements. We need cloned new elements
     GralCfgElement newObj = null;
     try{ newObj = (GralCfgElement)super.clone(); 
@@ -120,48 +128,61 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
    * @return
    * @throws ParseException 
    */
-  void setPos(GralMngBuild_ifc guiMng) 
-  throws ParseException 
-  { GralMng mng = GralMng.get();
-    if(positionString !=null) {
-      mng.setPos(positionString);
-    } else {
-      GralCfgPosition p = positionInput;
-      if(p.yPos >=0 || p.xPos >=0 || p.ySizeDown !=0 || p.xWidth !=0) {
-          
-        int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
-          p.ySizeDown == 0 ? GralPos.samesize : 
-          (p.ySizeFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
-        int xSize = p.xWidth == GralPos.useNatSize ? p.xWidth : 
-          p.xWidth == 0 ? GralPos.samesize :
-          (p.xSizeFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
-        mng.setFinePosition(p.yPos, p.yPosFrac, ySize, p.ySizeFrac, p.xPos, p.xPosFrac, xSize, p.xSizeFrac, 0, 'r', 0, 0, null);  
-      }
-      else {
-        stop();
-        //no position given. The new position will be set relative to the old one on widget.setToPanel.
-      }
-      //  setPosOld(guiMng);  //use inputPos
-    }
-  }  
+//  GralPos XXXsetPos(GralMngBuild_ifc guiMng) 
+//  throws ParseException 
+//  { GralMng mng = GralMng.get();
+//    if(positionString !=null) {
+//      return mng.setPos(positionString);
+//    } else {
+//      GralCfgPosition p = XXXpositionInput;
+//      if(p.yPos >=0 || p.xPos >=0 || p.ySizeDown !=0 || p.xWidth !=0) {
+//          
+//        int ySize = p.ySizeDown == GralPos.useNatSize ? p.ySizeDown :
+//          p.ySizeDown == 0 ? GralPos.samesize : 
+//          (p.ySizeFrac > 0 && p.ySizeDown < 0 ? p.ySizeDown -1 : p.ySizeDown) + GralPos.size;
+//        int xSize = p.xWidth == GralPos.useNatSize ? p.xWidth : 
+//          p.xWidth == 0 ? GralPos.samesize :
+//          (p.xSizeFrac > 0 && p.xWidth < 0 ? p.xWidth -1 : p.xWidth) + GralPos.size;
+//        mng.setFinePosition(p.yPos, p.yPosFrac, ySize, p.ySizeFrac, p.xPos, p.xPosFrac, xSize, p.xSizeFrac, 0, 'r', 0, 0, null);  
+//      }
+//      else {
+//        stop();
+//        //no position given. The new position will be set relative to the old one on widget.setToPanel.
+//      }
+//      return mng.getPositionInPanel();
+//      //  setPosOld(guiMng);  //use inputPos
+//    }
+//  }  
   
   
   
   
-  public String getPanel(){ return positionInput.panel; }
+  public String getPanel(){ return panel; }
 
-  void setPanel(String panel){ position.panel = positionInput.panel = panel; }
+  void setPanel(String panel){ this.panel = panel; }
   
-  public int get_xPos(){ return positionInput.xPos; }
+  public int XXXget_xPos(){ return XXXpositionInput.xPos; }
   
-  public int get_yPos(){ return positionInput.yPos; }
+  public int XXXget_yPos(){ return XXXpositionInput.yPos; }
   
   
   /**ZBNF: <?position> */
-  public GralCfgPosition new_position(){ return positionInput; }  
+  public GralCfgPosition XXXnew_position(){ return XXXpositionInput; }  
   
   /**ZBNF: <*:?position> */
-  public void set_positionString(String val) { this.positionString = val; }
+  public void set_positionString(String val) { 
+    this.positionString = val; 
+  }
+ 
+  /**ZBNF: <*:?position> */
+  public void set_name(String val) { 
+    this.name = val; 
+  }
+ 
+  /**ZBNF: <*:?position> */
+  public void set_panel(String val) { 
+    this.panel = val; 
+  }
  
   /**ZBNF: [<?position>   ] it is unnecessary*/
   public void set_position(String val) {  }
@@ -169,6 +190,16 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**ZBNF: <?position> */
   public void set_position(GralCfgPosition val) {  } //is set only
  
+  /**ZBNF: Window::= */
+  public GralCfgWindow new_Window()
+  { GralCfgWindow widgetType1 = new GralCfgWindow(this); 
+    this.widgetType = widgetType1; 
+    return widgetType1;
+  }
+  
+  /**ZBNF: Led::= */
+  public void set_Window(GralCfgWindow data){  }
+  
   /**ZBNF: Text::= */
   public GuiCfgText new_Text()
   { GuiCfgText widgetType1 = new GuiCfgText(this); 
@@ -298,6 +329,11 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   /**ZBNF: Curveview::= */
   public void set_Curveview(GuiCfgCurveview data){  }
 
+  
+  
+  @Override public String toString() {
+    return (this.positionString + ":" + this.widgetType);
+  }
   
   private void stop(){}
   

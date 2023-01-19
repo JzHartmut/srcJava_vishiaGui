@@ -31,6 +31,7 @@ import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
+import org.vishia.util.TimedValues;
 import org.vishia.util.Timeshort;
 import org.vishia.zbnf.ZbnfJavaOutput;
 import org.vishia.zbnf.ZbnfParser;
@@ -50,6 +51,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Version, history and license.
    * <ul>
+   * <li>2022-09-28 Hartmut deal with timeShort from the measurement resp. value source.
+   *   The absolute time is either associated here from the {@link System#currentTimeMillis()} 
+   *   or also possible for a given absolute time relation for the values outside of the current values.
    * <li>2018-09-20 Hartmut new feature on {@link #readCurveCsvHeadline(File)}, a variable which is not yet in cfg is disabled.
    *   Elsewhere not prepared stuff is shown in the graphic. It can be enabled and scaled by the user afterwards.
    *   The importance is, the variable will be inserted as signal (track) automatically
@@ -78,7 +82,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * <li>2014-03-14 Hartmut new: {@link CommonCurve#timeVariable} for time from target. 
    * <li>2014-02-03 Hartmut new: {@link CommonCurve#bFreeze}: freeze as common property of more as one GralCurveView. Constructor argument.
    * <li>2014-01-29 Hartmut new: Comment in Datapath supported. For nice presentation in list on long variable paths. 
-   * <li>2013-11-19 Hartmut new: {@link #repaint(int, int)} overridden forces paint of the whole curve
+   * <li>2013-11-19 Hartmut new: {@link #redraw(int, int)} overridden forces paint of the whole curve
    *   by setting {@link #bPaintAllCmd}, whereby in {@link #setSample(float[], int)} super.repaint is invoked, 
    *   which does not set {@link #bPaintAllCmd} and paints therefore only the new data. 
    * <li>2013-07-25 Hartmut new AutoSave capabilities.
@@ -133,7 +137,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public final static int version = 20130327;
+  public final static int version = 20220928;
   
   
   
@@ -243,10 +247,25 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   }
   
   
+  
+  public TimedValues tracksValue;
+  
+  
   /**The describing and the actual data of one track (one curve)
    */
-  public static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
+  public final static class Track implements GralCurveViewTrack_ifc, GralSetValue_ifc {
     public final String name;
+    
+    /**This is also for debug access to see the time to the values.
+     * 
+     */
+    final TimedValues timeValues;
+    
+    /**Contains all values maybe in different formats double, float, int, short
+     * and also the name of the tracke, min and max. 
+     * The time for the values are stored in {@link TimedValues#timeShort}
+     */
+    public final TimedValues.Track valueTrack;
     
     /**The index of the track in the List of tracks. 
      * It is the correspondent index in the float parameter for {@link GralCurveView#setSample(float[], int)}
@@ -260,7 +279,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     /**This value is set in {@link GralCurveView#refreshFromVariable(VariableContainer_ifc)}
      * after {@link #setDataPath(String)} is given. 
      */
-    private VariableAccess_ifc variable;
+    protected VariableAccess_ifc variable;
     
     private Object oContent;
     
@@ -270,8 +289,6 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     private int dataIx;
     
     public float YYYactValue;
-    
-    public float min, max;
     
     /**Reference to the scaling to show the track. More as one track can build a scale group 
      * which refers the same instance. */
@@ -290,9 +307,6 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     public int showSelected = 1;
     //public float y0Pix;
     
-    /**Array stores the last values which are able to show. */
-    public float[] values;
-    
     /**last values for paint. 
      * The current paint goes from lastValueY[1] to the current point.
      * The lastValueY[0] is used to repaint the last curve peace while shifting draw content.
@@ -305,7 +319,14 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     public int ypixLast;
     
     public Track(GralCurveView outer, String name, int ixList){ 
-      this.outer = outer; this.name = name; this.ixList = ixList; }
+      this.outer = outer; this.name = name; this.ixList = ixList; 
+      this.timeValues = outer.tracksValue;
+      TimedValues.Track valueTrack = outer.tracksValue.getTrack(name);
+      if(valueTrack ==null) {                              // use an existing ValueTrack
+        valueTrack = outer.tracksValue.addTrack(name, 'F');// or create it here for all.
+      }
+      this.valueTrack = valueTrack;
+    }
 
     @Override public void setContentInfo(Object content) { oContent = content; }
 
@@ -333,7 +354,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * @see org.vishia.gral.ifc.GralSetValue_ifc#setMinMax(float, float)
      */
     @Override public void setMinMax(float minValue, float maxValue) {
-      this.min = minValue; this.max = maxValue;
+      this.valueTrack.min = minValue; this.valueTrack.max = maxValue;
     }
 
     @Override public int getLinePercent(){ return scale.y0Line; }
@@ -388,7 +409,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(cursor >=0 && cursor < ((GraphicImplAccess)outer._wdgImpl).ixDataShown.length){
         try{
           int ixData = ((GraphicImplAccess)outer._wdgImpl).getIxDataFromPixelRight(cursor);
-          value = values[ixData]; 
+          value = this.valueTrack.getFloat(ixData); 
         } catch(Exception exc){
           value = 77777.7f;
         }
@@ -682,7 +703,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * is only present on startup of graphic and only if the difference is in range of presentation width,
    * see {@link #prepareIndicesDataForDrawing(int, int)}
    */
-  public final int[] timeValues;
+  //public final int[] timeValues;
 
 
   /**Distance of nrofValues for one vertical strong grid line.
@@ -756,13 +777,22 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
 
-  public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common)
+  /**Constructs the CurveView comprehensive widget.
+   * @param refPos reference position will also be changed by given position in sPosName, will be cloned for the widget.
+   * @param sName widget name or also "@<position>: name" for cursor positioning relative or absolute.
+   * @param maxNrofXvaluesP deepness of values, max. 16000000 (16 Mega), usual 10000 or such. This value will be increased to the next power of 2.
+            Not used if tracksValues are given.
+   * @param curveVariables null or possible given Variable set for more as one curve view
+   * @param tracksValues null or possible given Track Values from another CurveView or such.
+   */
+  public GralCurveView(GralPos refPos, String sPosName, int maxNrofXvaluesP, CommonCurve curveVariables, TimedValues tracksValues)
   {
-    super(null, sName, 'c');
-    this.common = common == null ? new CommonCurve() : common;
+    super(refPos, sPosName, 'c');
+    this.common = curveVariables == null ? new CommonCurve() : curveVariables;
+    int maxNrofXvaluesT = tracksValues !=null ? tracksValues.getLength() : maxNrofXvaluesP; 
     int maxNrofXvalues1 = 1;
     int shIxData1 = 32;
-    while(maxNrofXvalues1 < maxNrofXvaluesP){
+    while(maxNrofXvalues1 < maxNrofXvaluesT){
       maxNrofXvalues1 <<=1;
       shIxData1 -=1;
     }
@@ -772,31 +802,56 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     this.mIxData = ~(this.adIxData -1); //all bits which have to be used, mask out lower bits.
     this.mIxiData = maxNrofXValues -1;  //e.g. from 0x1000 to 0xfff
     this.ixDataWr = -adIxData; //initial write position, first increment to 0.
-    //
-    timeValues = new int[maxNrofXValues];
+    this.tracksValue = tracksValues !=null ? tracksValues       // use given track values
+                     : new TimedValues(this.maxNrofXValues);    // create here the trackValues.
+
     cleanBuffer();
     saveOrg.nrofValuesAutoSave = (int)(maxNrofXValues * 0.75);
     //values = new float[maxNrofXvalues][nrofTracks];
     //setPanelMng(mng);
+    initMenuContext();
     setActionMouse(mouseAction, 0);
-    
+
     //mng.registerWidget(this);
   }
 
-  
+  @Deprecated public GralCurveView(String sName, int maxNrofXvaluesP, CommonCurve common) {
+    this((GralPos)null, sName, maxNrofXvaluesP, common, null);
+  }  
   
   public void cleanBuffer()
   {
     for(int ix = 0; ix < maxNrofXValues; ++ix){
-      timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
+      //timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
     }
-    timeorg.calc();
-    timeorg.timeshortAdd = 0;
-    timeorg.timeshortLast = 0;
-    timeorg.absTime.clean();
+    this.tracksValue.cleanSetCapacity(this.maxNrofXValues);
+    this.timeorg.calc();
+    this.timeorg.timeshortAdd = 0;
+    this.timeorg.timeshortLast = 0;
+    this.timeorg.absTime.clean();
     if(super._wdgImpl !=null) {
       GraphicImplAccess wdgi = (GraphicImplAccess)super._wdgImpl;
-      wdgi.ixDataDraw = ixDataWr =0;
+      wdgi.ixDataDraw = this.ixDataWr =0;
+      wdgi.ixDataCursor1 = wdgi.ixDataCursor2 = 0;
+      wdgi.ixDataShowRight = 0;
+      Arrays.fill(wdgi.ixDataShown, 0);
+    }
+  }
+  
+  
+  public void showAll()
+  {
+    for(int ix = 0; ix < maxNrofXValues; ++ix){
+      //timeValues[ix] = ix;  //store succession of time values to designate it as empty.  
+    }
+    this.tracksValue.cleanSetCapacity(this.maxNrofXValues);
+    this.timeorg.calc();
+    this.timeorg.timeshortAdd = 0;
+    this.timeorg.timeshortLast = 0;
+    this.timeorg.absTime.clean();
+    if(super._wdgImpl !=null) {
+      GraphicImplAccess wdgi = (GraphicImplAccess)super._wdgImpl;
+      wdgi.ixDataDraw = this.ixDataWr =0;
       wdgi.ixDataCursor1 = wdgi.ixDataCursor2 = 0;
       wdgi.ixDataShowRight = 0;
       Arrays.fill(wdgi.ixDataShown, 0);
@@ -814,6 +869,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     //menuCurve.addMenuItemGthread("pause", "pause", null);
     menuCurve.addMenuItem("refresh", actionPaintAll);
     menuCurve.addMenuItem("go", actionGo);
+    menuCurve.addMenuItem("show All", actionShowAll);
     //menuCurve.addMenuItemGthread("zoomOut", "zoom in", null);
     menuCurve.addMenuItem("zoomBetweenCursor", "zoom between Cursors", actionZoomBetweenCursors);
     menuCurve.addMenuItem("zoomOut", "zoom out", actionZoomOut);
@@ -860,7 +916,6 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   {
     //Track track = initTrack(sNameTrack, sDataPath, color, style, nullLine, scale, offset, listTracksNew);
     Track track = new Track(this, sNameTrack, listTracks.size());
-    track.values = new float[this.maxNrofXValues];
     track.scale = new TrackScale();
     track.sDataPath =sDataPath;
     track.variable = null;                                 // will be found and set in {@link GralCurveView#refreshFromVariable(VariableContainer_ifc)
@@ -955,7 +1010,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   public long timeRight(){
     int ixData = ((GraphicImplAccess)super._wdgImpl).ixDataShown[0];  //right
-    int timeShort1 = timeValues[(ixData >> shIxiData) & mIxiData];
+    int timeShort1 = this.tracksValue.getTimeShort((ixData >> this.shIxiData) & this.mIxiData);
     //synchronized()
     return timeorg.absTime.absTimeshort(timeShort1);
     
@@ -971,7 +1026,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   /**
    * @see org.vishia.gral.ifc.GralCurveView_ifc#setSample(float[], int)
    */
-  @Override public void setSample(float[] values, int timeshort) {
+  @Override public void setSample(float[] values, int timeShort, int timeShortAdd) {
     if(testStopWr) return;  //only for debug test.
     //if(++ixDataWr >= maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
@@ -998,21 +1053,20 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     for(Track track: listTracks){ 
       if(ixSource < values.length -1){
         float val = values[++ixSource];  //write in the values.
-        track.values[ixWr] = val;  //write in the values.
-        if(track.min > val ){ track.min = val; }
-        if(track.max < val ){ track.max = val; }
+        track.valueTrack.setFloat(ixWr, val);  //write in the values.
+        if(track.valueTrack.min > val ){ track.valueTrack.min = val; }
+        if(track.valueTrack.max < val ){ track.valueTrack.max = val; }
       } else {
-        track.values[ixWr] = 0;
+        track.valueTrack.setFloat(ixWr, 0);
       }
     }
     //
-    int timeLast = timeValues[ixWr];
-    timeValues[ixWr] = timeshort;
+    int timeLast = this.tracksValue.getsetTimeShort(ixWr, timeShort, timeShortAdd);
     
-    timeorg.lastShortTimeDateInCurve = timeshort;
+    timeorg.lastShortTimeDateInCurve = timeShort;
     if(nrofValues < maxNrofXValues){
       if(nrofValues ==0){
-        timeorg.firstShortTimeDateInCurve = timeshort;
+        timeorg.firstShortTimeDateInCurve = timeShort;
       }
       this.nrofValues +=1;
     } else {
@@ -1024,13 +1078,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       synchronized(this){
         if(super._wdgImpl !=null) ((GraphicImplAccess)(super._wdgImpl)).redrawBecauseNewData = true;
       }
-      super.repaint(50,100);
+      super.redraw(50,100);
     }
   }
 
   
   
-  /**
+  /**The specific for this refresh is, that all variables are quest with the same time. 
+   * If any variable is not refreshed, then it is not able to recognize.
+   * Maybe later write curves in another kind. 
+   * It may be assumed that all variables are updated simultaneously.
    * @see org.vishia.gral.base.GralWidget#refreshFromVariable(org.vishia.byteData.VariableContainer_ifc)
    */
   @Override public void refreshFromVariable(VariableContainer_ifc container){
@@ -1038,6 +1095,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       List<Track> listTracks1 = listTracks; //Atomic access, iterate in local referenced list.
       float[] values = new float[listTracks1.size()];
       int ixTrack = -1;
+      int[] timeShortAbsLastFromVariable = null;
+      boolean bDifferentTime = false;
       boolean bRefreshed = false; //set to true if at least one variable is refreshed.
       for(Track track: listTracks1){
         if(track.variable ==null && bNewGetVariables){ //no variable known, get it.
@@ -1049,7 +1108,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
             }
             String sPath2 = sDataPath.trim();
             if(!sDataPath.startsWith("#")){ //don't regard commented line
-              String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);  //replaces only the alias:
+              String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath2);  //replaces only the alias:
               track.variable = container.getVariable(sPath);
               if(track.variable == null){
                 System.err.printf("GralCurveView - variable not found; %s in curveview: %s\n", sPath, super.name);
@@ -1060,10 +1119,21 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         final float value;
         
         if(track.variable !=null ){
+          int[] timeShort = track.variable.getLastRefreshTimeShort();
+          if(timeShort !=null && timeShort[0] !=0) {
+            if(timeShortAbsLastFromVariable == null) { timeShortAbsLastFromVariable = timeShort; }
+            else if(timeShort != timeShortAbsLastFromVariable) {      // has another time 
+              //maybe todo  possibility to mark a curve as old
+              bDifferentTime = timeShortAbsLastFromVariable[0] != timeShort[0];
+              if((timeShort[0] - timeShortAbsLastFromVariable[0] ) >0) {
+                timeShortAbsLastFromVariable[0] = timeShort[0];   //use the last value
+                timeShortAbsLastFromVariable[1] = timeShort[1];
+              }
+            }
+          }
           if(track.variable.isRefreshed()){
             bRefreshed = true;
           }
-          track.variable.requestValue();
           if(track.getDataPath().startsWith("xxx:"))
             stop();
           value = track.variable.getFloat();
@@ -1075,34 +1145,44 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       }  
       bNewGetVariables = false;
       final long timeyet = System.currentTimeMillis();
-      int timeshort;
+      final int timeshort, timeshortAdd;
       if(this.common.timeDatapath !=null && this.common.timeVariable ==null){
-        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
+        String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(this.common.timeDatapath);  //replaces only the alias:
         this.common.timeVariable = container.getVariable(sPath);
       }
       if(this.common.timeVariable !=null){
         //the time variable should contain a relative time stamp. It is the short time.
         //Usual it is in 1 ms-step. To use another step width, a mechanism in necessary.
-        //1 ms in 32 bit are ca. 2000000 seconds.
+        //1 ms in 32 bit are ca. +- 2000000 seconds or ~ +-23 days as longest time for differences.
         timeshort = this.common.timeVariable.getInt() + this.timeorg.timeshortAdd;
         this.common.timeVariable.requestValue(timeyet);
         if(this.timeorg.absTime.isCleaned()) {
           setTimePoint(timeyet, timeshort, 1.0f);  //the first time set.
+          timeshortAdd = 0;
         }
         else if((timeshort - this.timeorg.timeshortLast) <0 || this.timeorg.absTime.isCleaned()) {
           //new simulation time:
-          int timeshortAdd = this.timeorg.absTime.timeshort4abstime(timeyet);
-          timeshort += timeshortAdd;
+          timeshortAdd = this.timeorg.absTime.timeshort4abstime(timeyet);
           this.timeorg.timeshortAdd += timeshortAdd; 
           setTimePoint(timeyet, timeshort, 1.0f);  //for later times set the timePoint newly to keep actual.
+        } else {
+          timeshortAdd = 0;
+        }
+      } else if(timeShortAbsLastFromVariable !=null) {
+        timeshort = timeShortAbsLastFromVariable[0];
+        timeshortAdd = timeShortAbsLastFromVariable[1];
+        if(this.timeorg.absTime.isCleaned()) {
+          setTimePoint(timeyet, timeshort + timeshortAdd, 1.0f);  //set always a timePoint if abstime is not given.
         }
       } else {
         timeshort = (int)timeyet;  //The milliseconds from absolute time.
+        timeshortAdd = 0;
         setTimePoint(timeyet, timeshort, 1.0f);  //set always a timePoint if not data time is given.
       }
       if(bRefreshed && timeshort != this.timeorg.timeshortLast) {
         //don't write points with the same time, ignore seconds.
-        setSample(values, timeshort);
+        setSample(values, timeshort, timeshortAdd);
+        //System.out.println("setSample");
         this.timeorg.timeshortLast = timeshort;
       }
     }
@@ -1146,7 +1226,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     boolean bOk;
     try{
       //variate syntax in test... 
-      Report console = new ReportWrapperLog(itsMng.log());
+      Report console = new ReportWrapperLog(gralMng.log());
       ZbnfParser parser = new ZbnfParser(console);
       parser.setSyntax(syntaxSettings);
       bOk = parser.parse(in);
@@ -1194,7 +1274,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     int ixData;
     if(super._wdgImpl ==null) return "--no graphic--";
     dataOrg.ixDataStartSave = ((GraphicImplAccess)super._wdgImpl).ixDataShown[dataOrg.zPixelDataShown-1];
-    int timeShort1 = timeValues[(dataOrg.ixDataStartSave >> shIxiData) & mIxiData];
+    int timeShort1 = this.tracksValue.getTimeShort((dataOrg.ixDataStartSave >> shIxiData) & mIxiData);
     dataOrg.ixDataEndSave = ((GraphicImplAccess)super._wdgImpl).ixDataShown[0];
     if(!common.bFreeze){
       //running curve, autosave starts after it.
@@ -1224,8 +1304,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
   private CharSequence buildDate(int ixStart, int ixEnd){
-    int timeShortStart = timeValues[(ixStart >> shIxiData) & mIxiData];
-    int timeShortEnd = timeValues[(ixEnd >> shIxiData) & mIxiData];
+    int timeShortStart = this.tracksValue.getTimeShort((ixStart >> shIxiData) & mIxiData);
+    int timeShortEnd = this.tracksValue.getTimeShort((ixEnd >> shIxiData) & mIxiData);
     long timeStart = timeorg.absTime.absTimeshort(timeShortStart);
     long timeEnd = timeorg.absTime.absTimeshort(timeShortEnd);
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
@@ -1319,7 +1399,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         }
         bFirstCol = false;
       }
-      setSample(fvalues, timeshort);
+      setSample(fvalues, timeshort, 0);
     }
     ifile.close();
   }
@@ -1395,7 +1475,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         }
         float[] record = new float[listTracks1.size()];
         int ix = (ixDataStart >> shIxiData) & mIxiData;
-        int timeshortLast = timeValues[ix];
+        int timeshortLast = this.tracksValue.getTimeShort(ix);
         out.writeCurveStart(timeshortLast);
         int ixData = ixDataStart;
         int ctValues = this.nrofValues -1;  //read first, may be increment in next step
@@ -1403,9 +1483,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           ix = (ixData >> shIxiData) & mIxiData;
           ixTrack = -1;
           for(Track track: listTracks1){
-            record[++ixTrack] = track.values[ix];
+            record[++ixTrack] = track.valueTrack.getFloat(ix);
           }
-          int timeshort = timeValues[ix];
+          int timeshort = this.tracksValue.getTimeShort(ix);
           if((timeshort - timeshortLast)<0){
             //This is a older value since the last one,
             //it means it is the first value, all others are overwritten.
@@ -1425,16 +1505,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Forces repaint of the whole curves. It sets the internal flag {@link #bPaintAllCmd} which is checked
    * in the paint event routine. In opposite {@link #setSample(float[], int)} invokes
-   * super.repaint of {@link GralWidget#repaint(int, int)} without setting that flag. Therefore the graphic
+   * super.repaint of {@link GralWidget#redraw(int, int)} without setting that flag. Therefore the graphic
    * will be shifted to left only with paint of only the new data.
-   * @see org.vishia.gral.base.GralWidget#repaint(int, int)
+   * @see org.vishia.gral.base.GralWidget#redraw(int, int)
    */
-  @Override public void repaint(int delay, int latest){
+  @Override public void redraw(int delay, int latest){
     System.out.println("GralCurveView.Info - repaint all Trigger;");
     if(_wdgImpl == null) return;
     ((GraphicImplAccess)_wdgImpl).bPaintAllCmd = true;      //used in implementation level to force a paint of the whole curves.
     bNewGetVariables= true;   //used to get faulty variables newly with an error message.
-    super.repaint(delay, latest);
+    super.redraw(delay, latest);
   }
   
   
@@ -1448,7 +1528,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
   public abstract static class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc, Removeable
+  implements GralWidgImplAccess_ifc, Removeable
   { 
     protected final GralCurveView widgg;
     
@@ -1467,8 +1547,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * [0] is right. Use <code>(ixData >> shIxiData) & mIxiData</code> to calculate the real data index.
      * the used length is the number of pixel. 2000 are enough for a large representation.
      * This array is filled newly whenever any draw or paint action is done. It is prepared in the routine
-     * The field contains old indices if the size of drawing is less then the size of window.
      * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the drawTrack routine of the implementation level.
+     * The field contains old indices if the size of drawing is less then the size of window.
      */
     protected final int[] ixDataShown = new int[2000];
 
@@ -1636,7 +1716,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       ctLastSelected +=1;
       List<Track> listTracks1 = widgg.listTracks; //Atomic access, iterate in local referenced list.
       for(Track track: listTracks1){  //NOTE: break inside.
-        float val = track.values[ixData];
+        float val = track.valueTrack.getFloat(ixData);
         float yFactor = ysize / -10.0F / track.scale.yScale;  //y-scaling
         float y0Pix = (1.0F - track.scale.y0Line/100.0F) * ysize; //y0-line
         
@@ -1694,7 +1774,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         }
       }
       bRedrawAll = true;
-      widgg.repaint(0,0);
+      widgg.redraw(0,0);
       //repaint(50,100);
       if(widgg.actionMoveCursor !=null){
         widgg.actionMoveCursor.exec(0, widgg);
@@ -1706,11 +1786,11 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(bMouseDownCursor1){
         xpCursor1New = xr;  //from right;
         //System.out.println("SwtCurveView.mouseMove - cursor1; xr=" + xr);
-        widgg.repaint(50,100);
+        widgg.redraw(50,100);
       } else if(bMouseDownCursor2){
         xpCursor2New = xr;  //from right;
         //System.out.println("SwtCurveView.mouseMove - cursor2; xr=" + xr);
-        widgg.repaint(50,100);
+        widgg.redraw(50,100);
       } else {
         //System.out.println("SwtCurveView.mouseMove x,y=" + e.x + ", " + e.y);
           
@@ -1734,7 +1814,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(widgg.timeorg.timeSpread > 100) { widgg.timeorg.timeSpread /=2; }
       else { widgg.timeorg.timeSpread = 100; }
       bPaintAllCmd = true;
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     }
 
     /**Zooms the curve presentation with same index right with a greater time spread. 
@@ -1753,7 +1833,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       if(widgg.timeorg.timeSpread < 0x3fffffff) { widgg.timeorg.timeSpread *=2; }
       else { widgg.timeorg.timeSpread = 0x7fffffff; }
       bPaintAllCmd = true;
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     
     }
 
@@ -1767,8 +1847,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1) / 10) & widgg.mIxData);
       int ixiData1 = (ixDataShown[xpCursor1] >> widgg.shIxiData) & widgg.mIxiData;
       int ixiData2 = (ixDataShown[xpCursor2] >> widgg.shIxiData) & widgg.mIxiData;
-      int time1 = widgg.timeValues[ixiData1];
-      int time2 = widgg.timeValues[ixiData2];
+      int time1 = widgg.tracksValue.getTimeShort(ixiData1);
+      int time2 = widgg.tracksValue.getTimeShort(ixiData2);
       if((time2 - time1)>0){
         widgg.timeorg.timeSpread = (time2 - time1) * 10/8;
         assert(widgg.timeorg.timeSpread >0);
@@ -1776,7 +1856,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         widgg.stop();
       }
       xpCursor1New = xpCursor2New = cmdSetCursor;  
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     
     }
 
@@ -1814,7 +1894,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       */
       Assert.check(widgg.timeorg.timeSpread >0);
       xpCursor1New = xpCursor2New = cmdSetCursor;  
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
     }
 
     /**Shifts the curve presentation to the present (actual values).
@@ -1845,7 +1925,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           //ixDataShowRight1 = ixDataWr + ixdDataSpread;
         //}
         //ixDataShowRight += ixDataShown[0] - ixDataShown[nrofValuesShow-1]; 
-        widgg.repaint(100, 200);
+        widgg.redraw(100, 200);
     
       } else {
         setPaintAllCmd();  //refresh
@@ -1872,7 +1952,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           ixDataShowRight = widgg.ixDataWr + ixdDataSpread;
         }
       }
-      widgg.repaint(100, 200);
+      widgg.redraw(100, 200);
       //System.out.println("left-bottom");
     
     }
@@ -1925,7 +2005,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       int ixp2 = 0;
       int ixp = 0; //pixel from right to left
       int nrofPixel4Data =0;
-      final int timeRight = widgg.timeValues[ixD]; //timestamp of the right value.
+      final int timeRight = widgg.tracksValue.getTimeShort(ixD); //timestamp of the right value.
       //
       if(xViewPart > 100){
         widgg.timeorg.timeLeftShowing = timeRight - (int)((xViewPart +1) * widgg.timeorg.timePerPixel);
@@ -1995,7 +2075,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
           }
           else {
             ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData;  //the correct index in data.
-            time = widgg.timeValues[ixD];   //timestamp of that data point 
+            time = widgg.tracksValue.getTimeShort(ixD);   //timestamp of that data point 
             dtime2 = time - time2;    //difference time from the last one. It is negative.
             //dtime = time9 - time; //offset to first right point
             if((dtime2) <0){  //from rigth to left, dtime2 <0 is expected
@@ -2135,7 +2215,16 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public GralUserAction actionCleanBuffer = new GralUserAction("actionCleanBuffer"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        cleanBuffer();;
+        cleanBuffer();
+      }
+      return true;
+    }
+  };
+
+  public GralUserAction actionShowAll = new GralUserAction("actionShowAll"){
+    @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
+      if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        showAll();
       }
       return true;
     }

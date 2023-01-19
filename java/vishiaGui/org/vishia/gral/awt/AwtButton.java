@@ -70,9 +70,9 @@ public class AwtButton extends GralButton.GraphicImplAccess
 
   
   //public AwtButton(String sName, AwtWidgetMng mng, Container parent, int styleSwt, char size)
-  AwtButton(GralButton widgg, AwtWidgetMng mng)
+  AwtButton(GralButton widgg, AwtMng mng)
   {
-    widgg.super(widgg, mng.mng);
+    widgg.super(widgg, mng.gralMng);
     mouseListener = new AwtGralMouseListener.MouseListenerGralAction(mouseWidgetAction);
     float ySize = widgg.pos().height();
     char size1 = ySize > 3? 'B' : 'A';
@@ -99,7 +99,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
   @Override public GralRectangle getPixelPositionSize(){ return helper.getPixelPositionSize(); }
 
   
-  void setBoundsGraphic(AwtWidgetMng mng)
+  void setBoundsGraphic(AwtMng mng)
   {
     //widgetSwt.setSize(mng.propertiesGui.xPixelUnit() * xSize -2, mng.propertiesGui.yPixelUnit() * ySize -2);
     mng.setBounds_(widgg.pos(), widgetSwt);
@@ -205,7 +205,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
 
 
   @Override
-  public void repaintGthread() {
+  public void redrawGthread() {
     // TODO Auto-generated method stub
     
   };
@@ -213,7 +213,7 @@ public class AwtButton extends GralButton.GraphicImplAccess
 
     
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible){ super.setVisibleState(bVisible); helper.setVisibleGThread(bVisible); }
 

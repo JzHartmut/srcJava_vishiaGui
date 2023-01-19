@@ -6,6 +6,7 @@ import java.util.List;
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.JZtxtcmdScript;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -88,24 +89,19 @@ public class GralCommandSelector extends GralSelectList<JZtxtcmdScript.Subroutin
   
   final Appendable out;
   
-  public GralCommandSelector(String name, int rows, int[] columns, char size, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
-  { super(name, rows, columns, size);
+  public GralCommandSelector(GralPos currPos, String posName, int rows, int[] columns, CmdExecuter cmdExecuter, Appendable out, CmdGetterArguments getterArguments)
+  { super(currPos, posName, rows, columns);
     this.cmdExecuter = cmdExecuter;
     this.out = out;
     //this.cmdStore = new CmdStore();
     //this.cmdQueue = cmdQueue;
     this.getterArguments = getterArguments;
+    this.wdgdTable.specifyActionOnLineSelected(this.actionOnLineSelected);
    
   }
   
   
-  @Override
-  public void createImplWidget_Gthread(){
-    super.createImplWidget_Gthread();
-    wdgdTable.specifyActionOnLineSelected(actionOnLineSelected);
-  }
-
-  
+   
   
   
   public void clear() { wdgdTable.clearTable(); addJZsub2SelectTable.clear(); }

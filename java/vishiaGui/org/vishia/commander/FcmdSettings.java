@@ -84,36 +84,36 @@ public class FcmdSettings
   /**Builds the content of the file property window. The window is created static. It is shown
    * whenever it is used.  */
   void buildWindow()
-  { main._gralMng.selectPanel("primaryWindow");
+  { main.gui.gralMng.selectPanel("primaryWindow");
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop;
-    GralWindow window =  new GralWindow("10+29, 10+47", "windSettings", "Settings - The.file.Commander", windProps);
-    window.createImplWidget_Gthread();
+    GralWindow window =  main.gui.gralMng.addWindow("@10+29, 10+47 = windSettings", "Settings - The.file.Commander", windProps);
+    //window.createImplWidget_Gthread();
     windSettings = window; 
-    main._gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 0, 'd');
-    widgRefreshTime = main._gralMng.addTextField(null, true, "refresh time file panel", "t");
-    widgEditorPath = main._gralMng.addTextField(null, true, "standard editor path", "t");
-    widgCfgPath = main._gralMng.addTextField(null, false, "configuration directory path", "t");
+    main.gui.gralMng.setPosition(3.5f, GralPos.size -3, 1, -1, 'd');
+    widgRefreshTime = main.gui.gralMng.addTextField(null, true, "refresh time file panel", "t");
+    widgEditorPath = main.gui.gralMng.addTextField(null, true, "standard editor path", "t");
+    widgCfgPath = main.gui.gralMng.addTextField(null, false, "configuration directory path", "t");
     
-    //main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    main._gralMng.setPosition(-7, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "cmdjz.cfg", null, "edit");
-    widgApplyCmd = main._gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmdjz.cfg", null, "apply");
-    main._gralMng.addText("cmd cfg file");
+    //main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
+    main.gui.gralMng.setPosition(-7, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
+    widgEditCmd = main.gui.gralMng.addButton("editCmd", actionEditCfgFile, "cmdjz.cfg", null, "edit");
+    widgApplyCmd = main.gui.gralMng.addButton("applyCmd", actionApplyCfgCmd, "cmdjz.cfg", null, "apply");
+    main.gui.gralMng.addText("cmd cfg file");
     
-    main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main._gralMng.addButton("editCmd", actionEditCfgFile, "extjz.cfg", null, "edit");
-    widgApplyCmd = main._gralMng.addButton("applyExt", actionApplyCfgExt, "extjz.cfg", null, "apply");
-    main._gralMng.addText(".ext cfg file");
+    main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
+    widgEditCmd = main.gui.gralMng.addButton("editCmd", actionEditCfgFile, "extjz.cfg", null, "edit");
+    widgApplyCmd = main.gui.gralMng.addButton("applyExt", actionApplyCfgExt, "extjz.cfg", null, "apply");
+    main.gui.gralMng.addText(".ext cfg file");
     
-    main._gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 0, 'r', 0.5f);
-    widgEditCmd = main._gralMng.addButton("editPaths", actionEditCfgFile, "path.cfg", null, "edit");
-    widgApplyCmd = main._gralMng.addButton("applyPaths", actionApplyCfgPath, "path.cfg", null, "apply");
-    main._gralMng.addText("favor paths file");
+    main.gui.gralMng.setPosition(GralPos.refer + 3.0f, GralPos.size -2.0f, 1, GralPos.size + 8, 'r', 0.5f);
+    widgEditCmd = main.gui.gralMng.addButton("editPaths", actionEditCfgFile, "path.cfg", null, "edit");
+    widgApplyCmd = main.gui.gralMng.addButton("applyPaths", actionApplyCfgPath, "path.cfg", null, "apply");
+    main.gui.gralMng.addText("favor paths file");
     
-    main._gralMng.setPosition(-10, GralPos.size -2, -18, -1, 0, 'd', 0.5f);
-    widgOkError = main._gralMng.addButton("ok_error", actionOpenInfo, "infoBox");
-    main._gralMng.setPosition(-1, GralPos.size -2.5f, -9, -1, 0, 'd', 0.5f);
-    widgOk = main._gralMng.addButton("close", actionButton, "close");
+    main.gui.gralMng.setPosition(-10, GralPos.size -2, -18, -1, 'd', 0.5f);
+    widgOkError = main.gui.gralMng.addButton("ok_error", actionOpenInfo, "infoBox");
+    main.gui.gralMng.setPosition(-1, GralPos.size -2.5f, -9, -1, 'd', 0.5f);
+    widgOk = main.gui.gralMng.addButton("close", actionButton, "close");
     widgOk.setCmd("close");
   }
 
@@ -150,7 +150,7 @@ public class FcmdSettings
   {
     @Override public boolean exec(int keyCode, GralWidget_ifc widg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
-        GralMng.get().showInfo(null);
+        FcmdSettings.this.main.gui.gralMng.showInfo(null);
       }
       return true;
   } };
@@ -203,13 +203,13 @@ public class FcmdSettings
       if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
         String sFileCfg = ((GralWidget)widg).getCmd();
         main.executer.cmdSelector.clear();
-        String sError = main.executer.readCmdCfgSelectList(main.executer.cmdSelector.addJZsub2SelectTable, new File(main.cargs.dirCfg, sFileCfg), main.console);
+        String sError = main.executer.readCmdCfgSelectList(main.executer.cmdSelector.addJZsub2SelectTable, new File(main.cargs.dirCfg, sFileCfg), main.gui.gralMng.log);
         if(sError != null) {
-          main.showInfoBox(sError);
+          main.gui.outputBox.setText(sError);
           widgOkError.setText("error");
         } else {
           widgOkError.setText("success");
-          main.setTextInfoBox("ok read " + main.cargs.dirCfg + "/" + sFileCfg);
+          main.gui.outputBox.setText("ok read " + main.cargs.dirCfg + "/" + sFileCfg);
         }
       }
       return true;

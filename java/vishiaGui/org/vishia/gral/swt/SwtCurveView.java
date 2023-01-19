@@ -75,7 +75,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   @SuppressWarnings("hiding")
   public final static int version = 20120317;
 
-  private final CurveView curveSwt;
+  private final CurveViewSwtWidget curveSwt;
   
   private final Image cursorStore1, cursorStore2;
   
@@ -85,6 +85,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   
   protected final Color colorCursor, colorBack;
   
+  long timeRepaintLast, timeRepaintCall;
 
   
   public SwtCurveView(GralCurveView widgg, SwtMng mng) //String sName, GralPos pos, SwtMng mng, int nrofXvalues, GralCurveView.CommonCurve common)
@@ -93,9 +94,10 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //super(sName, mng.mng, nrofXvalues, common);
     mouseListenerCurve = new SwtGralMouseListener.MouseListenerGralAction();
   
-    GralRectangle bounds = mng.calcWidgetPosAndSize(widgg.pos(), 800, 600);
-    Composite panelSwt = (Composite)widgg.pos().panel.getWidgetImplementation();
-    curveSwt = this.new CurveView(panelSwt, bounds.dx, bounds.dy, widgg.maxNrofXValues);
+    GralRectangle bounds = mng.calcWidgetPosAndSize(widgg.pos(), 700, 600);
+    //Composite panelSwt = (Composite)widgg.pos().parent.getImpl().getWidgetImplementation();
+    Composite panelSwt = (Composite)SwtMng.getSwtImpl(widgg.pos().parent);
+    curveSwt = this.new CurveViewSwtWidget(panelSwt, bounds.dx, bounds.dy, widgg.maxNrofXValues);
     curveSwt.setData(this);
     curveSwt.setSize(bounds.dx, bounds.dy);
     curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);
@@ -109,11 +111,10 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     gridColorStrong = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorCursor = new Color(curveSwt.getDisplay(), 64, 64, 64);
     colorBack = new Color(curveSwt.getDisplay(), 0xff, 0xff, 0xff);
-    widgg.initMenuContext();
   }
   
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     int chg = dyda().getChanged();  //impl.getChanged();
     int acknChg = 0;
     if((chg & chgVisible)!=0){
@@ -126,6 +127,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       curveSwt.setVisible(false);
     }
     dyda().acknChanged(acknChg);
+    this.timeRepaintCall = System.currentTimeMillis(); //nanoTime();
+    //System.out.println("repaint req");
     curveSwt.redraw();
   }
 
@@ -140,49 +143,49 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
    * @param ixixDataLast The end index in {@link ixDataShown} for this presentation.
    */
   private void drawTrack(GC g, Point size, GralCurveView.Track track, int iTrack, int ixixDataLast){
-    int ixixiData = 0;
+    int ixixiData = 0;                                     // index in data index array
     //float pixelFromRight = 0;
-    int xp2 = size.x -1;
-    int xp1 = xp2;
-    int ixData2 = super.ixDataShown[ixixiData];
-    int nrofPixel4Data = super.nrofPixel4data[ixixiData];
-    int ixData = ixData2;
+    int xp2 = size.x -1;                                   // end x coord of point
+    int xp1 = xp2;                                         // start x coord of point
+    int ixData2 = super.ixDataShown[ixixiData];            // data index,
+    int nrofPixel4Data = super.nrofPixel4data[ixixiData];  // 0 = one point, 1.. more graphic points per one value 
+    int ixData = ixData2;                                  // index of left data value for one point.
     int ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData; //real index in data
     //
     float yFactor = size.y / -10.0F / track.scale.yScale;  //y-scaling
     float y0Pix = (1.0F - track.scale.y0Line/100.0F) * size.y; //y0-line
-    float yF = track.values[ixD];
-    int time2 = widgg.timeValues[ixD];
+    float yF = track.valueTrack.getFloat(ixD);             // current, here start value
+    int time2 = this.widgg.tracksValue.getTimeShort(ixD);
     int time1;
     int yp9 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
     int yp2 = yp9;  //right value
     int yp1; //left value
     int ixData1;
-    Color lineColor = track.lineColor !=null ? (Color)widgg.gralMng().impl.getColorImpl(track.lineColor) : ((SwtProperties)widgg.gralMng().propertiesGui).colorBackground;
+    Color lineColor = track.lineColor !=null ? (Color)widgg.gralMng()._mngImpl.getColorImpl(track.lineColor) : ((SwtProperties)widgg.gralMng().propertiesGui).colorBackground;
     if(iTrack == 0){
       //System.out.println("SwtCurveView-drawTrack-start(y0Pix=" + y0Pix + ", yFactor=" + yFactor + ", y=" + yF + ")");
     }
     //
     while( ixixiData < ixixDataLast){ //for all gotten ixData
-      ixixiData += nrofPixel4Data +1;
+      ixixiData += nrofPixel4Data +1;                      // get next value to left
       ixData1 = super.ixDataShown[ixixiData];
       //ixData1 = ixDataShown[(int)pixelFromRight];
       
-      xp1 -= nrofPixel4Data +1;
-      if(ixData != ixData1) {
+      xp1 -= nrofPixel4Data +1;                            // next end point of next value 
+      if(ixData != ixData1) {   // should always true
         int yp1min = Integer.MAX_VALUE, yp1max = Integer.MIN_VALUE;
         int nrofYp = 0;
         yp1 = 0;
-        do{ //all values per 1 pixel
-          ixData -= widgg.adIxData;
+        do{                                                // use all values per 1 pixel
+          ixData -= widgg.adIxData;                        // to next point
           ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData;
           int yp11;
           //if(ixData == ixDataDraw){
           if(ixixiData >= ixixDataLast){
               yp11 = track.ypixLast;
           } else {
-            yF = track.values[ixD];
-            time1 = widgg.timeValues[ixD];
+            yF = track.valueTrack.getFloat(ixD);
+            time1 = widgg.tracksValue.getTimeShort(ixD);
             int dTime = time2 - time1;
             //pixelFromRight += dTime * pixel7time;
             yp11 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
@@ -338,7 +341,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     while((xPixelTimeDiv1 = widgg.timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
       g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
       if(xPixelTimeDiv1 > 30){
-        g.setForeground((Color)widgg.gralMng().impl.getColorImpl(GralColor.getColor("bk")));
+        g.setForeground((Color)widgg.gralMng()._mngImpl.getColorImpl(GralColor.getColor("bk")));
         g.drawText(widgg.timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
         g.setForeground(gridColorStrong);
         widgg.timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
@@ -392,7 +395,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   
   
   
-  /**This routine overrides 
+  /**This routine is called from overridden {@link CurveViewSwtWidget#drawBackground(GC, int, int, int, int)}  
    * @see org.eclipse.swt.widgets.Canvas#drawBackground(org.eclipse.swt.graphics.GC, int, int, int, int)
    * It is called in this class in {@link #paintListener} in the {@link PaintListener#paintControl(PaintEvent)} method.
    * It draws the whole content.
@@ -438,11 +441,11 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //
         bPaintAll = false;
         if(ixDataRight != super.ixDataDraw){
-          widgg.testStopWr = true;
+          this.widgg.testStopWr = true;
           stop();
         }  
-        int timeLast = widgg.timeValues[(super.ixDataDraw >> widgg.shIxiData) & widgg.mIxiData];
-        int timeNow = widgg.timeValues[(ixDataRight >> widgg.shIxiData) & widgg.mIxiData];
+        int timeLast = this.widgg.tracksValue.getTimeShort((super.ixDataDraw >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeNow = this.widgg.tracksValue.getTimeShort((ixDataRight >> this.widgg.shIxiData) & this.widgg.mIxiData);
         timeDiff = timeNow - timeLast + super.timeCaryOverNewValue;  //0 if nothing was written.
         xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
         if(xViewPart > size.x){
@@ -488,10 +491,10 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //int ixDWr = (ixDataWr >> shIxiData) & mIxiData;
         //System.out.println("SwtCurveView.spread; " + ixDataRel1 + ".." + ixDataRel2);
         g.setLineWidth(5);
-        g.setForeground((Color)widgg.gralMng().impl.getColorImpl(GralColor.getColor("ye")));
+        g.setForeground((Color)widgg.gralMng()._mngImpl.getColorImpl(GralColor.getColor("ye")));
         g.drawLine(0, size.y -3, iPixRange1, size.y -3);  //left not shown range.
         g.drawLine(iPixRange2, size.y -3, size.x, size.y -3);  //right non shown range.
-        g.setForeground((Color)widgg.gralMng().impl.getColorImpl(GralColor.getColor("dgr")));
+        g.setForeground((Color)widgg.gralMng()._mngImpl.getColorImpl(GralColor.getColor("dgr")));
         //g.setAlpha(128);
         g.drawLine(iPixRange1, size.y -3, iPixRange2, size.y -3);  //shown range
       }
@@ -507,7 +510,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
 
   
   
-  private class CurveView extends Canvas
+  private class CurveViewSwtWidget extends Canvas
   {
     
     //private final CurveView widgSwt;
@@ -517,7 +520,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //private final Color[] lineColors;
     
     
-    public CurveView(Composite parent, int xPixel, int yPixel, int nrofXvalues){
+    public CurveViewSwtWidget(Composite parent, int xPixel, int yPixel, int nrofXvalues){
       super(parent, org.eclipse.swt.SWT.NO_SCROLL|org.eclipse.swt.SWT.NO_BACKGROUND);
       setData("Control", this);
       setSize(xPixel, yPixel);  //the size may be changed later by drag the window.
@@ -565,12 +568,21 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     
     
     
+    /**The paint event is forced by an handling on operation system, for example hide or show a window, resize etc. pp.
+     * It is also forced by new data, from calling of {@link #redrawGthread()}. 
+     */
     PaintListener paintListener = new PaintListener()
     {
-
+//      boolean show = true;
+      
       @Override public void paintControl(PaintEvent e) {
         GC gc = e.gc;
+        long time1 = System.currentTimeMillis(); //nanoTime();
+        long dCycle = time1 - timeRepaintLast;
+        long dCall = time1 - SwtCurveView.this.timeRepaintCall;
         drawBackground(e.gc, e.x, e.y, e.width, e.height);
+        long dCalc = (SwtCurveView.this.timeRepaintLast = System.currentTimeMillis()) - time1;
+//        if(this.show) {System.out.printf("curveViewGT %d: %d + %d\n", dCycle, dCall, dCalc); }
       }
       
     };
@@ -601,6 +613,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     @Override public void drawBackground(GC g, int xView, int yView, int dxView, int dyView) {
       //NOTE: forces stack overflow because calling of this routine recursively: super.paint(g);
       SwtCurveView.this.drawBackground(g, getSize(), xView, yView, dxView, dyView);
+      SwtMng.storeGralPixBounds(SwtCurveView.this, this);
     }    
   }
 
@@ -621,7 +634,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     /**Ct if redraw only because new data. */
     int ctRedrawBecauseNewData;
     
-    /**Coordinates while redraw. {@link CurveView#drawBackground(GC, int, int, int, int)}. */
+    /**Coordinates while redraw. {@link CurveViewSwtWidget#drawBackground(GC, int, int, int, int)}. */
     int xView, yView, dxView, dyView;
   } 
   TestHelp testHelp = new TestHelp();
@@ -663,8 +676,9 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy)
   {
-    // TODO Auto-generated method stub
-    
+    curveSwt.setBounds(x, y, dx, dy);
+    bRedrawAll = true;
+    curveSwt.redraw();
   }
 
 

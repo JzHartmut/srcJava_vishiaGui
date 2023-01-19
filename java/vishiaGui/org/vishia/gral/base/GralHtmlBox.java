@@ -33,13 +33,23 @@ public class GralHtmlBox extends GralWidget
   public final static int version = 0x20120303;
 
   
-  public GralHtmlBox(String name)
-  { super(name, 'h');
+  public GralHtmlBox(GralPos currPos, String name)
+  { super(currPos, name, 'h');
   }
 
-  public void setUrl(String url){ ((ImplAccess)_wdgImpl).setUrl(url); }
+  String url;
+  
+  public void setUrl(String url){ 
+    this.url = url; 
+    if(super._wdgImpl !=null) {
+      ((ImplAccess)_wdgImpl).setUrl(url); 
+    }
+  }
 
-  public void activate(){ ((ImplAccess)_wdgImpl).activate(); }
+  public void activate(){ 
+    ((ImplAccess)_wdgImpl).setUrl(url); 
+    ((ImplAccess)_wdgImpl).activate(); 
+  }
   
   
   public abstract static class ImplAccess extends GralWidget.ImplAccess

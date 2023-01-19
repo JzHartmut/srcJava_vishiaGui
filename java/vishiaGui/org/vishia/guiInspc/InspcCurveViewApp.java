@@ -1,14 +1,19 @@
 package org.vishia.guiInspc;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralFactory;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
@@ -23,7 +28,27 @@ public class InspcCurveViewApp
   //GralWindow wind;
   GralMng gralMng;
   
+  GralWindow windMain;
+  
+  LogMessage log;
+  
   Args argData = new Args();
+  
+  
+  InspcCurveViewApp ( ) {
+    this.gralMng = new GralMng();
+    this.reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl", this.gralMng) {
+      @Override protected void executeOrder () {
+        try {
+          InspcCurveViewApp.this.curveView.windCurve.reportAllContentImpl(log);
+          log.flush();
+        } catch (Exception e) {
+          System.out.append("unexpected Exception " + e.getMessage());
+        }
+      }
+    };
+  }
+  
   
   public static void main(String[] args){
     InspcCurveViewApp main = new InspcCurveViewApp();
@@ -31,7 +56,7 @@ public class InspcCurveViewApp
     for(String arg: args) { System.out.println(arg); }
     try {
       if(  false == main.argData.parseArgs(args, System.err)
-        || false == main.argData.testArgs(System.err)
+        || false == main.argData.testConsistence(System.err)
         ) { 
         System.exit(1); 
       }
@@ -46,27 +71,56 @@ public class InspcCurveViewApp
   }
   
   
+  
+
+  
+  
+  
+  
   private void execute(){
-    GralFactory gralFactory = new SwtFactory();
-    LogMessage log = new LogMessageStream(System.out);     // Note: Creating a window outside is necessary because:
-    GralWindow wind = gralFactory.createWindow(log, "Curve View", 'B', 100, 50, 800, 600);
-    FileCluster fileCluster = FileRemote.clusterOfApplication;
-    FileRemote fileCfg = fileCluster.getFile(this.argData.dirCfg.getAbsolutePath(), this.argData.fileCfg);
-    FileRemote fileData = fileCluster.getFile(this.argData.dirData.getAbsolutePath(), this.argData.fileData);
-    //                                                     // The InspcCurveView is a widget on any Window-Application
-    this.curveView = new InspcCurveView("curves", null, wind.gralMng(), fileCfg, fileData, this.argData.dirHtmlHelp.getAbsolutePath(), null);
-    this.curveView.windCurve = wind;
-    this.gralMng = wind.gralMng();
-    this.gralMng.gralDevice.addDispatchOrder(this.initGraphic);
+    this.gralMng = gralMng;                       // GralMng the singleton
+    FileOutputStream fLog = null;
+    try {
+      fLog = new FileOutputStream("T:/InspcCurveViewApp.log");
+      log = new LogMessageStream(System.out, fLog, null, false, null);     // Note: Creating a window outside is necessary because:
+      //GralWindow wind = gralFactory.createWindow(log, "Curve View", 'B', 100, 50, 800, 600);
+      FileCluster fileCluster = FileRemote.clusterOfApplication;
+      FileRemote fileCfg = fileCluster.getFile(this.argData.dirCfg.getAbsolutePath(), this.argData.fileCfg);
+      FileRemote fileData = fileCluster.getFile(this.argData.dirData.getAbsolutePath(), this.argData.fileData);
+      // =================================================== // Create an empty Window
+      // ========== The InspcCurveView is a Sub Window on any Window-Application
+      // Or it is created as main Window if it is the first one.
+      VariableContainer_ifc variables = null;              // has not any variables
+      this.curveView = new InspcCurveView("curves", variables, null, null, this.gralMng
+          , fileCfg, fileData, this.argData.dirHtmlHelp.getAbsolutePath(), null);
+      this.curveView.windCurve.reportAllContent(log);
+      log.flush();
+  
+      //this.curveView.windCurve = wind;
+      GralFactory gralFactory = new SwtFactory();
+      gralFactory.createGraphic(this.gralMng, 'C');
+
+      gralMng.addDispatchOrder(reportAllContentImpl);
+      
+    
+    } catch(Exception exc) {
+      System.out.println(org.vishia.util.ExcUtil.exceptionInfo("unexpected", exc, 1, 10, true));
+    } finally {
+    }
+    
     //initGraphic.awaitExecution(1, 0);
-    while(this.gralMng.gralDevice.isRunning()){
+    while(this.gralMng.isRunning()){
       try{ Thread.sleep(100);} 
       catch (InterruptedException e)
       { //dialogZbnfConfigurator.terminate();
       }
     }
+    if(fLog !=null) { try { fLog.close(); } catch (IOException e) { } }
       
   }
+  
+  final GralGraphicTimeOrder reportAllContentImpl;
+
   
   
   
@@ -146,19 +200,18 @@ public class InspcCurveViewApp
     /**Here empty no further test necessary
      *
      */
-    @Override
-    public boolean testArgs(Appendable msg) throws IOException {
+    @Override public boolean testConsistence(Appendable msg) throws IOException {
       return true;
     }
   }
   
   
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic"){
-    @Override public void executeOrder()
-    {
-      curveView.buildGraphicInCurveWindow(null);
-      //
-  } };
+//  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GralArea9Window.initGraphic", this.gralMng){
+//    @Override public void executeOrder()
+//    {
+//      //curveView.buildGraphicInCurveWindow(null);
+//      //
+//  } };
   
   
 }

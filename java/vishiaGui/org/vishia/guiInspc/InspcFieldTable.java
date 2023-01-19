@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
@@ -207,44 +208,27 @@ public class InspcFieldTable
   /**Set in graphic thread with {@link #btnSetValue}, ask and reset in the InspcMng-thread. */
   protected AtomicBoolean XXXbSetValue = new AtomicBoolean();
   
-  public InspcFieldTable(InspcMng inspcMng)
+  public InspcFieldTable(GralMng gralMng, InspcMng inspcMng)
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
-    this.wind = new GralWindow(null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    this.widgPath = new GralTextField("InspcFieldTableWind");
-    this.widgTable = new GralTable<InspcFieldOfStruct>("InspcFieldTable", new int[]{sizeStruct, sizeName, 0, -sizeType});
+    this.wind = new GralWindow((GralPos)null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    GralPos pos = gralMng.refPos();
+    this.widgPath = new GralTextField(pos, "0+2,3+10=@InspcFieldTableWind");
+    this.widgTable = new GralTable<InspcFieldOfStruct>(pos, "@-4,0,0,0=InspcFieldTable", 20, new int[]{sizeStruct, sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(2, true);
     this.widgTable.setActionChange(this.actionChgTable);
     this.widgTable.specifyActionOnLineSelected(actionLineSelected);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.fieldsof.");
-    this.btnBack = new GralButton("@InspcFieldBack", "<<", actionBack);
-    this.btnHelp = new GralButton("@InspcFieldHelp", "help [F1]", GralMng.get().actionHelp);
-    this.btnRefresh = new GralButton("@InspcFieldRefresh", "refresh [F5]", actionRefresh);
-    this.btnShowAll = new GralButton("@InspcFieldShowAll", "show all [c+]", actionShowAll);
-    this.btnSetValue = new GralButton("@InspcFieldSetValue", "set values", actionSetValues);
-    this.btnRepeat = new GralButton("@InspcFieldSetValue", "repeat", null);
+    this.btnBack = new GralButton(pos, "@0+2,0+3=InspcFieldBack", "<<", actionBack);
+    this.btnHelp = new GralButton(pos,"@InspcFieldHelp", "help [F1]", gralMng.actionHelp);
+    this.btnRefresh = new GralButton(pos, "@InspcFieldRefresh", "refresh [F5]", actionRefresh);
+    this.btnShowAll = new GralButton(pos, "@InspcFieldShowAll", "show all [c+]", actionShowAll);
+    this.btnSetValue = new GralButton(pos, "@InspcFieldSetValue", "set values", actionSetValues);
+    this.btnRepeat = new GralButton(pos, "@InspcFieldSetValue", "repeat", null);
     this.btnRepeat.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("wh"), null);
     this.inspcMng = inspcMng;
   }
   
   
-  public void setToPanel(GralMng mng){
-    wind.createImplWidget_Gthread();
-    mng.setPosition(0, 2, 0, 3, 0, 'd');
-    btnBack.createImplWidget_Gthread();
-    mng.setPosition(0, 2, 3, 0, 0, 'd');
-    widgPath.createImplWidget_Gthread();
-    mng.setPosition(2, -4, 0, 0, 0, 'd');
-    widgTable.createImplWidget_Gthread();
-    mng.setPosition(-2, 0, 0, 9, 0, 'r');
-    btnHelp.createImplWidget_Gthread();
-    btnRefresh.createImplWidget_Gthread();
-    mng.setPosition(-2, 0, sizeName, sizeName + 12, 1, 'r');
-    btnSetValue.createImplWidget_Gthread();
-    //mng.setPosition(-2, 0, sizeName+13, sizeName + 23, 0, 'r');
-    btnRepeat.createImplWidget_Gthread();
-    //mng.setPosition(-2, 0, sizeName + 13, sizeName + 23, 0, 'r');
-    btnShowAll.createImplWidget_Gthread();
-  }
   
   
   
@@ -412,7 +396,7 @@ public class InspcFieldTable
   { String sPath = null;
     String sField1 = line.getKey();
     //sPathCurrent = line.getDataPath();
-    InspcFieldOfStruct field = line.data;
+    InspcFieldOfStruct field = line.nd_data;
     InspcVariable var = field.variableExisting();
     if(var !=null) {
       sPath = var.ds.sPathWithAlias;
@@ -579,7 +563,7 @@ public class InspcFieldTable
       if(key == KeyCode.defaultSelect || key == KeyCode.userSelect){
         @SuppressWarnings("unchecked")
         GralTable<InspcFieldOfStruct>.TableLineData line = (GralTable.TableLineData)params[0];
-        if(line !=null && line.data !=null) { setCurrentFieldInfo(line); }
+        if(line !=null && line.nd_data !=null) { setCurrentFieldInfo(line); }
         return true;
       } else { 
         return false;

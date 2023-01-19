@@ -13,6 +13,7 @@ import org.vishia.event.TimeOrder;
  * @author Hartmut Schorrig.
  *
  */
+@SuppressWarnings("serial") 
 public abstract class GralGraphicTimeOrder extends TimeOrder
 {
   
@@ -64,18 +65,22 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
   public final static String version = "2015-01-17";
 
   
-  private static final long serialVersionUID = 1L;
-
+    final GralMng gralMng;
+  
   /**To create the instance for the EventConsumer to enqueue time orders in the graphic thread queue.
    * NOTE: class is need, not an anonymous instance, because initialization in super(..., new Enqueu...)
    */
   private static class EnqueueInGraphicThread implements EventConsumer {
-    @Override public int processEvent(EventObject ev)
+    
+    protected final GralMng gralMng;
+
+    public EnqueueInGraphicThread(GralMng gralMng) {
+      this.gralMng = gralMng;
+    }
+
+        @Override public int processEvent(EventObject ev)
     { //the manager is known application global
-      GralMng mng = GralMng.get();  //the singleton.
-      if(mng !=null) {
-        mng.gralDevice().storeEvent(ev);
-      }
+      this.gralMng.storeEvent(ev);
       return mEventConsumed;
     }
 
@@ -94,16 +99,16 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
    * </pre>  
    * @param name The name is only used for showing in debugging.
    */
-  protected GralGraphicTimeOrder(String name)
-  { super(name, new EnqueueInGraphicThread(), GralMng.get().gralDevice.orderList);
+  protected GralGraphicTimeOrder(String name, GralMng gralMng)
+  { super(name, new EnqueueInGraphicThread(gralMng), gralMng.orderList);
+    this.gralMng = gralMng;
   }
   
 
   
   /**Activates the graphic order to execute immediately as next call in the graphic thread. */
   public void activate(){
-    GralMng mng = GralMng.get();  //the singleton.
-    mng.gralDevice().storeEvent(this);
+    this.gralMng.storeEvent(this);
   }
   
 }

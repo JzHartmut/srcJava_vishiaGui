@@ -61,7 +61,7 @@ public class FcmdButtons
 
   FcmdButtons(Fcmd main){
     this.main = main;
-    main._gralMng.setMainKeyAction(actionMainKeys);
+    main.gui.gralMng.setMainKeyAction(actionMainKeys);
   }
   
   static class ButtonAction{
@@ -133,9 +133,9 @@ public class FcmdButtons
       idxKeyAction.put(key2, action);
     }
     if(menu !=null){
-      GralMenu menuBar = main.gui.getMenuBar();
-      menuBar.addMenuItem(menu, action);
-      //main.gui.addMenuBarArea9ItemGThread(null, menu, action);
+      GralMenu menuBar = main.gui.fcmdWindow.getMenuBar();
+      menuBar.addMenuItem(menuBar.widgg, menuBar.widgg.name, menu, action);
+      //main.gui.menuBar.addMenuItem(null, menu, action);
     }
   }
   
@@ -170,7 +170,7 @@ public class FcmdButtons
    */
   private void addButton(int idx, Iterator<Map.Entry<String, ButtonAction>> iterButtonAction){
     ButtonAction button = getNext(idx, iterButtonAction);
-    GralButton gralButton = main._gralMng.addButton(button.button, button.action, button.text);
+    GralButton gralButton = main.gui.gralMng.addButton(button.button, button.action, button.text);
     gralButton.setHtmlHelp(":Fcmd.html#Topic.FcmdHelp.Button." + button.text + ".");
     //keyAction[idx] = button.action;
   }
@@ -179,11 +179,11 @@ public class FcmdButtons
   void initPanelButtons()
   {
     //This calls creates the menu entries in the menu bar. The order determines the order in menu bar. It registeres the button strings and keys.
-    setBtnMenuAndKeys(main.filePropsCmd.actionOpenDialog, main.idents.buttonFileProps, main.idents.keyFileProps, main.idents.menuFilePropsBar);
-    setBtnMenuAndKeys(main.viewCmd.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
-    setBtnMenuAndKeys(main.viewCmd.actionQuickView, null, main.idents.key1QuickView, main.idents.key2QuickView, main.idents.menuBarQuickView);
+    setBtnMenuAndKeys(main.fcmdActions.actionOpenDialog, main.idents.buttonFileProps, main.idents.keyFileProps, main.idents.menuFilePropsBar);
+    setBtnMenuAndKeys(main.fileViewer.actionOpenView, main.idents.buttonFileView, main.idents.keyFileView, main.idents.menuFileViewBar);
+    setBtnMenuAndKeys(main.fileViewer.actionQuickView, null, main.idents.key1QuickView, main.idents.key2QuickView, main.idents.menuBarQuickView);
     setBtnMenuAndKeys(main.editWind.actionOpenEdit, main.idents.buttonEditIntern, main.idents.keyEditIntern, main.idents.menuBarEditIntern);
-    setBtnMenuAndKeys(main.actionEdit, main.idents.buttonFileEdit, main.idents.keyFileEdit, main.idents.menuFileEditBar);
+    setBtnMenuAndKeys(main.fcmdActions.actionEdit, main.idents.buttonFileEdit, main.idents.keyFileEdit, main.idents.menuFileEditBar);
     setBtnMenuAndKeys(main.copyCmd.actionConfirmCopy, main.idents.buttonFileCopy, main.idents.keyFileCopy, main.idents.menuConfirmCopyBar);
     setBtnMenuAndKeys(main.mkCmd.actionOpenDialog, main.idents.buttonMkdirFile, main.idents.keyFileCreate, main.idents.menuConfirmMkdirFileBar);
     setBtnMenuAndKeys(main.deleteCmd.actionConfirmDelete, main.idents.buttonFileDel, main.idents.keyFileDel1, main.idents.menuConfirmFileDelBar);
@@ -194,27 +194,27 @@ public class FcmdButtons
     setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh2, null);
     setBtnMenuAndKeys(main.favorPathSelector.actionRefreshFileTable, null, main.idents.keyRefresh3, null);
     
-    setBtnMenuAndKeys(main.selectCardThemesLeft, main.idents.buttonFavorLeft, main.idents.keyFavorLeft, main.idents.menuBarNavigationLeft);
-    setBtnMenuAndKeys(main.selectCardThemesMiddle, main.idents.buttonFavorMiddle, main.idents.keyFavorMiddle, main.idents.menuBarNavigationMiddle);
-    setBtnMenuAndKeys(main.selectCardThemesRight, main.idents.buttonFavorRight, main.idents.keyFavorRight, main.idents.menuBarNavigationRight);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectCardThemesLeft, main.idents.buttonFavorLeft, main.idents.keyFavorLeft, main.idents.menuBarNavigationLeft);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectCardThemesMiddle, main.idents.buttonFavorMiddle, main.idents.keyFavorMiddle, main.idents.menuBarNavigationMiddle);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectCardThemesRight, main.idents.buttonFavorRight, main.idents.keyFavorRight, main.idents.menuBarNavigationRight);
     
-    setBtnMenuAndKeys(main.selectFileCardLeft,  main.idents.buttonSelectPanelLeft,    main.idents.keySelectPanelLeft,   main.idents.menuBarSelectPanelLeft);
-    setBtnMenuAndKeys(main.selectFileCardLeft,  null,                                main.idents.keySelectPanelLeft2,   null);
-    setBtnMenuAndKeys(main.selectFileCardMid,   main.idents.buttonSelectPanelMiddle,  main.idents.keySelectPanelMiddle, main.idents.menuBarSelectPanelMiddle);
-    setBtnMenuAndKeys(main.selectFileCardMid,   null,                                main.idents.keySelectPanelMiddle2, null);
-    setBtnMenuAndKeys(main.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
-    setBtnMenuAndKeys(main.selectFileCardRight, null,                                main.idents.keySelectPanelRight2,  null);
-    setBtnMenuAndKeys(main.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardLeft,  main.idents.buttonSelectPanelLeft,    main.idents.keySelectPanelLeft,   main.idents.menuBarSelectPanelLeft);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardLeft,  null,                                main.idents.keySelectPanelLeft2,   null);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardMid,   main.idents.buttonSelectPanelMiddle,  main.idents.keySelectPanelMiddle, main.idents.menuBarSelectPanelMiddle);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardMid,   null,                                main.idents.keySelectPanelMiddle2, null);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardRight, main.idents.buttonSelectPanelRight,   main.idents.keySelectPanelRight,  main.idents.menuBarSelectPanelRight);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardRight, null,                                main.idents.keySelectPanelRight2,  null);
+    setBtnMenuAndKeys(this.main.fcmdActions.selectFileCardOther, main.idents.buttonSelectPanelOther,   main.idents.keySelectPanelOther,  main.idents.menuBarSelectPanelOther);
 
-    setBtnMenuAndKeys(main.actionFocusCardInPanelToLeft, main.idents.buttonFocusLeftCard,   main.idents.keyFocusLeftCard,  main.idents.menuBarFocusLeftCard);
-    setBtnMenuAndKeys(main.actionFocusCardInPanelToRight, main.idents.buttonFocusRightCard,   main.idents.keyFocusRightCard,  main.idents.menuBarFocusRightCard);
-    setBtnMenuAndKeys(main.actionFocusFileCard, main.idents.buttonFocusFileCard,   main.idents.keyFocusFileCard,  main.idents.menuBarFocusFileCard);
-    setBtnMenuAndKeys(main.actionFocusThemeCard, main.idents.buttonFocusThemeCard,   main.idents.keyFocusThemeCard,  main.idents.menuBarFocusThemeCard);
-    setBtnMenuAndKeys(main.actionFocusPanelToLeft, main.idents.buttonFocusPanelToLeft,   main.idents.keyFocusPanelToLeft,  main.idents.menuBarFocusPaneltoLeft);
-    setBtnMenuAndKeys(main.actionFocusPanelToRight, main.idents.buttonFocusPanelToRight,   main.idents.keyFocusPanelToRight,  main.idents.menuBarFocusPanelToRight);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusCardInPanelToLeft, main.idents.buttonFocusLeftCard,   main.idents.keyFocusLeftCard,  main.idents.menuBarFocusLeftCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusCardInPanelToRight, main.idents.buttonFocusRightCard,   main.idents.keyFocusRightCard,  main.idents.menuBarFocusRightCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusFileCard, main.idents.buttonFocusFileCard,   main.idents.keyFocusFileCard,  main.idents.menuBarFocusFileCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusThemeCard, main.idents.buttonFocusThemeCard,   main.idents.keyFocusThemeCard,  main.idents.menuBarFocusThemeCard);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusPanelToLeft, main.idents.buttonFocusPanelToLeft,   main.idents.keyFocusPanelToLeft,  main.idents.menuBarFocusPaneltoLeft);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusPanelToRight, main.idents.buttonFocusPanelToRight,   main.idents.keyFocusPanelToRight,  main.idents.menuBarFocusPanelToRight);
 
     
-    setBtnMenuAndKeys(main.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);
+    setBtnMenuAndKeys(this.main.fcmdActions.actionFocusCmdCard, main.idents.buttonFocusCmd, main.idents.keyFocusCmd, main.idents.menuBarNavigatonCmd);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameNonCase, main.idents.buttonFileSortNameNonCase, main.idents.keyFileSortNameNonCase, main.idents.menuBarFileSortNameNonCase);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerNameCase, main.idents.buttonFileSortNameCase, main.idents.keyFileSortNameCase, main.idents.menuBarFileSortNameCase);
     setBtnMenuAndKeys(main.favorPathSelector.actionSortFilePerExtensionNonCase, main.idents.buttonFileSortExtNonCase, main.idents.keyFileSortExtNonCase, main.idents.menuBarFileSortExtNonCase);
@@ -239,54 +239,54 @@ public class FcmdButtons
         setBtnMenuAndKeys(entry.action, entry.buttontext, entry.key1, entry.key2, entry.menu);
       }
     }
-    main.gui.addMenuBarArea9ItemGThread("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
+    main.gui.menuBar.addMenuItem("menuBarViewButtons", main.idents.menuBarViewButtons, actionViewButtons);
 
-    setBtnMenuAndKeys(main.gui.getActionHelp(), main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
+    setBtnMenuAndKeys(main.gui.gralMng.actionHelp, main.idents.buttonHelp, main.idents.keyHelp,main.idents.menuHelpBar);
     
     Iterator<Map.Entry<String, ButtonAction>> iterButtonAction = idxButtons.entrySet().iterator();
     
-    main._gralMng.selectPanel("Buttons");
+    main.gui.gralMng.selectPanel("Buttons");
     main.statusLine.buildGraphic();
     
-    main._gralMng.setPosition(4, GralPos.size + 1, 10, 20, 1, 'r');
-    main._gralMng.addText("F1");
-    main._gralMng.addText("F2");
-    main._gralMng.addText("F3");
-    main._gralMng.addText("F4");
-    main._gralMng.addText("F5");
-    main._gralMng.addText("F6");
-    main._gralMng.addText("F7");
-    main._gralMng.addText("F8");
-    main._gralMng.addText("F9");
-    main._gralMng.addText("F10");
-    main._gralMng.setPosition(7, GralPos.size +2, 0, 4, 1, 'd');
-    main._gralMng.addText("alt -");
-    main._gralMng.addText("ctr -");
-    main._gralMng.addText("shctr-");
-    main._gralMng.addText("sh  -");
+    main.gui.gralMng.setPosition(4, GralPos.size + 1, 10, 20, 'r');
+    main.gui.gralMng.addText("F1");
+    main.gui.gralMng.addText("F2");
+    main.gui.gralMng.addText("F3");
+    main.gui.gralMng.addText("F4");
+    main.gui.gralMng.addText("F5");
+    main.gui.gralMng.addText("F6");
+    main.gui.gralMng.addText("F7");
+    main.gui.gralMng.addText("F8");
+    main.gui.gralMng.addText("F9");
+    main.gui.gralMng.addText("F10");
+    main.gui.gralMng.setPosition(7, GralPos.size +2, 0, 4, 'd');
+    main.gui.gralMng.addText("alt -");
+    main.gui.gralMng.addText("ctr -");
+    main.gui.gralMng.addText("shctr-");
+    main.gui.gralMng.addText("sh  -");
 
-    main._gralMng.setPosition(5, 7, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(5, 7, 4, 14, 'r');
     int idx;
     for(idx = 0; idx < 10; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(7, 9, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(7, 9, 4, 14, 'r');
     for(idx = 10; idx < 20; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(9, 11, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(9, 11, 4, 14, 'r');
     for(idx = 20; idx < 30; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(11, 13, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(11, 13, 4, 14, 'r');
     for(idx = 30; idx < 40; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main._gralMng.setPosition(13, 15, 4, 14, 1, 'r');
+    main.gui.gralMng.setPosition(13, 15, 4, 14, 'r');
     for(idx = 40; idx < 50; ++idx){
       addButton(idx, iterButtonAction);
     }
-    main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
+    main.gui.area9.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
   }
 
 
@@ -328,10 +328,10 @@ public class FcmdButtons
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
       if(bButtonVisible){
         bButtonVisible = false;
-        main.gui.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
+        main.gui.area9.setMinMaxSizeArea("A3C3", 4, 4, 0, 0);
       } else {
         bButtonVisible = true;
-        main.gui.setMinMaxSizeArea("A3C3", 15, 15, 0, 0);
+        main.gui.area9.setMinMaxSizeArea("A3C3", 15, 15, 0, 0);
       }
       return true;
       } else return false;

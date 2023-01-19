@@ -1,4 +1,4 @@
-package org.vishia.commander;
+package org.vishia.gral.widget;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -13,28 +13,37 @@ import java.nio.charset.Charset;
 
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
 import org.vishia.util.StringFunctions_C;
 
-/**All functionality of view (F3-Key) and edit a file. 
+/**This is a comprehensive widget to show the content of files
+ * in some different text coding and also in hexa.
+ * Also support search, also support a simple edit. 
+ * This widget can be used for all situations where file contents should be shown and edit.  
  * @author Hartmut Schorrig
- * */
-public class FcmdView
-{
-  
+ *
+ */
+public class GralViewFileContent extends GralWidgetBase {
+
   /**Version, history and license. This String is visible in the about info.
    * <ul>
+   * <li>2022-12-26 Hartmut moved from FcmdView, can be used commonly outside the.File.commander,
+   *   especially for ordinary file selection and view of its content.  
    * <li>2021-02-05 Hartmut chg for FcmdView, change and write in hex. It is under construction yet now. 
    *     There were no other text editor simply found, which shows characters as hexa, and which allows hexa edit.
    *     Hexa changes should be very interesting for experience. Of course not for the common user.  
@@ -67,11 +76,12 @@ public class FcmdView
   //@SuppressWarnings("hiding")
   public static final String version = "2021-02-05";
 
+  final GralMng gralMng;
   
-  protected final Fcmd main;
-
+  final LogMessage log;
+  
   /**The window of this functionallity. */
-  private GralWindow_ifc windView;
+  private GralWindow windView;
 
   /**The widget to show content. */
   private GralTextBox widgContent;
@@ -142,46 +152,47 @@ public class FcmdView
   /**Instance to prepare the text especially for hex view. */
   private final StringFormatter formatterHex = new StringFormatter(120);
   
-  public FcmdView(Fcmd main)
-  { this.main = main;
-  }
-  
-  
-  /**Builds the content of the confirm-delete window. The window is created static. It is shown
-   * whenever it is used.  */
-  void buildWindowView()
-  {
-    main._gralMng.selectPanel("primaryWindow");
-    main._gralMng.setPosition(10, 0, 10, 0, 1, 'r'); //right buttom, about half less display width and hight.
-    int windProps = GralWindow.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable
+  public GralViewFileContent ( GralPos refPosP, String posName )
+  { super(refPosP, posName, null);
+    this.gralMng = refPosP.parent.gralMng();
+    this.log = this.gralMng.log();
+    //
+    GralPos refPos = refPosP.screenPos(20, 20, 100, 80);
+    int windProps = GralWindow_ifc.windConcurrently | GralWindow.windHasMenu | GralWindow.windResizeable
                   | GralWindow.windOnTop;
-    GralWindow wind =  main._gralMng.createWindow("windView", "view - The.file.Commander", windProps);
-    wind.addMenuBarItemGThread(null, "&File/&Save", actionSave);
-    wind.addMenuBarItemGThread(null, "&File/Save-as &UTF8-Unix-lf", actionSaveTextAsUTF8unix);
-    wind.addMenuBarItemGThread(null, "&File/Save-as &Windows (ISO-8859-1)", actionSaveTextAsWindows);
-    wind.addMenuBarItemGThread(null, "&File/Save-as &ISO-8859-1-Unix-lf", actionSaveTextAsISO8859_1_unix);
-    wind.addMenuBarItemGThread("view-Search", "&View/&Hex-Byte", actionSetHexView);
-    wind.addMenuBarItemGThread("view-Search", "&View/text-&Windows", actionSetTextViewISO8859_1);
-    wind.addMenuBarItemGThread("view-Search", "&View/text-&UTF", actionSetTextViewUTF8);
-    wind.addMenuBarItemGThread("view-Search", "&View/text-&ASCII-7", actionSetTextViewISO8859_1);
-    wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionSetTextViewISO8859_1);
-    wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
-    wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
-    main._gralMng.setPosition(0.5f, 2.5f, 1, 20, 0, 'r');
-    widgFindText = main._gralMng.addTextField(null, true, null, null);
-    main._gralMng.setPosition(0.5f, 2.5f, 22, GralPos.size + 10, 0, 'r', 1);
-    btnFind = main._gralMng.addButton(null, actionFind, null, null, "Search (ctrl-F)");
-    btnWholeword = main._gralMng.addSwitchButton(null, "wholeWord - no", "wholeWord- yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnCase = main._gralMng.addSwitchButton(null, "case - no", "case - yes", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    btnQuickview = main._gralMng.addSwitchButton("qview", "qview", "qview", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    widgShowInfo = main._gralMng.addTextField(null,false, null, null);
-    main._gralMng.setPosition(3, 0, 0, 0, 1, 'r');
-    widgContent = main._gralMng.addTextBox("view-content", false, null, '.');
-    widgContent.setUser(userKeys);
-    widgContent.setTextStyle(GralColor.getColor("bk"), main._gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
-    windView = wind; 
-    windView.specifyActionOnCloseWindow(actionOnSetInvisible);
-    windView.setWindowVisible(false);
+    this.windView = new GralWindow(refPos, posName + "Wind", "View", windProps); 
+    String name = this.windView.getName();
+    
+//    wind.addMenuBarItemGThread(null, "&File/&Save", actionSave);
+//    wind.addMenuBarItemGThread(null, "&File/Save-as &UTF8-Unix-lf", actionSaveTextAsUTF8unix);
+//    wind.addMenuBarItemGThread(null, "&File/Save-as &Windows (ISO-8859-1)", actionSaveTextAsWindows);
+//    wind.addMenuBarItemGThread(null, "&File/Save-as &ISO-8859-1-Unix-lf", actionSaveTextAsISO8859_1_unix);
+//    wind.addMenuBarItemGThread("view-Search", "&View/&Hex-Byte", actionSetHexView);
+//    wind.addMenuBarItemGThread("view-Search", "&View/text-&Windows", actionSetTextViewISO8859_1);
+//    wind.addMenuBarItemGThread("view-Search", "&View/text-&UTF", actionSetTextViewUTF8);
+//    wind.addMenuBarItemGThread("view-Search", "&View/text-&ASCII-7", actionSetTextViewISO8859_1);
+//    wind.addMenuBarItemGThread("view-Search", "&View/text-&Encoding", actionSetTextViewISO8859_1);
+//    wind.addMenuBarItemGThread("view-Search", "&Edit/&Search", actionSetTextViewISO8859_1);
+//    wind.addMenuBarItemGThread("view-Search", "&Edit/set &Writeable", actionSetEditable);
+    
+    this.widgFindText = new GralTextField(refPos, "@0.5+2, 2+20=find-" + name , GralTextField.Type.editable);
+    this.btnFind = new GralButton(refPos, "@0.5+2, 22+15++1=btnfind-" + name, "Search (ctrl-F)", this.actionFind);
+    this.btnWholeword = new GralButton(refPos, "wholeW-" + name, null, null);
+    this.btnWholeword.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.btnWholeword.setSwitchMode("wholeWord - no", "wholeWord- yes");
+    this.btnCase = new GralButton(refPos, "caseS-" + name, null, null);
+    this.btnWholeword.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.btnWholeword.setSwitchMode("case- no", "case- yes");
+    this.btnQuickview = new GralButton(refPos, "btnQuickView-" + name, "quick view", null);
+    this.btnQuickview.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.btnQuickview.setSwitchMode("quick view off", "quick view on");
+    this.widgShowInfo = new GralTextField(refPos, "info-" + name, "info", "r");
+      this.widgContent = new GralTextBox(refPos, "@3..0, 0..0=" + name + "_content");    
+//    widgContent = this.main.gui.gralMng.addTextBox("view-content", false, null, '.');
+    this.widgContent.setUser(userKeys);
+    //this.widgContent.setTextStyle(GralColor.getColor("bk"), this.main.gui.gralMng.propertiesGui.getTextFont(2.0f, 'm', 'n'));
+    this.windView.specifyActionOnCloseWindow(this.actionOnSetInvisible);
+    this.windView.setWindowVisible(false);
     //windView1.
   }
 
@@ -196,9 +207,8 @@ public class FcmdView
    * Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
-  void view(FileRemote XXXsrc)
+  void view(FileRemote file)
   { //String sSrc, sTrash;
-    file = main.currentFile();
     if(file !=null){
       long len = file.length();
       //if(len > 1000000){ len = 1000000; } //nor more than 1MByte, 
@@ -247,7 +257,7 @@ public class FcmdView
    * 
    */
   public void quickView(){
-    if(btnQuickview.isOn()){
+    if(btnQuickview !=null && btnQuickview.isOn()){   //check !=null only temporary
       nrQuickview +=1;
       widgShowInfo.setText("" + nrQuickview);
       view(null);
@@ -426,7 +436,7 @@ public class FcmdView
       InputStream inpBytes = new ByteArrayInputStream(uContent, 0, zContent);
       InputStreamReader inpText = new InputStreamReader(inpBytes, encodingContent);
       BufferedReader inpLines = new BufferedReader(inpText);
-      FileRemote filedst = main.currentFile();
+      FileRemote filedst = this.file;
       WritableByteChannel outchn =filedst.openWrite(0);
       ByteBuffer outBuffer = ByteBuffer.allocate(1200);
       //Writer out = new FileWriter();
@@ -466,7 +476,7 @@ public class FcmdView
       outchn.close();
       
     } catch(Exception exc){
-      main._gralMng.writeLog(0, exc);
+      this.log.writeError("unexpected", exc);
     }
     
   }
@@ -476,10 +486,10 @@ public class FcmdView
   void openQuickView(FileRemote src){
     if(widgQuickView == null){
       //creates an grid panel and select its in gralMng:
-      main.favorPathSelector.panelRight.tabbedPanelFileCards.addGridPanel("qview", "qview",1,1,10,10);
-      main._gralMng.setPosition(1, -1, 0, 0, 1, 'd');
+      //main.favorPathSelector.panelRight.tabbedPanelFileCards.addTabPanel("qview", "qview");
+      //this.main.gui.gralMng.setPosition(1, -1, 0, 0, 1, 'd');
       //adds a textBox in that grid panel.
-      widgQuickView = main._gralMng.addTextBox("qview-content", false, null, '.');
+      widgQuickView = this.gralMng.addTextBox("qview-content", false, null, '.');
       widgQuickView.setText("quick view");
       widgQuickView.setFocus();
     }
@@ -491,18 +501,81 @@ public class FcmdView
   
   
   void closeQuickView(){
-    main.favorPathSelector.panelRight.tabbedPanelFileCards.removePanel("qview");
+    //main.favorPathSelector.panelRight.tabbedPanelFileCards.removeWidget("qview");
     widgQuickView.remove();
     widgQuickView = null;
   }
   
   
+  @Override public void setFocus () {
+    this.windView.setFocus();
+  }
+
+
+
+
+  @Override public void setFocus ( int delay, int latest ) {
+    this.windView.setFocus(delay, latest);
+  }
+
+
+
+
+  @Override public boolean isInFocus () {
+    return this.windView.isInFocus();
+  }
+
+
+
+
+  @Override public boolean isVisible () {
+    return this.windView.isVisible();
+  }
+
+
+
+
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg ) {
+    this.windView.setFocusedWidget(widg);
+  }
+
+
+
+
+  @Override public GralWidgetBase_ifc getFocusedWidget () {
+    return this.windView.getFocusedWidget();
+  }
+
+
+
+
+  @Override public boolean setVisible ( boolean visible ) {
+    this.windView.setVisible(visible);
+    return true;
+  }
+
+
+
+
+  @Override public boolean createImplWidget_Gthread () throws IllegalStateException {
+    this.windView.createImplWidget_Gthread();
+    return true;
+  }
+
+
+
+
+  @Override public void removeImplWidget_Gthread () {
+    this.windView.removeImplWidget_Gthread();
+    
+  }
+
 
   
   
   /**Action for Key crl-Q for quick view command. Its like Norton Commander.
    */
-  GralUserAction actionQuickView = new GralUserAction("quick view")
+  public GralUserAction actionQuickView = new GralUserAction("quick view")
   {
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -543,7 +616,7 @@ public class FcmdView
   
   /**Action for Key F3 for view command. Its like Norton Commander.
    */
-  GralUserAction actionOpenView = new GralUserAction("actionOpenView")
+  public GralUserAction actionOpenView = new GralUserAction("actionOpenView")
   {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
@@ -567,7 +640,7 @@ public class FcmdView
         presentContentText(utf8);
         format = 'u';
       } catch(UnsupportedEncodingException exc){
-        System.err.println("FcmdView.actionSetTextViewUTF8 - UnsupportedEncodingException; unexpected");
+        System.err.println("GralViewFileContent.actionSetTextViewUTF8 - UnsupportedEncodingException; unexpected");
       }
       return true;
       } else return false; 
@@ -588,7 +661,7 @@ public class FcmdView
         presentContentHex();
         format = 'h';
       } catch(Exception exc){
-        System.err.println("FcmdView.actionSetHexView - Exception; unexpected");
+        System.err.println("GralViewFileContent.actionSetHexView - Exception; unexpected");
       }
       return true;
       } else return false; 
@@ -608,7 +681,7 @@ public class FcmdView
         presentContentText(iso8859_1);
         format = 'w';
       } catch(UnsupportedEncodingException exc){
-        System.err.println("FcmdView.actionSetTextViewISO8859_1 - UnsupportedEncodingException; unexpected");
+        System.err.println("GralViewFileContent.actionSetTextViewISO8859_1 - UnsupportedEncodingException; unexpected");
       }
       return true;
       } else return false; 
@@ -636,12 +709,12 @@ public class FcmdView
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { 
-      if(FcmdView.this.bEditable){
+      if(GralViewFileContent.this.bEditable){
         try{
         //InputStream inpBytes = new ByteArrayInputStream(uContent);
         //InputStreamReader inpText = new InputStreamReader(inpBytes);
         //BufferedReader inpLines = new BufferedReader(inpText);
-          FileRemote filedst = main.currentFile();
+          FileRemote filedst = GralViewFileContent.this.file;
           WritableByteChannel outchn =filedst.openWrite(0);  //use Channel-io to support remote files. 
           ByteBuffer outBuffer = ByteBuffer.allocate(1200);
           //Writer out = new FileWriter();
@@ -662,7 +735,7 @@ public class FcmdView
           outchn.close();
           
         } catch(Exception exc){
-          main._gralMng.writeLog(0, exc);
+          GralViewFileContent.this.log.writeError("unexpected", exc);
         }
       }
       return true;
@@ -719,5 +792,6 @@ public class FcmdView
       return bDone;
     }
   };
+
   
 }

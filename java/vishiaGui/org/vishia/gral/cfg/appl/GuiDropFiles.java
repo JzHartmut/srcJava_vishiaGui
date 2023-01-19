@@ -12,18 +12,21 @@ import javax.script.ScriptException;
 
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdScript;
-import org.vishia.gral.area9.GuiCallingArgs;
+import org.vishia.gral.base.GuiCallingArgs;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.cfg.GralCfgWindow;
+import org.vishia.gral.cfg.GralCfgWindow_Old;
+import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
 import org.vishia.util.FileSystem;
 
@@ -162,17 +165,20 @@ public class GuiDropFiles {
     if(this.args.fileGuiCfg !=null) {
       sCfg = FileSystem.readFile(this.args.fileGuiCfg);
     }
-    this.gralMng = GralMng.get();
+    this.gralMng = new GralMng(new LogMessageStream(System.out));
     this.gralMng.registerUserAction(null, this.action_dropFilePath);
     this.gralMng.registerUserAction(null, this.action_exec);
     this.gralMng.registerUserAction(null, this.action_abortCmd);
     this.gralMng.registerUserAction(null, this.action_clearOutput);
     this.gralMng.registerUserAction(null, this.action_readJZtc);
-    this.window = GralCfgWindow.createWindow("HelloWorldWindow", " hello world ", 'C', sCfg, null, null);
+    this.window = GralCfgZbnf.configWithZbnf(sCfg, "GuiDropFiles", this.gralMng);
+    //this.window = GralCfgWindow.createWindow("Guidropfiles", "Gui drop files and execute via JzTxtCmd", 'C', sCfg, null, null);
     GralTextBox msgOut = (GralTextBox)this.gralMng.getWidget("msgOut");
     this.outTextbox = msgOut;
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
+    this.gralMng.createGraphic("SWT", 'C', this.gralMng.log);
     readJZtcScript();
+    
   }
   
   
@@ -226,7 +232,7 @@ public class GuiDropFiles {
   private Appendable logTextbox(CharSequence msg) {
     try {
       this.outTextbox.append(msg);
-    } catch (IOException e) {
+    } catch (Exception e) {
       System.err.println("unexected: cannot append to msgOut");
     }
     return this.outTextbox;

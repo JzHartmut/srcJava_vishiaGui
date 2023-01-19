@@ -12,9 +12,9 @@ public class AwtCanvasDrawer implements GralCanvas_ifc
   
   private final Graphics graphicContext;
   
-  private final AwtWidgetMng widgMng;
+  private final AwtMng widgMng;
 
-  AwtCanvasDrawer(AwtWidgetMng widgMng, Graphics graphicContext){
+  AwtCanvasDrawer(AwtMng widgMng, Graphics graphicContext){
     this.widgMng = widgMng;
     this.graphicContext = graphicContext;
   }

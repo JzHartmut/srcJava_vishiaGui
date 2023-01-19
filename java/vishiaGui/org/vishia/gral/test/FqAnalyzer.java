@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.widget.GralPlotArea;
+import org.vishia.gral.widget.GralCanvasArea;
 
 
 public class FqAnalyzer
@@ -138,8 +138,8 @@ public class FqAnalyzer
     try{ wr.close(); } catch(IOException exc){}
   }
   
-  GralPlotArea plot;
-  GralPlotArea.UserUnits scaling;
+  GralCanvasArea plot;
+  GralCanvasArea.UserUnits scaling;
   GralColor color = org.vishia.gral.ifc.GralColor.getColor("red");
   
   void graphicInit() {

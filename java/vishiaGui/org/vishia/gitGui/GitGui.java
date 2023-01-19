@@ -14,6 +14,8 @@ import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdFilepath;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralGraphicTimeOrder;
+import org.vishia.gral.base.GralMenu;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -23,6 +25,7 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTextFieldUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.DataAccess;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileFunctions;
@@ -148,7 +151,7 @@ public class GitGui
   }
 
 
-
+  protected GralMng gralMng = new GralMng(new LogMessageStream(System.out));
 
 
   /**Action for open the commit text. 
@@ -288,7 +291,7 @@ public class GitGui
       try{
         if(errorcode !=0) { GitGui.this.wdgInfo.append("ERROR: " + errorcode + "\n"); }
         GitGui.this.wdgInfo.append(GitGui.this.gitOut); 
-      } catch(IOException exc) {} //nothing, not expected
+      } catch(Exception exc) {} //nothing, not expected
       GitGui.this.gitOut.buffer().setLength(0);  //prepare for the next command.
       GitGui.this.gitOut.assign(GitGui.this.gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     }
@@ -594,7 +597,7 @@ public class GitGui
       } else {
         wdgInfo.setText("cmd ouptut:\n");
         try { wdgInfo.append(gitOut);
-        } catch (IOException e) { }
+        } catch (Exception e) { }
       }
   } };
 
@@ -606,7 +609,7 @@ public class GitGui
     public void exec(int errorcode, Appendable out, Appendable err)
     { wdgInfo.setText("cmd ouptut:\n");
       try { wdgInfo.append(gitOut);
-      } catch (IOException e) { }
+      } catch (Exception e) { }
   } };
 
   
@@ -662,47 +665,46 @@ public class GitGui
   
   String sTypeOfImplementation = "SWT";  //default
   
+  final GralWindow window = this.gralMng.addWindow("@screen,10+60, 10+90=GitGui", "Git vishia");
 
-  final GralWindow window = new GralWindow("0+60, 0+90", "GitGui", "Git vishia", GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose);
-
-  final GralTextField wdgCmd = new GralTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
+  final GralTextField wdgCmd = this.gralMng.addTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
   
-  final GralButton wdgBtnCmd = new GralButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
+  final GralButton wdgBtnCmd = this.gralMng.addButton("@0..2, -6..0 = cmdExec", "exec", this.actionExecCmd);
 
   
-  final GralTable<RevisionEntry> wdgTableVersion = new GralTable<>("@3..-30,0..50=git-versions", new int[] {2, 10, 0, -10});
+  final GralTable<RevisionEntry> wdgTableVersion = new GralTable<RevisionEntry>(this.gralMng.refPos(), "@3..-30,0..50=git-versions", 50, new int[] {2, 10, 0, -10});
   
-  final GralTable<String> wdgTableFiles = new GralTable<>("@3..-30,51..0=git-files", new int[] {3,20,0});
+  final GralTable<String> wdgTableFiles = new GralTable<String>(this.gralMng.refPos(), "@3..-30,51..0=git-files", 50, new int[] {3,20,0});
   
-  final GralTextBox wdgInfo = new GralTextBox("@-30..0, 0..-20=info");
+  final GralTextBox wdgInfo = this.gralMng.addTextBox("@-30..0, 0..-20=info");
 
-  final GralButton wdgBtnDiffCurrWork = new GralButton("@-30+2, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
+  final GralButton wdgBtnDiffCurrWork = new GralButton(this.gralMng.refPos(), "@-30+2, -18..-2 = diffCurrWork", "diff current file to workspace", this.actionDiffCurrWork);
 
-  final GralButton wdgBtnDiffCurrFile = new GralButton("@-27+2, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
+  final GralButton wdgBtnDiffCurrFile = new GralButton(this.gralMng.refPos(), "@-27+2, -18..-2 = diffCurrFile", "diff current file", this.actionFileDiffRev);
 
-  final GralButton wdgBtnPull = new GralButton("@-21+2, -20..-15 = pull", "pull", this.actionPull);
+  final GralButton wdgBtnPull = new GralButton(this.gralMng.refPos(), "@-21+2, -20..-15 = pull", "pull", this.actionPull);
 
-  final GralButton wdgBtnPush = new GralButton("@-21+2, -7..-1 = push", "push", this.actionPush);
+  final GralButton wdgBtnPush = new GralButton(this.gralMng.refPos(), "@-21+2, -7..-1 = push", "push", this.actionPush);
 
-  final GralButton wdgBtnBlame = new GralButton("@-18..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
+  final GralButton wdgBtnBlame = new GralButton(this.gralMng.refPos(), "@-18..-21, -18..-2 = blameFile", "blame", this.actionFileBlame);
 
-  final GralButton wdgBtnDaylyBranch = new GralButton("@-15+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
+  final GralButton wdgBtnDaylyBranch = new GralButton(this.gralMng.refPos(), "@-15+2, -20..-12 = daylyBranch", "daylyBranch", this.actionDaylyBranch);
 
-  final GralButton wdgBtnDaylyMain = new GralButton("@-15+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
+  final GralButton wdgBtnDaylyMain = new GralButton(this.gralMng.refPos(), "@-15+2, -10..-2 = mainBranch", "mainBranch", this.actionMainBranch);
 
-  final GralButton wdgBtnAdd = new GralButton("@-12+2, -9..-1 = add", "add", this.actionAdd);
+  final GralButton wdgBtnAdd = new GralButton(this.gralMng.refPos(), "@-12+2, -9..-1 = add", "add", this.actionAdd);
 
-  final GralButton wdgBtnMove = new GralButton("@-12+2, -18..-10 = move", "move", this.actionMove);
+  final GralButton wdgBtnMove = new GralButton(this.gralMng.refPos(), "@-12+2, -18..-10 = move", "move", this.actionMove);
 
-  final GralButton wdgBtnCommitText = new GralButton("@-9+2, -20..-10 = commitText", "commit-text", this.actionOpenCommitText);
+  final GralButton wdgBtnCommitText = new GralButton(this.gralMng.refPos(), "@-9+2, -20..-10 = commitText", "commit-text", this.actionOpenCommitText);
 
-  final GralButton wdgBtnCommit = new GralButton("@-6+2, -20..-10 = commit", "do commit", this.actionCommit);
+  final GralButton wdgBtnCommit = new GralButton(this.gralMng.refPos(), "@-6+2, -20..-10 = commit", "do commit", this.actionCommit);
 
-  final GralButton wdgBtnRefresh = new GralButton("@-6+2, -9..-1 = refresh", "refresh", this.actionRefresh);
+  final GralButton wdgBtnRefresh = new GralButton(this.gralMng.refPos(), "@-6+2, -9..-1 = refresh", "refresh", this.actionRefresh);
 
-  final GralButton wdgBtnCleanInfo = new GralButton("@-3+2, -20..-10 = cleanInfo", "clean Info", this.actionCleanInfo);
+  final GralButton wdgBtnCleanInfo = new GralButton(this.gralMng.refPos(), "@-3+2, -20..-10 = cleanInfo", "clean Info", this.actionCleanInfo);
   
-  final GralButton wdgBtnShowCmd = new GralButton("@-3+2, -9..-1 = showCmd", "showCmd", this.actionShowExec);
+  final GralButton wdgBtnShowCmd = new GralButton(this.gralMng.refPos(), "@-3+2, -9..-1 = showCmd", "showCmd", this.actionShowExec);
   
 
 
@@ -758,6 +760,12 @@ public class GitGui
   final SimpleDateFormat dateFmtyyMMdd = new SimpleDateFormat("yy-MM-dd");
 
   
+  /**For stand alone application: Call as doubleclick in windows:
+   * The only one argument is the full path to a .git file directory or .git file or name.gitRepository file.
+   * More arguments which controls where git is found, which graphic size, where is the diff viewer are possible
+   * Describe it, todo.
+   * @param sCmdArgs 
+   */
   public static void main(String[]sCmdArgs){
     GitGuiCmd.CmdArgs cmdArgs = GitGuiCmd.parseArgsGitGui(sCmdArgs);
     if(cmdArgs !=null) {
@@ -801,7 +809,22 @@ public class GitGui
     this.wdgTableFiles.specifyActionChange("actionTableFile", this.actionTableFile, null);
     this.wdgInfo.setUser(this.wdgInfoSetSelection);
     this.window.specifyActionOnCloseWindow(this.actionOnCloseWindow);
-    this.window.create(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null, this.initGraphic);
+    
+    GralMenu menuTableFiles = this.wdgTableFiles.getContextMenuColumn(1);
+    menuTableFiles.addMenuItem("diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
+    menuTableFiles.addMenuItem("rename/move", "rename/move", actionTableFileRenMove);
+    menuTableFiles.addMenuItem("restore", "Restore this file", actionRestore);
+    menuTableFiles.addMenuItem("show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+    //
+    //Note for all columns extra:
+    
+    GralMenu menuTableVersion = this.wdgTableVersion.getContextMenuColumn(1);
+    menuTableVersion.addMenuItem("cmpVersion", "create zip form this version", actionOutputZip);
+    menuTableVersion.addMenuItem("cmpVersion", "cmp with this version", actionDiffVersion);
+    wdgTableVersion.setContextMenuColumn(2, menuTableVersion);
+    
+    
+    this.gralMng.createGraphic(this.sTypeOfImplementation, cmdArgs.graphicSize.charAt(0), null); //, this.initGraphic);
     this.wdgBtnShowCmd.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("lgn"));
     this.wdgCmd.setHtmlHelp(":GitGui.html#exec");
     this.cmdThread.start();
@@ -865,21 +888,21 @@ public class GitGui
   
   
 
-  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init")
-  { @Override protected void executeOrder() {
-      wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
-      wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
-      wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
-      wdgTableFiles.addContextMenuEntryGthread(1, "show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
-      //
-      //Note for all columns extra:
-      
-      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "create zip form this version", actionOutputZip);
-      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "create zip from this version", actionOutputZip);
-      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
-      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "cmp with this version", actionDiffVersion);
-    }
-  };
+//  GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("init", this.gralMng)
+//  { @Override protected void executeOrder() {
+//      wdgTableFiles.addContextMenuEntryGthread(1, "diffView", "Diff view [Mouse double], [ctrl-Enter]", actionTableFileDiffView);
+//      wdgTableFiles.addContextMenuEntryGthread(1, "rename/move", "rename/move", actionTableFileRenMove);
+//      wdgTableFiles.addContextMenuEntryGthread(1, "restore", "Restore this file", actionRestore);
+//      wdgTableFiles.addContextMenuEntryGthread(1, "show log for File", "Show log for this file [ctrl-s]", actionTableFileLog);
+//      //
+//      //Note for all columns extra:
+//      
+//      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "create zip form this version", actionOutputZip);
+//      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "create zip from this version", actionOutputZip);
+//      wdgTableVersion.addContextMenuEntryGthread(1, "cmpVersion", "cmp with this version", actionDiffVersion);
+//      wdgTableVersion.addContextMenuEntryGthread(2, "cmpVersion", "cmp with this version", actionDiffVersion);
+//    }
+//  };
 
 
 
@@ -1252,7 +1275,7 @@ public class GitGui
           lineTexts[2] = entry.commitTitle;
           lineTexts[3] = entry.author;
           GralTableLine_ifc<RevisionEntry> line = wdgTableVersion.addLine(hash, lineTexts, entry);  
-          line.repaint();
+          line.redraw();
         }
         entryLast = entry;
       } //
@@ -1261,7 +1284,7 @@ public class GitGui
       }
     } while(contCommits);
     //wdgTableVersion.
-    wdgTableVersion.repaint();
+    wdgTableVersion.redraw();
   }
 
 
@@ -1293,7 +1316,7 @@ public class GitGui
         System.err.println("more as one line marked");
       }
     }
-    GitGui.this.currentEntry = line.data;
+    GitGui.this.currentEntry = line.nd_data;
     GitGui.this.cmpEntry = cmpLine == null ? null : cmpLine.getUserData();
     String sGitCmd = "git";
     if(! sGitDir.startsWith(sWorkingDir)) {
@@ -1305,7 +1328,7 @@ public class GitGui
       wdgInfo.setText("(working area)");
       try{
         wdgInfo.append("\n");
-      } catch(IOException exc){}
+      } catch(Exception exc){}
       sGitCmd += " diff --name-status HEAD";
     } else {
       wdgInfo.setText(currentEntry.revisionHash);
@@ -1528,7 +1551,7 @@ public class GitGui
   void fillFileTable4Revision() {
     wdgTableFiles.clearTable();
     GralTableLine_ifc<String> line = wdgTableFiles.addLine("*", new String[] {"!","(all files)",""}, "*");  
-    wdgTableFiles.repaint();
+    wdgTableFiles.redraw();
     gitOut.firstlineMaxpart();
     do {
       String sLine = gitOut.getCurrentPart().toString();
@@ -1549,7 +1572,7 @@ public class GitGui
           Debugutil.stop();
         }
         line = wdgTableFiles.addLine(key, col, sLine);  
-        line.repaint();
+        line.redraw();
       }
     } while(gitOut.nextlineMaxpart().found());
     if(this.sLocalFile !=null) {

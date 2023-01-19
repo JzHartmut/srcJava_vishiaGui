@@ -20,7 +20,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
@@ -34,7 +36,6 @@ import org.vishia.gral.base.GralMenu._GraphicImpl;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
-import org.vishia.gral.base.GralTabbedPanel;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
@@ -43,14 +44,18 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFileDialog_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.util.Debugutil;
 
-public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, GralMng_ifc
+public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, GralMng_ifc
 {
   
   final AwtProperties propertiesGuiAwt; 
@@ -61,6 +66,10 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   /**The standard listener or action for mouse events, able to assign to all widgets which does not need an extra mouse behaviour. */
   final AwtGralMouseListener.MouseListenerGralAction mouseStdAction = new AwtGralMouseListener.MouseListenerGralAction(null);
   
+  
+  private static final HashMap<Component, GralWidget> gralWidgetFromComponent = new HashMap<Component, GralWidget>();;
+  
+  
   /**Creates an instance.
    * @param guiContainer The container where the elements are stored in.
    * @param width in display-units for the window's width, the number of pixel depends from param displaySize.
@@ -68,41 +77,93 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @param displaySize character 'A' to 'E' to determine the size of the content 
    *        (font size, pixel per cell). 'A' is the smallest, 'E' the largest size. Default: use 'C'.
    */
-  public AwtWidgetMng(AwtProperties propertiesGui
+  public AwtMng(GralMng gralMng, char displaySize
     //, VariableContainer_ifc variableContainer
     , LogMessage log
     )
-  { super(GralMng.get(), propertiesGui);
+  { super(gralMng);
+    super.sizeCharProperties = displaySize;
     //mainWindowAwt = window;
-    this.propertiesGuiAwt = propertiesGui;
+    this.propertiesGuiAwt = new AwtProperties(gralMng.gralProps);
+    this.gralMng.setProperties(this.propertiesGuiAwt);
+    
+       
     //mainWindowAwt.addKeyListener(mainKeyListener);
+    startThread();
+
   }
 
   
   
-  @Override public Container getCurrentPanel(){ return (Container)pos().panel.getWidgetImplementation(); }
+  /**Returns the Swt widget which implements the given GralWidget.
+   * It calls {@link GralWidget_ifc#getImplWidget()} and then checks,
+   * whether the Swt impl Widget is immediately an Control, 
+   * or it istype of {@link SwtWidgetHelper}. 
+   * In the last case {@link SwtWidgetHelper#widgetSwt} is returned.
+   * <br>
+   * New since 2022-09. The approach is, only the {@link GralWidget.ImplAccess#wdgimpl} should be used
+   * to store the aggregation to the implementation widget, so simple as possible. 
+   *  
+   * @param widgg
+   * @return null if a implementation is not available.
+   */
+  public static Component getAwtImpl ( GralWidgetBase_ifc widgg) {
+    GralWidget.ImplAccess impl = widgg.getImplAccess();
+    if(impl == null) return null;                          // not instantiated or has not a specific implementation widget.
+    else  return (Component)impl.getWidgetImplementation();  // maybe null on comprehensive widgets
+  }
+
+
+  
+  @Override public Container getCurrentPanel(){ return (Container)pos().parent.getImplAccess().getWidgetImplementation(); }
 
   
   public Container getWidgetsPanel(GralWidget widg){ 
     GralPos pos = widg.pos();
     if(pos == null) { pos = pos(); } //from GralMng
-    return ((Container)pos.panel.getWidgetImplementation()); 
+    return ((Container)pos.parent.getImplAccess().getWidgetImplementation()); 
   }
 
 
 
+  /**This is the core operation to create all implementation widgets from given {@link GralWidget}.
+   * It knows all types of widgets, selects it and calls the proper swt counterpart.
+   * See definition on {@link GralMng#createImplWidget_Gthread(GralWidget)}
+   * @param widgg the existing GralWidget derived type
+   */
   @Override public void createImplWidget_Gthread(GralWidget widgg){
+    Debugutil.stop();
+    //Note: the new AwtAccess instance is always stored in the widgg inside the constructor due to protected access possibilities.
+    final GralWidget.ImplAccess wdga; 
     if(widgg instanceof GralLabel){
-      new AwtLabel((GralLabel)widgg, this);
+      wdga = new AwtLabel((GralLabel)widgg, this);
     } else if(widgg instanceof GralTextField){
-      new AwtTextField((GralTextField)widgg, this);
-    } else if(widgg instanceof GralHorizontalSelector<?>){
-      //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
-      mng.registerWidget(widgg);
-    } else if(widgg instanceof GralTable<?>){
+      wdga = new AwtTextField((GralTextField)widgg, this);
+//    } else if(widgg instanceof GralHorizontalSelector<?>){
+//      //SwtHorizontalSelector swtSel = new SwtHorizontalSelector(this, (GralHorizontalSelector<?>)widgg);
+//      gralMng.registerWidget(widgg);
+//    } else if(widgg instanceof GralTable<?>){
       //AwtTable.addTable((GralTable<?>)widgg, this);
     } else if(widgg instanceof GralButton){
-      new AwtButton((GralButton)widgg, this);
+      wdga = new AwtButton((GralButton)widgg, this);
+    } else if(widgg instanceof GralWindow) {
+      wdga = new AwtSubWindow((GralWindow)widgg);
+      
+    } else if(widgg instanceof GralPanelContent) {
+      wdga = new AwtPanel((GralPanelContent)widgg);
+    } else {
+      wdga = null;
+      throw new IllegalArgumentException("missing Widget type: " + widgg.toString());
+    }
+    if(wdga !=null) {                                      // should be always possible to access GralWidget from the implementation Swt-Control
+      Component awtImpl = (Component)widgg.getImplWidget();
+      GralWidget exist = gralWidgetFromComponent.get(awtImpl);
+      if(exist !=null) {
+        assert(exist instanceof GralWindow);               // use the same also for GralPanelContent
+        assert(widgg instanceof GralPanelContent);
+      } else {
+        gralWidgetFromComponent.put(awtImpl, widgg);
+      }
     }
   }
   
@@ -334,18 +395,18 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   
   @Override protected GralMenu createContextMenu(GralWidget widg){
     Component widgSwt = (Component)widg._wdgImpl.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new AwtMenu(widg, widgSwt, mng);  //TODO
+    GralMenu menu = new GralMenu(widg); new AwtMenu(widg, widgSwt, gralMng);  //TODO
     PopupMenu menuAwt = (PopupMenu)menu.getMenuImpl();
-    widgSwt.add(menuAwt);
-    menuAwt.show(widgSwt, 10, 10);
+//    widgSwt.add(menuAwt);
+//    menuAwt.show(widgSwt, 10, 10);
     return menu;
   }
  
   
   
   @Override protected GralMenu createMenuBar(GralWindow windg){
-    Frame windowAwt = (Frame)windg.getWidgetImplementation();
-    GralMenu menu = new GralMenu(); new AwtMenu(windg, windowAwt, mng);  //TODO
+    Frame windowAwt = (Frame)windg._wdgImpl.getWidgetImplementation();
+    GralMenu menu = new GralMenu(windg); new AwtMenu(windg, windowAwt, gralMng);  //TODO
     return menu;
   }
  
@@ -355,19 +416,19 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   
-  @Override public GralPanelContent createCompositeBox(String name)
-  {
-      //Composite box = new Composite(graphicFrame, 0);
-      Container box = new Container();
-      Container parent = (Container)pos().panel.getWidgetImplementation();
-      
-      parent.add(box);
-      setPosAndSize_(mng.getPosOldPositioning(), box);
-      Dimension size = box.getSize();
-      GralPanelContent panel = new AwtPanel(name, mng, box);
-      //mng.registerPanel(panel);
-      return panel;
-  }
+//  @Override public GralPanelContent createCompositeBox(String name)
+//  {
+//      //Composite box = new Composite(graphicFrame, 0);
+//      Container box = new Container();
+//      Container parent = (Container)pos().parent.getImpl().getWidgetImplementation();
+//      
+//      parent.add(box);
+//      setPosAndSize_(gralMng.getPosOldPositioning(), box);
+//      Dimension size = box.getSize();
+//      GralPanelContent panel = new AwtPanel(name, gralMng, box);
+//      //mng.registerPanel(panel);
+//      return panel;
+//  }
 
   @Override
   public GralFileDialog_ifc createFileDialog()
@@ -376,21 +437,21 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     return null;
   }
 
-  @Override
-  public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
-    int xS, int yS)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+//  @Override
+//  public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
+//    int xS, int yS)
+//  {
+//    // TODO Auto-generated method stub
+//    return null;
+//  }
 
-  @Override
-  public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
-    int properties)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+//  @Override
+//  public GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user,
+//    int properties)
+//  {
+//    // TODO Auto-generated method stub
+//    return null;
+//  }
 
   @Override
   public GralWindow createWindow(String name, String title, int windPros)
@@ -401,14 +462,13 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
   
   @Override public void createSubWindow(GralWindow windowGral){
-    AwtSubWindow windowSwt = new AwtSubWindow(windowGral);
-    //new SwtSubWindow(name, swtDevice.displaySwt, title, windProps, this);
-    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
-    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
-    //window.window.redraw();
-    //window.window.update();
-    windowGral._wdgImpl = windowSwt;
-
+    AwtSubWindow windowAwt = new AwtSubWindow(windowGral);
+    gralWidgetFromComponent.put(windowAwt.window, windowGral);
+    //    GralRectangle rect = calcPositionOfWindow(windowGral.pos());
+//    windowSwt.window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
+//    //window.window.redraw();
+//    //window.window.update();
+   
   }
   
   /**Calculates the position as absolute value on screen from a given position inside a panel.
@@ -420,11 +480,11 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
   GralRectangle calcPositionOfWindow(GralPos posWindow)
   {
     final GralRectangle windowFrame;
-    if(posWindow.panel !=null) {
-      Object awtWidg = posWindow.panel.getWidgetImplementation();
+    if(posWindow.parent !=null) {
+      Object awtWidg = posWindow.parent.getImplAccess().getWidgetImplementation();
       Window parentFrame = (Frame)awtWidg; //((SwtPanel)(swtWidg)).panelComposite; //(Control)posWindow.panel.getPanelImpl();
       Point loc;
-      windowFrame = getPixelUseableAreaOfWindow(posWindow.panel);
+      windowFrame = getPixelUseableAreaOfWindow(((GralPanelContent)posWindow.parent).getPanelWidget());
     } else {
       windowFrame = new GralRectangle(0,0,800,600);
     }
@@ -438,7 +498,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
       dxFrame = rectParent.width; dyFrame = rectParent.height;
     }
     */
-    final GralRectangle rectangle = mng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
+    final GralRectangle rectangle = gralMng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
     rectangle.x += windowFrame.x;
     rectangle.y += windowFrame.y;
     /*
@@ -483,7 +543,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
 
 
   @Override
-  public boolean remove(GralPanelContent compositeBox)
+  public boolean remove(GralPanel_ifc compositeBox)
   {
     // TODO Auto-generated method stub
     return false;
@@ -515,9 +575,9 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     int test = 6;
     if(owidg !=null){
       Component swtWidget = (Component)owidg;
-      GralPanelContent panel = widgd.pos().panel;
-      GralRectangle size = panel._wdgImpl.getPixelPositionSize(); //PixelSize();
-      GralRectangle posSize = mng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
+      GralWidgetBase_ifc panel = widgd.pos().parent;
+      GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
+      GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
       swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
       swtWidget.repaint();
@@ -558,15 +618,15 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    */
   protected void XXXsetPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
   {
-    mng.setNextPosition();
+    gralMng.setNextPosition();
     Component parentComp = component.getParent();
     //Rectangle pos;
     final GralRectangle rectangle;
     if(parentComp == null){
-      rectangle = mng.calcWidgetPosAndSize(pos(), 800, 600, widthwidgetNat, heigthWidgetNat);
+      rectangle = gralMng.calcWidgetPosAndSize(pos(), 800, 600, widthwidgetNat, heigthWidgetNat);
     } else {
       final Rectangle parentSize = parentComp.getBounds();
-      rectangle = mng.calcWidgetPosAndSize(pos(), parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+      rectangle = gralMng.calcWidgetPosAndSize(pos(), parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
     }
     component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
        
@@ -610,7 +670,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
    * @return A rectangle with position and size.
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
-    Component parentComp = (Component)pos.panel.getWidgetImplementation();
+    Component parentComp = (Component)pos.parent.getImplAccess().getWidgetImplementation();
     //Rectangle pos;
     final GralRectangle rectangle;
     final Rectangle parentSize;
@@ -623,7 +683,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(mng.propertiesGui, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return pos.calcWidgetPosAndSize(gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -655,7 +715,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     } else {
       parentSize = parentComp.getBounds();
     }
-    return mng.calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    return gralMng.calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
   }
   
 
@@ -678,7 +738,51 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     return bOk;
   }
   
+  @Override protected void initGraphic()
+  {
+    //AwtSubWindow awtWindow = new AwtSubWindow(mainWindow, true);
+    //awtMng = new AwtWidgetMng(propertiesGui, log);
+    
+  }
+
+  @Override protected void closeImplGraphic ( )
+  {
+  }
   
+  @Override
+  protected boolean dispatchOsEvents()
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  protected void graphicThreadSleep()
+  {
+    synchronized(this){
+      try{ wait(100);} catch(InterruptedException exc){}
+    }
+  }
+
+
+  @Override
+  public void wakeup()
+  {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void reportContent ( Appendable out )
+      throws IOException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public void finishInit () {
+    // TODO Auto-generated method stub
+    
+  }
+
 
 
   KeyListener XXXXX_mainKeyListener = new KeyListener(){
@@ -711,7 +815,7 @@ public class AwtWidgetMng extends GralMng.ImplAccess // implements GralMngBuild_
     GralMng.GralMngFocusListener gralFocus;
     
     AwtMngFocusListener(){
-      gralFocus = GralMng.get().new GralMngFocusListener();
+      gralFocus = AwtMng.this.gralMng.new GralMngFocusListener();
     }
     
     @Override public void focusLost(FocusEvent ev)

@@ -7,7 +7,7 @@ import org.vishia.bridgeC.IllegalArgumentExceptionJc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 
-public class GralGridProperties
+public final class GralGridProperties
 {
   /**Version, history and license.
    * <ul>
@@ -48,24 +48,23 @@ public class GralGridProperties
    * First index is the height of field, second is the size of presentation.
    */
   protected final static int[][] stdTextFontSize =
-  { {5, 5, 6, 7, 7, 8, 9}  ////1, 1.1, 1.2
-  , {6, 6, 7, 8, 9, 9,10}  // 1 1/3,
-  , {6, 7, 8, 9, 9,10,12}  //1.5
-  , {7, 7, 8, 10,10,12,14}  //1 2/3
-  , {7, 8, 9, 11,12,14,18}  //2
-  , {8, 9, 10,11,12,14,18}  //2 1/3
-  , {9,10, 11, 11,12,14,18}  //2.5, 2 2/3
-  , {9,11, 11, 12, 12,14,18}  //3
-  , {10,11,11,12, 12,14,18}  //3.5
-  , {10,11,11,12, 12,14,18}  //>=4
+  {//6   7   8   9  10  12  15  18   pixel per grid unit
+   //A   B   C   D   E   F   G   H 
+    {3,  3,  4,  5,  5,  7,  8, 10}  ////1, 1.1, 1.2
+  , {3,  4,  4,  6,  7,  8, 10, 12}  // 1.3 1.4,
+  , {4,  4,  6,  8,  8, 10, 12, 15}  //1.5 1.6
+  , {4,  6,  7,  9,  9, 12, 15, 18}  //1.7..1.9
+  , {7,  8,  9, 11, 12, 14, 17, 20}  //2.0..2.2
+  , {8,  9, 10, 12, 14, 16, 20, 24}  //2.3 2.4
+  , {9, 10, 12, 14, 16, 18, 22, 28}  //2.5..2.9
+  , {10,12, 14, 16, 18, 20, 25, 30}  //3.0..3.4
+  , {12,14, 16, 18, 20, 24, 30, 36}  //3.5..3.9
+  , {15,18, 20, 22, 24, 30, 36, 44}  //>=4.0
   };
-  
-  protected final static int[] smallPromptFontSize = stdTextFontSize[0];
-  protected final static int[] stdInputFontSize =    stdTextFontSize[4];
-  protected final static int[] stdButtonFontSize =   stdTextFontSize[7];
   
   /** Number of pixel for fractional part and for the grid size.
    * The array is organized in a 2-dimensional array <code>[frac][size]</code>.
+   * The <code>[frac][10]</code> contains the number of pixel for 1 grid unit. 
    * <ul>
    * <li>The first column contains 0 for frac = 0.
    * <li>The last column: <code>pixelFrac[size] [10]</code> contains the pixel size of the grid.
@@ -106,17 +105,18 @@ public class GralGridProperties
  //       1/5   2/5   3/5   4/5      Divisions of 5
  //     1  2  3  4  5  6  7  8  9   0   the number given
   { {0, 1, 1, 2, 2, 3, 4, 4, 5, 5,  6 }  //pixel size A
-  , {0, 1, 1, 2, 3, 3, 4, 5, 6, 6,  7 }
-  , {0, 1, 2, 3, 3, 4, 5, 6, 6, 7,  8 }
-  , {0, 1, 2, 3, 4, 4, 5, 6, 7, 8,  9 }
-  , {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
-  , {0, 1, 2, 4, 5, 6, 7, 8,10,11, 12 }
-  , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }
+  , {0, 1, 1, 2, 3, 3, 4, 5, 6, 6,  7 }  //pixel size B
+  , {0, 1, 2, 3, 3, 4, 5, 6, 6, 7,  8 }  //pixel size C
+  , {0, 1, 2, 3, 4, 4, 5, 6, 7, 8,  9 }  //pixel size D
+  , {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }  //pixel size E
+  , {0, 1, 2, 4, 5, 6, 7, 8,10,11, 12 }  //pixel size F
+  , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }  //pixel size G
+  , {0, 3, 4, 6, 8, 9,10,12,14,15, 18 }  //pixel size H
   };
   
   //protected final static int[][] yPixelFrac = xPixelFrac;
   	  
-  protected final int xPixelUnit;
+  protected int xPixelUnit;
 
   //Map<Integer, GralColor> colors = new TreeMap<Integer, GralColor>();
 
@@ -137,14 +137,19 @@ public class GralGridProperties
   public final GralFont[] fontMonospacedSansSerif = new GralFont[10];  
   
   /**The size of this propety set.*/
-  protected final int size;
+  protected int size;
 
-	public GralGridProperties(char sizeC)
+	public GralGridProperties()
 	{
-		int size = (sizeC - 'A');
-	  if(size <0 || size >= stdInputFontSize.length) throw new IllegalArgumentException("parameter size should be 1.." + stdInputFontSize.length);
-  	this.size = size; 
-    this.xPixelUnit = pixelFrac[size][10];
+
+	}
+  
+	
+	public void setSizeGui(char sizeC) {
+	  int size = (sizeC - 'A');
+    if(size <0 || size >= pixelFrac.length) throw new IllegalArgumentException("parameter size should be A.." + (char)('A' + pixelFrac.length));
+    this.size = size; 
+    this.xPixelUnit = pixelFrac[size][10];                 // pixel per grid unit, last entry in pixelFrac
     colorBackground_ = color(0xeeeeee);
     this.textFont[0] = new GralFont("Arial", stdTextFontSize[0][size], 'n');
     this.textFont[1] = new GralFont("Arial", stdTextFontSize[1][size], 'n');
@@ -167,9 +172,9 @@ public class GralGridProperties
     this.fontMonospacedSansSerif[7] = new GralFont(sMonospaced, stdTextFontSize[7][size], 'n');
     this.fontMonospacedSansSerif[8] = new GralFont(sMonospaced, stdTextFontSize[8][size], 'n');
     this.fontMonospacedSansSerif[9] = new GralFont(sMonospaced, stdTextFontSize[9][size], 'n');
-
 	}
-  
+	
+	public int size() { return size; }
 	
 	public int getColorValue(String sColorName)
 	{ //Integer colorValue = 
@@ -181,15 +186,15 @@ public class GralGridProperties
   
   public GralFont getTextFont(float size)
   {
-    if(size <=1.2f) return textFont[0];  //1, 1.1, 1.2
-    if(size <=1.4f) return textFont[1];  // 1 1/3, 
-    if(size <=1.6f) return textFont[2];  //1.5
-    if(size <=1.8f) return textFont[3];  //1 2/3
-    if(size <=2.0f) return textFont[4];  //2
-    if(size <=2.4f) return textFont[5];   //2 1/3
-    if(size <=2.8f) return textFont[6];   //2.5, 2 2/3
-    if(size <=3.1f) return textFont[7];   //3
-    if(size <=3.9f) return textFont[8];   //3.5
+    if(size <=1.25f) return textFont[0];  //1, 1.1, 1.2
+    if(size <=1.45f) return textFont[1];  // 1 1/3, 
+    if(size <=1.65f) return textFont[2];  //1.5
+    if(size <=1.95f) return textFont[3];  //1 2/3
+    if(size <=2.25f) return textFont[4];  //2
+    if(size <=2.45f) return textFont[5];   //2 1/3
+    if(size <=2.95f) return textFont[6];   //2.5, 2 2/3
+    if(size <=3.45f) return textFont[7];   //3
+    if(size <=3.95f) return textFont[8];   //3.5
     return textFont[9];                   //>=4
     
   }
@@ -208,15 +213,15 @@ public class GralGridProperties
   public GralFont getTextFont(float fontHeight, char type, char style)
   {
     int ifontSize;
-    if(fontHeight <=1.2f) ifontSize = 0;  //1, 1.1, 1.2
-    else if(fontHeight <=1.4f) ifontSize = 1;  // 1 1/3, 
-    else if(fontHeight <=1.6f) ifontSize = 2;  //1.5
-    else if(fontHeight <=1.8f) ifontSize = 3;  //1 2/3
-    else if(fontHeight <=2.0f) ifontSize = 4;  //2
-    else if(fontHeight <=2.4f) ifontSize = 5;   //2 1/3
-    else if(fontHeight <=2.8f) ifontSize = 6;   //2.5, 2 2/3
-    else if(fontHeight <=3.1f) ifontSize = 7;   //3
-    else if(fontHeight <=3.9f) ifontSize = 8;   //3.5
+    if(fontHeight <=1.25f) ifontSize = 0;  //1, 1.1, 1.2
+    else if(fontHeight <=1.45f) ifontSize = 1;  //1.3..1.4 
+    else if(fontHeight <=1.65f) ifontSize = 2;  //1.5..1.6
+    else if(fontHeight <=1.95f) ifontSize = 3;  //1.7..1.9
+    else if(fontHeight <=2.25f) ifontSize = 4;  //2.0..2.2
+    else if(fontHeight <=2.45f) ifontSize = 5;   //2.3 2.4
+    else if(fontHeight <=2.95f) ifontSize = 6;   //2.5 ..2.9
+    else if(fontHeight <=3.45f) ifontSize = 7;   //3.0..3.4
+    else if(fontHeight <=3.95f) ifontSize = 8;   //3.5..3.9
     else ifontSize = 9;                   //>=4
     final GralFont font;
     switch(type){
@@ -267,6 +272,15 @@ public class GralGridProperties
   public int xPixelFrac(int frac){ return pixelFrac[size][frac]; }
 
 
-  
+  /**
+   *
+   */
+  public static abstract class ImplAccess {
+    
+    protected final static int[] smallPromptFontSize = stdTextFontSize[0];
+    protected final static int[] stdInputFontSize =    stdTextFontSize[4];
+    protected final static int[] stdButtonFontSize =   stdTextFontSize[7];
+    
+  }
   
 }

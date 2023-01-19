@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.ifc.GralColor;
@@ -76,11 +76,11 @@ import org.vishia.util.KeyCode;
  * <li>The {@link GralTable} contains some implementation-non-specific things, most of table structure.
  * <li>To access from this class to the GralTable, the inner class {@link GralTable.GraphicImplAccess}
  *   is used as super class of SwtTable with protected access.
- * <li>The GralTable knows this class via the interface {@link GralWidgImpl_ifc} in its superclass
+ * <li>The GralTable knows this class via the interface {@link GralWidgImplAccess_ifc} in its superclass
  *   association {@link GralWidget#_wdgImpl}.
  * <li>The GralTable knows this class via {@link GralTable#gi} association with the proper type.
  * <li>The {@link GralTable.GraphicImplAccess} defines some abstract methods which are implemented here.  
- * <li>But some implementations of {@link GralWidgImpl_ifc} is found in {@link SwtWidgetHelper}.
+ * <li>But some implementations of {@link GralWidgImplAccess_ifc} is found in {@link SwtWidgetHelper}.
  *   That are unique implementations, reuse it!
  * <li>Therefore for reused implementations this class delegates the interface to {@link #swtWidgHelper}.
  * <li>The Swt widget core implementation is {@link Table} which is derived from 
@@ -98,8 +98,8 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWidgImpl_ifc
-, FocusListener  //for the cells
+public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWidgImplAccess_ifc
+
 //public class SwtTable  implements GralWidgImpl_ifc 
 {
 
@@ -151,7 +151,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   public final static String version = "2015-08-29";
 
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   
@@ -180,9 +180,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   private final TableKeyListerner myKeyListener;
   
-  public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent)
-  { gralTable.super(gralTable, mng.mng);
+  public SwtTable(GralTable<?> gralTable, SwtMng mng, Composite parent) { 
+    gralTable.super(gralTable, mng.gralMng);
     //super(name, mng, columnWidths);
+    StringBuilder sLog = new StringBuilder(120);
     this.myKeyListener = this.new TableKeyListerner(null);
     focusListenerTable = this.new FocusListenerTable(mng);
     //focusListenerCell = this;
@@ -191,7 +192,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
     int zColumn = zColumn();
     Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
-    initSwtTable(swtTable, zColumn, mng);
+    //The background of the panel, which does not contain cells of Text:
+    swtTable.setBackground(mng.getColorImpl(GralColor.getColor("pgr")));
+    GralMenu[] contextMenuColumns = super.getContextMenuColumns();
+    GralMenu contextMenu = gralTable.getContextMenu();
+    initSwtTable(swtTable, zColumn, mng, contextMenu, contextMenuColumns);
     vScrollBar = new Vscrollbar(swtTable);
     super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
@@ -204,6 +209,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     swtWidgHelper.widgetSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
     GralRectangle pixTable = swtWidgHelper.mng.setBounds_(widgg.pos(), swtWidgHelper.widgetSwt);
     SwtTable.this.resizeTable(pixTable);
+    mng.gralMng.log.sendMsg(GralMng.LogMsg.newImplTable, sLog);
   }
 
 
@@ -229,7 +235,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
         table.outer.setDataPath(sName);
         table.swtWidgHelper.widgetSwt.setData(table);
-        mng.mng.registerWidget(gralTable);
+        mng.gralMng.registerWidget(gralTable);
         //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
         return gralTable;
 
@@ -237,15 +243,16 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       
       
   /*package private*/ 
-  static void createTable(GralTable<?> gralTable, SwtMng mng) {
+  static GralWidget.ImplAccess createTable(GralTable<?> gralTable, SwtMng mng) {
     
     Composite parent = mng.getWidgetsPanel(gralTable);
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);
-    mng.mng.registerWidget(gralTable);
+    table.redrawGthread();
+    //mng.gralMng.registerWidget(gralTable);
     //NOTE done in SwtTable.resize()     ((SwtMng)mng).setPosAndSize_(table.table);  
-
+    return table;
   }
       
       
@@ -279,7 +286,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy) {
-    // TODO Auto-generated method stub
+    SwtTable.this.swtWidgHelper.widgetSwt.setBounds(x, y, dx, dy);
     
   }
   
@@ -288,20 +295,13 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   @Override public GralRectangle getPixelPositionSize(){ return swtWidgHelper.getPixelPositionSize(); }
 
   
-  //@Override 
-  public boolean XXXsetVisible(boolean visible){
-    boolean ret = swtWidgHelper.widgetSwt.isVisible();
-    swtWidgHelper.widgetSwt.setVisible(visible);
-    ((GralWidget.ImplAccess)this).setVisibleState(visible);
-    return ret;
-  }
   
 
 
   /** TODO implement in {@link GralTable.GraphicImplAccess}
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#repaintGthread()
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#redrawGthread()
    */
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     if(bFocusLost){
       //this is about 50 ms after focus lost, the focus has lost really.
       bFocused = false;
@@ -374,7 +374,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * TODO this method must call in the graphic thread yet, queue it with {@link GralMng#setInfo(GralWidget, int, int, Object, Object)}.
    */
   @Override public boolean setFocusGThread()
-  { repaintGthread();  //to set the focus of the cell
+  { redrawGthread();  //to set the focus of the cell
     return true;
   }
 
@@ -387,7 +387,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         cell.setVisible(bVisible);
       }
     }
-    repaintGthread();
+    redrawGthread();
   }
 
 
@@ -429,7 +429,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     GralTable.CellData data = (GralTable.CellData)cell.getData();
     data.bSetFocus = true;
     if(super.redrawTableWithFocusedCell(data)){
-      repaintGthread();
+      redrawGthread();
       //((Table)swtWidgWrapper.widgetSwt).redrawGthread();
     }
   }
@@ -438,7 +438,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected int getVisibleLinesTableImpl(){
     Rectangle size = swtWidgHelper.widgetSwt.getBounds();  
-    return size.height / linePixel;
+    return (size.height+1) / linePixel;
   }  
   
   
@@ -490,7 +490,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       }
     } else {
       //empty line:
-      GralColor colorBack = colorBackTable();
+      GralColor colorBack = linePresentationP.colorBack;  //colorBackTable();
       for(int col=0; col < cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
         GralTable.CellData cellData = cellLine[col]; //(GralTable.CellData)cellSwt.getData();
@@ -552,7 +552,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   @Override protected GralMenu createColumnMenu(int column){
     //GralMenu menuColumn = new SwtMenu(outer, swtWidgWrapper.widgetSwt, itsMng());
-    GralMenu menuColumn = new GralMenu(); 
+    GralTable<?> widgg = (GralTable<?>)super.widgg;
+    GralMenu menuColumn = new GralMenu(widgg); 
     new SwtMenu(menuColumn, null, cellsSwt[0][column]);
     for(int iRow = 1; iRow < cellsSwt.length; ++iRow){
       //uses the same menu instance in all cells of the column.
@@ -644,53 +645,70 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   
   
+  FocusListener focusListenerCells = new FocusListener() { //for the cells
   
-  
-  /**Focus listener implementation for all cells.
-   * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
-   * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
-   * {@link GralTable.GraphicImplAccess#bRedrawPending} is not set. That prevents invocation while
-   * {@link GralTable.GraphicImplAccess#updateGraphicCellContent()} sets the focus while updating the graphic cells.
-   * 
-   */
-  @Override public void focusLost(FocusEvent ev){ 
-    //System.out.println("Cell focus lost");
-    super.focusLostTable();
-    if(!bRedrawPending){
-      //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
-      GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
-      Text widgSwt = (Text)ev.widget;
-      if(super.bColumnEditable(celldata.ixCellColumn)){
-        String sText = widgSwt.getText();
-        super.checkAndUpdateText(sText, celldata);
+    /**Focus listener implementation for all cells.
+     * This routine is invoked whenever the focus of any Text field of the table will be lost the focus. 
+     * It invokes {@link GralTable.GraphicImplAccess#focusLostTable()} but only if 
+     * {@link GralTable.GraphicImplAccess#bRedrawPending} is not set. That prevents invocation while
+     * {@link GralTable.GraphicImplAccess#updateGraphicCellContent()} sets the focus while updating the graphic cells.
+     * 
+     */
+    @Override public void focusLost(FocusEvent ev){ 
+      //System.out.println("Cell focus lost");
+      SwtTable.this.focusLostTable();
+      if(!bRedrawPending){
+        //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
+        GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
+        Text widgSwt = (Text)ev.widget;
+        if(SwtTable.this.bColumnEditable(celldata.ixCellColumn)){
+          String sText = widgSwt.getText();
+          SwtTable.this.checkAndUpdateText(sText, celldata);
+        }
+        //System.out.println("SwtTableCell - focus lost;");
       }
-      //System.out.println("SwtTableCell - focus lost;");
     }
-  }
-  
-  /**Focus listener implementation for all cells.
-   * This routine is invoked especially if the mouse is landing 
-   * on a Text-field with click. Then this table line and column
-   * should be selected as currently. <br>
-   * This routine is invoked on setFocus()-call too. In this case
-   * it should not done anything. The variable #bRedrawPending guards it.
-   * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
-   */
-  @Override public void focusGained(FocusEvent ev) { 
-    SwtTable.this.focusGainedTable();
-    setFocused(widgg, true); 
-    cellInFocus = (Text)ev.getSource();
-    //System.out.println("SwtTableCell - focus gained;");
-  }
-  
+    
+    /**Focus listener implementation for all cells.
+     * This routine is invoked especially if the mouse is landing 
+     * on a Text-field with click. Then this table line and column
+     * should be selected as currently. <br>
+     * This routine is invoked on setFocus()-call too. In this case
+     * it should not done anything. The variable #bRedrawPending guards it.
+     * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
+     */
+    @Override public void focusGained(FocusEvent ev) { 
+      GralTable.CellData cell = (GralTable.CellData)((Text)ev.getSource()).getData();
+      SwtTable.this.ixLineFocus = cell.ixCellLine;
+      SwtTable.this.ixColumnFocus = cell.ixCellColumn;
+      SwtTable.this.focusGainedTable();
+      setFocused(widgg, true); 
+      cellInFocus = (Text)ev.getSource();
+      //System.out.println("SwtTableCell - focus gained;");
+    }
+  };
 
   
   
   
-  protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng){
+  /**It creates {@link Text} for each cell of the table,
+   * and assigns the {@link #swtKeyListener}, {@link #focusListenerCells}, {@link #mousePressedListener},
+   * {@link #mouseWheelListener}, {@link #traverseListenerTable} to all cells.
+   * <br>
+   * Each cell gets {@link GralTable.CellData} as {@link Control#setData(Object)}. 
+   * @param swtTable
+   * @param zColumns
+   * @param mng
+   */
+  protected void initSwtTable(Composite swtTable, int zColumns, SwtMng mng, GralMenu contextMenu, GralMenu[] contextMenuColumn ){
     int yPix = 0;
-    Font font = mng.propertiesGuiSwt.getTextFontSwt(2, outer.whatIs, outer.whatIs);
+    GralTable wdgg = (GralTable)super.widgg;
+    Font font = mng.propertiesGuiSwt.stdInputFont; //mng.propertiesGuiSwt.getTextFontSwt(2, 'n', 'n');
     Color colorBackTableSwt = mng.getColorImpl(colorBackTable());
+    if(contextMenuColumn !=null || contextMenu !=null) {
+      Debugutil.stop();
+    }
+    
     for(int iCol = 0; iCol < zColumns; ++iCol){
       //menuColumns[iCol] = new SwtMenu(name + "_menu" + iCol, this, itsMng());
     }
@@ -702,23 +720,33 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       for(int iCol = 0; iCol < zColumns; ++iCol){
         boolean editable = super.bColumnEditable(iCol);
         Text cell = new Text(swtTable, SWT.LEFT | SWT.SINGLE | (editable  ? 0 : SWT.READ_ONLY));
+        cell.setText("cell" + iRow + "," + iCol);
         if(editable){ 
           cell.addKeyListener(swtKeyListener);
         }
         cell.setFont(font);
         cell.addKeyListener(myKeyListener);
-        cell.addFocusListener(this);
+        cell.addFocusListener(focusListenerCells);
         cell.addMouseListener(mousePressedListener);
         cell.addMouseWheelListener(mouseWheelListener);
         cell.addTraverseListener(traverseListenerTable);
         GralTable.CellData cellData = new GralTable.CellData(iRow, iCol);
         cell.setData(cellData);
-        cells[iRow][iCol] = cellData;
-        int xdPixCol = super.columnPixel[iCol+1] - columnPixel[iCol];
-        cell.setBounds(columnPixel[iCol], yPix, xdPixCol, linePixel);
+        super.cells[iRow][iCol] = cellData;                // in GralTable.GraphicImplAccess
         cell.setBackground(colorBackTableSwt);
-        //cell.setMenu((Menu)menuColumns[iCol].getMenuImpl());
-        cellsSwt[iRow][iCol] = cell;
+        if(contextMenu !=null) {
+          if(!contextMenu.hasImplementation()){            // create a implementation with the first cell and the GralTable as widget.
+            new SwtMenu(contextMenu, wdgg, cell);          // aggregates SwtMenu in contectMenu
+          }
+          cell.setMenu((Menu)contextMenu.getMenuImpl());
+        }
+        if(contextMenuColumn !=null && contextMenuColumn[iCol] !=null) {
+          if(!contextMenuColumn[iCol].hasImplementation()){   // create a implementation with the first cell and the GralTable as widget.
+            new SwtMenu(contextMenuColumn[iCol], wdgg, cell); // aggregates SwtMenu in contectMenu
+          }
+          cell.setMenu((Menu)contextMenuColumn[iCol].getMenuImpl());
+        }
+        cellsSwt[iRow][iCol] = cell;                       // The array of swt.Txt
       }
       yPix += linePixel;
     }
@@ -788,7 +816,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       }
     } catch(Exception exc){
       String txt = Assert.exceptionInfo("SwtTable - keyPressed Exception", exc, 0, 20, true).toString();
-      swtWidgHelper.mng.mng.log.sendMsg(0, txt);
+      swtWidgHelper.mng.gralMng.log.sendMsg(0, txt);
       //CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
       //System.err.append(stackInfo);
       //exc.printStackTrace(System.out);
@@ -835,6 +863,10 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     
   };
   
+  /**The Resize listener for the whole table (a swt.Composite). 
+   * The controlResized(...) operation calls {@link #resizeTable(GralRectangle)}
+   * which calculates and sets the bounds of all swt.Text fields.
+   */
   ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
@@ -1022,7 +1054,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
 
   
-  protected SwtKeyListener swtKeyListener = new SwtKeyListener(widgg.gralMng()._impl.gralKeyListener)
+  protected SwtKeyListener swtKeyListener = new SwtKeyListener(widgg.gralMng()._implListener.gralKeyListener)
   {
 
     @Override public final boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ 

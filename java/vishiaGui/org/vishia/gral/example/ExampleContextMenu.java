@@ -36,9 +36,9 @@ public class ExampleContextMenu extends ExampleSimpleButton
    */
   public static final int version = 20120303;
 
-  ExampleContextMenu(GralMng gralMng)
+  ExampleContextMenu(String[] args)
   {
-    super(gralMng);
+    super(args);
   }
   
   
@@ -49,34 +49,20 @@ public class ExampleContextMenu extends ExampleSimpleButton
    */
   public static void main(String[] args)
   {
-    main(args, new Factory());
-  
+    try {
+      ExampleContextMenu thiz = new ExampleContextMenu(args); // constructs the main class
+      thiz.init("SWT");
+      thiz.execute();
+    } catch (Exception exc) {
+      System.err.println("Exception: " + exc.getMessage());
+      exc.printStackTrace(System.err);
+    }
+   
   }  
 
 
  
-  protected class InitGuiCodeContextMenu extends ExampleSimpleButton.InitGuiCodeSimpleButton{
-    @Override public void executeOrder(){
-      super.executeOrder();
-      //GralMenu menuInput = gui.gralMng.createContextMenu("menu-test", gui.widgInput);
-      GralMenu menuInput = gui.widgInput.getContextMenu();
-    }
-
-  }
   
-  
-  
-  /**This inner class creates this class with given parameter.
-   */
-  static class Factory extends ExampleSimpleButton.Factory{
-    ExampleSimpleButton create(GralMng gralMng){
-      ExampleContextMenu obj = new ExampleContextMenu(gralMng);
-      obj.setInitGuiCode(obj.new InitGuiCodeContextMenu());
-      return obj;
-    }
-  }
-  
-
   
   
 }

@@ -12,6 +12,7 @@ public class GralButton extends GralWidget
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-10-25 Hartmut new: {@link #wasPressed()} and {@link #wasReleased()} is polling request.
    * <li>2016-05-03 Hartmut chg: Now supports {@link GralWidget#setVisible(boolean)}
    * <li>2015-06-21 Hartmut chg: {@link #setSwitchMode(GralColor, GralColor, GralColor)} with null as 3. color
    *   sets to 2-times switch like {@link #setSwitchMode(GralColor, GralColor)}. 
@@ -58,7 +59,7 @@ public class GralButton extends GralWidget
   
   //final GralWindowMng_ifc mainWindow;
   
-  protected boolean pressed;
+  protected boolean XXXpressed;
   
   /**The state of switch and check button
    * 1=on 2=off 3=disabled. 0=initial, see {@link #kOn} etc.
@@ -86,6 +87,9 @@ public class GralButton extends GralWidget
   /**Currently pressed, show it in graphic. */
   protected boolean isPressed;
   
+  /**Used to one time query */
+  protected boolean wasPressed, wasReleased;
+  
   
   /**True if it is a switch or a check button. */
   protected boolean shouldSwitched;
@@ -96,9 +100,14 @@ public class GralButton extends GralWidget
   /**True if the button has three states: on, off, disabled. */
   protected boolean bThreeStateSwitch;
   
-  public GralButton(String sName)
+//  public GralButton(String sPosName)
+//  {
+//    super((GralPos)null, sPosName, 'B');  //GralWidget
+//  }
+  
+  public GralButton(GralPos pos, String sName)
   {
-    super(sName, 'B');  //GralWidget
+    super(pos, sName, 'B');  //GralWidget
   }
   
   /**Creates a button
@@ -106,11 +115,15 @@ public class GralButton extends GralWidget
    * @param sText The button text
    * @param action The action on release mouse
    */
-  public GralButton(String sPosName, String sText, GralUserAction action)
-  { super(sPosName, 'B');
+  public GralButton(GralPos currPos, String sPosName, String sText, GralUserAction action)
+  { super(currPos, sPosName, 'B');
     setText(sText);
     if(action !=null) { specifyActionChange(null, action, null); }
   }
+  
+//  public GralButton(String sPosName, String sText, GralUserAction action)
+//  { this((GralPos)null, sPosName, sText, action);    }
+  
     
   @Deprecated public GralButton(String position, String sName, String sText, GralUserAction action)
   {
@@ -222,7 +235,7 @@ public class GralButton extends GralWidget
     }//switch
     if(bChanged){
       dyda.setChanged(ImplAccess.chgColorBack); 
-      repaint();
+      redraw();
     }
   }
 
@@ -250,15 +263,17 @@ public class GralButton extends GralWidget
     
     if(sButtonTextDisabled == null){ sButtonTextDisabled = sButtonText; }
     if(sButtonTextOn == null){ sButtonTextOn = sButtonText; }
-    repaint(100, 100);
+    redraw(100, 100);
   }
   
   /**Show the button in an activated state. This method is called especially 
    * in its mouse press and release events. 
    * In the activated state the button looks like pressed.*/
   protected void setActivated(boolean value){ 
-    isPressed = value;
-    repaint(100, 100);
+    this.isPressed = value;
+    this.wasPressed = value;
+    this.wasReleased = !value;
+    redraw(100, 100);
   }
   
   
@@ -277,7 +292,7 @@ public class GralButton extends GralWidget
     if(action !=null){
       action.action().exec(KeyCode.enter, this, action.args());
     }
-    repaint();
+    redraw();
   }
   
   
@@ -299,7 +314,7 @@ public class GralButton extends GralWidget
   
   public void XXXsetDisabled(boolean value){
     this.switchState = value ? State.Disabled: State.On; //kDisabled : kOn;
-    repaint(100, 100);
+    redraw(100, 100);
   }
   
   
@@ -307,6 +322,29 @@ public class GralButton extends GralWidget
   
   
   public boolean isOn(){ return switchState == State.On; }
+  
+  /**Returns the state whether is currently pressed. */
+  public boolean isPressed ( ) { return this.isPressed; }
+
+  /**Returns one time true after pressing, all next queries return false till next pressing. 
+   * This operation is for polling with an adequate rate faster than human. 
+   * It is an alternative to a existing callback operation. Maybe better usable for scripting.
+   */
+  public boolean wasPressed ( ) { 
+    boolean ret = this.wasPressed;
+    this.wasPressed = false;
+    return ret; 
+  }
+
+  /**Returns one time true after releasing the button, all next queries return false till next releasing. 
+   * This operation is for polling with an adequate rate faster than human. 
+   * It is an alternative to a existing callback operation. Maybe better usable for scripting. 
+   */
+  public boolean wasReleased ( ) { 
+    boolean ret = this.wasReleased;
+    this.wasReleased = false;
+    return ret; 
+  }
 
   /**Sets the appearance of the button
    * <ul> 
@@ -345,7 +383,7 @@ public class GralButton extends GralWidget
         switchState = State.Off;
       }
     }
-    repaint(100,100);
+    redraw(100,100);
   }
   
 
@@ -357,7 +395,7 @@ public class GralButton extends GralWidget
   public void setState(State state){
     //if(state == kOn || state == kOff || state ==kDisabled){
       switchState = state;
-      repaint(100,100);
+      redraw(100,100);
     //} else {
     //  throw new IllegalArgumentException("faulty state: " + state);
     //}
@@ -434,7 +472,7 @@ public class GralButton extends GralWidget
           action.action().exec(keyCode, widgg, args2); 
         }
       }*/
-      widgg.repaint(); //100, 200);
+      widgg.redraw(); //100, 200);
     }
 
 
@@ -489,7 +527,7 @@ public class GralButton extends GralWidget
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
 
     /**That action effects that the internal variable {@link #switchedOn} is set for a switching button.

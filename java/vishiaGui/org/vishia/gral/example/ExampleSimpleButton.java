@@ -3,17 +3,13 @@ package org.vishia.gral.example;
 import java.io.IOException;
 
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;
@@ -23,8 +19,14 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
+//tag::classHead[]
 public class ExampleSimpleButton
 {
+  /**A log mechanism nice to have and necessary for GRAL built,
+   * writes firstly to the console out on built of the graphic. 
+   * Changeable later of the graphic runs. */
+  protected LogMessage log;
+  //end::classHead[]
   
   /**Version, history and license.
    * <ul>
@@ -57,218 +59,149 @@ public class ExampleSimpleButton
    */
   public static final int version = 20220126;
 
-  /**Instance of inner class contains the graphical elements.
-   * 
+  //tag::guiClass[]
+  /**Extra inner class (for more data structuring) for all Gui elements.
    */
+  protected class GuiElements
+  {
+    /**The central Gral management instance:*/
+    final GralMng gralMng = new GralMng(ExampleSimpleButton.this.log);
+  
+    /**Intermediate Position instance as helper for positioning. */
+    GralPos refPos = new GralPos(this.gralMng);            // use an own reference position to build
+    
+    /**The Window of the application. */
+    final GralWindow window = new GralWindow(this.refPos, "@screen, 10+30,20+80=mainWin"
+                            , "ExampleSimpleTextButton"
+                            , GralWindow.windRemoveOnClose | GralWindow.windResizeable);
+    /**A text field.*/
+    final GralTextField wdgInputText = new GralTextField(this.refPos, "@main, 2+2, 2+20=input"
+                                     , GralTextField.Type.editable);
+    /*A button. */
+    final GralButton wdgButton1 = new GralButton(this.refPos, "@8-3, 2+10++2.5 =button1"
+        , "press me", ExampleSimpleButton.this.actionButton); //Position string: next to right with 2 units space
+
+    final GralButton wdgButton2 = new GralButton(this.refPos, "button2"
+        , "Button 2", null); //without action,              //without position string, automatic right side
+
+    /**Textbox for output texts, can be also used for log. */
+    GralTextBox widgOutput = new GralTextBox(this.refPos, "@-10..0,0..0=output");
+    
+    /**Empty ctor, formally. */
+    GuiElements() { }                                      // empty ctor, only formally
+  }
+  //end::guiClass[]
+
+
+
+  //tag::fieldsCtor[]
+  /**Instance of inner class contains the graphical elements.*/
   protected final GuiElements gui;
   
-  /**Instance to initialize the graphic. */
-  private GralGraphicTimeOrder initGuiCode;
+  int ctKeyStroke1 = 0, ctKeyStroke2 = 0;
   
-  ExampleSimpleButton(GralMng gralMng)
+  ExampleSimpleButton ( String[] args )
   {
-    //this.initGuiCode = new InitGuiCode();
-    this.gui = new GuiElements(gralMng);
-    
+    this.log = new LogMessageStream(System.out);  // may also write to a file, use calling arguments
+    //----------------------------------   initialize the graphic Gral Widgets (not the implementing graphic).
+    this.gui = new GuiElements();       // because the log is set, GuiElements construction uses it. 
   }
-  
-  protected void setInitGuiCode(GralGraphicTimeOrder initGuiCode)
-  {
-    this.initGuiCode = initGuiCode;
-  }
-  
-  
-  /**Initializes the graphical user interface.
-   * 
-   */
-  void initGui()
-  {
-    //The code to initialize the GUI appearance should be run in the graphic thread.
-    //Therefore the code snippet which contains the functionality to set the graphic is applied to the graphic thread.
-    //It is defined in this application class locally.
-    this.gui.gralMng.gralDevice.addDispatchOrder(this.initGuiCode);
-    this.initGuiCode.awaitExecution(1, 0);  //waits for finishing
-    
-  }
-  
-  
-  /**Main execute method for any other actions than the graphical actions. 
-   * The application may do some things beside.
-   */
-  void execute()
-  {
-    //Now do nothing because all actions are done in the graphic thread.
-    //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
-    //
-    while(this.gui.gralMng.gralDevice.isRunning()){
-      try{ Thread.sleep(100); } catch(InterruptedException exc){}
-    }
-    
-  }
+  //end::fieldsCtor[]
   
   
   
-  
-  
-  /**Code snippet for the action while the button is pressed. This snippet will be executed
-   * if the left mouse key is released on the button. If the left mouse is pressed and then
-   * the mouse cursor is removed from the button while it is pressed, the action is not executed.
-   * This is important if a touch screen is used and the accuracy of target seeking of the finger
-   * is not sufficient, the action can be aborted. If the mouse is pressed respectively the button 
-   * is sought, the button changes its appearance, it is marked. 
-   * That actions are done by the gral implementation independing of the implementation layer.
-   */
-  private final GralUserAction actionButtonCode = new GralUserAction("buttonCode")
-  { 
-    int ctKeyStroke = 0;
-    
-    @Override
-    public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        String textOfField = ExampleSimpleButton.this.gui.widgInput.getText();
-        try{ ExampleSimpleButton.this.gui.widgOutput.append("Button " + (++this.ctKeyStroke) + " time, text=" + textOfField + "\n");
-        } catch(IOException exc){}
-      }
-      return true;  
-    } 
-  };
-  
-  
-  
-  
-  protected static class GuiElements
-  {
-    final GralMng gralMng;
-
-    GralTextField widgInput;
-    
-    GralButton widgButton;
-    
-    GralTextBox widgOutput;
-  
-    /**Constructor with given widget manager.
-     * @param gralMng
-     */
-    GuiElements(GralMng gralMng)
-    {
-      this.gralMng = gralMng;
-    }
-  }
   
   
   /**Code snippet for initializing the GUI. This snippet will be executed
    * in the graphic thread. It is an anonymous inner class. 
    */
-  @SuppressWarnings("serial")
-  protected class InitGuiCodeSimpleButton extends GralGraphicTimeOrder
-  {
-    InitGuiCodeSimpleButton(){
-      super("ExampleSimpleButton.initGuiCode");
-    }
-    
-    /**This routine is called in the graphic thread if it was added.
-     * @see org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)
-     */
-    @Override public void executeOrder()
-    {
-      //we have only one panel. But if there are more as one, select which.
-      ExampleSimpleButton.this.gui.gralMng.selectPanel("primaryWindow");
-      //
-      //Sets the positions in grid line and columns. line 5 to 8, column 2 to 15
-      ExampleSimpleButton.this.gui.gralMng.setPosition(5, 8, 2, 15, 0, '.');
-      //Adds a text input field.
-      //NOTE: the element gui is arranged in the outer class because it may be accessed later.
-      ExampleSimpleButton.this.gui.widgInput = ExampleSimpleButton.this.gui.gralMng.addTextField("input", true, null, "t");
-      //Sets the position of the next widget, the button, relative to the last one, 5 lines deeper.
-      //Use size instead an line position. 
-      ExampleSimpleButton.this.gui.gralMng.setPosition(GralPos.same+5, GralPos.size +3, 2, GralPos.size +10, 0, '.');
-      ExampleSimpleButton.this.gui.widgButton = ExampleSimpleButton.this.gui.gralMng.addButton("button", ExampleSimpleButton.this.actionButtonCode, "test", null, "Hello");
-      //
-      //The button can be presented with colors. Use named colors 'Pastel GreeN' and 'Pastel YEllow'.
-      //The button is a switching button then. 
-      ExampleSimpleButton.this.gui.widgButton.setSwitchMode(GralColor.getColor("pgn"), GralColor.getColor("pye"));
-      //
-      //Sets the position of the next widget, the textbox, relative to the last one, 5 lines deeper.
-      //Use size instead an line position. 
-      //The columns are dedicated with 0 (left) and 0 (from right). It means the full window width.
-      //ExampleSimpleButton.this.gui.widgOutput = new GralTextBox("outputText");
-      ExampleSimpleButton.this.gui.gralMng.setPosition(-10, 0, 0, 0, 0, '.');
-      //ExampleSimpleButton.this.gui.gralMng.registerWidget(ExampleSimpleButton.this.gui.widgOutput);
-      //alternatively:
-      ExampleSimpleButton.this.gui.widgOutput = ExampleSimpleButton.this.gui.gralMng.addTextBox("outputText", true, null, '.');
-    }
-  };
-
+  //tag::initImplGraphic[]
+  void init ( String awtOrSwt) {
+    this.gui.wdgInputText.setText("any text input");
+    this.gui.gralMng.createGraphic(awtOrSwt, 'E', this.log);
+  }
+  //end::initImplGraphic[]
 
   
+  //tag::execute[]
+  /**execute routine for any other actions than the graphical actions. 
+   * The application may do some things beside.
+   */
+  void execute ( )
+  {
+    //Now do nothing because all actions are done in the graphic thread.
+    //A more complex application can handle some actions in its main thread simultaneously and independent of the graphic thread.
+    //
+    while(this.gui.gralMng.isRunning()) {
+      try {
+        if(this.gui.wdgButton2.wasReleased()) {
+          String textOfField = this.gui.wdgInputText.getText();
+          this.gui.widgOutput.append("Button2 " + (++this.ctKeyStroke2) + " time, text=" + textOfField + "\n");
+          throw new Exception("test");
+        }
+        Thread.sleep(100); 
+      } catch(Exception exc){
+        CharSequence sText = org.vishia.util.ExcUtil.exceptionInfo("unexpected: ", exc, 1, 10);
+        this.log.sendMsg(9999, sText);
+      }
+      
+    }
+  }
+  //end::execute[]
+
+
+
+
+
   /**The main routine. It creates the factory of this class
    * and then calls {@link #main(String[], Factory)}.
    * With that pattern a derived class may have a simple main routine too.
    * @param args command line arguments.
    */
-  public static void main(String[] args)
+  //tag::main[]
+  public static void main ( String[] args)
   {
-    main(args, new Factory());
-  
-  }  
-  
-  
-  
-  
-  /**Main routine with a factory class. That allows to use the same main routine for a derived class
-   * for further more complex examples.
-   * @param args command line arguments.
-   * @param factoryExample The factory to create the current class which should be derived from this.
-   */
-  protected static void main(String[] args, Factory factoryExample)
-  {
-    //boolean bOk = true;
-    //
-    //choose a factory, recomment one of the following:
-    //
-    //depr GralFactory graphicFactory = new SwtFactory();   //Awt SwtFactory
-    //GralFactory_ifc graphicFactory = new FactorySwt();
-    //
-    //A logger is a final thing what is need. This logger writes to the console.
-    //A complexer application may write to a graphic output window.
-    LogMessage log = new LogMessageStream(System.out);
-    //
-    //create the window, use the factory.
-    GralWindow primaryWindow = new GralWindow("10..50,20..90", "ExampleSimpleButton", "ExampleSimpleButton", GralWindow_ifc.windIsMain);
-    GralFactory.createGraphic(primaryWindow, 'C', log, "SWT");
-    
-    //depr: GralWindow primaryWindow = graphicFactory.createWindow(log, "Example Simple Button", 'C', 50,50,400, 300);
-    //
-    //The widget manager is created with the primary window. Use it.
-    GralMng gralMng = primaryWindow.gralMng();
-    //
-    //An empty graphic window is present now. It is time to create this application class now. 
-    //In an complexer application the graphic window can contain an output window, so information
-    //while building the application class can be shown for the user. 
-    //
-    //The gralMng is the main access to the graphic. It is independent of the graphical implementation layer.
-    ExampleSimpleButton mainData = factoryExample.create(gralMng);
-    //
-    //Now the appearance of the graphic should be initialized:
-    mainData.initGui();
-    //
-    //Now executes the application code which may be independent of the graphic execution.
-    mainData.execute();
-  }
-  
-  
-  
- 
-  /**This inner class creates this class with given parameter.
-   */
-  static class Factory {
-    ExampleSimpleButton create(GralMng gralMng){
-      ExampleSimpleButton obj = new ExampleSimpleButton(gralMng);
-      obj.setInitGuiCode(obj.new InitGuiCodeSimpleButton());
-      return obj;
+    try {
+      ExampleSimpleButton thiz = new ExampleSimpleButton(args); // constructs the main class
+      thiz.init("SWT");
+      thiz.execute();
+    } catch (Exception exc) {
+      System.err.println("Exception: " + exc.getMessage());
+      exc.printStackTrace(System.err);
     }
   }
+  //end::main[]
+
+
+
+  //tag::action[]
+  /**Operation on button pressed, on the application level.
+   * It uses the known references to the GralWidget. 
+   * Immediately access to implementation widgets is not necessary.  
+   * This operation is executed in the Graphic thread. 
+   * Be carefully, do not program longer or hanging stuff such as synchronized or sleep.
+   */
+  void actionButton ( ) throws IOException {
+    String textOfField = this.gui.wdgInputText.getText();
+    this.gui.widgOutput.append("Button1 " + (++this.ctKeyStroke1) + " time, text=" + textOfField + "\n");
+  }
   
   
-  
+  /**Action operation is called in the event handler of the appropriate widget. */
+  private final GralUserAction actionButton = new GralUserAction("buttonCode")
+  { 
+    @Override
+    public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
+        try{ 
+          ExampleSimpleButton.this.actionButton();         // defined of class level of the main (environment) class.
+        } catch(Exception exc){                            // Exceptions should catch anyway. but not expected.
+          ExampleSimpleButton.this.log.writeError("Unexpected", exc);
+        }                           
+      }
+      return true;  
+    } 
+  };  
+  //end::action[]
+   
 }

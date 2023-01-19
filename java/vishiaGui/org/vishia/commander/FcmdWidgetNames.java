@@ -19,22 +19,22 @@ public class FcmdWidgetNames
   
   /**Name of the tab inside the tabbed main panel for left, mid, right 
    * which contains a tabbed panel for the tabs for selection. */
-  public final static String tabFavoritesLeftMidRight = "tabSelectTabs";   //+1 +2 +3 
+  public final static String tabFavoritesLeftMidRight = "tabFavor";   //+1 +2 +3 
   
   /**Name of the panel inside the main left, mid, right panel 
    * which contains a tabbed panel for the tabs for selection. */
-  public final static String panelFavoritesLeftMidRight = "selectTabs";   //+1 +2 +3 
+  public final static String panelFavoritesLeftMidRight = "panelFavors";   //+1 +2 +3 
   
   /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
-  public final static String tabMainFavorites = "tabSelectAll";   //+1 +2 +3 
+  public final static String tabMainFavorites = "tabFavorsAll";   //+1 +2 +3 
   
   /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
-  public final static String tabFavorites = "tabSelect-";   //+1 +2 +3 
+  public final static String tabFavorites = "tabFavor-";   //+1 +2 +3 
   
   /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
-  public final static String tableFavorites = "tableSelect-";   //+label +1 +2 +3 
+  public final static String tableFavorites = "tableFavors-";   //+label +1 +2 +3 
   
   /**Name of the tab inside panelFavoritesLeftMidRight for the main selection. */
-  public final static String tableFavoritesMain = "tableSelectMain.";   //+1 +2 +3 
+  public final static String tableFavoritesMain = "tableFavorsMain.";   //+1 +2 +3 
   
 }

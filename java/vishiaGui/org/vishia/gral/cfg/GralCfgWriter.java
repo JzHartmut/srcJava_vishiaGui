@@ -95,12 +95,12 @@ public class GralCfgWriter
     }
     
     if(cfge.widgetType.whatIs == 'w'){ 
-      GralCfgPanel cfgp = (GralCfgPanel)cfge;
+      //TODO GralCfgPanel cfgp = (GralCfgPanel)cfge;
       writer.append("\n\n//================================================================================\n");
-      writer.append("Window: @").append(cfgp.windPos);
+      //TODO writer.append("Window: @").append(cfgp.windPos);
       //writePosition(ww, cfge);
       writer.append(": ");
-      writer.append(cfgp.name).append(", \"").append(cfgp.windTitle).append("\";\n\n");
+      //TODO writer.append(cfgp.name).append(", \"").append(cfgp.windTitle).append("\";\n\n");
 
     } else {
       //<Element>
@@ -137,7 +137,7 @@ public class GralCfgWriter
     if(cfge.positionString !=null) {
       ww.append(cfge.positionString);
     } else {
-      GralCfgPosition pp = cfge.positionInput;
+      GralCfgPosition pp = cfge.XXXpositionInput;
       if(pp.yPos >=0 || pp.xPos >=0 || pp.ySizeDown !=0 || pp.xWidth !=0){
         if(pp.panel !=null){ 
           if(!pp.panel.equals(sLastPanel)) {
@@ -261,8 +261,8 @@ public class GralCfgWriter
       writer.append(sep).append("dragText=\"")  .append(pp.dragText).append("\""); sep = ", "; }
     if(pp.dropFiles !=null) { writer.append(sep).append("dropFiles=\"") .append(pp.dropFiles).append("\""); sep = ", "; }
     if(pp.dropText !=null)  { writer.append(sep).append("dropText=\"")  .append(pp.dropText).append("\""); sep = ", "; }
-    if(pp.color0 !=null)    { writer.append(sep).append("color=")       .append(pp.color0.color); 
-      if(pp.color1 !=null)  { writer            .append("/")            .append(pp.color1.color); }  sep = ", "; 
+    if(pp.color0 !=null)    { writer.append(sep).append("color=")       .append(pp.color0.color.toString()); 
+      if(pp.color1 !=null)  { writer            .append("/")            .append(pp.color1.color.toString()); }  sep = ", "; 
     }
   }
 

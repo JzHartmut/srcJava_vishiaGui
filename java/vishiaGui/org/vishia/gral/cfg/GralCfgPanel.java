@@ -7,7 +7,7 @@ import java.util.List;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralRectangle;
 
-final public class GralCfgPanel extends GralCfgElement
+final public class GralCfgPanel extends GralCfgData.GuiCfgWidget
 {
   /**Version, history and license.
    * <ul>
@@ -40,25 +40,36 @@ final public class GralCfgPanel extends GralCfgElement
    */
   public static final int version = 20120303;
 
-  String name;
+  final GralCfgWindow window;
+  
+  /**All elements of this panel. If it is a tabbed panel, the elements are only panels. */
   final List<GralCfgElement> listElements = new ArrayList<GralCfgElement>();
   
+  final List<GralCfgPanel> listTabs = new LinkedList<GralCfgPanel>();
   
-  String windTitle;
   
-  String windPos;
+  String XXXwindTitle;
   
-  GralCfgPanel(){  }
+  String XXXwindPos;
+  
+  GralCfgPanel(GralCfgElement itsElement, GralCfgWindow window){ 
+    super(itsElement, '$');   
+    this.window = window;
+  }
 
-  GralCfgPanel(String name){ this.name = name; }
+  GralCfgPanel(String name, GralCfgWindow window){ 
+    super(null, '@');
+    this.window = window;
+    this.name = name; 
+  }
 
 
   /**Set from ZBNF: */
-  public void set_windIdent(String val){ name = val;  }
+  public void XXXset_windIdent(String val){ name = val;  }
   
-  public void set_windTitle(String val){ windTitle = val; }
+  public void XXXset_windTitle(String val){ XXXwindTitle = val; }
   
-  public void set_windPos(String val) { windPos = val; }
+  public void XXXset_windPos(String val) { XXXwindPos = val; }
 
 
 }

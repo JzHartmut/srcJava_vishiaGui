@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
@@ -99,6 +100,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-06 Hartmut new: {@link #setCurrentColumn(int)} important to focus a column,
+   *   if the evaluation of click/enter should depend from the selected column.  At long last it works. 
+   * <li>2023-01-02 Hartmut new: {@link #getFirstLine()} sometimes necessary, why this was not existing till now?
+   *   {@link #fillVisibleArea()} has had a problem if the #lineSelected was =null, 
+   *   occurring on click on a non existing line in the table. now fixed.
+   * <li>2023-01-02 Hartmut new: {@link #fillinPending(boolean)} especially for color to show,
+   *   now first time it is really obviously how long or whether a file panel will be filled in another thread.
+   * <li>2023-01-02 Hartmut new: {@link #processKeys(int)}: More detailed association between key and action.  
+   * <li>2022-12-12 Hartmut new: {@link #getColumnInFocus()}. why was this not existing till now?
+   * <li>2022-12-12 Hartmut new: {@link #setColumnProportional(int[])} and resizing with this proportional values.
+   *   This feature was longer plant but never implemented till now. See also changes in {@link GraphicImplAccess#resizeTable(GralRectangle)}. 
+   * <li>2022-12-12 Hartmut chg: using {@link GralWidget_ifc.ActionChangeWhen#onAnyKey} instead onEnter. It is systematically. 
+   * <li>2022-10-22 Hartmut chg: rename variables of {@link NodeTableLine} with prefix tbl_ to distinguish from nd_ variables from node 
    * <li>2018-10-28 Hartmut chg: Now uses argument zLineMax from {@link #GralTable(String, int, int[])} instead constant 50 for number of showed lines.
    * <li>2018-01-07 Hartmut new: {@link #getCellTextFocus()}  
    * <li>2016-09-17 Hartmut new: in {@link #mouseDouble(int, CellData)} the <code>getActionChangeStrict(ActionChangeWhen.onMouse1Double, true)</code>
@@ -155,14 +169,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *   elsewhere only in the implementation layer via the text widget.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
    * <li>2013-11-02 Hartmut chg: {@link GralTable.GraphicImplAccess#resizeTable(GralRectangle)} moved from SWT implementation,
-   *   preparing tree view. {@link GralTable.TableLineData#treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
+   *   preparing tree view. {@link GralTable.TableLineData#tbl_treeDepth}, {@link GralTable.TableLineData#childLines} for tree view.
    * <li>2013-11-02 Hartmut chg: {@link GralTable.TableLineData} is static now with outer reference, more transparent
    * <li>2013-10-06 Hartmut chg: call {@link #actionOnLineSelected(int, GralTableLine_ifc)} only if the line is changed, 
    *   not on focus without changed line.
    * <li>2013-09-15 Hartmut new: Implementation of {@link #setBackColor(GralColor, int)}  
    *   with special comments for usage of the int parameter.
    *   See {@link GralTable_ifc#setBackColor(GralColor, int)}, Adequate {@link #getBackColor(int)}. 
-   * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImpl_ifc} without any other
+   * <li>2013-09-14 Hartmut chg: {@link GraphicImplAccess} implements now {@link GralWidgImplAccess_ifc} without any other
    *   changes (was proper) and sets {@link GralWidget#_wdgImpl}. Therefore all routines which works from the
    *   GralWidget calls the methods of the implement of the GralTable immediately without special overridden methods
    *   in this class. It is the concept.
@@ -247,7 +261,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  protected final static String sVersion = "2018-10-28";
+  protected final static String sVersion = "2023-01-06";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -275,9 +289,15 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
   
+  /**Set if relative column widths are used.
+   * null if only absolute.
+   * Set with 
+   */
+  protected int[] columnWidthsPromille;
+  
   protected boolean[] bColumnEditable;
   
-  protected GralMenu[] menuColumns;
+  protected GralMenu[] contextMenuColumns;
   
 
   
@@ -287,7 +307,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**The currently selected cell. */
   protected int lineSelectedixCell, colSelectedixCellC;
   
-  protected int lineSelectedNewixCell;
+  protected int lineSelectedNewixCell, colSelectedNewixCellC;
   
   /**Array of lines which are currently associated to the cells of the implementation layer.
    * It means they are the showing lines. Note that the TableLineData referred with the {@link #rootLine}
@@ -306,6 +326,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**The line which is selected by mouse pressing, for right mouse menu. */
   protected TableLineData lineSelectedNew;
   
+  /**Set to true if a fillin is pending. */
+  protected boolean fillinPending;
+
   
   /**Number of lines and columns of data. */
   protected int zLine, zColumn;
@@ -379,6 +402,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected GralColor colorBackSelectNew;
   protected GralColor colorBackSelectNewMarked;
   
+  protected GralColor colorBackFillPending;
+  
   protected GralColor colorTextSelect;
   protected GralColor colorTextMarked;
   
@@ -402,30 +427,30 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
    * see {@link #GralTable(String, int, int[])}, zLineMax is 50. 
    */
-  public GralTable(String posName, int[] columnWidths) {
-    this(posName, 50, columnWidths);
-  }
+//  public GralTable ( String posName, int[] columnWidths) {
+//    this(posName, 50, columnWidths);
+//  }
   
   
   
   
   /**Constructs a table which should be positioned on {@link #setToPanel(GralMngBuild_ifc)}
-   * @param pos String given position in GralPos units.
+   * @param currPos Position used for current, maybe null
+   * @param posName String given position in GralPos units and name, see {@link GralWidget#GralWidget(GralPos, String, char)}
    * @param zLineMax maximal number of lines managed for content. It should be related to the size of viewing. 10..50 is proper.
-   * @param name to register for symbolic access
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String posName, int zLineMax, int[] columnWidths) {
-    super(posName, 'L');
+  public GralTable ( GralPos currPos, String posName, int zLineMax, int[] columnWidths) {
+    super(currPos, posName, 'L');
     this.columnWidthsGral = columnWidths;
     this.zColumn = columnWidths.length;
     this.bColumnEditable = new boolean[this.zColumn];  //all false.
     
     rootLine = new NodeTableLine("", null);
-    rootLine.showChildren = true;
-    rootLine.treeDepth = -1; //children of rootline are level 0
-    rootLine.zLineUnfolded = 0;  //count added line.
+    rootLine.tbl_showChildren = true;
+    rootLine.tbl_treeDepth = -1; //children of rootline are level 0
+    rootLine.tbl_zLineUnfolded = 0;  //count added line.
     
     @SuppressWarnings("unchecked")
     TableLineData[] linesForCell1 = (TableLineData[])Array.newInstance( TableLineData.class, zLineMax );
@@ -435,7 +460,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
 
   
-  
+//  public GralTable ( String posName, int zLineMax, int[] columnWidths) {
+//    this(null, posName, zLineMax, columnWidths);
+//  }  
   
   /**Constructs a table with position
    * @param pos String given position in GralPos units.
@@ -443,8 +470,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param columnWidths positive value from left: width, negative value from right: width. 
    *   The last column with a positive width is used for sizeable. 
    */
-  public GralTable(String pos, String name, int[] columnWidths) 
-  { this(pos !=null ? ((pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, columnWidths); }
+//  public GralTable ( String pos, String name, int[] columnWidths) 
+//  { this(pos !=null ? ((pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, columnWidths); }
   
   
   
@@ -532,15 +559,22 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @return The menu to add {@link GralMenu#addMenuItem(String, String, GralUserAction)}.
    */
   public GralMenu getContextMenuColumn(int col){
-    if(menuColumns == null){
-      menuColumns = new GralMenu[zColumn];
+    if(contextMenuColumns == null){
+      contextMenuColumns = new GralMenu[zColumn];
     }
-    if(menuColumns[col] == null){
-      menuColumns[col] = gi.createColumnMenu(col); //for all cells of this column
+    if(contextMenuColumns[col] == null){
+      contextMenuColumns[col] = new GralMenu(this); //gi.createColumnMenu(col); //for all cells of this column
     }
-    return menuColumns[col];
+    return contextMenuColumns[col];
   }
+
   
+  public void setContextMenuColumn(int col, GralMenu menu){
+    if(contextMenuColumns == null){
+      contextMenuColumns = new GralMenu[zColumn];
+    }
+    contextMenuColumns[col] = menu; //gi.createColumnMenu(col); //for all cells of this column
+  }
   
   /**Adds a context menu entries to all cells of the designated column. This method can't be used 
    * if either {@link #getContextMenuColumn(int)} or {@link #addContextMenuEntryGthread(int, String, String, GralUserAction)}
@@ -563,7 +597,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   public void setColumnWidth(int width, int[] columnWidths){
-    columnWidthsGral = columnWidths;
+    this.columnWidthsGral = columnWidths;
+  }
+  
+  /**Specify a proportional width for each column. 
+   * The absolute values given on construction or {@link #setColumnWidth(int, int[])} are used as minimal values.
+   * Hence a value of 0 for width means, the given absolute width should be used anytime. 
+   * <br>
+   * The sum of all here given widths is the size of all columns on proportion to the here given column values.
+   * 
+   * @param widths
+   */
+  public void setColumnProportional(int[] widths){
+    this.columnWidthsPromille = widths;
   }
   
   
@@ -578,7 +624,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     bColumnEditable[column] = val;
     if(((GralWidget)this)._wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgEditableColumn);
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
   }
   
@@ -596,42 +642,43 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   
   void setColors(){
-    colorBackSelect = GralColor.getColor("lam");
-    colorBackSelectNew = GralColor.getColor("lbl");
+    this.colorBackSelect = GralColor.getColor("lam");
+    this.colorBackSelectNew = GralColor.getColor("lbl");
     
-    colorBackMarked = GralColor.getColor("lrd");
-    colorBackSelectMarked = GralColor.getColor("rd");
+    this.colorBackMarked = GralColor.getColor("lrd");
+    this.colorBackSelectMarked = GralColor.getColor("rd");
     
-    colorBackSomeMarked = GralColor.getColor("pma");
-    colorBackSelectSomeMarked = GralColor.getColor("lma");
+    this.colorBackSomeMarked = GralColor.getColor("pma");
+    this.colorBackSelectSomeMarked = GralColor.getColor("lma");
     
-    colorBackSelectNewMarked = GralColor.getColor("lpu");
-    dyda.backColor = GralColor.getColor("wh");
-    dyda.backColorNoFocus = GralColor.getColor("pgr");
+    this.colorBackSelectNewMarked = GralColor.getColor("lpu");
+    this.colorBackFillPending = GralColor.getColor("ma");
+    this.dyda.backColor = GralColor.getColor("wh");
+    this.dyda.backColorNoFocus = GralColor.getColor("pgr");
     //colorBackSelectNonFocused = GralColor.getColor("am");
     //colorBackMarkedNonFocused = GralColor.getColor("lrd");
     //colorBackTableNonFocused = GralColor.getColor("gr");
-    dyda.textColor = GralColor.getColor("bk");
-    colorSelectCharsBack = GralColor.getColor("lgr");
-    colorSelectChars = GralColor.getColor("wh");
-    colorBackVscrollbar = GralColor.getColor("lgr");
+    this.dyda.textColor = GralColor.getColor("bk");
+    this.colorSelectCharsBack = GralColor.getColor("lgr");
+    this.colorSelectChars = GralColor.getColor("wh");
+    this.colorBackVscrollbar = GralColor.getColor("lgr");
     int rd1,gn1, bl1, rd2, gn2, bl2;
-    bl1 = colorBackVscrollbar.getColorValue();
+    bl1 = this.colorBackVscrollbar.getColorValue();
     rd1 = (bl1 >>16) & 0xff;
     gn1 = (bl1 >>8) & 0xff;
     bl1 = bl1 & 0xff;
-    colorSliderVscrollbar[0] = GralColor.getColor("bl");
-    bl2 = colorSliderVscrollbar[0].getColorValue();
+    this.colorSliderVscrollbar[0] = GralColor.getColor("bl");
+    bl2 = this.colorSliderVscrollbar[0].getColorValue();
     rd2 = (bl1 >>16) & 0xff;
     gn2 = (bl1 >>8) & 0xff;
     bl2 = bl1 & 0xff;
     
-    for(int ix=1; ix < colorSliderVscrollbar.length; ++ix){
-      float r = 0.8f * ((float)(ix)) / (colorSliderVscrollbar.length);  //max. 0.8
+    for(int ix=1; ix < this.colorSliderVscrollbar.length; ++ix){
+      float r = 0.8f * ((float)(ix)) / (this.colorSliderVscrollbar.length);  //max. 0.8
       int rd = rd2 + (int)((rd1 - rd2) * r);
       int gn = gn2 + (int)((gn1 - gn2) * r);
       int bl = bl2 + (int)((bl1 - bl2) * r);
-      colorSliderVscrollbar[ix] = GralColor.getColor(rd, gn, bl);
+      this.colorSliderVscrollbar[ix] = GralColor.getColor(rd, gn, bl);
     }
   }
   
@@ -641,7 +688,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   /**Sets the focus of the table.
    * It sets an information that the selected cell should focused while drawing ({@link GraphicImplAccess.CellData#bSetFocus}).
    * Than it invokes the overridden super.{@link GralWidget#setFocus(int, int)}. 
-   * That method asserts the visibility of the table and calls {@link GralWidgImpl_ifc#setFocusGThread()}
+   * That method asserts the visibility of the table and calls {@link GralWidgImplAccess_ifc#setFocusGThread()}
    * That method is implemented in the implementation widget layer and causes a redraw which focused
    * the correct cell. 
    * @see org.vishia.gral.base.GralWidget#setFocus(int, int)
@@ -649,7 +696,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   @Override public void setFocus(int delay, int latest){
     if(gi !=null){
       gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true;  //will be processed on redraw
-      super.setFocus(delay, latest);
+      super.setFocus(delay, latest);   // From GralWidget
     }
   }
   
@@ -662,22 +709,33 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     int ixline1 = ixline >= 0 ? ixline: zLineVisible + ixline;  //negative: -1 is the last line.
     if(ixline1 < 0) { ixline1 = 0;}
     if(ixline1 >= zLineVisible) { ixline1 = zLineVisible-1; }
-    assert(zLineVisible >0);
-    assert(ixcolumn < gi.cells[0].length);
-    lineSelected = (TableLineData)line;
-    nLineFirst = -1;  //get new, undefined elsewhere.
-    actionOnLineSelected(KeyCode.userSelect, lineSelected);
-    lineSelectedixCell = ixline1;
-    if(lineSelectedixCell >= zLineVisible){
-      lineSelectedixCell = zLineVisible -1;
+    if(zLineVisible >0) {
+      assert(ixcolumn < gi.cells[0].length);
+      lineSelected = (TableLineData)line;
+      nLineFirst = -1;  //get new, undefined elsewhere.
+      actionOnLineSelected(KeyCode.userSelect, lineSelected);
+      lineSelectedixCell = ixline1;
+      if(lineSelectedixCell >= zLineVisible){
+        lineSelectedixCell = zLineVisible -1;
+      }
+      if(ixcolumn >=0){
+        this.colSelectedixCellC = ixcolumn;
+      }
+      bPrepareVisibleArea = true;
+      redraw();
+    } else {
+      this.gralMng().log().writeWarning("table not visiable");
     }
-    if(ixcolumn >=0){
-      this.colSelectedixCellC = ixcolumn;
-    }
-    bPrepareVisibleArea = true;
-    repaint();
   }
 
+  
+  public void setCurrentColumn(int col) {
+    this.colSelectedixCellC = col;     // remark the focused column.
+    if(this.gi !=null) {               // the flag bSetFocus sets the focus to this cell on redraw, after them set to false.
+      this.gi.cells[this.lineSelectedixCell][this.colSelectedixCellC].bSetFocus = true;  
+    }
+    redraw();
+  }
   
   
   /**Sets the color of the currently selected line. 
@@ -685,10 +743,26 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   public void setColorBackSelectedLine(GralColor color){ 
     colorBackSelect = color; 
-    repaint(100, 0);
+    redraw(100, 0);
   }
 
+  /**Quest whether the table is in a fillin pending state,
+   * see {@link #fillinPending(boolean)}.
+   * @return the state true if pending. 
+   */
+  public boolean fillinPending() { return this.fillinPending; }
   
+  /**Sets the table to a fillin pending state or in a not pending state 
+   * This is if another thread sets the line data, or create new lines,
+   * which may need a while. 
+   * @param set true: set to pending, false: set to ready.
+   * @return pending state before. 
+   */
+  public boolean fillinPending(boolean set) {
+    boolean ret = this.fillinPending;
+    this.fillinPending = set;
+    return ret;
+  }
 
   
   /**Returns the current selected line. */
@@ -710,10 +784,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
 
   @SuppressWarnings("unchecked") @Override
-  public GralTableLine_ifc<UserData> getLine(String key) {
-    Object oRootline = rootLine.getNode(key, keySeparator);
-    if(oRootline instanceof GralTableLine_ifc){ return (GralTableLine_ifc<UserData>) oRootline; }
-    else return null;
+  public TableLineData getLine ( String key) {
+    Object oRootline = this.rootLine.getNode(key, this.keySeparator);
+    if(oRootline instanceof GralTable.TableLineData){ return (TableLineData) oRootline; }
+    else return null;  //unexpected.
+  }
+
+
+  
+  public GralTableLine_ifc<UserData> getFirstLine ( ) {
+    return this.rootLine.firstChild();
   }
 
 
@@ -728,6 +808,16 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
 
+  
+  /**Returns the column which is in focus on an action,
+   * @return -1 if implementation does not exists, else 0...
+   */
+  public int getColumnInFocus() {
+    if(this._wdgImpl !=null) { return ((GralTable.GraphicImplAccess) this._wdgImpl).ixColumnFocus; }
+    else return -1; //nothing in foucs
+  }
+  
+  
   /**Gets the index in the visual presentation of the given line.
    * @param line any line of this table, maybe null, maybe a line from any other table
    * @return 0 for the first line, 1..., -1 if not found respectively the line is not in the visible area. 
@@ -783,14 +873,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     }
     bPrepareVisibleArea = true;
-    repaint(100, 0);
+    redraw(100, 0);
     return line;
   }
 
   
   
-  /* (non-Javadoc)
-   * @see org.vishia.gral.ifc.GralTable_ifc#addLine(java.lang.String, java.lang.String[], java.lang.Object)
+  /**
+   * @see GralTable_ifc#addLine(String, String[], Object)
    */
   @Override public TableLineData addLine(String lineKey, String[] lineTexts, UserData userData) {
     return rootLine.addChildLine(lineKey, lineTexts, userData);
@@ -819,7 +909,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     }
     bPrepareVisibleArea = true;
-    repaint();
+    redraw();
     return line;
   }
 
@@ -870,7 +960,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     bChangedLinesForCell = true;
     rootLine.clear();
     bPrepareVisibleArea = true;
-    repaint(200,200);
+    redraw(200,200);
   }
 
   
@@ -881,8 +971,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     List<GralTableLine_ifc<UserData>> list = new LinkedList<GralTableLine_ifc<UserData>>();
     
     for(TableLineData item: rootLine.iterator()){
-      if(item.data instanceof MarkMask_ifc){
-        if((((MarkMask_ifc)item.data).getMark() & mask) !=0){
+      if(item.nd_data instanceof MarkMask_ifc){
+        if((((MarkMask_ifc)item.nd_data).getMark() & mask) !=0){
           list.add(item);
         }
       }
@@ -920,7 +1010,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   private void fillVisibleArea(){
+    if(this.lineSelected ==null) {
+      this.lineSelected = (TableLineData)getFirstLine();
+    }
     TableLineData line = lineSelected;
+    
     int ix = lineSelectedixCell;
     while(ix >0 && line !=null){
       line = prevLine(line);
@@ -1001,7 +1095,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   TableLineData nextLine(TableLineData lineP){
     TableLineData line = lineP;
     TableLineData linenext = null;
-    if(line.showChildren){
+    if(line.tbl_showChildren){
       linenext = line.firstChild();         //deeper to any children
     }
     if(linenext == null){ //no children found
@@ -1032,7 +1126,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
     } else {
       //if(line2 !=null){ line2 = line2.prevSibling(); } //the parent is the current parent, use previous.
-      while(line2 !=null && line2.showChildren){
+      while(line2 !=null && line2.tbl_showChildren){
         //it has children
         line2 = line2.lastChild();  //last of all showing levels
       }
@@ -1048,7 +1142,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected void mouseDown(int key, CellData cell){
     lineSelectedNew = linesForCell[cell.ixCellLine]; 
-    repaint(0,0);  //immediately, it is in the graphic thread.
+    redraw(0,0);  //immediately, it is in the graphic thread.
   }
 
 
@@ -1064,7 +1158,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       lineSelectedixCell = cell.ixCellLine;  //used for key handling.
       colSelectedixCellC = cell.ixCellColumn;
       actionOnLineSelected(KeyCode.userSelect, lineSelected);
-      repaint();
+      redraw();
     }
   }
 
@@ -1186,10 +1280,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //NOTE: prevent to fast key action if the last redraw is yet finished.
       //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
       long timeDiff = time - timeLastRedraw;
-      if( keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
-        keyDone = false;
+      if( this.keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
+        this.keyDone = false;                              // execution pending
         switch(keyCode){
-        case KeyCode.tab: {
+        case KeyCode.tab: {                                // tab and sh-tab switches between columns
           if(colSelectedixCellC < columnWidthsGral.length-1) { 
             colSelectedixCellC +=1; 
           }
@@ -1217,7 +1311,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           actionOnLineSelected(KeyCode.userSelect, lineSelected);
           keyActionDone.activate();
         } break;
-        case KeyCode.mouseWheelUp:
+        case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
         case KeyCode.up: {
           if(!searchContent(true)) {
             if(lineSelectedixCell > 2){
@@ -1262,9 +1356,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } break;
         default:
           if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
-            ) {
+            ) {                                            // arrow down, mouse wheel down
             if(keyCode == keyMarkDn && lineSelected !=null){
-              GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
+              GralTableLine_ifc<?> line = lineSelected;    //mark the lines
               if((line.getMark() & FileMark.select)!=0){
                 //it is selected yet
                 line.setNonMarked(FileMark.select, line.getUserData());
@@ -1296,18 +1390,18 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             
             keyActionDone.activate();
           } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
-            keyCode &= ~KeyCode.shiftDigit;  //The keycode is valid without shift-designation.
+            keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
             searchChars.appendCodePoint(keyCode);
             searchContent(false);
-            repaint();
-          } else if(keyCode == KeyCode.esc){
+            redraw();
+          } else if(keyCode == KeyCode.esc){               // --- esc cleans the search chars 
             searchChars.setLength(0);
-            repaint();
+            redraw();
           } else if(keyCode == KeyCode.back && searchChars.length() >0){
             searchChars.setLength(searchChars.length()-1);
-            repaint();
+            redraw();
           } else if(lineSelected !=null && keyCode == keyOpenChild){
-            if(lineSelected.lineCanHaveChildren){
+            if(lineSelected.tbl_lineCanHaveChildren){
               actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
             }
             if(lineSelected.hasChildren()){           //only if it has children currently really.
@@ -1317,10 +1411,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
               //repaint();
             }
           } else if(lineSelected !=null && keyCode == keyCloseChild){
-            if(lineSelected !=null && lineSelected.showChildren){
+            if(lineSelected !=null && lineSelected.tbl_showChildren){
               lineSelected.showChildren(false, false);
               fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
-              repaint();
+              redraw();
             }
           } else {
             done = false;
@@ -1339,19 +1433,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           done = true;
         }
         if(!done /*&& lineSelected !=null*/){
-          GralWidget_ifc.ActionChange action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
+          GralWidget_ifc.ActionChange action = null;
+          if(keyCode == KeyCode.enter) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter); }
+          else if(keyCode == (KeyCode.ctrl + KeyCode.enter)) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onCtrlEnter); }
+          else if(keyCode == KeyCode.mouse1Double) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Double); }
+          if(action ==null) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey); }
+          //?? if(action ==null) { action = getActionChangeStrict(null, false); }  //any action for the table
           if(action !=null){
             Object[] args = action.args();
             if(args == null){ done = action.action().exec(keyCode, this, lineSelected); }
             else { done = action.action().exec(keyCode, this, args, lineSelected); }
           }
         } //if(table.)
-        if(!done && itsMng.userMainKeyAction() !=null){
-          done = itsMng.userMainKeyAction().exec(keyCode, getCurrentLine());
+        if(!done && gralMng.userMainKeyAction() !=null){
+          done = gralMng.userMainKeyAction().exec(keyCode, getCurrentLine());
         }
         if(!done){
-          //if actionChanging.userAction() returns false 
-          GralUserAction mainKeyAction = itsMng.getRegisteredUserAction("KeyAction");
+          GralUserAction mainKeyAction = gralMng.getRegisteredUserAction("KeyAction");
           if(mainKeyAction !=null){
             //old form called because compatibility, if new for with int-parameter returns false.
             if(!mainKeyAction.exec(keyCode, this)){
@@ -1379,11 +1477,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * If a navigation key is released, the table navigation should be stopped immediately.
    * 
    */
-  protected final GralGraphicTimeOrder keyActionDone = new GralGraphicTimeOrder("GralTableKeyDone") {
+  protected final GralGraphicTimeOrder keyActionDone = new GralGraphicTimeOrder("GralTableKeyDone", this.gralMng()) {
     @Override
     public void executeOrder() {
       gi.bFocused = true;  //to focus while repainting
-      _wdgImpl.repaintGthread();
+      _wdgImpl.redrawGthread();
       keyDone = true;
       //System.out.println("Key done");
     }
@@ -1399,7 +1497,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param line
    */
   private void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
-    itsMng.setLastClickedWidget(lineSelected);
+    gralMng.setLastClickedWidget(lineSelected);
     if(actionOnLineSelected !=null){
       actionOnLineSelected.exec(key, this, line);
     }
@@ -1435,7 +1533,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * 
    */
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc, Removeable
+  implements GralWidgImplAccess_ifc, Removeable
   {
     
     public static final int chgEditableColumn = 0x00100000;
@@ -1472,7 +1570,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**Pixel position of the vertical scroll bar. */
     protected final GralRectangle xyVscrollbar = new GralRectangle(0,0,0,0);
     
-    /**Position of vScrollBar calculated from {@link GralTable#rootLine}. {@link NodeTableLine#zLineUnfolded} and {@link GralTable#nLineCurr}
+    /**Position of vScrollBar calculated from {@link GralTable#rootLine}. {@link NodeTableLine#tbl_zLineUnfolded} and {@link GralTable#nLineCurr}
      * written in {@link #determineSizeAndPosition()} used for painting vScrollBar. */
     protected int y1Scrollbar, y2Scrollbar;
     
@@ -1481,10 +1579,6 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**New and last index of the sliderColor. The last index is stored by the implementation and compared with the new one
      * to desire whether a new implementation color should be gotten. */
     protected int ixColorScrollbar, ixColorScrollbarLast = -1;
-    
-    /**Start position of each column in pixel. 
-     * @deprecated only used in org.vishia.gral.swt.SwtTable#initSwtTable(...) */
-    protected int[] columnPixel;
     
     protected final int xPixelUnit;
         
@@ -1506,6 +1600,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * of the same table. */
     protected boolean bFocusLost;
     
+    protected int ixLineFocus, ixColumnFocus;
+    
+    
     /**Set to true if the table has the focus in window.
      */
     protected boolean XXXhasFocus;
@@ -1521,26 +1618,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       super(outer, mng);
       this.outer = outer;
       this.cells = new GralTable.CellData[zLineVisibleMax][zColumn()];
-      xPixelUnit = mng.propertiesGui.xPixelUnit();
+      xPixelUnit = mng.gralProps.xPixelUnit();
       outer.gi = this; 
-      int xdPix = outer.itsMng.propertiesGui().xPixelUnit();
-      columnPixel = new int[outer.columnWidthsGral.length+1];
-      int xPix = 0;
-      columnPixel[0] = xPix;
-      for(int iCol = 0; iCol < outer.columnWidthsGral.length; ++iCol){
-        xPix += outer.columnWidthsGral[iCol] * xdPix;
-        columnPixel[iCol+1] = xPix;
-      }
-
+      int xdPix = outer.gralMng.propertiesGui().xPixelUnit();
       this.xpixelCell = new int[outer.columnWidthsGral.length+1];
-      int ydPix = outer.itsMng.propertiesGui().yPixelUnit();
+      int ydPix = outer.gralMng.propertiesGui().yPixelUnit();
       linePixel = 2 * ydPix;
     }
     
-    protected GralMng itsMng(){ return outer.itsMng; }
+    protected GralMng itsMng(){ return outer.gralMng; }
     
     protected boolean bColumnEditable(int ix){ return GralTable.this.bColumnEditable[ix]; }
     
+    protected GralMenu[] getContextMenuColumns() { return GralTable.this.contextMenuColumns; }
     
     protected void checkAndUpdateText(String sText, CellData celldata){
       GralTable.this.checkAndUpdateText(sText, celldata);
@@ -1551,6 +1641,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected int ixLine(){ return outer.ixLine; }
     
     protected int[] columnWidthsGral(){ return outer.columnWidthsGral; }
+    
+    protected int[] columnWidthsPromille(){ return outer.columnWidthsPromille; }
     
     
     
@@ -1766,35 +1858,54 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       long dbgtime = System.currentTimeMillis();
       bRedrawPending = true;
 
-      Assert.check(outer.itsMng.currThreadIsGraphic());
+      Assert.check(outer.gralMng.currThreadIsGraphic());
       GralTable<UserData>.TableLineData/*<?>*/ line;
       
-      if(outer.bPrepareVisibleArea){
+      //todo if(outer.bPrepareVisibleArea){
         outer.fillVisibleArea();  //show the selected line at line 3 in graphic or before 0..2
         outer.bPrepareVisibleArea = false;
-      }
+      //}
       
       //Now draw:
       //
       int ix = -1;
       while(++ix < outer.zLineVisible) {
         line = outer.linesForCell[ix];
-        setLinePresentation(line);
+        setLineColors(line);
         drawCellContent(ix, cells[ix], line, linePresentation);
       }
       if(++ix < outer.zLineVisibleMax){  //a half visible line
         drawCellContent(ix, cells[ix], null, linePresentation);
       }
       outer.timeLastRedraw = System.currentTimeMillis();
-      //System.out.println("GralTable - redraw;" + timeLastRedraw - dbgTime);
+      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name + timeLastRedraw);
     }
 
     
     
-    private void setLinePresentation(TableLineData/*<?>*/ line){
+    /**Sets the colors of the given line depending on the state
+     * <ul>
+     * <li>line == {@link GralTable#lineSelected} : 
+     *   <ul><li>marked: {@link TableLineData#colorBackSelectMarked} or {@link GralTable#colorBackSelectMarked}
+     *   <li>childrenMarked: {@link TableLineData#colorBackSelectSomeMarked} or {@link GralTable#colorBackSelectSomeMarked}
+     *   <li>not marked: {@link TableLineData#colorBackSelect} or {@link GralTable#colorBackSelect}
+     *   </ul>
+     * <li>selected new: {@link GralTable#colorBackSelectNewMarked} or {@link GralTable#colorBackSelectNew}
+     * <li>normal non selected line:
+     *   <ul><li>marked: {@link TableLineData#colorBackSelectMarked} or {@link GralTable#colorBackSelectMarked}
+     *   <li>childrenMarked: {@link TableLineData#colorBackSelectSomeMarked} or {@link GralTable#colorBackSelectSomeMarked}
+     *   <li>not focused: {@link GralWidget.DynamicData#backColorNoFocus} 
+     *   <li>not marked: {@link TableLineData#colorBackSelect} or {@link GralTable#colorBackSelect}
+     *   </ul>
+     * </ul> 
+     * @param line
+     */
+    private void setLineColors(TableLineData/*<?>*/ line){
       boolean marked = line !=null && (line.getMark() & 1)!=0;
       boolean childrenMarked = line !=null && (line.getMark() & 2)!=0;
-      if(line == outer.lineSelected){
+      if(outer.fillinPending) {                            // a temporary situation 
+        linePresentation.colorBack = outer.colorBackFillPending;
+      } else if(line !=null && line == outer.lineSelected){               // only one line
         if(marked){
           linePresentation.colorBack = line.colorBackSelectMarked !=null ? line.colorBackSelectMarked : outer.colorBackSelectMarked;
         } else if(childrenMarked){
@@ -1802,7 +1913,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } else {
           linePresentation.colorBack = line !=null && line.colorBackSelect !=null ? line.colorBackSelect : outer.colorBackSelect;
         }
-      } else if(line == outer.lineSelectedNew){
+      } else if(line !=null && line == outer.lineSelectedNew){
         linePresentation.colorBack = marked ? outer.colorBackSelectNewMarked : outer.colorBackSelectNew;
       } else {
         if(marked){
@@ -1821,19 +1932,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
 
     /**This method have to be called before the vertical scroll bar is painted
-     * in the {@link GralWidgImpl_ifc#repaintGthread()} routine..
+     * in the {@link GralWidgImplAccess_ifc#redrawGthread()} routine..
      * It checks whether the {@link GralTable#nLineCurr} and the shown number of lines
-     * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#zLineUnfolded}
+     * in {@link GralTable#rootLine}. {@link GralTable.NodeTableLine#tbl_zLineUnfolded}
      * is given, e.g. >=0. If one of them is <0 or lines are countered
      * calling {@link NodeTableLine#countChildren(boolean, int)}. 
      * Therewith the {@link GralTable#nLineCurr} is set too. Anytime if the situation is not specified
      * the {@link GralTable#nLineCurr} can be set to -1. This forces new calculation.
      */
     protected void determineSizeAndPositionScrollbar(int yPixel)
-    { if(GralTable.this.nLineFirst <0 || GralTable.this.rootLine.zLineUnfolded <0) {
+    { if(GralTable.this.nLineFirst <0 || GralTable.this.rootLine.tbl_zLineUnfolded <0) {
         GralTable.this.rootLine.countChildren(true, 0);
       }
-      int zLine = Math.max(1, rootLine.zLineUnfolded);
+      int zLine = Math.max(1, rootLine.tbl_zLineUnfolded);
       int y1 = yPixel * nLineFirst / zLine;
       int zLineShow = Math.min(zLineVisible, zLine);  //less if table is shorter than visible area
       int yd = yPixel * zLineShow / zLine;   //it is <= yPixel
@@ -1855,7 +1966,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     }
 
-    /**This routine will be called inside a resize listener of the implementation graphic.
+    /**This routine will be called inside the resize listener of the implementation graphic.
      * It calculates the width of the columns with the given width of the table's canvas.
      * Then {@link #setBoundsCells()} will be called. 
      * That is implemented in the underlying graphic layer and sets the bounds for each cell.
@@ -1864,31 +1975,107 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     protected void resizeTable(GralRectangle pixTable) {
       int xPixelUnit = itsMng().propertiesGui().xPixelUnit();
       int yPixelUnit = itsMng().propertiesGui().yPixelUnit();
-      outer.zLineVisible = pixTable.dy / yPixelUnit / 2;
+      outer.zLineVisible = (pixTable.dy +1) / yPixelUnit / 2;   // height of one cell always 2
       if(outer.zLineVisible > outer.zLineVisibleMax){ outer.zLineVisible = outer.zLineVisibleMax; }
-      xyVscrollbar.x = pixTable.dx - xPixelUnit;
+      if(outer.zLineVisible < 2)
+        Debugutil.stop();
+      System.err.println("GralTable zLineVisible = " + outer.zLineVisible + " name " + name);
+      int xPixTable = pixTable.dx - xPixelUnit;
+      int xPixTable2 = xPixTable;                          // available sum of pixel of the columns which are proportional
+      xyVscrollbar.x = xPixTable;
       xyVscrollbar.dx = xPixelUnit;
       xyVscrollbar.y = 0;
       xyVscrollbar.dy = pixTable.dy;
-      int xPixel1 = 0;
-      xpixelCell[0] = xPixel1;
+      //
+      int[] columnWidthsGral = columnWidthsGral();
+      int[] xPixColumns = new int[columnWidthsGral.length];
+      int[] xProportionals = columnWidthsPromille();
+      float[] xFProportional = null;
+      int xPixPos = 0;
+      xpixelCell[0] = xPixPos;
       int ixPixelCell;
-      int xPos;
-      //Columns from left with positive width
-      for(ixPixelCell = 0; ixPixelCell < columnWidthsGral().length && (xPos = columnWidthsGral()[ixPixelCell]) > 0; ++ixPixelCell){
-        xPixel1 += xPos * xPixelUnit;
-        xpixelCell[ixPixelCell+1] = xPixel1;
+      int xPixColumn;
+      int xPixTableMin = 0;
+      //----------------------------------------------------- count sum of grid column widths for possible reducing min width
+      for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+        xPixColumn = columnWidthsGral[ixPixelCell] * xPixelUnit;   // the absolute width
+        xPixColumns[ixPixelCell] = xPixColumn;
+        if(xPixColumn <0) { xPixColumn = -xPixColumn; }
+        else if(xPixColumn < xPixelUnit) { xPixColumn = xPixelUnit; }
+        xPixTableMin += xPixColumn;
+      }
+      if(xPixTableMin > xPixTable) {                       // The space is too less, reduce the min width
+        float f = (float)xPixTable / xPixTableMin;         // adjust pixel (min) per column
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          xPixColumn = columnWidthsGral[ixPixelCell] * xPixelUnit;   // the absolute width
+          xPixColumns[ixPixelCell] = (int)(f*xPixColumn);  // also negative
+        }
+      }
+      //----------------------------------------------------- detect the sum (size) for proportional values
+      int xSumProportional = 0;                            // sum of proportional values
+      int xSumProportional2 = 0;                           // sum of proportional values only from relevant columns
+      if(xProportionals !=null) {
+        xFProportional = new float[xProportionals.length];
+        //--------------------------------------------------- calculates sum of proportional widths first without check relevant columns.
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          xSumProportional += xProportionals[ixPixelCell];
+        }
+        //--------------------------------------------------- second step: compare widths with proportion, which are relevant
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          float f = (float)xProportionals[ixPixelCell] / xSumProportional;
+          int xPixGrid = xPixColumns[ixPixelCell];
+          if(xPixGrid <0) { xPixGrid = - xPixGrid; }
+          int xPixPropor = (int)(f * xPixTable2);
+          if(xPixGrid < xPixPropor) {                      // only if the proportional position is greater than the minimal one
+            xSumProportional2 += xProportionals[ixPixelCell]; // then count their width to the sum
+            xFProportional[ixPixelCell] = f;               // and mark that columns !=0
+          } else {
+            xPixTable2 -= xPixGrid;                        // column with min width, do not regard on calculate the proportion.
+            xFProportional[ixPixelCell] = 0;               // mark the columns = 0 which uses the minimal size
+          }
+        }
+        //--------------------------------------------------- third step: calculate proportional factor
+        for(ixPixelCell = 0; ixPixelCell < columnWidthsGral.length; ++ixPixelCell) {
+          if(xFProportional[ixPixelCell] !=0) {
+            float f = (float)xProportionals[ixPixelCell] / xSumProportional2;
+            xFProportional[ixPixelCell] = f;
+          }
+        }
+      }
+      
+      //----------------------------------------------------- Columns from left with positive width
+      for(ixPixelCell = 0; ixPixelCell < xPixColumns.length && (xPixColumn = xPixColumns[ixPixelCell]) > 0; ++ixPixelCell) {
+        //--------------------------------------------------- xPixColumn = absolute minimal width
+        //if(columnWidthsPromille !=null && columnWidthsPromille.length > ixPixelCell) {
+        if(xFProportional !=null && xFProportional[ixPixelCell] >0) {
+          //int xPixColRel = (xProportionals[ixPixelCell] * xPixTable + (xSumProportional>>1))/ xSumProportional;
+          int xPixColRel = (int)(xFProportional[ixPixelCell] * xPixTable2);
+//          if(xPixColRel > xPixColumn) {                    // xPixColRel is the relative column width in pixel
+            xPixColumn = xPixColRel;                       // use the greater value, for width, relative promille or min. 
+//          }
+        }
+        xPixPos += xPixColumn;
+        xpixelCell[ixPixelCell+1] = xPixPos;
       }
       nrofColumnTreeShift = ixPixelCell +1;
       System.out.println("GralTable - resizeTable; nrofColumnTreeShift =" + nrofColumnTreeShift);
-      xPixel1 = pixTable.dx - xPixelUnit;
-      xpixelCell[columnWidthsGral().length] = xPixel1;  //right position.
-      for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPos = columnWidthsGral()[ixPixelCell]) < 0; --ixPixelCell){
-        xPixel1 += xPos * xPixelUnit;
-        xpixelCell[ixPixelCell] = xPixel1;
+      xPixPos = xPixTable;
+      xpixelCell[columnWidthsGral().length] = xPixTable;  //right position.
+      //----------------------------------------------------- Columns from right with negative width
+      for(ixPixelCell = columnWidthsGral().length-1; ixPixelCell >=0  && (xPixColumn = - xPixColumns[ixPixelCell]) > 0; --ixPixelCell){
+      //--------------------------------------------------- xPixColumn = absolute minimal width
+        //if(columnWidthsPromille !=null && columnWidthsPromille.length > ixPixelCell) {
+        if(xFProportional !=null && xFProportional[ixPixelCell] >0) {
+          //int xPixColRel = (xProportionals[ixPixelCell] * xPixTable + (xSumProportional>>1))/ xSumProportional;
+          int xPixColRel = (int)(xFProportional[ixPixelCell] * xPixTable2);
+//          if(xPixColRel > xPixColumn) {                    // xPixColRel is the relative column width in pixel
+            xPixColumn = xPixColRel;                       // use the greater value, for width, relative promille or min. 
+//          }
+        }
+        xPixPos -= xPixColumn;
+        xpixelCell[ixPixelCell] = xPixPos;
       }
       setBoundsCells(0, outer.zLineVisible);
-
     }
     
     
@@ -1950,10 +2137,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //Any cell has got the focus, it means the table has gotten the focus.
         bFocused = true; 
         if(!bRedrawPending){
-          itsMng.gralFocusListener.focusGainedGral(GralTable.this);
+          gralMng.gralFocusListener.focusGainedGral(GralTable.this);
           //super.focusGained();
           //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
-          repaint(50,100);
+          redraw(50,100);       //to show all table cells with the focused background color.
         }
       }
     }
@@ -1966,7 +2153,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      */
     protected void focusLostTable(){ 
       bFocusLost = true;
-      repaint(50,100);  //NOTE: bFocusLost =false will be set in repaint.
+      redraw(50,100);  //NOTE: bFocusLost =false will be set in repaint.
     }
     
 
@@ -2031,12 +2218,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**Number of lines for this line and all visible children.
      * 
      */
-    int zLineUnfolded;
+    int tbl_zLineUnfolded;
     
     /**The deepness in the tree presentation of the data.
      * 
      */
-    int treeDepth;
+    int tbl_treeDepth;
 
     /**Lines of a children, a tree structure. null for a non-treed table.
      * null it the children are unknown or there are not children.
@@ -2046,17 +2233,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     //protected TableLineData parentLine;
     
     /**True if it is known that the node has children. They may be unknown, then {@link #childLines} are null. */
-    boolean lineCanHaveChildren;
+    boolean tbl_lineCanHaveChildren;
 
     /**True if the children are shown in representation. */
-    boolean showChildren;
+    boolean tbl_showChildren;
 
     NodeTableLine(String key, UserData data){ super(key, data); }
     
     
     void clear() {
       rootLine.removeChildren();
-      rootLine.zLineUnfolded = 0;
+      rootLine.tbl_zLineUnfolded = 0;
     }
     
     
@@ -2069,10 +2256,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return the added line.
      */
     public TableLineData addChildLine(String lineKey, String[] lineTexts, UserData userDataP){
-      lineCanHaveChildren = true; //hasChildren();
+      tbl_lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addNode(line);
-      line.treeDepth = this.treeDepth +1;
+      line.tbl_treeDepth = this.tbl_treeDepth +1;
       line.prepareAddedLine(lineTexts);
       return line;
 
@@ -2086,7 +2273,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return the added line.
      */
     public TableLineData addPrevLine(String lineKey, String[] lineTexts, UserData userDataP){
-      lineCanHaveChildren = true; //hasChildren();
+      tbl_lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addSiblingPrev(line);  
       line.prepareAddedLine(lineTexts);
@@ -2103,7 +2290,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @return the added line.
      */
     public TableLineData addNextLine(String lineKey, String[] lineTexts, UserData userDataP){
-      lineCanHaveChildren = true; //hasChildren();
+      tbl_lineCanHaveChildren = true; //hasChildren();
       TableLineData line = GralTable.this.new TableLineData(lineKey, userDataP);
       super.addSiblingNext(line);
       line.prepareAddedLine(lineTexts);
@@ -2129,7 +2316,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         nLineFirst = -1;  //get new, undefined elsewhere.
       }
       line1.detach();
-      repaint();
+      redraw();
     }
     
     
@@ -2137,23 +2324,23 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     void countChildren(boolean bLeftGrandChildrenOpen, int nrParent){
       countChildren(bLeftGrandChildrenOpen, nrParent, 0);
-      adjCountChildrenInParent(this.zLineUnfolded);
+      adjCountChildrenInParent(this.tbl_zLineUnfolded);
     }
     
     
     /**Counts the children and checks whether their childs should be shown.
-     * It checks and sets {@link TableLineData#showChildren}
+     * It checks and sets {@link TableLineData#tbl_showChildren}
      * @param lineParent
-     * @param bLeftGrandChildrenOpen false then set {@link TableLineData#showChildren} = false, true: count the grand children.  
+     * @param bLeftGrandChildrenOpen false then set {@link TableLineData#tbl_showChildren} = false, true: count the grand children.  
      * @param recurs more than 100 - prevent it.
      */
     void countChildren(boolean bLeftGrandChildrenOpen, int nrParent, int recurs){
       if(recurs >100) return;
-      this.zLineUnfolded = 0;
+      this.tbl_zLineUnfolded = 0;
       int ctParent = nrParent;
       TableLineData child = this.firstChild();
       while(child !=null) {
-        this.zLineUnfolded +=1;
+        this.tbl_zLineUnfolded +=1;
         ctParent +=1;
         if(zLineCurr >=0){ 
           zLineCurr +=1; 
@@ -2161,12 +2348,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             nLineFirst = ctParent;
           }
         }
-        if(child.showChildren && bLeftGrandChildrenOpen) {
+        if(child.tbl_showChildren && bLeftGrandChildrenOpen) {
           child.countChildren(true, ctParent, recurs+1);
-          this.zLineUnfolded += child.zLineUnfolded;
+          this.tbl_zLineUnfolded += child.tbl_zLineUnfolded;
         } else {
-          child.showChildren = false; //close it.
-          child.zLineUnfolded = 0;
+          child.tbl_showChildren = false; //close it.
+          child.tbl_zLineUnfolded = 0;
         }
         child = child.nextSibling();
       }
@@ -2177,11 +2364,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     void adjCountChildrenInParent(int nCorr) {
       ////
       NodeTableLine parent1 = parent();
-      boolean showChildren1 = showChildren;
+      boolean showChildren1 = tbl_showChildren;
       while(parent1 !=null   //stop on root node. 
-          && (showChildren1 &= parent1.showChildren)   //stop count zLineUnfolded on nonvisible children.
+          && (showChildren1 &= parent1.tbl_showChildren)   //stop count zLineUnfolded on nonvisible children.
         ) {
-        zLineUnfolded += nCorr;
+        tbl_zLineUnfolded += nCorr;
         parent1 = parent1.parent();   
       }
     }
@@ -2197,7 +2384,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * The graphical representation refers this class.
    * A table line contains:
    * <ul>
-   * <li>Association to user data for application usage, unused in graphic: {@link TreeNodeBase#data}
+   * <li>Association to user data for application usage, unused in graphic: {@link TreeNodeBase#nd_data}
    * <li>Texts for all cells of the table: {@link TableLineData#cellTexts}
    * <li>background and text color for the line (all cells) {@link TableLineData#colorBackground}, {@link TableLineData#colorForeground}
    * <li>Maybe background colors for all or some cells, null if the cell have the line back color
@@ -2276,19 +2463,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       adjCountChildrenInParent(1);
       zLine += 1;
       GralTable.this.bPrepareVisibleArea = true;
-      boolean showChildren1 = this.showChildren; 
-      if(zLineUnfolded == -1){ 
-        zLineUnfolded = 0;
+      boolean showChildren1 = this.tbl_showChildren; 
+      if(tbl_zLineUnfolded == -1){ 
+        tbl_zLineUnfolded = 0;
       }
-      if(showChildren) {
-        zLineUnfolded +=1;
+      if(tbl_showChildren) {
+        tbl_zLineUnfolded +=1;
         adjCountChildrenInParent(1);
       }
       if(this == linesForCell[0]) {
-        nLineFirst = rootLine.zLineUnfolded;  //store the number of current line if given.
+        nLineFirst = rootLine.tbl_zLineUnfolded;  //store the number of current line if given.
       }
       if(showChildren1) {
-        repaint();
+        redraw();
       }
     }
     
@@ -2362,7 +2549,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public String[] getCellTexts() { return cellTexts; }
 
     
-    public int treeDepth(){ return treeDepth; }
+    public int treeDepth(){ return tbl_treeDepth; }
     
     @Override
     public String setCellText(String text, int column) {
@@ -2370,7 +2557,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(oldText ==null || !oldText.equals(text)) {
         cellTexts[column] = text;
         bChangedSet[column] = true;
-        GralTable.this.repaint();
+        GralTable.this.redraw();
       }
       return oldText;
     }
@@ -2378,7 +2565,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     
     
-    @Override public UserData getUserData() { return data;  }
+    @Override public UserData getUserData() { return nd_data;  }
 
     //@Override public void setUserData(UserData data) {this.userData = data; }
 
@@ -2395,7 +2582,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     { return false;  //TODO line visible. 
     }
 
+    @Override public void setVisibleStateWidget(boolean bVisible) { GralTable.this.setVisibleStateWidget(bVisible); }
     
+    @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) { } // unreleavant
+    
+    @Override public GralWidgetBase_ifc getFocusedWidget() { return null; }
+
     
     @Override public void setFocus() { GralTable.this.setFocus(); }
 
@@ -2409,14 +2601,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override @Deprecated public GralColor setBackgroundColor(GralColor color) {
       GralColor ret = colorBackground;
       colorBackground = color;
-      repaint(50, 50);
+      redraw(50, 50);
       return ret;
     }
 
     @Override @Deprecated public GralColor setForegroundColor(GralColor color) {
       GralColor ret = colorForeground;
       colorForeground = color;
-      repaint(50, 50);
+      redraw(50, 50);
       return ret;
     }
 
@@ -2435,7 +2627,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         if(cellColorBack == null){ cellColorBack = new GralColor[cellTexts.length]; }
         cellColorBack[ix] = color;
       }
-      repaint();
+      redraw();
+    }
+    
+    
+    public void cleanSpecialColorsOfLine ( ) {
+      if(this.cellColorBack !=null) {
+        this.cellColorBack = null;
+      }
     }
     
     @Override public GralColor getBackColor(int ix)
@@ -2477,19 +2676,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         this.colorBackSelectSomeMarked = colorSomeMarked;
         this.colorBackSelectMarked = colorSelectMarked;
       }
-      repaint();
+      redraw();
     }
     
     @Override public void setLineColor(GralColor color, int ix)
     { 
       colorForeground = color;
-      repaint(50, 50);
+      redraw(50, 50);
     }
 
     @Override public void setTextColor(GralColor color)
     { 
       colorForeground = color;
-      repaint(50, 50);
+      redraw(50, 50);
     }
 
     @Override public void setText(CharSequence text){
@@ -2499,18 +2698,18 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     @Override public void showChildren(boolean show, boolean bLeftGrandChildrenOpen) {
       if(show) {
-        if(bLeftGrandChildrenOpen && showChildren) return;  //do nothing because no change
+        if(bLeftGrandChildrenOpen && tbl_showChildren) return;  //do nothing because no change
         else {
-          if(showChildren) {  //it is shown already
+          if(tbl_showChildren) {  //it is shown already
           }
-          showChildren = true;
+          tbl_showChildren = true;
           //children are closed yet, open and count it.
           countChildren(bLeftGrandChildrenOpen, nLineFirst);
         }
       } else { //switch off children
-        if(showChildren) {
-          adjCountChildrenInParent(-zLineUnfolded);  //firstly subtract because children are open
-          showChildren = false;
+        if(tbl_showChildren) {
+          adjCountChildrenInParent(-tbl_zLineUnfolded);  //firstly subtract because children are open
+          tbl_showChildren = false;
         }
         //else: don't change anything.
       }
@@ -2523,19 +2722,19 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       showChildren(show, bLeftGrandChildrenOpen);
       countChildren(bLeftGrandChildrenOpen, nLineFirst);  //count the children.
       fillVisibleAreaBehind(this, lineSelectedixCell);
-      repaint();
+      redraw();
     }      
     
     
     @Override
-    public void repaint() {
+    public void redraw() {
       ctRepaintLine.addAndGet(1);
-      GralTable.this.repaint(); 
+      GralTable.this.redraw(); 
     }
 
-    @Override public void repaint(int delay, int latest){
+    @Override public void redraw(int delay, int latest){
       ctRepaintLine.addAndGet(1);
-      GralTable.this.repaint(delay, latest); 
+      GralTable.this.redraw(delay, latest); 
       //itsMng.setInfoDelayed(this, GralPanelMngWorking_ifc.cmdRedraw, 0, null, null, delay);
     }
     
@@ -2585,13 +2784,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public void setHtmlHelp(String url) { GralTable.this.setHtmlHelp(url); }
     
     
-    @Override public Object getContentInfo(){ return data; }
+    @Override public Object getContentInfo(){ return nd_data; }
 
     
     
     @Override public int getMark(){
-      if(data instanceof MarkMask_ifc){
-        return ((MarkMask_ifc)data).getMark();
+      if(nd_data instanceof MarkMask_ifc){
+        return ((MarkMask_ifc)nd_data).getMark();
       } else if(markMask == null){
         return 0;
       } else {
@@ -2639,13 +2838,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
     @Override public GralMng gralMng(){ return GralTable.this.gralMng(); }
     
-    @Override public void setToPanel(GralMngBuild_ifc mng){
-      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
-    }
-
-    @Override public void createImplWidget_Gthread(){
-      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
-    }
+ 
+//    @Override public void createImplWidget_Gthread(){
+//      throw new IllegalArgumentException("GralTableLine.setToPanel - is illegal; Use GralTable.setToPanel(...)");
+//    }
 
     @Override public String toString(){ 
       StringBuilder u = new StringBuilder();
@@ -2664,7 +2860,28 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
     @Override public UserData getData()
-    { return data;
+    { return nd_data;
+    }
+
+
+
+
+    @Override public ImplAccess getImplAccess () { return GralTable.this.getImplAccess(); }
+
+
+
+
+    @Override public GralPos pos () {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+
+
+
+    @Override public Object getImplWidget () {
+      // TODO Auto-generated method stub
+      return null;
     }
   }
   

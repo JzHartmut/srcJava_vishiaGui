@@ -64,7 +64,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   public static final int version = 20130524;
 
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   
@@ -83,20 +83,20 @@ public class SwtButton extends GralButton.GraphicImplAccess
   //public SwtButton(String sName, SwtMng mng, Composite parent, int styleSwt, char size)
   SwtButton(GralButton widgg, SwtMng mng)
   {
-    widgg.super(widgg, mng.mng);
+    widgg.super(widgg, mng.gralMng);
     widgg.setActionMouse(mouseWidgetAction, 0);
     mouseListener = new SwtGralMouseListener.MouseListenerGralAction();
     //Control xx = mng.pos.panel.panelComposite;
     black = mng.propertiesGuiSwt.colorSwt(0x202020);
     white = mng.propertiesGuiSwt.colorSwt(0xffffff);
-    Composite panelSwt = mng.getCurrentPanel();
+    Composite panelSwt = mng.getWidgetsPanel(widgg);
     int styleSwt = 0;
     widgetSwt = new SwtButtonImpl(panelSwt, styleSwt);
     widgetSwt.setData(this);
     widgetSwt.setBackground(mng.propertiesGuiSwt.colorBackground);
     widgetSwt.addMouseListener(mouseListener);
     widgetSwt.addFocusListener(mng.focusListener);  //common focus listener 
-    widgetSwt.addKeyListener(new KeyListener(mng.mng._impl.gralKeyListener));
+    widgetSwt.addKeyListener(new KeyListener(mng.gralMng._implListener.gralKeyListener));
     widgetSwt.addTraverseListener(SwtMng.swtTraverseListener);
     setBoundsGraphic(widgg.pos(), mng);
     float ySize = widgg.pos().height();
@@ -145,14 +145,14 @@ public class SwtButton extends GralButton.GraphicImplAccess
 
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   @Override public void setVisibleGThread(boolean bVisible) { 
     super.setVisibleState(bVisible); 
     swtWidgHelper.setVisibleGThread(bVisible);
   }
   
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     super.prepareWidget();
     GralWidget.DynamicData dyda = dyda();
     int chg = dyda.getChanged();

@@ -1,11 +1,17 @@
 package org.vishia.gral.swt;
 
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralLabel;
 
@@ -45,21 +51,24 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
   public static final int version = 20120317;
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWidgHelper;
   
-  protected Label labelSwt;
+  protected SwtTransparentLabel labelSwt;
 
   private Font fontSwt;
   
-  SwtLabel(GralLabel widgg, SwtMng mng)
+  SwtLabel(GralLabel widgg, SwtMng swtMng)
   {
-    widgg.super(widgg, mng.mng);
-    Composite panelSwt = mng.getCurrentPanel();
+    widgg.super(widgg, swtMng.gralMng);                           // calls the super ctor of this but with the instance of the environment class.
+    GralPos pos = widgg.pos();
+    GralWidget.ImplAccess parentImpl = pos.parent.getImplAccess();
+    Composite panelSwt = SwtMng.getSwtParent(pos);
+    //assert(parentImpl.tabFolder ==null);
     int styleSwt = 0;
-    labelSwt = new Label(panelSwt, styleSwt);
-    super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(labelSwt, mng);
+    this.labelSwt = new SwtTransparentLabel(panelSwt, styleSwt);
+    super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(this.labelSwt, swtMng);
     int mode;
     switch(origin()){
     case 1: mode = SWT.LEFT; break;
@@ -73,10 +82,23 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     case 9: mode = SWT.RIGHT; break;
     default: mode = 0;
     }
-    labelSwt.setAlignment(mode);
-    mng.setBounds_(widgg.pos(), labelSwt);
-    mng.mng.registerWidget(widgg);
-    repaintGthread();  //to set text etc.
+    this.labelSwt.setAlignment(mode);
+    //swtMng.setPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
+    GralRectangle rectangle = swtMng.calcWidgetPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
+    this.labelSwt.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
+    Color color = swtMng.getColorImpl(super.dyda().textColor);
+    this.labelSwt.setForeground(color);
+    float height = this.widgg.pos().height();
+    GralFont gralFont = swtMng.gralMng.gralProps.getTextFont(height);
+    Font swtFont = swtMng.propertiesGuiSwt.fontSwt(gralFont);
+    this.labelSwt.setFont(swtFont);
+    FontData[] fontData = swtFont.getFontData();
+    float fontHeigth = fontData[0].height;
+    System.out.println(super.dyda().displayedText + " dy=" + rectangle.dy + " height=" + height + " fontHeight = " + fontHeigth);
+    //widgg.setText(widgg.getText() + " dy=" + rectangle.dy + " height=" + height);
+    //on SWT it invokes the resize listener if given.
+    //swtMng.gralMng.registerWidget(widgg);
+    redrawGthread();  //to set text etc.
   }
 
 
@@ -95,7 +117,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 
 
   @Override
-  public void repaintGthread()
+  public void redrawGthread()
   {
     if(labelSwt !=null){ //do nothing if the graphic implementation widget is removed.
       GralWidget.DynamicData dyda = dyda();

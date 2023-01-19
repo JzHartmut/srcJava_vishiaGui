@@ -106,7 +106,7 @@ public class GralCfgDesigner
   {
     assert(dialogWindowProps == null); //check call only one time.
     mng.selectPanel("primaryWindow");
-    mng.setPosition(-38, GralPos.size +38, -40, GralPos.size +40, 1, 'r');
+    mng.setPosition(-38, GralPos.size +38, -40, GralPos.size +40, 'r');
     dialogWindowProps = mng.createWindow("widgetEdit", "Widget Properties", GralWindow.windConcurrently);
     
     mng.setPositionSize(1, 0, 3, 34, 'd');
@@ -158,8 +158,8 @@ public class GralCfgDesigner
       int dxPixel = xy.x - xMouse0;
       int dyPixel = xy.y - yMouse0;
       
-      float dxGridf = (float)dxPixel / mng.propertiesGui.xPixelUnit();
-      float dyGridf = (float)dyPixel / mng.propertiesGui.yPixelUnit();
+      float dxGridf = (float)dxPixel / mng.gralProps.xPixelUnit();
+      float dyGridf = (float)dyPixel / mng.gralProps.yPixelUnit();
       
       int dxGrid = (int)(dxGridf >0 ? dxGridf + 0.5f : dxGridf - 0.5f);
       int dyGrid = (int)(dyGridf >0 ? dyGridf + 0.5f : dyGridf - 0.5f);
@@ -167,8 +167,8 @@ public class GralCfgDesigner
       GralCfgElement cfge = (GralCfgElement)widgd.getCfgElement();
       if(cfge !=null){
         String sPanel = cfge.getPanel();  //Note: The cloned Object maybe empty here before buildWidget() is called
-        int xPosAct = cfge.get_xPos();
-        int yPosAct = cfge.get_yPos();
+        int xPosAct = cfge.XXXget_xPos();
+        int yPosAct = cfge.XXXget_yPos();
         if(bCopy){
           GralCfgElement cfgn = cfge.clone(); //cfgBuilder.newCfgElement(cfge);
           cfge = cfgn;
@@ -176,8 +176,8 @@ public class GralCfgDesigner
         if(cfge.positionString !=null) {
           
         } else {
-          cfge.positionInput.xPos = xPosAct + dxGrid; 
-          cfge.positionInput.yPos = yPosAct + dyGrid; 
+          cfge.XXXpositionInput.xPos = xPosAct + dxGrid; 
+          cfge.XXXpositionInput.yPos = yPosAct + dyGrid; 
         }
         if(!bCopy){
           widgd.remove();
@@ -214,10 +214,10 @@ public class GralCfgDesigner
         sPrompt = cfge.widgetType.prompt;
         sPromptPos = cfge.widgetType.promptPosition;
         
-        sLine = (cfge.positionInput.yPosRelative ? "&" : "") + cfge.positionInput.yPos + (cfge.positionInput.yPosFrac !=0 ? "." + cfge.positionInput.yPosFrac : "");
-        sColumn = (cfge.positionInput.xPosRelative ? "&" : "") + cfge.positionInput.xPos + (cfge.positionInput.xPosFrac !=0 ? "." + cfge.positionInput.xPosFrac : "");
-        sHeight = "" + cfge.positionInput.ySizeDown + (cfge.positionInput.ySizeFrac !=0 ? "." + cfge.positionInput.ySizeFrac : "");
-        sWidth = "" + cfge.positionInput.xWidth + (cfge.positionInput.xSizeFrac !=0 ? "." + cfge.positionInput.xSizeFrac : "");
+        sLine = (cfge.XXXpositionInput.yPosRelative ? "&" : "") + cfge.XXXpositionInput.yPos + (cfge.XXXpositionInput.yPosFrac !=0 ? "." + cfge.XXXpositionInput.yPosFrac : "");
+        sColumn = (cfge.XXXpositionInput.xPosRelative ? "&" : "") + cfge.XXXpositionInput.xPos + (cfge.XXXpositionInput.xPosFrac !=0 ? "." + cfge.XXXpositionInput.xPosFrac : "");
+        sHeight = "" + cfge.XXXpositionInput.ySizeDown + (cfge.XXXpositionInput.ySizeFrac !=0 ? "." + cfge.XXXpositionInput.ySizeFrac : "");
+        sWidth = "" + cfge.XXXpositionInput.xWidth + (cfge.XXXpositionInput.xSizeFrac !=0 ? "." + cfge.XXXpositionInput.xSizeFrac : "");
         dialogFieldName.setText(sName ==null ? "" : sName);
         dialogFieldDatapath.setText( sDataPath == null ? "" : sDataPath);
         dialogFieldText.setText(sText ==null ? "" : sText);
@@ -236,7 +236,7 @@ public class GralCfgDesigner
         dialogFieldName.setText( "ERROR cfge");
       }
     }
-    //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 1, 'r' );
+    //dialogWindowProps.posWindow.setPosition(widgd.pos, widgd.pos.y +2, GralGridPos.size+30, widgd.pos.x, GralGridPos.size+40, 'r' );
     //dialogWindowProps.setWindowVisible(true);
     //use manager to position.
     dialogWindowProps.setFocus(); //Visible(true);
@@ -290,10 +290,10 @@ public class GralCfgDesigner
           cfge.widgetType.prompt = sPrompt.trim().length() >0 ? sPrompt : null;
           cfge.widgetType.promptPosition = sPromptPos.trim().length() >0 ? sPromptPos : null;
           boolean bOk;
-          bOk = cfge.positionInput.setPosElement('y', sLine.trim());          
-          bOk = bOk && cfge.positionInput.setPosElement('x', sColumn.trim());          
-          bOk = bOk && cfge.positionInput.setPosElement('h', sHeight.trim());          
-          bOk = bOk && cfge.positionInput.setPosElement('w', sWidth.trim());
+          bOk = cfge.XXXpositionInput.setPosElement('y', sLine.trim());          
+          bOk = bOk && cfge.XXXpositionInput.setPosElement('x', sColumn.trim());          
+          bOk = bOk && cfge.XXXpositionInput.setPosElement('h', sHeight.trim());          
+          bOk = bOk && cfge.XXXpositionInput.setPosElement('w', sWidth.trim());
           if(!bOk)
             stop();
           mng.remove(widgdInDialog);  //remove the widget.

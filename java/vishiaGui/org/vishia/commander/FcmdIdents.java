@@ -19,15 +19,17 @@ public class FcmdIdents extends FcmdIdentsBase
 {
   List<GralButtonKeyMenu> entries = new LinkedList<GralButtonKeyMenu>();
   
-  final GralButtonKeyMenu readMsg = new GralButtonKeyMenu(main.actionReadMsgConfig, "&Help/read &MsgCfg", null, null, null, 0, 0, entries);  ////
-  final GralButtonKeyMenu deselectRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionDeselectDirtree, "fol&Der/&Deselect dirtree  [ctrl-d]", "&Deselect dirtree [ctrl-d]", null, null, KeyCode.ctrl + 'd', KeyCode.ctrl + 'D', entries);
-  final GralButtonKeyMenu cleanFileRemoteRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionCleanFileRemote, "fol&Der/&Clean dirtree", null, null, null, 0, 0, entries);
+  GralButtonKeyMenu readMsg;
+
+  GralButtonKeyMenu deselectRecursFiles;
+  GralButtonKeyMenu cleanFileRemoteRecursFiles;
+
   
-  final GralButtonKeyMenu openConfirmDelete = new GralButtonKeyMenu(main.delCmd.actionConfirmCopy, "&File/&Delete [sh-F8]", "&Delete", null, null, KeyCode.shift + KeyCode.F8, 0, entries);
+  GralButtonKeyMenu openConfirmDelete;
   
-  final GralButtonKeyMenu openConfirmCompare = new GralButtonKeyMenu(main.compareCmd.actionConfirmCopy, "&File/&Compare [sh-F7]", "&Compare", null, null, KeyCode.shift + KeyCode.F7, 0, entries);
+  GralButtonKeyMenu openConfirmCompare;
   
-  final GralButtonKeyMenu openSearch = new GralButtonKeyMenu(main.searchCmd.actionConfirmCopy, "&File/&Compare [alt-F7]", "&Search", null, null, KeyCode.alt + KeyCode.F7, 0, entries);
+  GralButtonKeyMenu openSearch;
   
   String menuBarSettings = "&Help/&Settings [cP]";
   String menuContextSettings = "Settings [cP]";
@@ -396,6 +398,19 @@ public class FcmdIdents extends FcmdIdentsBase
   FcmdIdents(Fcmd main){
     super(main);  //firstly the superclass ctor is called.
     //after them all statements in the class body, main is known.
+  }
+  
+  public void buildDependings ( ) {
+    this.readMsg = new GralButtonKeyMenu(this.main.fcmdActions.actionReadMsgConfig, "&Help/read &MsgCfg", null, null, null, 0, 0, entries);  ////
+
+    this.deselectRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionDeselectDirtree, "fol&Der/&Deselect dirtree  [ctrl-d]", "&Deselect dirtree [ctrl-d]", null, null, KeyCode.ctrl + 'd', KeyCode.ctrl + 'D', entries);
+    this.cleanFileRemoteRecursFiles = new GralButtonKeyMenu(main.favorPathSelector.actionCleanFileRemote, "fol&Der/&Clean dirtree", null, null, null, 0, 0, entries);
+    
+    this.openConfirmDelete = new GralButtonKeyMenu(main.delCmd.actionConfirmCopy, "&File/&Delete [sh-F8]", "&Delete", null, null, KeyCode.shift + KeyCode.F8, 0, entries);
+    
+    this.openConfirmCompare = new GralButtonKeyMenu(main.compareCmd.actionConfirmCopy, "&File/&Compare [sh-F7]", "&Compare", null, null, KeyCode.shift + KeyCode.F7, 0, entries);
+    
+    this.openSearch = new GralButtonKeyMenu(main.searchCmd.actionConfirmCopy, "&File/&Compare [alt-F7]", "&Search", null, null, KeyCode.alt + KeyCode.F7, 0, entries);
     GralFileSelector.contextMenuTexts.deselectRecursFiles = deselectRecursFiles.menuContext;
     
     GralFileSelector.contextMenuTexts.sortNameCase = menuContextFileSortNameCase;
@@ -406,9 +421,8 @@ public class FcmdIdents extends FcmdIdentsBase
     GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
     GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
     GralFileSelector.contextMenuTexts.sizeLarge = menuContextFileSortSizeLarge;
+    
   }
-  
-  
   
 }
 

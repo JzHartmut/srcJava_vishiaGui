@@ -63,11 +63,12 @@ public interface GralCurveView_ifc extends GralWidget_ifc, GralSetValue_ifc, Get
    * if the data are given faster than the users view eye.
    * 
    * @param values The values.
-   * @param timeshort relative time-stamp as currently wrapping time in milliseconds.
+   * @param timeShort relative time-stamp as currently wrapping time in any user step width, for example milliseconds.
+   * @param timeShortAdd additional value for timeShort to refer to an absolute time stamp.
    * 
    * @see #setTimePoint(long, int, float)
    */
-  void setSample(float[] values, int timeshort);
+  void setSample(float[] values, int timeShort, int timeShortAdd);
 
   
   

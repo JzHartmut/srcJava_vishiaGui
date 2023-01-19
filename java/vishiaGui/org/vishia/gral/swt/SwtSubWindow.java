@@ -1,5 +1,6 @@
 package org.vishia.gral.swt;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -10,6 +11,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.ShellEvent;
@@ -17,6 +20,7 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -24,27 +28,58 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralWindow_setifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 //public class SubWindowSwt extends GralPanelContent implements WidgetCmpnifc
 //public class SwtSubWindow extends GralWindow implements SwtSetValue_ifc
-public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWidgImpl_ifc
+/**The SwtSubWindow is the wrapper arroung a {@link Shell} to implement a {@link GralWindow}.
+ * The following inheritance structure is given (hint: only readable in Javadoc, not in src, because of length of link controls
+ * <pre>
+ * {@link SwtSubWindow}&lt;>-->{@link SwtPanel}&lt;>-->{@link GralPanelContent.ImplAccess}&lt;>-->{@link GralWidget.ImplAccess}
+ *                   |                                    |
+ *                   +&lt;*>-->{@link SwtPanel#swtGralWindow}        +&lt;*>---------------------------------------+
+ *                            |                                                                      ,
+ *                            +&lt;*>-->{@link GralWindow.WindowImplAccess#gralWindow} : {@link GralWindow}&lt;>-->{@link GralPanelContent}&lt;>-->{@link GralWidget}
+ *                                     ^
+ *   {@link SwtWindowImplAccess}&lt;>-------------+
+ *   
+ * SwtSubWindow<>--->SwtPanel<>--->GralPanelContent.ImplAccess<>---->GralWidget.ImplAccess
+ *  |                 |                              |                               +-widgg-->GralWindow<>-->GralWidget
+ *  |                 |                              +-widgg : GralPanelContent      +-wdgimpl-->GralWidgetImpl_ifc<>-+
+ *  |                 +-panelComposite--->
+ *  |                 +-tabFolder : TabFolder
+ *  |                 +-itsTabSwt : TabItem
+ *  |
+ *  +-swtWidgWrapper--------------->SwtWidgetHelper<------------------------------------------------------------------
+ *  +-window-->swt.Shell<>-->Control<--widgetSwt-+ 
+ *  +-swtPanel--->SwtPanel
+ *  +-menuBar--->SwtMenu
+ * </pre>
+ * To access the {@link GralWindow.WindowImplAccess#gralWindow} you should use the aggregation {@link SwtPanel#swtGralWindow}
+ * from the SwtPanel super class.
+ * @author Hartmut Schorrig
+ *
+ */
+public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWidgImplAccess_ifc
 {
 
   
   /**Version, history and license:
    * <ul>
    * <li>2016-08-31 Hartmut chg: Now disposes the window in {@link #shellListener} 
-   * <li>2015-05-31 Hartmut {@link #setFocusGThread()} now regards the {@link GralPanelContent#setPrimaryWidget(GralWidget)}.
+   * <li>2015-05-31 Hartmut {@link #setFocusGThread()} now regards the {@link GralPanelContent#setFocusedWidget(GralWidget)}.
    * <li>2015-04-27 Hartmut new {@link #windRemoveOnClose}
    * <li>2012-07-13 Hartmut new:  {@link #getPixelSize()}, chg: {@link #getPixelPositionSize()} in all implementations. 
    *   A swt.widget.Shell now returns the absolute position and the real size of its client area without menu and title bar.
@@ -103,10 +138,11 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   public static final String sVersion = "2016-08-31";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   SwtWidgetHelper swtWidgWrapper;
-
+  
+  
   protected Shell window;
   
   
@@ -118,19 +154,7 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   /**Some flags to set an action listener a first time if the action is given. */
   private boolean bHasResizeAction, bHasMouseAction;
   
-  /**The resizeListener will be activated if {@link #setResizeAction(GralUserAction)} will be called.
-   * It calls this user action on resize. */
-  private final ControlListener resizeListener = new ControlListener()
-  { @Override public void controlMoved(ControlEvent e) 
-    { //do nothing if moved.
-    }
-
-    @Override public void controlResized(ControlEvent e) 
-    { if(resizeAction() !=null){
-        resizeAction().exec(0, SwtSubWindow.super.gralWindow);
-      }
-    }
-  };
+  
   
 
   
@@ -145,13 +169,14 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
    * @param title
    * @param windProps
    * @param gralMng
+   * @throws IOException 
    */
-  SwtSubWindow(SwtMng mng, GralWindow wdgGral)
+  SwtSubWindow(SwtMng mng, GralWindow gralWindow) //throws IOException
   //SwtSubWindow(String name, Display display, String title, int windProps, GralMng gralMng)
   { //super(name, windProps, gralMng, null);
-    super(wdgGral);  //Invoke constructor of the super class, with knowledge of its outer class.
+    super(gralWindow );  //Invoke constructor of the super class, with knowledge of its outer class.
     int props = 0; ////|SWT.CLOSE;
-    String sTitle = super.getTitle();
+    String sTitle = this.getTitle();
     int windProps = super.getWindowProps();
     if(sTitle !=null){ 
       props |= SWT.TITLE | SWT.BORDER | SWT.CLOSE | SWT.MIN | SWT.MAX; 
@@ -170,13 +195,14 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     //
     //create the window:
     window = new Shell(mng.displaySwt, props);
-    window.setData(wdgGral);
     super.wdgimpl = this.swtWidgWrapper = new SwtWidgetHelper(window, mng);
-    GralRectangle rect = mng.calcPositionOfWindow(wdgGral.pos());
+    GralRectangle rect = mng.calcPositionOfWindow(gralWindow.pos());
     window.setBounds(rect.x, rect.y, rect.dx, rect.dy );
     if(rect.dx == -1)  { //TODO
       window.setMaximized(true);
     }    
+    
+    //window.addPaintListener(windowPaintListener);
     window.addShellListener(shellListener);
     if((windProps & GralWindow.windIsMain)!=0) {
       window.addDisposeListener(disposeListenerMainWindow);
@@ -185,15 +211,32 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     }
     window.addFocusListener(mng.focusListener);
     //window.add
-    if((windProps & GralWindow.windHasMenu) !=0){
-      Menu menuBarSwt = new Menu(window, SWT.BAR);
-      window.setMenuBar(menuBarSwt);
+    //if((windProps & GralWindow.windHasMenu) !=0){
+    GralMenu menu = getMenubar();
+    if(menu !=null){
+      //this.mngImpl.createContextMenu(menu);
+      SwtMenu swtMenu = new SwtMenu(gralWindow, menu, window);
+//      Menu menuBarSwt = new Menu(window, SWT.BAR);
+//      window.setMenuBar(menuBarSwt);
     }
     //super.panelComposite = window;
     if(sTitle !=null){ window.setText(sTitle); }
-    if(!bHasResizeAction && resizeAction() != null){
+    if(!bHasResizeAction && super.resizeAction() != null){
       window.addControlListener(resizeListener);  //This listener calls the resizeAction
     }
+    //this.checkCreateTabFolder(this.window, mng);
+    SwtMng.storeGralPixBounds(this, this.window);
+    this.widgg.toString(System.out);
+    this.window.setVisible(this.widgg.isVisible());        // sets the window visible due to the Gral state.
+    //super.checkCreateTabFolder(this.window, mng);
+    assert(gralWindow.mainPanel !=null);
+    //if(gralWindow.mainPanel.isTabbed()) {
+    //  gralWindow.mainPanel.createImplWidget_Gthread();  //extra panel because the Shell is only a simple Composite
+//    } else {
+//      gralWindow.mainPanel._wdgImpl = new SwtPanel(gralWindow.mainPanel, window);
+//    }
+    
+    
     /* test
     Label testLabel = new Label(window, 0);
     testLabel.setText("T");
@@ -215,7 +258,14 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   */
   
   
-  @Override public Object getWidgetImplementation(){ return window; }
+  /**The Swt widget implementation is either the Shell itself which is a Composite,
+   * or it is the TabFolder, which is created as only one Composite inside this shell composite. 
+   * Both are referenced via the abstraction class {@link SwtPanel#panelSwtImpl}.
+   */
+  @Override public Object getWidgetImplementation(){ 
+    return window;
+    //return window; 
+  }
   
   
   
@@ -234,10 +284,6 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     return swtWidgWrapper.getPixelPositionSize();
   }
 
-  @Override public GralRectangle getPixelSize(){
-    Point size = window.getSize();
-    return new GralRectangle(0,0,size.x, size.y);
-  }
 
 
   /**Returns the size of the working area without border, menu and title of the window.
@@ -251,6 +297,96 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
   
   
   
+  void stop(){}
+
+  @Override
+  public boolean setFocusGThread()
+  { 
+    //setVisibleState(true);  //has focus, 
+    this.window.setVisible(true);
+    this.window.setFocus();
+    return true;
+  }
+
+  @Override public void setVisibleGThread(boolean bVisible) { 
+    this.window.open();                                    // on primary window
+    super.setVisibleState(bVisible); 
+    this.window.setVisible(bVisible); 
+  }
+
+  @Override public void redrawGthread() {
+    int chg = getChanged();
+    int acknChg = 0;
+    if(!this.bHasResizeAction && this.resizeAction() != null){
+      this.window.addControlListener(this.resizeListener);
+    }
+    if(!this.bHasMouseAction && this.mouseAction() != null){
+      this.window.addControlListener(this.resizeListener);
+    }
+    if(super.shouldClose()){
+      this.window.close();
+    } 
+    if((chg & chgText)!=0){
+      acknChg |= chgText;   //sets the title of the window
+      this.window.setText(dyda().displayedText);;
+    }
+    if((chg & chgVisible)!=0){
+      acknChg |= chgVisible;
+      setFocusGThread();
+    }
+    if((chg & chgInvisible)!=0){
+      acknChg |= chgInvisible;
+      this.window.setVisible(false);
+    }
+    if(this.bFullScreen != super.isFullScreen()){
+      window.setFullScreen(bFullScreen = super.isFullScreen());
+    }
+    acknChanged(acknChg);
+    this.window.update();
+    this.window.redraw();
+    SwtMng.storeGralPixBounds(this, this.window);
+    //swtWindow_setifc.repaintGthread(); 
+  }
+
+  @Override
+  public void updateValuesForAction() {
+    // TODO Auto-generated method stub
+    
+  }
+
+  
+  /**Reports the tree of content of the window from view of swt {@link Composite#getChildren()}
+   * @param out 
+   * @throws IOException
+   */
+  @Override public void reportAllContentImpl ( Appendable out) throws IOException {
+    GralPanelContent mainPanel = super.gralWindow.mainPanel;
+    SwtPanel swtPanel = (SwtPanel)mainPanel.getImplAccess();
+    Composite swtComposite = swtPanel.panelSwtImpl;
+    if(swtComposite != this.window) {
+      Control[] content = this.window.getChildren();
+      if(content.length !=1 || content[0] != swtComposite ) {
+        out.append("bad Shell content ...");
+      }
+    }
+    SwtPanel.reportAllContentImpl(swtComposite, out);
+  }
+
+  
+  
+  protected PaintListener windowPaintListener = new PaintListener() {
+
+    @Override public void paintControl ( PaintEvent e ) {
+      // TODO Auto-generated method stub
+      Debugutil.stop();
+      System.out.println("SwtSubWindow-PaintListener");
+    }
+    
+  };
+  
+  
+
+
   @SuppressWarnings("synthetic-access") 
   protected ShellListener shellListener = new ShellListener(){
 
@@ -266,9 +402,9 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
      * @see org.eclipse.swt.events.ShellListener#shellClosed(org.eclipse.swt.events.ShellEvent)
      */
     @Override public void shellClosed(ShellEvent e) ////
-    { int windProps = getWindowProps();
-      if(actionOnCloseWindow() !=null){
-        actionOnCloseWindow().exec(KeyCode.menuEntered, SwtSubWindow.this.gralWindow);
+    { int windProps = SwtSubWindow.this.getWindowProps();
+      if(SwtSubWindow.this.actionOnCloseWindow() !=null){
+        SwtSubWindow.this.actionOnCloseWindow().exec(KeyCode.menuEntered, SwtSubWindow.this.gralWindow);
       }
       setVisibleState(false);
       if((windProps & GralWindow_ifc.windRemoveOnClose)!=0) {
@@ -277,7 +413,11 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
         menuBar = null;
         SwtSubWindow.this.widgg._wdgImpl = null;  //therewith garbage this class.
 
-        gralWindow.remove();  //remove the window as widget.
+        SwtSubWindow.this.gralWindow.remove();  //remove the window as widget.
+        GralWindow windg = (GralWindow)SwtSubWindow.this.widgg;
+        if( windg == windg.gralMng.getPrimaryWindow()) {
+          windg.gralMng.closeApplication();
+        }
         e.doit = true;
       } else {
         e.doit = false;
@@ -326,7 +466,9 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
     @Override
     public void widgetDisposed(DisposeEvent e)
     {
-      GralMng.closeGral();
+      GralMng gralMng = SwtSubWindow.this.swtWidgWrapper.mng.gralMng;
+      gralMng.closeImplGraphic();                          // this forces exit of the graphic thread.
+      // whats happen with the application, is programmed in the main thread. 
     }
   };
   
@@ -391,65 +533,113 @@ public class SwtSubWindow extends GralWindow.GraphicImplAccess implements GralWi
 
 
   
-  void stop(){}
-
-  @Override
-  public boolean setFocusGThread()
-  { 
-    setVisibleState(true);  //has focus, 
-    window.setVisible(true);
-    //if(gralPanel().setFocusGThread()){   //sets the focus of the primary widget.
-      //return true;  //if any element of the panel was set to focus, the window has the focus already.
-      //Especially the primaryWidget should be focused.
-    //} else {
-      //no primary window etc.
-      return window.setFocus();  
-    //}
-  }
-
-
-  @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); window.setVisible(bVisible); }
-
-
-
-  @Override public void repaintGthread() {
-    int chg = getChanged();
-    int acknChg = 0;
-    if(!bHasResizeAction && resizeAction() != null){
-      window.addControlListener(resizeListener);
+  /**The resizeListener is always associated to the Shell (Swt Window). 
+   * It checks whether the Shell has only one child, which is usual a Composite (a GralPanel).
+   * Then this Composite will be resized with the same size. 
+   * <br>
+   * The resizing of the Composite will force calling the {@link SwtPanel#resizeItemListener}
+   * which is the listener for the Composite to resize the content. See there.
+   * <br>
+   * Resizing of the Window can call a user defined resize action. 
+   * This can be defined from user level with {@link GralWindow#setResizeAction(GralUserAction)}.
+   * The user's action is optional, it is not necessary for resizing itself (changed in 2022-09).
+   * History: before 2022-09 this action does the resizing itself. 
+   */
+  private final ControlListener resizeListener = new ControlListener()
+  { @Override public void controlMoved(ControlEvent e) 
+    { //do nothing if moved.
     }
-    if(!bHasMouseAction && mouseAction() != null){
-      window.addControlListener(resizeListener);
-    }
-    if(super.shouldClose()){
-      window.close();
-    } 
-    if((chg & chgText)!=0){
-      acknChg |= chgText;   //sets the title of the window
-      window.setText(dyda().displayedText);;
-    }
-    if((chg & chgVisible)!=0){
-      acknChg |= chgVisible;
-      setFocusGThread();
-    }
-    if((chg & chgInvisible)!=0){
-      acknChg |= chgInvisible;
-      window.setVisible(false);
-    }
-    if(bFullScreen != super.isFullScreen()){
-      window.setFullScreen(bFullScreen = super.isFullScreen());
-    }
-    acknChanged(acknChg);
-    window.update();
-    window.redraw();
-    //swtWindow_setifc.repaintGthread(); 
-  }
-
-  @Override
-  public void updateValuesForAction() {
-    // TODO Auto-generated method stub
-    
-  }
   
+    @Override public void controlResized(ControlEvent e) 
+    { 
+      Shell window = SwtSubWindow.this.window;
+      Object widgg = window.getData();
+      if(widgg instanceof GralPanelContent.ImplAccess) {
+        Debugutil.stop();  //TODO same algorithm as on SwtPanel
+      } else {
+        Control[] children = window.getChildren();          //Note: on first call only after creation of Shell it has no children.
+        for(Control child: children) {
+          if(children.length==1 && child instanceof Composite) {
+//            Object widgachild = child.getData();
+//            if(widgachild instanceof GralPanelContent.ImplAccess) {
+              //GralUserAction resizeAction = ((GralPanelContent.ImplAccess)widgachild).resizeAction();
+              Debugutil.stop();
+//              Rectangle xy = window.getBounds();           // x and y is the absolute position on screen
+//              xy.x = 0;                                    // relative position inside the window is necessary.
+//              xy.y = 0;                                    // relative from left top [0,0] to given size
+              Rectangle xy = window.getClientArea();
+              child.setBounds(xy);                         // call its resize as Swt-listener.
+//            } else {
+//              Rectangle xy = window.getBounds();
+//              child.setBounds(xy);     //call its resize as Swt-listener.
+//            }
+          } else {
+            // the window may be a GralPanelContent.ImplAccess
+            // this is quest above.
+            Debugutil.stop(); //TODO
+          }
+        }
+      }
+      
+      
+      if(SwtSubWindow.this.resizeAction() !=null){
+        SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
+      }
+    }
+  };
+
+  
+  
+  
+//  private class SwtWindowImplAccess extends GralWindow.WindowImplAccess {
+//
+//    public SwtWindowImplAccess(GralWindow gralWdg) {
+//      super(gralWdg);
+//    }
+//    
+//    @Override public boolean setFocusGThread () {
+//      // TODO Auto-generated method stub
+//      return false;
+//    }
+//
+//    @Override public void setVisibleGThread (
+//        boolean bVisible ) {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public void removeWidgetImplementation () {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public void repaintGthread () {
+//      // TODO Auto-generated method stub
+//      Debugutil.stop();
+//    }
+//
+//    @Override public Object getWidgetImplementation () {
+//      // TODO Auto-generated method stub
+//      return null;
+//    }
+//
+//    @Override public void setBoundsPixel ( int x, int y,
+//        int dx, int dy ) {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public void updateValuesForAction () {
+//      // TODO Auto-generated method stub
+//      
+//    }
+//
+//    @Override public GralRectangle getPixelPositionSize () {
+//      // TODO Auto-generated method stub
+//      return null;
+//    }
+//
+// 
+//  }
 
 }

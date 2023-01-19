@@ -1,5 +1,6 @@
 package org.vishia.gral.cfg;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 
 
@@ -23,6 +25,9 @@ public final class GralCfgData
   
   /**Version and history
    * <ul>
+   * <li>2022-09-23 {@link GuiCfgWidget#set_data(String)} now sets default also the name. 
+   *   Hence Show(data=path); is sufficient for a simple show field. The path is also the name for access. 
+   * <li>2022-08 not elaborately changed, same data, toString() operations. 
    * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2013-12-02 Hartmut new conditional configuration. 
    * <li>2012-04-22 Hartmut support {@link #new_Type()}.
@@ -104,7 +109,9 @@ public final class GralCfgData
 
     public boolean editable;
     
-    /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. */
+    /**From ZBNF-parser param::=<?> ...name = <""?name> etc. values are set if it is parsed. 
+     * The name can alternatively also given in {@link GralCfgElement#name}. 
+     */
     public String name, text, cmd, userAction, mouseAction, data, showMethod, format, type, prompt, promptPosition, help;
     
     /**From ZBNF-parser param::=<?> ...dropFiles = <""?name> etc. values are set if it is parsed. */
@@ -120,7 +127,23 @@ public final class GralCfgData
       this.whatIs = whatIs;
     }
     
-    public void set_data(String val){ this.data = val; }
+    /**<code> &lt;""?text> | &lt;$-/\.:?text></code> is the non designated form of a parameter.
+     * Use it as name if the name is not given, and also as data path. 
+     * <br>
+     * Example Show(myVar) use the text as {@link {@link #data} and {@link #name}. It is the simple form. 
+     * Also set the field {@link #text}
+     * @param val
+     */
+    public void set_text(String val) {
+//      if(this.data == null) { this.data = val; }
+//      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
+      this.text = val;
+    }
+    
+    public void set_data(String val){ 
+      this.data = val;                           // the data path, usual use a variable
+      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
+    }
     
     public void set_help(String sHelp){ this.help = sHelp; }
     
@@ -164,6 +187,7 @@ public final class GralCfgData
       if(color1 ==null){ color1 = src.color1; }
     }
     
+    @Override public String toString() { return "Widget name=: " + this.name; }
     
   }//class WidgetTypeBase
   
@@ -174,11 +198,14 @@ public final class GralCfgData
   {
     public String typeName;
     public GuiCfgType(){ super(null, '*'); }
+
+    @Override public String toString() { return "Widget Type...: "; }
   }
   
   
+
   /**ZBNF: Text::= ... ;
-   * Class for instance to capture and store the Table data. */
+   */
   public final static class GuiCfgText extends GuiCfgWidget implements Cloneable
   {
     public String size = "B";
@@ -187,6 +214,7 @@ public final class GralCfgData
     public void XXXset_colorValue(int value){
       //colorName = 
     }
+    @Override public String toString() { return "Textfield: " + super.text; }
   }
   
   
@@ -199,6 +227,8 @@ public final class GralCfgData
     
     @Override
     public void set_data(String val){ this.data = val; }
+
+    @Override public String toString() { return "Led: "; }
 
   }
   
@@ -217,6 +247,8 @@ public final class GralCfgData
     public GuiCfgCoord new_coord(){ return new GuiCfgCoord(); }
     
     public void add_coord(GuiCfgCoord value){ coords.add(value); }
+
+    @Override public String toString() { return "Line: "; }
   }
   
   
@@ -239,6 +271,8 @@ public final class GralCfgData
     public GuiCfgImage(GralCfgElement itsElement){ super(itsElement, 'i'); }
   
     public void set_file(String value){ file_ = value; }
+
+    @Override public String toString() { return "Image: "; }
   }
   
   
@@ -249,6 +283,15 @@ public final class GralCfgData
   {
     
     public GuiCfgShowField(GralCfgElement itsElement){ super(itsElement, 'S'); }
+    
+    /**For Show(varx) use the text as {@link {@link #data} and #name. It is the simple form. 
+     * Also set the field {@link #text}
+     * @param val
+     */
+    @Override public void set_text(String val) {
+      if(this.data == null) { this.data = val; }
+      this.text = val;
+    }
   }
   
   
@@ -258,6 +301,9 @@ public final class GralCfgData
   {
     
     public GuiCfgInputFile(GralCfgElement itsElement){ super(itsElement, 'F'); }
+
+    @Override public String toString() { return "InputFile: "; }
+
   }
   
   
@@ -268,6 +314,8 @@ public final class GralCfgData
     final boolean bSwitch;
     public GuiCfgButton(GralCfgElement itsElement){ super(itsElement, 'B'); bSwitch = false; }
     public GuiCfgButton(GralCfgElement itsElement, boolean bSwitch){ super(itsElement, 'B'); this.bSwitch = bSwitch; }
+
+    @Override public String toString() { return "Switch-Button: "; }
   }
   
   
@@ -288,6 +336,8 @@ public final class GralCfgData
     public void set_text(String value){ super.text = value; }
     
     public List<Integer> getColumnWidths(){ return columnWidths; } 
+
+    @Override public String toString() { return "Table: "; }
   }
   
   
@@ -332,7 +382,9 @@ public final class GralCfgData
       newLine = null;
     } 
     
-    
+
+    @Override public String toString() { return "CurveView: "; }
+
   }
   
 
@@ -347,21 +399,31 @@ public final class GralCfgData
     public int colorValue = 0;
     public float offset, scale;
     public int nullLine;
+
+    @Override public String toString() { return "CurveView-Line: "; }
+
   }
   
   
   public final static class GuiCfgColor
   {
-    public String color;
+    public GralColor color;
+    
+    public void set_color(String val) { 
+      this.color = GralColor.getColor(val);   //hint: does not throw, use magenta color on error
+    }
+
+    @Override public String toString() { return "Color: " + this.color.toString(); }
+
   }
   
   
   final List<String> cfgConditions;
   
   
-  GralCfgElement firstElement = null;
+//  GralCfgElement firstElement = null;
   
-  private GralCfgElement actualElement = null;
+//  private GralCfgElement actualElement = null;
   
   private Conditional actualConditional;
   
@@ -385,10 +447,24 @@ public final class GralCfgData
    */
   final List<GralCfgElement> listElementsInTextfileOrder = new ArrayList<GralCfgElement>();
   
-  GralCfgPanel actPanel;
+  //GralCfgPanel actPanel;
   
-  /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
+  /**The current window where 
+   * 
+   */
+  GralCfgWindow currWindow;
+  
+  /**The current panel where a widget is associated to, with or without panel definition.
+   * A panel definition determines this currPanel with the new current one.
+   */
+  GralCfgPanel currPanel;
+  
+  /**Map of panels. Filled via {@link #add_Element(GralCfgElement)}  */
   private final Map<String, GralCfgPanel> idxPanels = new TreeMap<String,GralCfgPanel>();
+
+  
+  /**Map of panels. Filled via {@link #add_Element(GralCfgElement)}  */
+  private final Map<String, GralCfgElement> idxWindow = new TreeMap<String,GralCfgElement>();
 
   
   public GralCfgData(List<String> conditions)
@@ -397,7 +473,9 @@ public final class GralCfgData
   }
   
   
-  public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return idxPanels.entrySet(); } 
+  public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return this.idxPanels.entrySet(); } 
+  
+  public Set<Map.Entry<String, GralCfgElement>> getWindows(){return this.idxWindow.entrySet(); } 
   
   /**ZBNF: size( <#?ySize> , <#?xSize> ) */
   public void set_ySize(int value)
@@ -461,62 +539,115 @@ public final class GralCfgData
 
   
 
-  public GralCfgPanel new_Window()
-  { GralCfgPanel panel = new GralCfgPanel();
-    panel.widgetType = new GuiCfgWidget(panel, 'w');
-    return panel;
-  }
-
-  public void add_Window(GralCfgPanel panel)
-  {
-    idxPanels.put(panel.name, panel); 
-    listElementsInTextfileOrder.add(panel);  //list of elements in text file
-    
-  }
-
-  
-  /**ZBNF: DataReplace: < ?Element >[ | | ] */
+   
+  /**ZBNF: filled on "GuiDialogZbnfControlled::= ... <Element>"
+   * or also on "Conditional::=  ... <Element>"
+   * It is the second level of syntax or the third one if Conditional. */
   public GralCfgElement new_Element()
   { 
     if(newGuiElement == null){ newGuiElement = new GralCfgElement(); }
     //
     if(actualConditional ==null || actualConditional.condition){
-      if(firstElement ==null){
-        firstElement = newGuiElement;
-      }
-      //GralCfgElement actual1 = actualConditional == null ? actualElement : actualConditional.actualElement;
-      if(actualElement !=null){
-        actualElement.next = newGuiElement;
-      }
-      newGuiElement.previous = actualElement;  //may be null
-      actualElement = newGuiElement;
+//      if(firstElement ==null){
+//        firstElement = newGuiElement;
+//      }
+//      //GralCfgElement actual1 = actualConditional == null ? actualElement : actualConditional.actualElement;
+//      if(actualElement !=null){
+//        actualElement.next = newGuiElement;
+//      }
+//      newGuiElement.previous = actualElement;  //may be null
+//      actualElement = newGuiElement;
     }
     return newGuiElement; 
   }  
 
   
-  /**From ZBNF: DataReplace: < DataReplace> */
+  /**ZBNF: filled on "GuiDialogZbnfControlled::= ... <Element>"
+   * or also on "Conditional::=  ... <Element>"
+   * It is the second level of syntax or the third one if Conditional. 
+   * <br>
+   * It checks the content:
+   * @throws ParseException 
+   * 
+   * */
   public void add_Element(GralCfgElement value)
   { 
     if(actualConditional ==null || actualConditional.condition){
-      String sPanel = value.positionInput.panel;
-      if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
-        stop();
-      if(sPanel == null){ //the last panel is used furthermore.
-        if(actPanel == null){ 
-          actPanel = new GralCfgPanel("$");
-        }
-        sPanel = actPanel.name;
-        value.setPanel(sPanel);
-      } else { //a panel is given.
-        actPanel = idxPanels.get(sPanel); 
-        if(actPanel == null){ //first time use that:
-          actPanel = new GralCfgPanel(sPanel);
-          idxPanels.put(sPanel, actPanel);
+      String sPanel = value.panel;
+      final String name;                                   // The name of the cfgElement have two destinations.
+      if(value.name == null) {                             // expected given with syntax (... name = [<""?name>|<$-/?name>] )
+        name = value.name = value.widgetType.name;         // then store also here.
+      } else {   //------------------------------------or---  given with syntay <*=:?positionString> [ = <$-/?name>]
+        name = value.name;
+        if(value.widgetType.name !=null && ! value.widgetType.name.equals(value.name)) {
+          throw new IllegalArgumentException("only one name should be given or name should be the same: " + value.toString());
+        } else {
+          value.widgetType.name = value.name;              // store it also in the widgettype
         }
       }
-      actPanel.listElements.add(value);      //list of elements in panels   
-      listElementsInTextfileOrder.add(value);  //list of elements in text file
+      // name clarified.
+      //
+//      if(value.widgetType != null && value.widgetType.text !=null && value.widgetType.text.equals("wd:yCos"))
+//        stop();
+      //===================================================== Select type of widget, consider Window, Panel
+      if (value.widgetType instanceof GralCfgWindow){      // definitive given window
+        this.idxWindow.put(name, value);
+        this.currWindow = (GralCfgWindow)value.widgetType;
+      } else { //-------------------------------------------- not a window
+        if(this.currWindow ==null) {                       // Window not given, create a default window of not given.  
+          GralCfgElement cfgWindow = new GralCfgElement();
+          this.currWindow = new GralCfgWindow(null);
+          cfgWindow.widgetType = this.currWindow;
+          this.currWindow.name = "mainWindow";
+          this.idxWindow.put(this.currWindow.name, cfgWindow);
+        }
+        //
+        if(value.widgetType instanceof GralCfgPanel) {     // definitive given panel for example an Area9Panel
+          GralCfgPanel newPanel = (GralCfgPanel)value.widgetType;
+          if(this.currWindow.panelWin == null) {              // it is the panel of the window
+            this.currWindow.panelWin = newPanel;
+          } else {                                         // it is a sub panel in a panel
+            this.currPanel.listElements.add(value);        // add the GralCfgElement which is the newPanel
+          }
+          this.currPanel = newPanel;                       // now use it for furthermore
+        } else {
+          //------------------------------------------------- other widget, on a panel
+          if(this.currPanel == null) {              // default panel in the window
+            String nameDefaultPanel = this.currWindow.name;
+            if(nameDefaultPanel.endsWith("Window")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-6);}
+            else if(nameDefaultPanel.endsWith("Wind")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-4);}
+            else if(nameDefaultPanel.endsWith("Win")) { nameDefaultPanel = nameDefaultPanel.substring(0, nameDefaultPanel.length()-3);}
+            this.currPanel = new GralCfgPanel(nameDefaultPanel, this.currWindow);
+            this.idxPanels.put(nameDefaultPanel, this.currPanel);
+            assert(this.currWindow.panelWin == null);  // elsewhere this.currPanel is not null
+            this.currWindow.panelWin = this.currPanel;
+          }
+          //
+          if(sPanel == null){                              //the last panel is used furthermore.
+            sPanel = this.currPanel.name;
+            value.setPanel(sPanel);
+          } else {  //======================================= a panel is given.
+            GralCfgPanel panel = this.idxPanels.get(sPanel); 
+            if(panel == null){                             // an unknown panel name forces a tab in the given window panel. Since 2010
+              if(this.currWindow.panelWin.listElements.size() >0) {
+                GralCfgPanel tab1 = this.currWindow.panelWin; // if the current panel contains already content
+                String nameTabPanel = this.currWindow.panelWin.name + "-Tabbed"; // then create instead a new empty panel for the window
+                GralCfgPanel tabbedPanel = new GralCfgPanel(nameTabPanel, this.currWindow);
+                this.idxPanels.put(nameTabPanel, tabbedPanel);
+                tabbedPanel.listTabs.add(tab1);  // and add the previous current panel as tab panel in the current window:
+                this.currWindow.panelWin = tabbedPanel;  // exchange the panel of the window with the new tabbedPanel
+              }
+              panel = new GralCfgPanel(sPanel, this.currWindow); //the tab pannel
+              this.currWindow.panelWin.listTabs.add(panel);
+              this.idxPanels.put(sPanel, panel);
+            }
+            this.currPanel = panel;
+            this.currWindow = panel.window;              // another window is selected with the panel
+          }
+          this.currPanel.listElements.add(value);      //list of elements in panels   
+        }
+      }
+      this.listElementsInTextfileOrder.add(value);  //list of elements in text file
     }
     newGuiElement = null;
   } 

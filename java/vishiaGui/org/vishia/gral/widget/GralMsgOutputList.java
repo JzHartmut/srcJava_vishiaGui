@@ -1,5 +1,6 @@
 package org.vishia.gral.widget;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.IllegalFormatConversionException;
 import java.util.IllegalFormatPrecisionException;
@@ -15,6 +16,7 @@ import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
 import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageBase;
 import org.vishia.util.Assert;
 
 /**This class supports output of messages in a GralTable to view and scroll.
@@ -25,7 +27,7 @@ import org.vishia.util.Assert;
  * @author Hartmut Schorrig
  *
  */
-public class GralMsgOutputList  implements LogMessage
+public class GralMsgOutputList  extends LogMessageBase
 {
 
   /**Version, history and license.
@@ -87,13 +89,13 @@ public class GralMsgOutputList  implements LogMessage
     return true;
   }
 
-  @Override public boolean sendMsg(int identNumber, String text, Object... args) {
+  @Override public boolean sendMsg(int identNumber, CharSequence text, Object... args) {
     // TODO Auto-generated method stub
     return false;
   }
 
   @Override public boolean sendMsgTime(int identNumber, OS_TimeStamp creationTime,
-      String text, Object... args) {
+      CharSequence text, Object... args) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -102,14 +104,13 @@ public class GralMsgOutputList  implements LogMessage
    * @see org.vishia.msgDispatch.LogMessage#sendMsgVaList(int, org.vishia.bridgeC.OS_TimeStamp, java.lang.String, org.vishia.bridgeC.Va_list)
    */
   @Override public boolean sendMsgVaList(int identNumber, OS_TimeStamp creationTime,
-    
-    String text, Va_list args) {
+    CharSequence text, Va_list args) {
     String sTime = dateFormat.format(creationTime);
     String state = identNumber <0 ? "-" : "+'";  //going/coming
     int identNumber1 = identNumber < 0 ? -identNumber :identNumber;
     //The configuration for this msg ident.
     String sText;
-    try{ sText = String.format(localization, text,args.get());
+    try{ sText = String.format(localization, text.toString(), args.get());
     }catch(IllegalFormatPrecisionException exc){
       sText = "error-precision in text format: " + text;
     } catch(IllegalFormatConversionException exc){
@@ -133,5 +134,24 @@ public class GralMsgOutputList  implements LogMessage
     return true;
   }
   
+  @Override
+  public Appendable append(CharSequence csq) throws IOException {
+    sendMsg(0, csq.toString());
+    return this;
+  }
+
+  @Override
+  public Appendable append(CharSequence csq, int start, int end) throws IOException {
+    sendMsg(0, csq.subSequence(start, end).toString());
+    return this;
+  }
+
+  @Override
+  public Appendable append(char c) throws IOException {
+    String s = "" + c;
+    sendMsg(0, s);
+    return this;
+  }
+
 }
 

@@ -17,23 +17,18 @@ import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
-import org.vishia.gral.base.GralWidgImpl_ifc;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
-import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.base.GralPanelActivated_ifc;
-import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
-//import org.vishia.gral.ifc.GuiShellMngIfc;
-import org.vishia.gral.widget.GralHorizontalSelector;
 import org.vishia.gral.widget.GralInfoBox;
 import org.vishia.util.KeyCode;
 import org.vishia.util.ReplaceAlias_ifc;
+import org.vishia.util.TimedValues;
 
 
 
@@ -171,7 +166,7 @@ public interface GralMngBuild_ifc
    *              If it the instance is fault, a ClassCastException is thrown.
    *         
    */
-  public void registerPanel(GralPanelContent panel);
+  public void registerPanel(GralPanel_ifc panel);
   
   
   /**Adds a panel for tabs as child of the current panel.
@@ -180,15 +175,15 @@ public interface GralMngBuild_ifc
    * @param properties use or of constants {@link #propZoomedPanel}, {@link #propGridZoomedPanel}
    * @return The tab-container, there the tabs can be registered.
    */
-  GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int properties);
+//  GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int properties);
   
   /**selects a registered panel for the next add-operations.
    * see {@link #registerPanel(String, Object)}. 
    */
-  void selectPanel(String sName);
+  GralPanel_ifc selectPanel(String sName);
 
   /**Selects the given panel as current panel to build some content. */
-  void selectPanel(GralPanelContent panel);
+  void selectPanel(GralPanel_ifc panel);
   
   /**Selects the primary window as current panel to build some content. */
   void selectPrimaryWindow();
@@ -231,7 +226,7 @@ public interface GralMngBuild_ifc
    * @param columnEndOrSize
    */
   public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
-    , int origin, char direction );
+    , char direction );
   
   
   /**Sets the position in relation to a given position.
@@ -243,11 +238,11 @@ public interface GralMngBuild_ifc
    * @deprecated. 
    */
   public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
-    , int origin, char direction);
+    , char direction);
 
 
   public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
-    , int origin, char direction, float border);
+    , char direction, float border);
 
 
   /**Sets the position with fine position given as float value. Only one digit after the float point is regarded,
@@ -256,12 +251,11 @@ public interface GralMngBuild_ifc
    * @param lineEnd
    * @param column
    * @param columnEnd
-   * @param origin see {@link #setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
    * @param direction
    * @param border
    */
   public void setPosition(float line, float lineEnd, float column, float columnEnd
-    , int origin, char direction, float border);
+    , char direction, float border);
 
 
   
@@ -276,27 +270,11 @@ public interface GralMngBuild_ifc
    * @param xEndFrac Number between 0..9 for fine positioning in the grid step.
    * @param direction Direction of the next position if that is not given than or {@link GralPos#next} is given than.
    *        A value other then r, l, u, d let the direction unchanged from previous call.
-   * @param origin Origin of inner widgets or next widgets. Use:
-   *        <pre>
-   *        1    4    7
-   *        2    5    8
-   *        3    6    9
-   *        </pre>
-   *        for the origin points. (origin-1) %3 is the horizontal origin, (origin-1 /3) is the vertical one.
-   *        A value 0 let the origin unchanged from previous call.
    */
   public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
       , int x, int xFrac, int xEnd, int xEndFrac
-      , int origin, char direction, int border, int borderFrac, GralPos frame);
+      , char direction, int border, int borderFrac, GralPos frame);
   
-  /**Sets the next position if the position is used, but change the size.
-   * @param ySize
-   * @param ySizeFrac
-   * @param xSize
-   * @param xSizeFrac
-   */
-  public void setSize(int ySize, int ySizeFrac, int xSize, int xSizeFrac);
-
   
   
   /**Gets the current position in the panel to store anywhere other. Usual the position is stored in the widget itself.
@@ -370,8 +348,8 @@ public interface GralMngBuild_ifc
   //, String sShowMethod
   , String sDataPath
   , String sButtonText
-  , String color0
-  , String color1
+  , GralColor colorOff
+  , GralColor colorOn
   );
   
   
@@ -513,7 +491,7 @@ public interface GralMngBuild_ifc
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * {@link XXXSwtCanvasStorePanel}. This class stores the line coordinates and conditions 
    * and draws it as background if drawing is invoked.
    * 
    * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.
@@ -522,14 +500,14 @@ public interface GralMngBuild_ifc
    * @param ya start of line relative to current position in grid units.
    * @param xe end of line relative to current position in grid units.
    * @param ye end of line relative to current position in grid units.
-   * @deprecated it is the old form before a {@link org.vishia.gral.widget.GralPlotArea} was created. Use that.
+   * @deprecated it is the old form before a {@link org.vishia.gral.widget.GralCanvasArea} was created. Use that.
    */
   @Deprecated void addLine(int colorValue, float xa, float ya, float xe, float ye);
     
   
   /**Adds a line.
    * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link SwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * {@link XXXSwtCanvasStorePanel}. This class stores the line coordinates and conditions 
    * and draws it as background if drawing is invoked.
    * 
    * @param color
@@ -621,7 +599,7 @@ public interface GralMngBuild_ifc
    * @param nrofTracks number of curves (tracks).
    * @return The Canvas Object.
    */
-  GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common);
+  GralCurveView addCurveViewY(String sPosName, int nrofXvalues, GralCurveView.CommonCurve common, TimedValues tracksValues);
   
   /**Adds a special text field to select a file. On the right side a small button [<] is arranged
    * to open the standard file select dialog. 
@@ -643,7 +621,7 @@ public interface GralMngBuild_ifc
   /**Adds a panel that is not bound yet.
    * @param panel
    */
-  //void addPanel(GralPanelContent panel);
+  //void addPanel(GralPanel_ifc panel);
   
   /**Adds the given Focus action to the named widget.
    * @param sName The name of the widget. It should be registered calling any add... method.
@@ -767,7 +745,7 @@ public interface GralMngBuild_ifc
    * @param compositeBox
    * @return true if removed.
    */
-  boolean remove(GralPanelContent compositeBox);
+  boolean remove(GralPanel_ifc compositeBox);
   
   boolean remove(GralWidget widget);
   
@@ -791,16 +769,15 @@ public interface GralMngBuild_ifc
 	 * @param title Title of the window, may be null, then without title bar.
 	 * @param windProps Or of the static variables {@link GralWindow#windExclusive} etc. 
 	 * @return
-	 * @deprecated use {@link GralWindow#GralWindow(String, String, String, int)} and then {@link GralWidget#createImplWidget_Gthread()}
+	 * @xxdeprecated use {@link GralWindow#GralWindow(String, String, String, int)} and then {@link GralWidget#createImplWidget_Gthread()}
 	 *   with this window.
 	 */
-  @Deprecated 
 	GralWindow createWindow(String name, String title, int windProps);
   
 	
   GralInfoBox createTextInfoBox(String name, String title);
 
-  GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop);
+  GralInfoBox createHtmlInfoBox(String posName, String title, boolean onTop);
 
   /**Sets the builder for content configuration.
    * @param cfgBuilder

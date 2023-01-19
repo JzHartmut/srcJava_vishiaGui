@@ -54,11 +54,10 @@ public class GralLed extends GralWidget
   
   /**
    * @param name
-   * @param mng
-   * @deprecated use {@link #GralLed(String)}
+   * @param gralMng
    */
-  protected GralLed(String name, GralMng mng)
-  { super(name, 'D', mng);
+  public GralLed(GralPos currPos, String sPosName)
+  { super(currPos, sPosName, 'D');
     colorBorderSelectable = new GralColor[3];
     colorBorderSelectable[0] = GralColor.getColor("ye");
     colorBorderSelectable[1] = GralColor.getColor("gn");
@@ -70,10 +69,14 @@ public class GralLed extends GralWidget
     setValue(0);  //initializes dyda.colors
   }
 
+  public GralLed(GralPos currPos, String sPosName, GralMng mng) {
+    this(currPos, sPosName);
+  }
   
   public GralLed(String name)
-  { this(name, null);
+  { this(null, name);
   }
+  
   
   
   /**Sets the LED's color. The border can be another than the inner color.
@@ -84,7 +87,7 @@ public class GralLed extends GralWidget
   public void setColor(GralColor colorBorder, GralColor colorInner){
     dyda.lineColor = colorBorder;
     dyda.backColor = colorInner;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
   }
 
   /**Sets the color both inner and border with the given value
@@ -123,7 +126,7 @@ public class GralLed extends GralWidget
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
 
     
@@ -132,7 +135,7 @@ public class GralLed extends GralWidget
       super(widgg, mng);
     }
     
-    protected GralWidget.DynamicData dyda(){ return dyda; }
+    protected GralWidget.DynamicData xxxdyda(){ return dyda; }
   }    
 
 }

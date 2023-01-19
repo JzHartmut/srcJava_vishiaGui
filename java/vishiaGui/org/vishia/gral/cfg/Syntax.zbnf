@@ -1,11 +1,13 @@
 <?ZBNF-www.vishia.org version="1.0" encoding="iso-8859-1" ?>
 
 GuiDialogZbnfControlled::=
+[<*|==vishiaGral==?>==vishiaGral== ]      ## skip over all content till ==vishiaGral== is found, but optional.
 [ size( <#?ySize> , <#?xSize> ) ;]
-{ DataReplace: <DataReplace>
+{ ==end-vishiaGral==<*\e?>                ## skip till end of file if found. 
+| DataReplace: <DataReplace>
 | Type <Type>
 | if <Conditional> 
-| <Element>    
+| <Element>                               ## All widgets are an GralCfgElement. Inside widgetType references the particular type.    
 } \e.
 
 
@@ -17,22 +19,19 @@ Conditional::=
 endif[;]
 .
 
+##Syntax of position internally in Java:
+
+
+
+
+
 
 Element::=
- [<?position> @ [<$?panel> ,] 
-                [<?yPosRelative> &+]
-                [<#?yPos>[\.<#?yPosFrac>]] 
-                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|] 
-                [ <?yIncr> ++] 
-                [ ,
-                  [<?xPosRelative> &+] 
-                  [<#?xPos>[\.<#?xPosFrac>]] 
-                  [ [+] <#-?xWidth>[\.<#?xSizeFrac>]| +* <?xOwnSize> |]
-                  [ <?xIncr> ++]
-                ] :
- ] 
- [ Led <Led> 
- | <Button> 
+[@[<$?panel> ,]<*=:?positionString> [ = <$-/?name>] :       ## Position and name same for all elements.
+| <$-/?name> :                                              ## Only the name if next position
+|]
+ [ Led <Led>                                                ## Each widget type has its own subclass of GralCfgData.Type
+ | <Button>                                                 ## It is stored in GralCfgElement#widgetType
  | SwitchButton ( <param?SwitchButton> ) ; 
  | ValueBar ( <param?ValueBar> ) ;
  | InputTextline ( <param?InputTextline> ) ;
@@ -47,6 +46,7 @@ Element::=
  | <Imagefile>
  | <Line>
  | <Curveview>
+ | Window <Window> 
 ## | <InputField>
  | <FileInputField>
  ] 
@@ -58,7 +58,8 @@ Element::=
 DataReplace::= <$?key> = <$-/\.:?string> ;.
 
 param::=<?>
-{ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
+{
+[ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
 | cmd =  [<""?cmd>|\[<*\]?cmd>\]] 
 | text = [<""?text>|<$-/?text>] 
 | name = [<""?name>|<$-/?name>] 
@@ -78,9 +79,13 @@ param::=<?>
 | <""?text>
 | <$-/\.:?text>
 ##| <*,)?text>
+|]
 ? , 
 }.
 
+
+
+Window::= [<""?title> | <$-\ ?title>] [( <param?Window> )] ;.
 
 
 Type::= [(<$?typeName>)|<$?typeName>] [: <param?>|( <param?> )] ;.
@@ -107,7 +112,8 @@ Table::=Table ( [<""?text>|<*)?text>] ) :
 { size ( { <#?columnWidth> ? + } x <#?height> ) 
 | cmd = [<""?cmd>|\[<*\]?cmd>\]] 
 | userAction = <$?userAction> 
-| name = [<""?name>|<$?name>] ? , 
+| name = [<""?name>|<$?name>] 
+? , 
 } ; .
 
 Curveview::=Curveview ( <$?name> [ , <#?nrofPoints>][ , active<?activate>]) :
@@ -139,7 +145,7 @@ Imagefile::= Imagefile
 
 
 
-Line::= Line ( {<colorName> | color = <#x?colorValue> |<?coord> <#f?x> , <#f?y> ? , } ) ;.
+Line::= Line ( {<colorName> | color = <#x?colorValue> |<?coord> <#f?x> , <#f?y> ? , | ; } ) ;.
 
 ?en:Line/xCoord::="There may be at least 2, but more possible pairs of x,y for polygons.".
 

@@ -1,14 +1,20 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
+import org.vishia.util.ExcUtil;
 
 /**This class represents a window of an application, either the primary window or any sub window.
  * The {@link GralPos#pos} of the baseclass is the position of the window derived from any other 
@@ -16,7 +22,7 @@ import org.vishia.msgDispatch.LogMessageStream;
  * @author Hartmut Schorrig
  *
  */
-public class GralWindow extends GralPanelContent implements GralWindow_ifc
+public class GralWindow extends GralWidget implements GralWindow_ifc
 {
 
   /**Version, history and license.
@@ -90,11 +96,11 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   { 
     ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
-    { for(GralWidget widgd: widgetsToResize){
+    { for(GralWidget widgd: GralWindow.this.mainPanel.getWidgetsToResize()){
         if(widgd instanceof GralWindow) {
           System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
         } else {
-          widgd.gralMng().impl.resizeWidget(widgd, 0, 0);
+          widgd.gralMng()._mngImpl.resizeWidget(widgd, 0, 0);
         }
       }
       return true;
@@ -104,6 +110,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   /**Or of some wind... constants.
    */
   int windProps;  
+  
+  public GralPanelContent mainPanel;
   
   /**This action is called whenever the window is resized by user handling on GUI
    * and the window is determined as {@link GralWindow_ifc#windResizeable}.
@@ -122,7 +130,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
   /**State of visible, fullScreen, close set by {@link #setVisible(boolean)}, {@link #setFullScreen(boolean)},
    * {@link #closeWindow()} called in another thread than the graphic thread. It is stored here
-   * and executed in the {@link GralWidgImpl_ifc#repaintGthread()}. */
+   * and executed in the {@link GralWidgImplAccess_ifc#redrawGthread()}. */
   protected boolean XXXbVisible, bFullScreen, bShouldClose;
   
 
@@ -137,7 +145,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    */
   @Deprecated public GralWindow(String posString, String nameWindow, String sTitle, int windProps, GralMng mng, Object panelComposite)
   {
-    super( posString, nameWindow, 'w');  //relative Window position.
+    super((GralPos)null, posString, nameWindow, 'w');
     dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
     if((windProps & windResizeable)!=0){
@@ -148,23 +156,56 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
 
   
   
-  /**Constructs a window.
-   * @param posString the position relative to a given position of the parent window. "!" on top level window. 
-   * @param nameWindow
-   * @param sTitle
+  /**Constructs a window with an empty {@link #mainPanel}
+   * @param refPos The parent will be set related to to the screen: {@link GralMng#screen}. 
+   *   The internal used {@link GralWidget#pos()} is cloned. 
+   *   The refPos will be set to the whole main panel.
+   * @param posName possible position and name. Syntax [@<position> =]<$?name>
+   *   If name ends with "Win" or "Window" then the panel name is the same without "Win" or "Window".
+   *   Else the panel name is the same + "Panel".
+   * @param sTitle can be null then the name is used as title without trailing "Win" or "Window".
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
    */
-  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
+  public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
-    super( posString, nameWindow, 'w');  //relative Window position.
-    dyda.displayedText = sTitle;  //maybe null
-    this.windProps = windProps;
-    if((windProps & windResizeable)!=0){
-      resizeAction = new ActionResizeOnePanel();
+    super(refPos.setParent(gralMng.screen), posName, 'w', gralMng);
+    int lenNameWindow = super.name.length();
+    final String sNamePanel;
+    final String sTitleDefault;
+    if(super.name.endsWith("Window")) {
+      sNamePanel = sTitleDefault = super.name.substring(0, lenNameWindow-6);
+    } else if(super.name.endsWith("Win")) {
+      sNamePanel = sTitleDefault = super.name.substring(0, lenNameWindow-3);
+    } else {
+      sNamePanel = super.name + "Panel";
+      sTitleDefault = super.name;
     }
-
+    this.dyda.displayedText = sTitle == null ? sTitleDefault : sTitle;  //maybe null
+    this.windProps = windProps;
+    GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
+    this.mainPanel = new GralPanelContent(posPanel, sNamePanel, this.gralMng());
+    //                                                     // A window has anytime only one GralPanel, the mainPanel.
+    super.gralMng.registerWindow(this);
+    if((windProps & windResizeable)!=0){
+      this.resizeAction = new ActionResizeOnePanel();
+    }
+    refPos.set(posPanel);                                  // at least: the refPos for further usage is the position on the whole panel.
+    
   }
 
+  public GralWindow(GralPos currPos, String posName, String sTitle, int windProps)
+  { this(currPos, posName, sTitle, windProps, currPos.parent.gralMng());
+  }
+  
+  public GralWindow(GralPos currPos, String posString, String nameWindow, String sTitle, int windProps)
+  { this(currPos, posString + "=" + nameWindow, sTitle, windProps, null);
+  }
+  
+//  public GralWindow(String posString, String nameWindow, String sTitle, int windProps)
+//  { this(null, posString, nameWindow, sTitle, windProps);
+//  }
+  
+  
   @Override public void specifyActionOnCloseWindow(GralUserAction action)
   { actionOnCloseWindow = action;
   }
@@ -176,28 +217,36 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * The it invokes {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}. 
    * The application should not know whether it is the primary or any secondary window.
    * That helps for applications which are started from a Gral graphic application itself without an own operation system process. 
+   * <br>
+   * The new implementation graphic starts on {@link GralGraphicThread#runGraphicThread()}
+   * <br>
    * @param awtOrSwt see {@link GralFactory#createGraphic(GralWindow, char, LogMessage, String)}
    * @param size 'A'..'G', 'A' is a small size, 'G' is the largest.
    * @param log maybe null. If not given a {@link LogMessageStream} with System.out will be created. For internal logging.
    * @param initializeInGraphicThread maybe null, an order which will be executed in the graphic thread after creation of the window.
+   * @deprecated create new {@link org.vishia.gral.swt.SwtFactory} or new {@link org.vishia.gral.awt.AwtFactory} and then
+   *   call the overridden operation {@link org.vishia.gral.ifc.GralFactory#createGraphic(GralWindow, char, LogMessage)}.
+   *   You can then use also any other Factory for the graphic system for any other graphic system. 
    */
-  public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
-    if(_wdgImpl !=null) throw new IllegalStateException("window already created.");
-    GralMng mng = GralMng.get();
-    GralGraphicThread gthread = mng.gralDevice();
-    if(gthread.isRunning()) {
-      gthread.addDispatchOrder(createImplWindow);
-    } else {
-      //it is the primary window, start the graphic with it.
-      if(log == null) { log = new LogMessageStream(System.out); }
-      gthread = GralFactory.createGraphic(this, size, log, awtOrSwt);
-    }
-    if(initializeInGraphicThread !=null) {
-      gthread.addDispatchOrder(initializeInGraphicThread);
-    }
-  }
+//  @Deprecated public void create(String awtOrSwt, char size, LogMessage log, GralGraphicTimeOrder initializeInGraphicThread){
+//    if(this._wdgImpl !=null) throw new IllegalStateException("window already created.");
+//    GralMng mng = GralMng.get();
+//    if(mng.isRunning()) {
+//      mng.addDispatchOrder(this.createImplWindow);
+//    } else {
+//      //it is the primary window, start the graphic with it.
+//      if(log == null) { log = new LogMessageStream(System.out); }
+//      GralFactory.createGraphic(this, size, log, awtOrSwt);
+//    }
+//    if(initializeInGraphicThread !=null) {
+//      mng.addDispatchOrder(initializeInGraphicThread);
+//    }
+//  }
 
   
+
+  @Override public GralPanelContent getItsPanel(){ return this.mainPanel; }
+
   @Override public void setWindowVisible(boolean visible){
     setVisible(visible);
   }
@@ -211,7 +260,8 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   
   @Override public boolean remove() {
     super.remove();
-    itsMng.deregisterPanel(this);
+    gralMng.deregisterPanel(this.mainPanel);
+    gralMng.deregisterWindow(this);
     return true;
   }
   
@@ -244,11 +294,11 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
    * If the window has a menu bar already, it is stored in the reference {@link #menuBarGral}.
    * @return the menu root for this window.
    */
-  public GralMenu getMenuBar(){
-    if(menuBarGral == null){
-      menuBarGral = itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
+  @Override public GralMenu getMenuBar(){
+    if(this.menuBarGral == null){
+      this.menuBarGral = new GralMenu(this); //itsMng.createMenuBar(this);   //delegation, the widget mng knows the implementation platform.
     }
-    return menuBarGral;
+    return this.menuBarGral;
   }
   
   
@@ -277,7 +327,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   {
     dyda.displayedText = sTitle;
     dyda.setChanged(ImplAccess.chgText); 
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
   }
 
   
@@ -285,7 +335,7 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   public void setFullScreen(boolean val){
     if(bFullScreen !=val){
       bFullScreen = val;
-      repaint();
+      redraw();
     }
   }
 
@@ -297,50 +347,112 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   }
   
   
-  /**This class is not intent to use from an application, it is the super class for the implementation layer
-   * to access all necessary data and methods with protected access rights.
-   * The methods are protected because an application should not use it. This class is public because
+  
+  public GralWidgetBase_ifc getFocusedWidget() { return this.mainPanel; }
+
+  
+  
+  public void reportAllContent(Appendable out) {
+    try {
+      out.append("==== GralWindow.reportAllContent():\n");
+      out.append("Window: ").append(this.name);
+      this.mainPanel.reportAllContent(out,0);
+      out.append("\n====\n");
+    } catch(Exception exc) {
+      System.err.println("unexpected exception on reportAllContent: " + exc.getMessage());
+    }
+  }
+
+  
+  public void reportAllContentImpl(Appendable out) throws IOException {
+    GralWindow.WindowImplAccess wdga = (GralWindow.WindowImplAccess)getImplAccess();
+    out.append("\n==== GralWindow.reportAllContent Implementation ====\n");
+    if(wdga ==null) {
+      out.append("No implementation\n");
+    } else {
+      wdga.reportAllContentImpl(out);
+    }
+  }
+  
+  
+  /**Implementation of the creation of implementation graphic for the GralWindow.
+   *
+   */
+  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+    if(super.createImplWidget_Gthread()) {
+      GralPos pos = this.pos();
+      if(pos.x.p1 ==0 && pos.x.p2 == 0 && pos.y.p1 == 0 && pos.y.p2 == 0){
+        this.setFullScreen(true);  
+      }
+      this.mainPanel.createImplWidget_Gthread();
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    this.mainPanel.removeImplWidget_Gthread();                     // recursively call of same
+    super.removeImplWidget_Gthread();
+  }
+
+  /**This class is not intent to use from an application.
+   * It is instantiated with the implementation graphic, 
+   * for SWT especially aggregated from {@link org.vishia.gral.swt.SwtPanel}.
+   * This implementation access class has a special role with the aggregation,
+   * in opposite to ImplAccess from other widgets, which are the super class for the implementation layer.
+   * This class allows access to all necessary data and methods of the environment class with protected access rights.
+   * The class and methods are public here because elsewhere cannot access from the swt package.
+   * An application should not use it. This class is public because
    * it should be visible from the graphic implementation which is located in another package. 
    */
-  public abstract static class GraphicImplAccess extends GralPanelContent.ImplAccess //access to GralWidget
-  implements GralWidgImpl_ifc
+  public abstract static class WindowImplAccess extends GralWidget.ImplAccess //access to GralWidget
+  implements GralWidgImplAccess_ifc
   {
     
-    protected final GralWindow gralWindow;  //its outer class.
+    public final GralWindow gralWindow;  //its outer class.
     
-    protected GraphicImplAccess(GralWindow gralWdg){
+    protected WindowImplAccess(GralWindow gralWdg){
       super(gralWdg);
       this.gralWindow = gralWdg;  //References the environment class
+      gralWdg._wdgImpl = this;
     }
     
     /**The title is stored in the {@link GralWidget.DynamicData#displayedText}. */
-    protected String getTitle(){ return gralWindow.dyda.displayedText; }
+    public String getTitle(){ return gralWindow.dyda.displayedText; }
     
     /**Window properties as Gral bits given on ctor of GralWindow. */
-    protected int getWindowProps(){ return gralWindow.windProps; }
+    public int getWindowProps(){ return gralWindow.windProps; }
     
     
     
     //protected boolean isVisible(){ return gralWindow.bVisible; }
     
-    protected boolean isFullScreen(){ return gralWindow.bFullScreen; }
+    public boolean isFullScreen(){ return gralWindow.bFullScreen; }
     
-    protected boolean shouldClose(){ return gralWindow.bShouldClose; }
+    public boolean shouldClose(){ return gralWindow.bShouldClose; }
     
     /**The resizeAction from the {@link GralWindow_ifc#setResizeAction(GralUserAction)} */
-    protected GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
+    public GralUserAction resizeAction(){ return gralWindow.resizeAction; }  
   
     /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
-    protected GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
+    public GralUserAction mouseAction(){ return gralWindow.mouseAction; }  
   
     /**The invisibleSetAction from the {@link GralWindow_ifc#specifyActionOnCloseWindow(GralUserAction)} */
-    protected GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }  
-  
-  
-  
-  
-  
-  
+    public GralUserAction actionOnCloseWindow(){ return gralWindow.actionOnCloseWindow; }
+
+    
+    protected final GralMenu getMenubar() { return this.gralWindow.menuBarGral; }
+    
+    abstract public void reportAllContentImpl(Appendable out) throws IOException;
+
+    
+    
   }
 
 
@@ -348,10 +460,10 @@ public class GralWindow extends GralPanelContent implements GralWindow_ifc
   /**Code snippet for initializing the GUI area (panel). This snippet will be executed
    * in the GUI-Thread if the GUI is created. 
    */
-  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow")
+  GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow", this.gralMng)
   {
     @Override public void executeOrder()
-    { GralMng mng = GralMng.get();
+    { GralMng mng = gralMng();
       mng.selectPrimaryWindow();
       GralWindow.this.createImplWidget_Gthread();
       GralWindow.this.setVisible(true);

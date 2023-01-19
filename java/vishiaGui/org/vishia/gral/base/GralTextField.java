@@ -14,6 +14,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.swt.SwtTextFieldWrapper;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.DataAccess;
+import org.vishia.util.Debugutil;
 import org.vishia.util.Removeable;
 import org.vishia.util.StringFunctions;
 
@@ -25,6 +26,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2023-01-17 new {@link #setText(CharSequence, int, boolean)} for unconditional write, this is if a text field itself
+   *   causes the operation which the call setText(). 
    * <li>2022-01-29 Hartmut chg: Now only one implementation {@link GraphicImplAccess} 
    *   by {@link SwtTextFieldWrapper} (and {@link AwtTextField}) 
    *   for a {@link GralTextBox} and this class. Most is the same, few things are tuned.
@@ -111,8 +114,6 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   protected GralTextFieldUser_ifc user;
   
-  /**It is used for some operations. */
-  protected final GralGraphicThread windowMng;
   
   final boolean bPassword;
   
@@ -129,8 +130,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    *   See {@link GralWidget#GralWidget(String, char)}.
    * @param property password, editable, maybe left empty.
    */
-  public GralTextField(String posName, Type... property){
-    super(posName, 't');
+  public GralTextField(GralPos currPos, String posName, Type... property){
+    super(currPos, posName, 't');
     boolean bPassword1 = false;
     if(property !=null){
       for(int ii=0; ii<property.length; ++ii){
@@ -141,19 +142,43 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
       }
     }
     bPassword = bPassword1;
-    windowMng = null;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
   }
 
-  /**Constructs a text field with given properties
+  
+  /**Constructs a text field with prompt and given properties
+   * @param posName Position and Name of the field. Maybe null if it is not need in management by name
+   *   See {@link GralWidget#GralWidget(String, char)}.
+   * @param property password, editable, maybe left empty.
+   */
+  /**
+   * @param refPos Reference position
+   * @param posName can contain "@<positionString>=", then the name of the widget
+   * @param sPrompt prompt text
+   * @param promptStylePos "t" or "r"
+   * @param property see {@link Type}, password or editable
+   */
+  public GralTextField(GralPos refPos, String posName, String sPrompt, String promptStylePos, Type... property){
+    this(refPos, posName, property);
+    this.sPrompt = sPrompt;
+    this.sPromptStylePosition = promptStylePos;
+    
+  }
+  
+  
+//  public GralTextField(String posName, Type... property){
+//    this(GralMng.get().pos().pos, posName, property);
+//  }
+
+    /**Constructs a text field with given properties
    * @param name Name of the field. Maybe null if it is not need in management by name
    * @param property password, editable, maybe left empty.
    * @deprecated since 2016-09,use {@link GralTextField#GralTextField(String, Type...)} with "@pos=name"
    */
-  public GralTextField(String pos, String name, Type... property){
-    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, property);
-  }
+//  public GralTextField(String pos, String name, Type... property){
+//    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, property);
+//  }
   
   
   @Deprecated public GralTextField(String name, char whatis, GralMng mng){
@@ -161,7 +186,6 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     bPassword = false;
     setBackColor(GralColor.getColor("wh"),0);
     setTextColor(GralColor.getColor("bk"));
-    this.windowMng = mng.gralDevice;
   }
   
   
@@ -170,7 +194,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     this.sPrompt = sPrompt;
     if(_wdgImpl !=null){
       dyda.setChanged(GraphicImplAccess.chgPrompt);
-      repaint();
+      redraw();
     } else {
       this.sPromptStylePosition = "t";
     }
@@ -186,6 +210,14 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   }
   
   
+  /**Sets a callback instance which is invoked on any key press event except writing keys on a editable field.
+   * The user interface gets the key pressed, the current content of this field, the current caret position 
+   * and also the positions in the text of the selection. 
+   * Hence the user can process a selected text also.   
+   * <br>
+   * This is an alternative to
+   * @param user callback instance due to the interface.
+   */
   public void setUser(GralTextFieldUser_ifc user){
     this.user = user;
   }
@@ -545,28 +577,50 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   { setText(arg, 0);
   }
   
-  /**Sets the textual content. This method sets the text and invokes a {@link #repaint(int, int)} in 100 ms 
-   * if the content is changed in another thread than the graphical thread. It invokes a {@link #repaintGthread()}
+  /**Sets the textual content. This method sets the text and invokes a {@link #redraw(int, int)} in 100 ms 
+   * if the content is changed in another thread than the graphical thread. It invokes a {@link #redrawGthread()}
    * if the content was changed in the graphical thread.
    * Note: If the current content is equals with the new one, a repaint request is not forced.
    * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
    * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
    */
   @Override public void setText(CharSequence arg, int caretPos)
-  {
-    bShouldInitialize= false;  //it is done.
-    if(  dyda.displayedText == null   //set the text if no text is stored. Initially!
-      //|| !bTextChanged                 //don't set the text if it is changed by user yet.  
-         //&& 
-        || (  !dyda.bTouchedField  //don't change the text if the field is in focus and anything was moved. Either any copy to clipboard is pending, or it is in editing. 
-           && !StringFunctions.equals(dyda.displayedText,arg) || caretPos != this.caretPos)  //set the text only if it is changed. Prevent effort.
-      ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
-      dyda.displayedText = arg.toString();
-      this.caretPos = caretPos;
-      dyda.setChanged(GralWidget.ImplAccess.chgText);
-      repaint();
-    } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
+  { setText(arg, caretPos, false);
   }
+  
+  
+  
+  /**Sets the textual content. This method sets the text and invokes a {@link #redraw(int, int)} in 100 ms 
+   * if the content is changed in another thread than the graphical thread. It invokes a {@link #redrawGthread()}
+   * if the content was changed in the graphical thread.
+   * Note: If the current content is equals with the new one with the same cursor position, a repaint request is not forced.
+   * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
+   * @param arg the new text
+   * @param caretPos <=0 not used, >=0 the caret position 
+   * @param bSetAlways if not true then the text is not set if typing of the field is in progress.
+   *   Then {@link DynamicData#bTouchedField} is true. set a text from outside will be attack this typing.
+   *   Typing by the user has a higher priority. It is important for example for currently shown values,
+   *   which are also editable. 
+   *   if true than always the text is set. This is especially if this invocation comes from the typing itself,
+   *   for example type a control-Key during edit to force actions on this text field itself. 
+   * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
+   */
+  public void setText(CharSequence arg, int caretPos, boolean bSetAlways)
+  {
+    this.bShouldInitialize= false;  //it is done.
+    if( ( bSetAlways
+        || this.dyda.displayedText == null   //set the text if no text is stored. Initially!
+        || !this.dyda.bTouchedField          //don't change the text if the field is in focus and anything was changed. 
+        )                                    //Either any copy to clipboard is pending, or it is in editing. 
+     && ( !StringFunctions.equals(this.dyda.displayedText,arg) // set the text only if it is changed. Prevent effort. 
+        || caretPos >=0 && caretPos != this.caretPos)          // or also if only the caret position is changed  
+       ){                               //prevent invocation of setText() on non changed values to help move cursor, select etc.
+      this.dyda.displayedText = arg.toString();
+      if(caretPos >=0 ) { this.caretPos = caretPos; }
+      this.dyda.setChanged(GralWidget.ImplAccess.chgText);
+      redraw(-100, 100);
+    } //else: no change, do nothing. Therewith the field is able to edit on unchanged texts.
+ }
   
   
 
@@ -603,7 +657,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     if(pos != caretPos){
       caretPos = pos;
       dyda.setChanged(GraphicImplAccess.chgCursor);
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
     return pos9;  //the old
   }
@@ -615,7 +669,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     dyda.textColor = color;
     dyda.setChanged(GralWidget.ImplAccess.chgColorText);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
   }
   
@@ -625,7 +679,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     dyda.textColor = GralColor.getColor(color);
     dyda.setChanged(GralWidget.ImplAccess.chgColorText);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
   }
   
@@ -644,7 +698,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
     borderwidth = width;
     dyda.setChanged(GralWidget.ImplAccess.chgColorLine);
     if(_wdgImpl !=null){
-      repaint();
+      redraw();
     }
     return widthLast;
   }
@@ -698,7 +752,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   
   
-  protected GralKeyListener gralKeyListener = new GralKeyListener(itsMng)
+  protected GralKeyListener gralKeyListener = new GralKeyListener(gralMng)
   {
     @Override public boolean specialKeysOfWidgetType(int key, GralWidget_ifc widgg, Object widgImpl){ return false; }
   };
@@ -706,7 +760,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   
   
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
-  implements GralWidgImpl_ifc
+  implements GralWidgImplAccess_ifc
   {
 
     public static final int chgPrompt = 0x100, chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800
@@ -719,14 +773,25 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
     
     
+    
+    
     protected GraphicImplAccess(GralWidget widgg)
+    { this(widgg, widgg.gralMng._mngImpl);
+    }
+    
+    
+    
+    protected GraphicImplAccess(GralWidget widgg, GralMng.ImplAccess mngImpl)
     {
-      super(widgg);
+      super(widgg, mngImpl);
+      if(widgg.name !=null && widgg.name.startsWith("showSrc"))
+        Debugutil.stop();
+      
       if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")) {
         //mng.setNextPosition();  //deprecated, done in Widget constructor.
         char sizeFontPrompt;
-        posPrompt = new GralPos(); 
-        posField = new GralPos();
+        posPrompt = new GralPos(widgg._wdgPos.parent);     // inside same panel 
+        posField = new GralPos(widgg._wdgPos.parent);
 
         //boundsAll = mng.calcWidgetPosAndSize(this.pos, 800, 600, 100, 20);
         float ySize = widgg.pos().height();
@@ -736,14 +801,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
         //switch(promptStylePosition){
           //case 't':{
             if(ySize <= 2.5){ //it is very small for top-prompt:
-              yPosPrompt = 1.0f;  //no more less than 1/2 normal line. 
+              yPosPrompt = 1.0f;  // from top no more less than 1/2 normal line. 
               heightPrompt = 1.0f;
               heightText = ySize - 0.7f;  //max. 1.8
               if(heightText < 1.0f){ heightText = 1.0f; }
             } else if(ySize <=3.3){ //it is normally 2.5..4
-              heightPrompt = ySize - 2.0f + 0.5f;   //1 to 1.8
-              yPosPrompt = ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
-              heightText = 2.0f;
+              heightPrompt = 1.0f + (ySize - 2.5f);   //1.0 to 1.8, 1.5 for size=3 
+              heightPrompt = ((int)(10.0f*heightPrompt)) / 10.0f;
+              heightText = ySize - heightPrompt + 0.5f;            //            2.0 for size=3
+              yPosPrompt = heightPrompt; //ySize - heightPrompt - 0.1f;  //no more less than 1/2 normal line. 
             } else if(ySize <=4.0){ //it is normally 2.5..4
               heightPrompt = ySize - 2.0f + (4.0f - ySize) * 0.5f; 
               if(heightPrompt < 1.0f){ heightPrompt = 1.0f; }
@@ -754,10 +820,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
               heightPrompt = ySize * 0.4f;;
               heightText = ySize * 0.5f;
             }
-            //from top, size of prompt
-            posPrompt.setPosition(widgg.pos(), GralPos.same - ySize + yPosPrompt, GralPos.size - heightPrompt, GralPos.same, GralPos.same, 0, '.');
+            GralPos refPos = widgg.pos().setAsFrame();
+            //from bottom as base line, size of prompt
+            posPrompt.setPosition(refPos, GralPos.same
+                , GralPos.refer - (ySize - heightPrompt)              //negative value means, base line is bottom
+                , GralPos.same, GralPos.same, '.', 0);
             //from bottom line, size of text
-            posField.setPosition(widgg.pos(), GralPos.same, GralPos.size - heightText, GralPos.same, GralPos.same, 0, '.');
+            posField.setPosition(refPos, GralPos.same
+                , GralPos.size - heightText                //negative value means, base line is bottom
+                , GralPos.same, GralPos.same, '.', 0);
           //} break;
         //}
       
@@ -775,7 +846,15 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
  
     protected int borderwidth(){ return GralTextField.this.borderwidth; }
     
-    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
+    /**Access and clear a new Text set in any other thread.
+     * See {@link GralTextBox#append(CharSequence)}
+     * @return the new text.
+     */
+    protected String getAndClearNewText(){ String ret; 
+      synchronized(newText){ 
+        ret = newText.toString(); newText.setLength(0); 
+      } return ret; 
+    }
   
     /**Returns the cursor position in the whole text
      * @return

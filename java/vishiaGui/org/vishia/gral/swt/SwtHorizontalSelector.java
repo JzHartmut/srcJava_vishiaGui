@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.vishia.gral.base.GralWidgImpl_ifc;
+import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.widget.GralHorizontalSelector;
@@ -23,7 +23,7 @@ import org.vishia.gral.widget.GralHorizontalSelector;
  * @author Hartmut Schorrig
  *
  */
-public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAccess implements GralWidgImpl_ifc
+public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAccess implements GralWidgImplAccess_ifc
 {
   /**Version, history and copyright/copyleft.
    * <ul>
@@ -62,7 +62,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
-   * and implements some methods of {@link GralWidgImpl_ifc} which are delegate from this.
+   * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
    */
   private final SwtWidgetHelper swtWdgW;
 
@@ -78,9 +78,9 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
   
   
   public SwtHorizontalSelector(SwtMng mng, GralHorizontalSelector<?> wdgGral)
-  { super(wdgGral, mng.mng);  //Invoke constructor of the super class, with knowledge of its outer class.
+  { super(wdgGral, mng.gralMng);  //Invoke constructor of the super class, with knowledge of its outer class.
     //this.mng = mng;
-    Composite panel = (Composite)outer.pos().panel.getWidgetImplementation();
+    Composite panel = (Composite)outer.pos().parent.getImplAccess().getWidgetImplementation();
     //widgetSwt = new Canvas(panel,0);
     super.wdgimpl = this.swtWdgW = new SwtWidgetHelper(new Canvas(panel,0), mng);
     swtWdgW.widgetSwt.setData(wdgGral);
@@ -100,7 +100,7 @@ public class SwtHorizontalSelector extends GralHorizontalSelector.GraphicImplAcc
 
   
   
-  @Override public void repaintGthread(){ swtWdgW.swtUpdateRedraw(); }
+  @Override public void redrawGthread(){ swtWdgW.swtUpdateRedraw(); }
 
   
   @Override public Object getWidgetImplementation(){ return swtWdgW.widgetSwt; }

@@ -9,7 +9,10 @@ import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.ifc.GralColor;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 
 public class SwtHtmlBox extends GralHtmlBox.ImplAccess
 {
@@ -54,16 +57,17 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
   public SwtHtmlBox(GralHtmlBox box, SwtMng mngSwt)
   { super(box);
     //SwtMng mngSwt = (SwtMng)(GralMng.get()).impl;
-    GralPanelContent panel = widgg.pos().panel;
+    GralWidgetBase_ifc panel = widgg.pos().parent;
     Composite parent;
     if(panel == null){
       parent = mngSwt.displaySwt.getActiveShell();
     } else {
-      parent = (Composite)(panel.getWidgetImplementation());
+      parent = (Composite)(panel.getImplAccess().getWidgetImplementation());
       //parent = ((SwtPanel)panel.getWidgetImplementation()).panelComposite; //(Composite)(panel.getPanelImpl());
     }
     try {
-      boxSwt = new Browser(parent,0);
+      this.boxSwt = new Browser(parent,0);
+      super.wdgimpl = this.boxSwt;
       //mng.registerWidget(this);
       mngSwt.setPosAndSizeSwt(box.pos(), boxSwt, 0, 0);
     } catch(Throwable exc){
@@ -124,7 +128,7 @@ public class SwtHtmlBox extends GralHtmlBox.ImplAccess
   @Override public void setVisibleGThread(boolean bVisible) { super.setVisibleState(bVisible); boxSwt.setVisible(bVisible); }
 
 
-  @Override public void repaintGthread(){
+  @Override public void redrawGthread(){
     if(boxSwt !=null){ boxSwt.redraw(); }
   }
 

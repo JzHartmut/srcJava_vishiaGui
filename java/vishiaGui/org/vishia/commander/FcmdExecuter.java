@@ -12,6 +12,9 @@ import org.vishia.cmd.JZtxtcmdExecuter;
 import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.cmd.PrepareCmd;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
@@ -24,6 +27,7 @@ import org.vishia.gral.widget.GralCommandSelector;
 import org.vishia.jztxtcmd.JZtxtcmd;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.mainCmd.MainCmd_ifc;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.DataAccess;
 import org.vishia.util.KeyCode;
 
@@ -67,17 +71,17 @@ public class FcmdExecuter
   
   
   /**For output messages. */
-  final MainCmd_ifc console;
+  final LogMessage console;
 
   private final Fcmd main;
   
-
+  private final GralMng gralMng;
   
-  GralWindow_ifc windConfirmExec = new GralWindow("-19..0,-47..0","execWindow", "confirm execute", GralWindow.windConcurrently);
+  GralWindow windConfirmExec;
 
  // GralTable<CmdBlock> widgSelectExec = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
 
-  GralTable<JZtxtcmdScript.Subroutine> widgSelectJzExt = new GralTable<>("0..0,0..0", "execChoice", new int[]{47});
+  GralTable<JZtxtcmdScript.Subroutine> widgSelectJzExt;
 
   /**Store of all possible commands given in the command file. */
   //final CmdStore cmdStore = new CmdStore();
@@ -87,6 +91,13 @@ public class FcmdExecuter
   /**The command queue to execute */
   
   final CmdExecuter cmdExecuter;
+
+  
+  /**This is the panel for command selection used by {@link FcmdExecuter}
+   * as one tab of the left only instance of this.
+   */
+  GralPanelContent wdgPanelTabCmds;
+
 
   /**Table contains some commands, can be selected and executed.
    * <ul>
@@ -99,17 +110,17 @@ public class FcmdExecuter
    *   
    * </ul> 
    */
-  final GralCommandSelector cmdSelector;
+  GralCommandSelector cmdSelector;
 
 
   
-  FcmdExecuter(MainCmd_ifc console, Appendable outStatus, Fcmd main)
+  FcmdExecuter(LogMessage console, Appendable outStatus, Fcmd main)
   { this.main = main;
+    this.gralMng = main.gui.gralMng;
     this.console = console;
     //this.cmdQueue = new CmdQueue(outStatus);
     this.cmdExecuter = new CmdExecuter();
-    this.cmdExecuter.setEchoCmdOut(main.guiW.outputBox);
-    cmdSelector = new GralCommandSelector("cmdSelector", 50, new int[]{0,-10}, 'A', cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
+    this.cmdExecuter.setEchoCmdOut(main.gui.outputBox);
   }
   
   
@@ -120,9 +131,8 @@ public class FcmdExecuter
   { 
     
     
-    windConfirmExec.createImplWidget_Gthread();
+    //windConfirmExec.createImplWidget_Gthread();
    // widgSelectExec.specifyActionChange("exec", actionExecCmdAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
-    widgSelectJzExt.specifyActionChange("exec", actionJZextAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
   }  
   
   
@@ -159,11 +169,26 @@ public class FcmdExecuter
   }
   
   
-  public String readCmdCfgSelectList(JZtxtcmdScript.AddSub2List dst, File cfgFile, MainCmdLogging_ifc log)
+  public String readCmdCfgSelectList(JZtxtcmdScript.AddSub2List dst, File cfgFile, LogMessage log)
   { File cmdCfgJbat = new File(cfgFile.getParentFile(), "cmdjz.cfg");
     return JZtxtcmd.readJZcmdCfg(dst, cmdCfgJbat, log, cmdExecuter);
   }  
 
+  
+  
+  void buildGui ( ) {
+    //this.gralMng.selectPanel("primaryWindow");
+    GralPos refPos = new GralPos(this.gralMng);
+    this.windConfirmExec = new GralWindow(refPos, "@screen, 20+19,40+47=execWindow", "confirm execute", GralWindow.windConcurrently);
+    this.widgSelectJzExt = new GralTable<JZtxtcmdScript.Subroutine>(refPos, "@0..0,0..0=execChoice", 20, new int[]{47});
+    this.widgSelectJzExt.specifyActionChange("exec", this.actionJZextAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
+    //The GralCommandSelector is a table.
+    this.wdgPanelTabCmds = this.main.favorPathSelector.panelLeft.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+    refPos = new GralPos(this.wdgPanelTabCmds);
+    this.cmdSelector = new GralCommandSelector(refPos, "@0..0,0..0=cmdSelector", 50, new int[]{0,-10}, cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
+    this.windConfirmExec.setVisible(false);
+  }
+  
   
   /**
    * Action to set the working directory for the next command invocation. The
@@ -203,7 +228,7 @@ public class FcmdExecuter
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if (main.currentFile() != null) {
           cmdSelector.clear();
-          String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.currentFile(), main.console);
+          String sError = readCmdCfgSelectList(cmdSelector.addJZsub2SelectTable, main.currentFile(), main.log);
           if(sError !=null) {
             System.err.println("readCmdCfg; from file " + main.cargs.fileCfgButtonCmds.getAbsolutePath()+ "; error: " + sError);
           }
@@ -248,7 +273,7 @@ public class FcmdExecuter
 
 
   
-  private void executeFileByExtension(File file){
+  void executeFileByExtension(File file){
     String ext;
     if(file !=null){
       String name = file.getName();
@@ -262,7 +287,7 @@ public class FcmdExecuter
       }
       List<JZtxtcmdScript.Subroutine> listSub = mapCmdExt.get(ext.toLowerCase());
       if(listSub !=null){
-        widgSelectJzExt.clearTable();
+        this.widgSelectJzExt.clearTable();
         GralTable<JZtxtcmdScript.Subroutine>.TableLineData firstLine = null;
         for(JZtxtcmdScript.Subroutine jzsub: listSub) {
           GralTable<JZtxtcmdScript.Subroutine>.TableLineData line = widgSelectJzExt.insertLine(jzsub.name, -1, null, jzsub);
@@ -270,9 +295,9 @@ public class FcmdExecuter
           line.setCellText(jzsub.name, 0);
           
         }
-        widgSelectJzExt.setCurrentLine(firstLine, 0, 0); //set the first line to position 0.
+        this.widgSelectJzExt.setCurrentLine(firstLine, 0, 0); //set the first line to position 0.
         //windConfirmExec.setWindowVisible(true);
-        windConfirmExec.setFocus();
+        this.windConfirmExec.setFocus();
         
       }
       
@@ -311,19 +336,6 @@ public class FcmdExecuter
       } else return false;
   } };  
   
-  /**This action is associated to any {@link FcmdFileCard} as action on enter file.
-   * The file is given as parameter then.
-   */
-  GralUserAction actionOnEnterFile = new GralUserAction("actionOnEnterFile")
-  { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
-    { FileRemote file = (FileRemote)params[0]; 
-      executeFileByExtension(file);  
-      return true;
-    }
-  };
-  
-  
-
   
   
   

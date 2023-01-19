@@ -3,7 +3,7 @@ package org.vishia.gral.test;
 import java.text.ParseException;
 
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.cfg.GralCfgWindow;
+import org.vishia.gral.cfg.GralCfgWindow_Old;
 
 ;
 
@@ -15,7 +15,7 @@ public class HelloWorldScript
 
   public static void main(String[] args){
     GralWindow window = null;
-    try{ window = GralCfgWindow.createWindow("HelloWorldWindow", " hello world ", 'C', script, null, null);
+    try{ window = GralCfgWindow_Old.createWindow("HelloWorldWindow", " hello world ", 'C', script, null, null);
     } catch(ParseException exc) {
       System.err.println("cannot create window because error in config file: " + exc.getMessage());
     }

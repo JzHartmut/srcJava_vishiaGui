@@ -1,5 +1,7 @@
 package org.vishia.gral.ifc;
 
+import java.io.IOException;
+
 /**A GralRectangle is a commonly use-able data class to hold any x,y and size values in integer. 
  * It is used for some return data, often it is pixel units.
  * <br><br>
@@ -44,6 +46,13 @@ public class GralRectangle
   public GralRectangle(int x, int y, int dx, int dy)
   { this.x = x; this.y = y; this.dx = dx; this.dy = dy;
   }
+ 
+  
+  public static void toString(Appendable out, int x, int y, int dx, int dy) throws IOException {
+    out.append("[bounds x,y=").append(Integer.toString(x)).append('+').append(Integer.toString(dx)).append(", ").append(Integer.toString(y)).append('+').append(Integer.toString(dy)).append(']');
+    
+  }
+  
   
   @Override public String toString(){
     return "GralRectangle(" + x + " + " + dx + ", " + y + " + " + dy + ")";

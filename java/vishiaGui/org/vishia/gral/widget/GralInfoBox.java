@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidget.ImplAccess;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWindow_setifc;
@@ -17,6 +18,7 @@ import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_getifc;
 import org.vishia.gral.ifc.GralTextBox_ifc;
@@ -84,6 +86,9 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   private GralUserAction actionOk;
   
+  
+  private GralWidgetBase_ifc wdgInFocus;
+  
   public GralInfoBox(GralWindow window, GralTextBox textBox, GralTextField infoLine, GralWidget buttonOk)
   {
     this.window = window;
@@ -91,6 +96,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     this.htmlBox = null;
     this.infoLine = infoLine;
     this.buttonOk = buttonOk;
+    this.wdgInFocus = textBox;
   }
   
   public GralInfoBox(GralWindow window, GralHtmlBox htmlBox, GralTextField infoLine, GralWidget buttonOk)
@@ -100,19 +106,20 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     this.htmlBox = htmlBox;
     this.infoLine = infoLine;
     this.buttonOk = buttonOk;
+    this.wdgInFocus = textBox;
   }
   
-  public static GralInfoBox createTextInfoBox(GralMngBuild_ifc mng, String name, String title)
+  public static GralInfoBox createTextInfoBox(GralMng mng, String name, String title)
   {
     GralWindow window = mng.createWindow(name, title, GralWindow_ifc.windConcurrently);
     //TODO the position frame (size) regards the title bar, it should not do so!
-    mng.setPosition(0, -3, 0, 0, 0, '.');
+    mng.setPosition(0, -3, 0, 0, '.');
     GralTextBox text = mng.addTextBox(name, false, null, '.');
-    mng.setPosition(0, -4, -4, -2, 0, '.');
+    mng.setPosition(0, -4, -4, -2, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
-    mng.setPosition(-3, 0, -6, 0, 0, '.');
+    mng.setPosition(-3, 0, -6, 0, '.');
     GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "OK");
-    mng.setPosition(-3, 0, -16, -10, 0, '.');
+    mng.setPosition(-3, 0, -16, -10, '.');
     GralWidget buttonClear = mng.addButton(name + "-Info-clear", null, "clear");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonOk.setActionChange(box.actionOkButton);
@@ -121,15 +128,8 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   }
   
   
-  @Override public void setToPanel(GralMngBuild_ifc mng){
-    throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
-  }
 
-
-  @Override public void createImplWidget_Gthread(){
-    throw new IllegalArgumentException("TODO, new concept is not implemented yet.");
-  }
-
+ 
 
   
   /**Creates a sub window for showing html content.
@@ -141,23 +141,22 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
    * @param onTop
    * @return
    */
-  public static GralInfoBox createHtmlInfoBox(String posString, String name, String title, boolean onTop)
+  public static GralInfoBox createHtmlInfoBox(GralMng mng, GralPos currPos, String posName, String title, boolean onTop)
   {
     int props = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     if(onTop){ props |= GralWindow_ifc.windOnTop; }
-    GralWindow window = new GralWindow(posString, name, title, props); //mng.createWindow(name, title, props);
-    GralMng mng = GralMng.get();
-    window.setToPanel(mng);
+    GralWindow window = mng.addWindow(posName, title, props); //mng.createWindow(name, title, props);
+    //window.setToPanel(mng);
     //TODO the position frame (size) regards the title bar, it should not do so!
-    mng.setPosition(0, -3, 0, 0, 0, '.');
-    GralHtmlBox text = new GralHtmlBox(name); //     mng.addHtmlBox(name);
-    text.setToPanel(mng);
-    mng.setPosition(-2.5f, -0.5f, 0, -14, 0, '.');
+    mng.setPosition(0, -3, 0, 0, '.');
+    GralHtmlBox text = new GralHtmlBox(currPos, window.name + "-text"); //     mng.addHtmlBox(name);
+    //text.setToPanel(mng);
+    mng.setPosition(-2.5f, -0.5f, 0, -14, '.');
     GralTextField infoLine = mng.addTextField("info", false, null, null);
-    mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 0, 'r', 0.5f);
-    GralButton buttonLock = mng.addSwitchButton(name + "-Info-ok", "following", "locked", GralColor.getColor("wh"), GralColor.getColor("gn"));
-    mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 0, 'r', 0.5f);
-    GralWidget buttonOk = mng.addButton(name + "-Info-ok", null, "close");
+    mng.setPosition(-3, GralPos.size+3, -13, GralPos.size+6, 'r', 0.5f);
+    GralButton buttonLock = mng.addSwitchButton(window.name + "-Info-ok", "following", "locked", GralColor.getColor("wh"), GralColor.getColor("gn"));
+    mng.setPosition(-3, GralPos.size+3, -6, GralPos.size+6, 'r', 0.5f);
+    GralWidget buttonOk = mng.addButton(window.name + "-Info-ok", null, "close");
     GralInfoBox box = new GralInfoBox(window, text, infoLine, buttonOk);
     box.buttonLock = buttonLock;
     box.buttonOk.setActionChange(box.actionOkButton);
@@ -274,10 +273,10 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   
   
 
-  @Override public void repaint(){ repaint(0,0); }
+  @Override public void redraw(){ redraw(0,0); }
 
-  @Override public void repaint(int delay, int latest){
-    window.repaint(delay, latest);
+  @Override public void redraw(int delay, int latest){
+    window.redraw(delay, latest);
   }
   
   
@@ -300,6 +299,16 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return null;
   }
 
+  
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {
+    this.wdgInFocus = widg;
+  }
+  
+  @Override public GralWidgetBase_ifc getFocusedWidget() { 
+    return this.wdgInFocus;
+  }
+
+  
   @Override public void setFocus()
   { if(textBox !=null){ textBox.setFocus(); }
     else if(htmlBox !=null){ htmlBox.setFocus();}
@@ -308,6 +317,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   @Override public void setFocus(int delay, int latest)
   { if(textBox !=null){ textBox.setFocus(delay, latest); }
     else if(htmlBox !=null){ htmlBox.setFocus(delay, latest);}
+    //TODO regard wdgInFocus
   }
   
   
@@ -478,6 +488,27 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
   @Override public Object getData()
   {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override public void setVisibleStateWidget (
+      boolean visible ) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override public ImplAccess getImplAccess () {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override public GralPos pos () {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override public Object getImplWidget () {
     // TODO Auto-generated method stub
     return null;
   }

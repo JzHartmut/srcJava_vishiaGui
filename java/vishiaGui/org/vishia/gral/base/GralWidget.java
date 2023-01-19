@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,17 +13,20 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidgetCfg_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 import org.vishia.gral.widget.GralHorizontalSelector;
-import org.vishia.util.Assert;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
+import org.vishia.util.ObjectVishia;
 
 
 
@@ -68,7 +72,7 @@ import org.vishia.util.KeyCode;
  *                                             |<*>------------------------>swt.Canvas
  *                                             |                                  |
  *                                             |                                  |
- *                                          -paintRoutine <-------paintListener---|
+ *                                          -drawRoutine <-------drawListener---|
  *                                          -mouseListener<-------mouseListener---|
  *                                          -etc.                          
  *                                      
@@ -79,17 +83,17 @@ import org.vishia.util.KeyCode;
  * Then the user builds its graphic appearance with invocation of {@link GralHorizontalSelector#setToPanel(GralMngBuild_ifc)}
  * with the derived instance of {@link GralMng} as parameter. 
  * <br><br>  
- * The <code>GralWidget</code> knows the graphic implementation via the {@link GralWidgImpl_ifc} to invoke some methods
+ * The <code>GralWidget</code> knows the graphic implementation via the {@link GralWidgImplAccess_ifc} to invoke some methods
  * for the graphical appearance. The interface is independent
  * of the implementation itself. The implementor of this interface for this example 
  * is the {@link org.vishia.gral.swt.SwtHorizontalSelector} implements this methods. 
  * <br><br>
  * The SwtHorizontalSelector refers the platform-specific widget Object (Swing: javax.swing.JComponent, 
  * org.eclipse.swt.widgets.Control etc.), in this case a {@link org.eclipse.swt.widgets.Canvas}. 
- * It contains the special paint routines, mouse handling etc. 
+ * It contains the special draw routines, mouse handling etc. 
  * <br><br>
  * The platform-specific widget has a reference to the GralWidget, in this case the {@link GralHorizontalSelector}
- * stored as Object-reference. This reference can be used in the paintRoutine, mouseListerner etc. to get
+ * stored as Object-reference. This reference can be used in the drawRoutine, mouseListerner etc. to get
  * information about the GralWidget.  
  * <br><br> 
  * The second form takes most of the characteristics as parameters for the creating method. 
@@ -171,12 +175,24 @@ import org.vishia.util.KeyCode;
  * @author Hartmut Schorrig
  *
  */
-public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
+public abstract class GralWidget extends GralWidgetBase implements GralWidget_ifc, GralSetValue_ifc, GetGralWidget_ifc
 {
   
   /**Version, history and license.
    * <ul>
-   * <li>2016-09-30 Hartmut improved: {@link #repaint(int, int)} now the second argument can be really 0 to prevent a not required repaint from the first repaint call
+   * <li>2022-12-11 new: {@link ActionChangeSelect#onAnyKey}: This action was missing especially in a {@link GralTable},
+   *   because only the common action was used without designation. Is it satisfying? Better have the specific action for key pressing. 
+   *   The change was done maybe without necessity but with a systematically focus. 
+   * <li>2022-11-11 chg: {@link #createImplWidget_Gthread()} is now only existing in this class, 
+   *   works together with the derived {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)}.
+   *   Necessities of {@link GralWindow#mainPanel} and children of {@link GralPanelContent} are regarded here. 
+   * <li>2022-11-01 new very important: {@link #redraw(int, int, boolean)} and {@link #redrawOnlyDynamics(int, int)}.
+   *   The concept of dynamics in the widget positions is introduced with the {@link GralCanvasStorage}.
+   *   Generally: repaint and redraw are synonymous, also in SWT. I want to use better wording redraw if possible.   
+   * <li>2022-09-13 {@link ImplAccess#setPosBounds()} now regard the tab panel on resize.
+   * <li>2022-09-13 new {@link #toString(Appendable)} usable for comprehensive reports and toString() 
+   * <li>2022-08 new {@link GralWidget#GralWidget(GralPos, String, char)} for the new concept, some more adaptions. 
+   * <li>2016-09-30 Hartmut improved: {@link #redraw(int, int)} now the second argument can be really 0 to prevent a not required redraw from the first redraw call
    *   if some more replaints are registered per delay.
    * <li>2016-09-30 Hartmut bugfix: {@link #setFocus()} has set the default focus of the primaryWindow if the focus of a window was set.
    * <li>2016-09-30 Hartmut New idea, concept: {@link ImplAccess#wdgimpl}: That refers an implementation of a WidgetHelper class of the implementation layer
@@ -200,12 +216,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)} sets the only one or special actions,
    *   {@link #getActionChange(org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen)} selects a proper one. 
    *   All derived widgets and implementation are adapted to the new system. The user interface is nearly identical.
-   * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImpl_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
+   * <li>2016-07-03 Hartmut chg: it is not derived from {@link GralWidgImplAccess_ifc} any more. It was the old concept: An implementing widgets was derived from the GralWidget. 
    *   The new concept is: An implementing widget is derived from its derived class of {@link GralWidget.ImplAccess}. Therefore only that base class implements the GralWidgetImpl_ifc.
    * <li>2016-07-03 Hartmut chg: handling of visible: A GralWidget is invisible by default. {@link #setVisible(boolean)} should be invoked on creation.
    *   It is possible that widgets are switched. All widgets of a non-visible tab of a tabbed panel are set to invisible, especially {@link #bVisibleState} = false.
    *   The {@link #isVisible()} is checked to decide whether a widget should be updated in the inspector. Only visible widgets should be updated.
-   *   The {@link GralWidgImpl_ifc#setVisibleGThread(boolean)} is implemented to all known widgets for the implementation layer in the kind of {@link #setFocusGThread()}.
+   *   The {@link GralWidgImplAccess_ifc#setVisibleGThread(boolean)} is implemented to all known widgets for the implementation layer in the kind of {@link #setFocusGThread()}.
    *   See documentation on the methods.   
    * <li>2015-09-20 Hartmut chg: some final methods now non final, because they have to be overridden for large widgets.
    * <li>2015-09-20 Hartmut chg: gardening for {@link DynamicData#getChanged()}, now private attribute {@link DynamicData#whatIsChanged}
@@ -218,14 +234,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    *   if any editing key was received. Then the GUI-operator may mark a text or make an input etc. The setting of the text
    *   from a cyclically thread should be prevented then to prevent disturb the GUI-operation. If the focus was lost then this bit
    *   is reseted. It is an important feature for GUI-handling which was missed up to now. 
-   *   Yet only used for {@link GralTextField#setText(CharSequence, int)}. It may prevent repaint for universally usage for all widgets.
+   *   Yet only used for {@link GralTextField#setText(CharSequence, int)}. It may prevent redraw for universally usage for all widgets.
    * <li>2015-01-27 Hartmut new: method {@link #getVariable(VariableContainer_ifc)} instead {@link #getVariableFromContentInfo(VariableContainer_ifc)}.
    *   The last one method is used in an application but it does not run well for all requirements. The code of {@link #getVariable(VariableContainer_ifc)}
    *   is copied from the well tested {@link #refreshFromVariable(VariableContainer_ifc)} as own routine and then used in a new application.    
    * <li>2014-01-15 Hartmut new: {@link #getCmd(int)} with options.
    * <li>2014-01-03 Hartmut new: {@link #isInFocus()} 
-   * <li>2013-12-21 Hartmut chg: {@link #repaint()} invokes redraw immediately if it is in graphic thread.
-   *   It invokes {@link #repaint(int, int)} with the {@link #repaintDelay} if it is not in graphic thread.
+   * <li>2013-12-21 Hartmut chg: {@link #redraw()} invokes redraw immediately if it is in graphic thread.
+   *   It invokes {@link #redraw(int, int)} with the {@link #redrawtDelay} if it is not in graphic thread.
    *   It does nothing if the implementation layer widget is not created yet. It means it can invoked
    *   without parameter in any case.
    * <li>2013-12-21 Hartmut chg: {@link ImplAccess#setDragEnable(int)} and setDropEnable moved from the core class.
@@ -262,16 +278,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>2012-04-01 Hartmut new: {@link #refreshFromVariable(VariableContainer_ifc)}. A GralWidget is binded now
    *   more to a variable via the new {@link VariableAccessWithIdx} and then to any {@link VariableAccess_ifc}.
    *   It is possible to refresh the visible information from the variable.
-   * <li>2012-01-04 Hartmut new: {@link #repaintDelay}, use it.  
+   * <li>2012-01-04 Hartmut new: {@link #redrawtDelay}, use it.  
    * <li>2012-03-31 Hartmut new: {@link #isVisible()} and {@link ImplAccess#setVisibleState(boolean)}.
    *   renamed: {@link #implMethodWidget_} instead old: 'gralWidgetMethod'.
-   * <li>2012-03-08 Hartmut chg: {@link #repaintRequ} firstly remove the request from queue before execution,
+   * <li>2012-03-08 Hartmut chg: {@link #redrawRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
-   * <li>2012-02-22 Hartmut new: catch on {@link #repaintGthread()} and continue the calling level
-   *   because elsewhere the repaint order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicTimeOrder)}-queue.
+   * <li>2012-02-22 Hartmut new: catch on {@link #redrawGthread()} and continue the calling level
+   *   because elsewhere the redraw order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicTimeOrder)}-queue.
    * <li>2012-02-22 Hartmut new: implements {@link GralSetValue_ifc} now.
-   * <li>2012-01-16 Hartmut new Concept {@link #repaint()}, can be invoked in any thread. With delay possible. 
-   *   All inherit widgets have to be implement  {@link #repaintGthread()}.
+   * <li>2012-01-16 Hartmut new Concept {@link #redraw()}, can be invoked in any thread. With delay possible. 
+   *   All inherit widgets have to be implement  {@link #redrawGthread()}.
    * <li>2011-12-27 Hartmut new {@link #setHtmlHelp(String)}. For context sensitive help.
    * <li>2011-11-18 Hartmut bugfix: {@link #setFocusGThread()} had called {@link GralMng#setFocus(GralWidget)} and vice versa.
    *   Instead it should be a abstract method here and implemented in all Widgets. See {@link org.vishia.gral.swt.SwtWidgetHelper#setFocusOfTabSwt(org.eclipse.swt.widgets.Control)}.
@@ -336,30 +352,25 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2016-09-02";
+  public static final String sVersion = "2022-09-13";
 
   
-  /**The widget manager from where the widget is organized. Most of methods need the information
-   * stored in the panel manager. This reference is used to set values to other widgets. */
-  protected GralMng itsMng;
+  //private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
   
-  /**The position of the widget. It may be null if the widget should not be resized. */
-  private GralPos _wdgPos;
-
-
   /**The implementation specific widget. The instance is derived from the graphic implementation-specific
    * super class of all widgets such as {@link org.eclipse.swt.widgets.Control} or {@link java.awt.Component}. 
    * The user can check and cast this instance if some special operations may be need graphic-implementation-dependent.
    * It is recommended that implementation specific features should not used if they are not necessary
    * and the application should be held graphic implementation independent.
    * <br><br>
-   * This reference is null if the GralWidgets extends the Graphic specific implementation widget.
-   * It should be used in the future (2013-06).
+   * This reference is null if the implementation independent GralWidget is only created yet,
+   * and the implementation is not created till now.
+   * Call of {@link #createImplWidget_Gthread()} creates the implementation. 
    */
   public ImplAccess _wdgImpl;
 
 
-  protected GralMngBuild_ifc buildMng;
+  protected GralMngBuild_ifc XXXbuildMng;
   
   /**Association to the configuration element from where this widget was built. 
    * If the widget is moved or its properties are changed in the 'design mode' of the GUI,
@@ -376,6 +387,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected static class ActionChangeSelect
   {
     ActionChange onAnyChangeContent;
+    ActionChange onAnyKey;
     ActionChange onEnter;
     ActionChange onCtrlEnter;
     ActionChange onFocusGained;
@@ -410,12 +422,22 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     private String[] sShowParam;
     
     
-    /**Either this or {@link #actionChangeSelect} is set. */
+    /**If this field is set, this is the only one action for the widget.
+     * Either the action is specified for a definitive operation, then also {@link #actionChange1When} is set.
+     * Or this action is called on any situation.
+     * <br>
+     * If this field is set, {@link #actionChangeSelect} is null. (Saves memory space if only one action is given).
+     * If this field is null, {@link #actionChangeSelect} may be set for more as one dedicated actions. */
     protected ActionChange actionChange1;
     
+    /**Condition(s) for the only one {@link #actionChange1}. 
+     * If this field is null, but 'actionChange1' is set, then 'actionChange1' is valid for all occurrences.
+     * This field is null if 'actionChange1' is null.
+     */
     protected ActionChangeWhen[] actionChange1When;
     
-    /**Either this or {@link #actionChange} is set. */
+    /**sub object for more as one action. If this field is set, {@link #actionChange1} is null.
+     * */
     protected ActionChangeSelect actionChangeSelect;
 
     /**Action method on activating, changing or release the widget-focus. */
@@ -448,11 +470,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
 
   }
   
-  /**Reference to the common configuration data for widgets. */
+  /**Reference to the common configuration data for widgets.
+   * See the inner class {@link ConfigData}. It is a sub structure. 
+   * It has no cohesion with the {@link #itsCfgElement}.  */
   public ConfigData cfg = new ConfigData();
-  
-  /**Name of the widget in the panel. */
-  public String name;
   
     
   
@@ -496,10 +517,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * <li>U: a graphical value representation (bar etc)
    * <li>V: a graphical value enter representation (slider etc)
    * <li>w: A window.
-   * <li>@: A Tabbed Panel
+   * <li>xx@: A Tabbed Panel deprecated
    * <li>$: Any Panel (composite)
    * <li>+: A canvas panel
    * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
+   * <li>9: GralArea9Panel
    * </ul>
    * */
   public final char whatIs;
@@ -578,12 +600,12 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   protected boolean bShouldInitialize = true;
   
   
-  /**Standard delay to repaint if {@link #repaint()} is called without arguments. 
-   * It delays a few time because an additional process can be occure in a short time, and only one repaint should be invoked.
-   * The repaintDelayMax limits a shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
+  /**Standard delay to redraw if {@link #redraw()} is called without arguments. 
+   * It delays a few time because an additional process can be occur in a short time after, and only one redraw should be invoked.
+   * The redrawDelayMax limits are shifting to the future. See {@link org.vishia.event.EventTimeout}, that is used.
    * 
    */
-  protected int repaintDelay = 30, repaintDelayMax = 100;
+  protected int redrawtDelay = 50, redrawDelayMax = 100;
 
   /**The time when the bVisible state was changed. */
   long lastTimeSetVisible = 0;
@@ -593,14 +615,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**This inner class holds the dynamic data of a widget.
    * This data are existent for any widget independent of its type.
    * It can be used in a specific way depending on the widget type.
+   * <br>
+   * Hint for visibility in Java: The class and members are public. 
+   * But the access to the class, the reference {@link GralWidget#dyda} is protected. 
+   * To access any data from a implementing widget, use {@link GralWidget.ImplAccess#dyda()}
+   * which is protected but visible for the own widget implementation. 
    */
   public final static class DynamicData {
     
-    /**32 bit what is changed, see {@link GralWidget#chgColorText} etc. 
-     * TODO should be protected. */
+    /**32 bit what is changed, see {@link GralWidget.ImplAccess#chgColorText} etc. 
+     * with this information the redraw in the implementing level can see what is to do. */
     private AtomicInteger whatIsChanged = new AtomicInteger(); 
     
     /**Sets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
+     * It uses the atomic access capability (see {@link #whatIsChanged}) to ensure thread safety.
      * @param mask one bit or some bits. ImplAccess.chgXYZ
      */
     public void setChanged(int mask){
@@ -621,24 +649,26 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public int getChanged(){ return whatIsChanged.get(); }
     
     /**Resets what is changed, Bits defined in {@link GralWidget.ImplAccess#chgColorBack} etc.
-     * This routine should be called in the paint routine whenever the change was succeeded.
+     * This routine should be called in the draw routine whenever the change was succeeded.
      * @param mask one bit or some bits. ImplAccess.chgXYZ
      */
     public void acknChanged(int mask){
       int catastrophicalCount = 1000;
       boolean bOk;
       do {
-        int act =whatIsChanged.get();
+        int act =this.whatIsChanged.get();
         int newValue = act & ~mask;
-        bOk = whatIsChanged.compareAndSet(act, newValue);
+        bOk = this.whatIsChanged.compareAndSet(act, newValue);
       } while(!bOk && --catastrophicalCount >= 0);
     }
     
     
-    /**Three colors for background, line and text should be convert to the platforms color and used in the paint routine. 
+    /**Three colors for background, line and text should be convert to the platforms color and used in the draw routine. 
      * If this elements are null, the standard color should be used. */
-    public GralColor backColor = GralColor.getColor("wh"), backColorNoFocus = GralColor.getColor("lgr")
-      , lineColor = GralColor.getColor("bk"), textColor = GralColor.getColor("bk");
+    public GralColor backColor = GralColor.getColor("wh")  // proper for show fields
+      , backColorNoFocus = GralColor.getColor("lgr")
+      , lineColor = GralColor.getColor("bk")
+      , textColor = GralColor.getColor("bk");
 
     /**It depends of the pixel size. Therefore set after setToPanel, if GralMng is known. */
     public GralFont textFont;
@@ -702,71 +732,93 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @deprecated since 2016-09: May use always {@link GralWidget#GralWidget(String, char)} if levels above are proper
    */
   @Deprecated public GralWidget(String pos, String name, char whatIs){ 
-    this(pos !=null ? ( (pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, whatIs);
+    this((GralPos)null, pos !=null ? ( (pos.startsWith("@") ? "" : "@") + pos + "=" + name) : name, whatIs);
+  }
+
+  
+  /**Constructs the widget with a maybe separately given position string. 
+   * It should only be used if this is the signature of the derived widget.  
+   * @param currPos
+   * @param posName can be null if only name is given, can contain "<positionString>"
+   *   or also "@<positionString> = name"
+   * @param name if posName == null, should be given as name, can be null if name is defined by posName writing "... = name"
+   * @param whatIs See {@link #whatIs}, type of widget.
+   */
+  public GralWidget ( GralPos currPos, String posName, String name, char whatIs, GralMng gralMng){ 
+    this(currPos                                           // can also be the position immediately to use if pos == null
+        , posName ==null ? name                            // pos not given, use only name. Name can start with @ and contains then a posString.
+          : ( (posName.startsWith("@") ? "" : "@")         // supplement @ if not given in pos 
+              + posName + 
+              ( name == null ? "" : "=" + name) )          // combine @pos = name 
+        , whatIs, gralMng);
+  }
+
+
+  public GralWidget ( GralPos currPos, String posName, String name, char whatIs){
+    this(currPos, posName, name, whatIs, null);
+  }
+  
+  
+  protected GralWidget ( GralPos currPos, String sPosName, char whatIs){
+    this(currPos, sPosName, whatIs, currPos.parent.gralMng());
   }
 
   
   
   /**Creates a widget.
-   * @param sName has the form "@pos = name" then this is a combination from position string and name.
-   *   The name should be unified to indent a widget by its name.
-   *   Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
+   * @param currPos The position, absolute. This is either the given ready to use position
+   *   or the basic of a relative position given in the posName argument.
+   *   <br>
+   *   If null then the {@link GralMng#pos()} is used, the argument gralMng should be given.
+   *   A given position in the posName argument is written back to this given instance,
+   *   also on given absolute positions. Especially for relative positions to the previous widgets this is sensible.
+   *   For internal use the position info are cloned to a internal separated position instance aggregated by the widget.
+   *   It means the given currPos argument can be changed afterwards, especially to calculate new positions from the current one. 
+   *   if this argument is null, the central singleton position in the GralMng is used. 
+   *   Then the thread safety is not given. 
+   * @param sPosName can have the form "@pos = name" then this is a combination from position string and name.
+   *   <br>* The name should be unified to indent a widget by its name for the whole application.
+   *   <br>* The position string will be applied to the given currPos.
+   *   <br>* Syntax of pos: see {@link GralPos#setPosition(CharSequence, GralPos)}. It is the same syntax as in textual config scripts. 
    * @param whatIs See {@link #whatIs}
+   * @param gralMng should be given if currPos is not given, to work with a dedicated GralMng, not with the singleton.
+   *   If currPos is given and valid, this argument can be null.
    */
-  public GralWidget(String sPosName, char whatIs){ 
-    int posName;
-    String posString1;
-    if(sPosName !=null && sPosName.startsWith("@") && (posName= sPosName.indexOf('='))>0) {
-      posString1 = sPosName.substring(0, posName).trim();
-      this.name = sPosName.substring(posName+1).trim();
-    } else {
-      this.name = sPosName;
-      posString1 = null;
-    }
+  public GralWidget ( GralPos refPos, String sPosName, char whatIs, GralMng gralMng){ 
+    super(refPos, sPosName, gralMng);                     // set the gralMng reference, maybe from currPos or from gralMng
+    assert(this.gralMng !=null);
     //this.widget = null;
     this.whatIs = whatIs;
     //bVisibleState = whatIs != 'w';  //true for all widgets, false for another Windows. 
-    bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
+    //this.bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
     this.itsCfgElement = null;
-    itsMng = GralMng.get();
-    assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
-    if(posString1 !=null) {
-      try{
-        if(whatIs == 'w') {
-          //a window: don't change the GralMng.pos, create a new one.
-          GralPos pos = new GralPos();
-          pos.panel = itsMng.getPrimaryWindow();
-          this._wdgPos = pos.setNextPos(posString1);
-        } else {
-          //a normal widget on a panel
-          this._wdgPos = itsMng.pos().pos.setNextPos(posString1);
-        }
-        registerWidget();
-      } catch(ParseException exc) {
-        throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString1);
-      }
-    } //else: don't set the pos, it is done later 
+    assert(this.gralMng !=null);  //should be created firstly in the application, since 2015-01-18
+    registerWidget();
+
   }
   
   
+  
+  
+  
   void registerWidget() {
-    if(this._wdgPos.panel == this) {
+    if(this._wdgPos.parent == this) {
       //don't register the panel itself!
-    } else if(_wdgPos.panel !=null){
-      this._wdgPos.panel.addWidget(this, _wdgPos.toResize());
-    } else {
-      this._wdgPos.panel = itsMng.getCurrentPanel();
+    } else if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent){
+      ((GralPanelContent)this._wdgPos.parent).addWidget(this, _wdgPos.toResize());
+    } else if(_wdgPos ==null) {
+      this._wdgPos.parent = gralMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
     }
+    this.gralMng.registerWidget(this);
   }
   
   
   @Deprecated public GralWidget(String sName, char whatIs, GralMng mng)
-  { this(sName, whatIs);
-    itsMng = GralMng.get();
-    assert(itsMng !=null);  //should be created firstly in the application, since 2015-01-18
+  { this((GralPos)null, sName, whatIs);
+    assert(gralMng !=null);  //should be created firstly in the application, since 2015-01-18
     if(mng !=null){
-      assert(this.itsMng == mng);
+      assert(this.gralMng == mng);
       //sets the mng and the pos of Window in that cases
       //where the mng is present on ctor. (not in new form)
       //setPanelMng(mng);   
@@ -782,40 +834,86 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Standard implementation of  @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel()
-   * Only large widgets (contains more as one GralWidget) should override this method.
-   * If the _wdgImpl is initialized already, this method does nothing. It is possible to invoke this for all existing widgets
-   * of a panel, only new widgets are initialized with them. 
-   * @before 2016-07 it has thrown an exception on repeated invocation.
+  /**Creates the implementation widget instance(s). 
+   * This routine should be called only one time after the Gral widget was created. 
+   * It creates the graphical appearance using the capabilities of the derived GralMng for the systems graphic level.
+   * This operation invokes the abstract operation {@link GralMng.ImplAccess#createImplWidget_Gthread(GralWidget)} 
+   * which is implemented in the derived Mng instances for the implementation graphic.
+   * It tests the type of the derived GralWidget to create the correct graphical implementation widget. 
+   * <br>
+   * The implementation of a widget is firstly a class which is inherit from {@link ImplAccess}. With them the {@link GralWidget}
+   * is references because it is the environment class. The implementation graphical widget is an aggregation in this instance. It is possible 
+   * that more as one implementation widget is used for a Gral Widget implementation. For example a text field with a prompt
+   * consists of two implementation widgets, the text field and a label for the prompt.
+   * <br><br>
+   * <b>Positioning and Registering the widget:</b>
+   * That is clarified by the {@link #_wdgPos} of the Gral widget. 
+   * The GralPos can contain relative or negative values from bottom or left. 
+   * It means for the particular position the area of the panel where the widget is positioned is necessary to calculate.
+   * <br><br>
+   * This operation is or should be overridden for the {@link GralPanelContent}, {@link GralWindow}
+   * and all comprehensive widgets which contains from more as one basic widget. 
+   * The overridden operation should call this operation for the the basically widgets for the implementation. 
+   * The overridden operations may be called firstly this operation as super.createImplWidget_Gthread()
+   * if the derived class has also a basic implementation widget as parent.
+   * Or it shold call firstly {@link #checkImplWidgetCreation()}.
+   * On both, return false should prevent creation of the internal widgets.
+   * This is so for {@link GralWindow} and {@link GralPanelContent},
+   * see {@link GralWindow#createImplWidget_Gthread()} and {@link GralPanelContent#createImplWidget_Gthread()}.
+   *   
+   * @throws IllegalStateException This routine can be called only if the graphic implementation widget is not 
+   *   existing. It is one time after startup or more as one time if {@link #removeWidgetImplementation()}
+   *   was called. 
    */
-  @Override public void createImplWidget_Gthread() throws IllegalStateException {
-    if(_wdgImpl ==null){ // throw new IllegalStateException("setToPanel faulty call - GralTable;");
-      GralMng mngg = GralMng.get();  //The implementation should be instantiated already!
-      if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
-        dyda.textFont = mngg.propertiesGui.getTextFont(mngg.pos().pos.height());
-        dyda.setChanged(ImplAccess.chgFont);
+  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+    try {
+      if(checkImplWidgetCreation(this._wdgImpl)) {
+        if(dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
+          dyda.textFont = this.gralMng.gralProps.getTextFont(this._wdgPos.height());
+          dyda.setChanged(ImplAccess.chgFont);
+        }
+        
+          this.gralMng._mngImpl.createImplWidget_Gthread(this); //calls Implementation manager functionality to satisfy
+//        if(this instanceof GralWindow) {
+//          //------------------------------------------------ // a GralWindow aggregates anytime a GralPanelContent
+//          //the implementation can decide whether the same implementation widget is used
+//          //also for the GralPanelContent or create an own one.
+//          ((GralWindow)this).mainPanel.createImplWidget_Gthread();
+//        }
+//        else if(this instanceof GralPanelContent) {
+//          //------------------------------------------------ // a panel contains children, create it.
+//          ((GralPanelContent)this).createChildrensImplWidget_Gthread();
+//         }
+        if(this.contextMenu !=null) {
+          this.gralMng._mngImpl.createContextMenu(this);
+        }
+        return true;
       }
-      mngg.createImplWidget_Gthread(this);
+    } catch(Throwable exc) {
+      System.err.println(ExcUtil.exceptionInfo("\nERROR: implementing widget " + this.name +": ", exc, 0,10));
+    }
+    return false; //on catched exception of not implementation. see return inside.
+  }
+
+  
+  
+  public void setToPanel(GralMng gralMng) {
+    createImplWidget_Gthread();
+  }
+  
+  
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    if(this._wdgImpl !=null) {
+      this._wdgImpl.removeWidgetImplementation();
+      this._wdgImpl = null;
     }
   }
-
   
-  
-  /**
-   * @see org.vishia.gral.ifc.GralWidget_ifc#setToPanel(org.vishia.gral.ifc.GralMngBuild_ifc)
-   * @deprecated use {@link #createImplWidget_Gthread()}
-   */
-  @Override @Deprecated public final void setToPanel(GralMngBuild_ifc mngUnused) throws IllegalStateException { createImplWidget_Gthread(); }
-
-  
-  public GralPos pos(){ return _wdgPos; } 
-  
-  
-  
-  public void chgPos(GralPos newPos){
-    dyda.setChanged(ImplAccess.chgPos);
-    _wdgPos = newPos;
-  }
   
   /**Returns this.
    * @see org.vishia.gral.base.GetGralWidget_ifc#getGralWidget()
@@ -831,11 +929,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public void setPrimaryWidgetOfPanel(){
-    _wdgPos.panel.setPrimaryWidget(this);
+    ((GralPanelContent)_wdgPos.parent).setFocusedWidget(this);
   }
 
   
-  @Override public String getName(){ 
+  @Deprecated @Override public String getName(){ 
     if(name !=null) return name;
     else if(sDataPath !=null) return sDataPath;
     else if(sCmd !=null) return sCmd;
@@ -878,7 +976,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * This info can be set and changed anytime. */
   public void setData(Object data){  oContentInfo = data;}
   
-  /**Gets the application specific info. See {@link #setContentInfo(Object)}. */
+  /**Gets the application specific info. See {@link #setData(Object)}. */
   public Object getData(){ return oContentInfo; }
   
  
@@ -887,7 +985,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(bEditable != editable) {
       bEditable = editable;
       dyda.setChanged(ImplAccess.chgEditable); 
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
   }
 
@@ -901,8 +999,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setDataPath(String sDataPath){  
     this.sDataPath = sDataPath;
-    variable = null;
-    variables = null;
+    this.variable = null;              // should be associated newly
+    this.variables = null;
   }
   
   /**Changes the data path
@@ -962,13 +1060,18 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * </ul> 
    * @param action any instance. Its action method is invoked depending of the type of widget
    *        usual if the user takes an action on screen, press button etc.
-   *        
+   * @deprecated use instead {@link #specifyActionChange(String, GralUserAction, String[], org.vishia.gral.ifc.GralWidget_ifc.ActionChangeWhen...)}
+   *   possible in form 'specifyActionChange(null, action, null);' 
    */
   @Deprecated public void setActionChange(GralUserAction action){ specifyActionChange(null, action, null); } //cfg.actionChanging = action; }
   
   
+  /**Contains all actions only to store a single action in 
+   * 
+   */
   private static ActionChangeWhen[] whenAll = 
   { ActionChangeWhen.onAnyChgContent
+  , ActionChangeWhen.onAnyKey
   , ActionChangeWhen.onFocusGained
   , ActionChangeWhen.onChangeAndFocusLost
   , ActionChangeWhen.onCtrlEnter
@@ -984,7 +1087,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   };
 
   
-  /**Sets the action to invoke after changing or touching the widget.
+  /**Sets the action to invoke after changing or touching the widget due to GUI handling.
    * @param sAction maybe null, String for visualization, especially menu entry for context menu.
    * @param action The action. null admissible to remove the existing action. 
    * @param args possible arguments for the action or null
@@ -1023,6 +1126,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   {
     switch(when){
     case onAnyChgContent: cfg.actionChangeSelect.onAnyChangeContent = action; break;
+    case onAnyKey: cfg.actionChangeSelect.onAnyKey = action; break;
     case onCtrlEnter: cfg.actionChangeSelect.onCtrlEnter = action; break;
     case onFocusGained: cfg.actionChangeSelect.onFocusGained = action; break;
     case onChangeAndFocusLost: cfg.actionChangeSelect.onChangeAndFocusLost = action; break;
@@ -1042,8 +1146,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   public void specifyContextMenu(GralMenu menu) {
-    if(_wdgImpl !=null && _wdgImpl.wdgimpl !=null) { _wdgImpl.wdgimpl.specifyContextMenu(menu); }
-    else { } //TODO set to instanciation data
+//    if(_wdgImpl !=null && _wdgImpl.wdgimpl !=null) { _wdgImpl.wdgimpl.specifyContextMenu(menu); }
+//    else { } //TODO set to instanciation data
   
   }
   
@@ -1069,14 +1173,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @return null if the action is not set.
    */
   public ActionChange getActionChangeStrict(ActionChangeWhen when, boolean strict) {
-    if(cfg.actionChange1 !=null) {
-      if(cfg.actionChange1When == null){ 
+    if(this.cfg.actionChange1 !=null) {
+      if(this.cfg.actionChange1When == null){ 
         return strict && when !=null 
           ? null                //specific action required and strict: returns null though a common action is given.
-          : cfg.actionChange1;  //no specific action required or set, or no specifia action set and not strict: returns the only one action.
+          : this.cfg.actionChange1;  //no specific action required or set, or no specifia action set and not strict: returns the only one action.
       } else {
-        for(ActionChangeWhen when1:cfg.actionChange1When){
-          if(when1 == when) return cfg.actionChange1;
+        for(ActionChangeWhen when1:this.cfg.actionChange1When){
+          if(when1 == when) return this.cfg.actionChange1;
         }
         //not found:
         return null;
@@ -1085,19 +1189,20 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       //actionChangeSelect is given:
       if(when == null || cfg.actionChangeSelect == null) return null;
       switch(when){
-      case onAnyChgContent: return cfg.actionChangeSelect.onAnyChangeContent;
-      case onCtrlEnter: return cfg.actionChangeSelect.onCtrlEnter;
-      case onFocusGained: return cfg.actionChangeSelect.onFocusGained;
-      case onChangeAndFocusLost: return cfg.actionChangeSelect.onChangeAndFocusLost;
-      case onDrag: return cfg.actionChangeSelect.onDrag;
-      case onDrop: return cfg.actionChangeSelect.onDrop;
-      case onEnter: return cfg.actionChangeSelect.onEnter;
-      case onMouse1Double: return cfg.actionChangeSelect.onMouse1Double;
-      case onMouse1Dn: return cfg.actionChangeSelect.onMouse1Dn;
-      case onMouse1Up: return cfg.actionChangeSelect.onMouse1Up;
-      case onMouse1UpOutside: return  cfg.actionChangeSelect.onMouse1UpOutside;
-      case onMouse2Up: return cfg.actionChangeSelect.onMouse2Up;
-      case onMouseWheel: return cfg.actionChangeSelect.onMouseWheel;
+      case onAnyChgContent: return this.cfg.actionChangeSelect.onAnyChangeContent;
+      case onAnyKey: return this.cfg.actionChangeSelect.onAnyKey;
+      case onCtrlEnter: return this.cfg.actionChangeSelect.onCtrlEnter;
+      case onFocusGained: return this.cfg.actionChangeSelect.onFocusGained;
+      case onChangeAndFocusLost: return this.cfg.actionChangeSelect.onChangeAndFocusLost;
+      case onDrag: return this.cfg.actionChangeSelect.onDrag;
+      case onDrop: return this.cfg.actionChangeSelect.onDrop;
+      case onEnter: return this.cfg.actionChangeSelect.onEnter;
+      case onMouse1Double: return this.cfg.actionChangeSelect.onMouse1Double;
+      case onMouse1Dn: return this.cfg.actionChangeSelect.onMouse1Dn;
+      case onMouse1Up: return this.cfg.actionChangeSelect.onMouse1Up;
+      case onMouse1UpOutside: return  this.cfg.actionChangeSelect.onMouse1UpOutside;
+      case onMouse2Up: return this.cfg.actionChangeSelect.onMouse2Up;
+      case onMouseWheel: return this.cfg.actionChangeSelect.onMouseWheel;
       default: throw new IllegalArgumentException("not all when-conditions");
       }
     }
@@ -1253,10 +1358,10 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @return the context menu root for this widget.
    */
   public GralMenu getContextMenu(){
-    if(contextMenu == null){
-      contextMenu = itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
+    if( this.contextMenu == null){
+      this.contextMenu = new GralMenu(this); //itsMng.createContextMenu(this);   //delegation, the widget mng knows the implementation platform.
     }
-    return contextMenu;
+    return this.contextMenu;
   }
   
   
@@ -1280,19 +1385,22 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   
-  /**Sets the GralMng.
-   * @deprecated it should be set by the MethodsCalledbackFromImplementation ctor. 
+   
+  /**Sets a variable associated to the widget to refresh with a value.
+   * For refreshing call {@link #refreshFromVariable(VariableContainer_ifc)}.
+   * The variable can be set independent from a given {@link #setDataPath(String)}
+   * but also depending on a {@link #getDataPath()} especially from config reading. 
+   * <br>
+   * On a new called {@link #setDataPath(String)} this variable association is loss.
+   * This is intent to associate a new variable. 
+   * On {@link #refreshFromVariable(VariableContainer_ifc)} also this association 
+   * with the maybe newly {@link #setDataPath(String)} is done.
+   * 
+   * @param variable Any variable from anywhere.
    */
-  @Deprecated
-  public void setPanelMng(GralMng mng)
-  { this.itsMng = mng; 
-    if(this._wdgPos !=null) 
-      throw new IllegalStateException("GralWidget - setPos() is set already.");
-    this._wdgPos = mng.getPosCheckNext();
-    this.registerWidget();  //always clone it from the central pos 
-
+  public void setVariable ( VariableAccess_ifc variable) {
+    this.variable = variable;
   }
-  
   
   
   /**Gets the info to access the values for this widget in the users context.
@@ -1317,7 +1425,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       //first usage:
       String sPath1 = this.getDataPath();
       if(sPath1 !=null && (sPath1 = sPath1.trim()).length()>0){
-        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath1);
+        String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath1);
         variable = container.getVariable(sPath1);
         this.setContentInfo(variable);
       } else {
@@ -1343,7 +1451,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
           if(sPath1.contains("["))
             stop();
           String sPath2 = sPath1.trim();
-          String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
+          String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
           VariableAccess_ifc variable1 = container.getVariable(sPath);
           if(variable1 !=null){
             variables.add(variable1);
@@ -1353,8 +1461,8 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         if(sDataPath.contains("["))
           stop();
         String sPath2 = sDataPath.trim();
-        String sPath = itsMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
-        variable = container.getVariable(sPath);
+        String sPath = gralMng.getReplacerAlias().replaceDataPathPrefix(sPath2);
+        this.variable = container.getVariable(sPath);
       }
     }
     if(variable !=null) return variable;
@@ -1385,6 +1493,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void refreshFromVariable(VariableContainer_ifc container
       , long timeLatest, GralColor colorRefreshed, GralColor colorOld
   ){    
+    if(sDataPath ==null) return;
     if(sDataPath !=null && sDataPath.startsWith("intern"))
       stop();
     if(this instanceof GralLed)
@@ -1406,7 +1515,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
       //standard behavior to show: call setValue or setText which may overridden by the widget type.
       if(variable !=null){
         if(sDataPath !=null && sDataPath.contains("#dEB:activeDamping.i1intg"))
-          Assert.stop();
+          Debugutil.stop();
         if(colorRefreshed !=null && colorOld !=null){
           long timeVariable = variable.getLastRefreshTime();
           long timediff = timeVariable - timeLatest;
@@ -1458,7 +1567,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
         }
       } else if(sDataPath !=null){
         setText("?? " + sDataPath); //called on fault variable path.
-        setBackColor(colorOld, 0);
+        if(colorOld !=null) { setBackColor(colorOld, 0); }
       }
     }
     
@@ -1482,11 +1591,11 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Gets the current value of the content of the widget in the given context.
-   * @param mng The context.
+   * @param gralMng The context.
    * @return The value in String representation, null if the widget has no possibility of input.
    */
   public String getValue()
-  { return itsMng.getValueFromWidget(this);
+  { return gralMng.getValueFromWidget(this);
   }
   
   
@@ -1510,23 +1619,23 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   /**Sets the widget visible or not. It is the default implementation for all simple widgets:
    * Sets {@link ImplAccess#chgVisible} or {@link ImplAccess#chgInvisible} in {@link DynamicData#setChanged(int)}
-   * and invokes {@link #repaint()} with the {@link #repaintDelay} and {@link #repaintDelayMax}
+   * and invokes {@link #redraw()} with the {@link #redrawtDelay} and {@link #redrawDelayMax}
    * @param visible
    * @return the old state.
    */
-  @Override public boolean setVisible(boolean visible){
-    if(this instanceof GralTable)
-      System.out.println("GralTable set " + (visible? "visible: " : "invisible: ") + this.name);
+  @Override public boolean setVisible ( boolean visible){
+    //if(this instanceof GralTable)
+    this.gralMng.log.sendMsg(GralMng.LogMsg.setVisible, "setVisible: " + visible +" §" + this.name + this.pos());
     if(this instanceof GralWindow)
       Debugutil.stop();
     if(_wdgImpl == null) {
-      bVisibleState = true;  //without graphic yet now
+      bVisibleState = visible;  //without graphic yet now
     } else {
-      if(itsMng.currThreadIsGraphic()) {
+      if(gralMng.currThreadIsGraphic()) {
         _wdgImpl.setVisibleGThread(visible);   //sets the implementation widget visible.
       } else {
         dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
-        repaint();
+        redraw();
       }
     }
     return bVisibleState;
@@ -1560,7 +1669,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setValue(int cmd, int ident, Object visibleInfo)
   { dyda.visibleInfo = visibleInfo;
     dyda.setChanged(ImplAccess.chgVisibleInfo);
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //itsMng.setInfo(this, cmd, ident, visibleInfo, null);
   }
   
@@ -1569,7 +1678,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(dyda.backColor == null || color.notUsed() || !dyda.backColor.equals(color)){
       dyda.backColor = color; 
       dyda.setChanged(ImplAccess.chgColorBack); 
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
   }
   
@@ -1581,7 +1690,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(dyda.lineColor == null || !dyda.lineColor.equals(color)){
       dyda.lineColor = color; 
       dyda.setChanged(ImplAccess.chgColorLine); 
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
   }
   
@@ -1589,7 +1698,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     if(dyda.textColor == null || !dyda.textColor.equals(color)){
       dyda.textColor = color; 
       dyda.setChanged(ImplAccess.chgColorText); 
-      repaint(repaintDelay, repaintDelayMax);
+      redraw(redrawtDelay, redrawDelayMax);
     }
   }
   
@@ -1603,7 +1712,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   public void setValue(int cmd, int ident, Object visibleInfo, Object userData)
   { dyda.visibleInfo = visibleInfo;
     dyda.userData = userData;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //itsMng.setInfo(this, cmd, ident, visibleInfo, userData);
   }
   
@@ -1613,7 +1722,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setValue(float value){
     dyda.fValue = value;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
@@ -1625,7 +1734,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void setLongValue(long value){
     dyda.fValue = value; //may be shorten in acceleration
     dyda.lValue = value;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
@@ -1647,7 +1756,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   @Override public void setValue(Object[] value){
     dyda.oValues = value;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //itsMng.setInfo(this, GralMng_ifc.cmdSet, 0, value, null);
   }
   
@@ -1656,7 +1765,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void setText(CharSequence text){
     dyda.displayedText = text.toString(); 
     dyda.setChanged(ImplAccess.chgText);
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //System.err.println(Assert.stackInfo("GralWidget - non overridden setText called; Widget = " + name + "; text=" + text, 5));
   }
   
@@ -1677,7 +1786,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   @Override public void setMinMax(float minValue, float maxValue){
     dyda.minValue = minValue;
     dyda.maxValue = maxValue;
-    repaint(repaintDelay, repaintDelayMax);
+    redraw(redrawtDelay, redrawDelayMax);
     //
   }
 
@@ -1699,15 +1808,21 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   }
   
   
+  
   /**Standard implementation. Override only if necessary for sepcial handling.
    * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
    */
-  public void setFocus(){ setFocus(0,0); }
+  public void setFocus ( ){ setFocus(0,0); }
+  
+  /**The default implementation is empty.
+   * It is valid for simple widgets which have not sub widgets. 
+   *
+   */
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {}
 
   
-  
   /**Sets the focus to this widget. This method is possible to call in any thread.
-   * If it is called in the graphic thread and the delay = 0, then it is executed immediately.
+   * If it is called in the graphic thread and the delay = 0 or negative, then it is executed immediately.
    * Elsewhere the request is stored in the graphic thread execution queue and invoked later.
    * If the widget is inside a tab of a tabbed panel, the tab is designated as currently therewith.
    * That is done in the calling thread because it is a thread safe operation.
@@ -1715,131 +1830,124 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    * @param delay Delay in ms for invoking the focus request 
    * @param latest 
    */
-  public void setFocus(int delay, int latest){
-    if(delay >0 || !itsMng.currThreadIsGraphic() || _wdgImpl == null) {
-      dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
-      repaint(delay, latest);
-    } else {
-      //action in the graphic thread.
-      if(!bHasFocus) {
-        GralWidget child = this;
-        if(! (child instanceof GralWindow)) {
-          GralPanelContent parent = _wdgPos.panel;
-          int catastrophicalCount = 100;
-          //set the visible state and the focus of the parents.
-          while(parent !=null && parent.pos() !=null  //a panel is knwon, it has a parent inside its pos() 
-              && !parent.bHasFocus
-              && parent._wdgImpl !=null
-              && --catastrophicalCount >=0){
-            parent._wdgImpl.setFocusGThread();
-            parent.setVisibleStateWidget(true);
-            if(parent instanceof GralTabbedPanel) {
-              //TabbedPanel: The tab where the widget is member of have to be set as active one.
-              GralTabbedPanel panelTabbed = (GralTabbedPanel)parent;
-              assert(child instanceof GralPanelContent);
-              panelTabbed.selectTab(child.name);
-              //String name = panel1.getName();
-              //panelTabbed.selectTab(name);  //why with name, use GralPanel inside GralTabbedPanel immediately!
-            }
-            if(parent instanceof GralWindow) {       //This is not the window itself
-              parent = null;
-            } else {
-              child = parent;
-              parent = parent.pos().panel; //
-            }
-          }
-        }
-        _wdgImpl.setFocusGThread();  //sets the focus to the
-        bVisibleState = true;
-      } 
-      GralWidget parent = this;
-      GralWidget child;
-      GralPanelContent panel;
-      while(parent instanceof GralPanelContent
-        && (child = (panel = (GralPanelContent)parent).primaryWidget) !=null
-        && child._wdgImpl !=null
-        && !child.bHasFocus
-        ) {
-        child.setFocus();
-        child._wdgImpl.setFocusGThread();
-        child.bVisibleState = true;
-        child._wdgImpl.repaintGthread();
-        List<GralWidget> listWidg = panel.getWidgetList();
-        
-        if(!(panel instanceof GralTabbedPanel)) { //don't show all childs of all tabs!
-          for(GralWidget widgChild : listWidg) {
-            widgChild._wdgImpl.setVisibleGThread(true);
-            widgChild.bVisibleState = true;
-          }
-        }
-        parent = child;  //loop if more as one GralPanelContent
-      }
-    }
+  @Override public void setFocus ( int delay, int latest){
+    GralWidgetBase_ifc child = this;
+    GralWidgetBase_ifc parent;
+    this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "GralWidget.setFocus: " + delay +" §" + this.name);
+//    while( !(child instanceof GralScreen) ) {
+//      parent = child.pos().parent;
+//      parent.setVisible(true);
+//      parent.setFocusedWidget(child);
+//      child = parent;
+//    }
+    do {
+      child.setVisible(true);                              // maybe GralWidget is not visible
+      parent = child.pos().parent;                         
+      parent.setFocusedWidget(child);                      // sets the child as focused widget in parent
+      child = parent;
+    } while( !(parent instanceof GralScreen) );            // the last parent is GralScreen, hence also the window is visible
+//    while( (child = parent.getFocusedWidget()) !=null) {
+//      parent = child;
+//    }
+//    while( !(child instanceof GralWidget)) {
+//      child = child.getFocusedWidget();
+//    }
+    GralWidget wdgToFocus = this; //(GralWidget)parent;
+    wdgToFocus.dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
+    wdgToFocus.redraw(delay, latest);                     // do the following action in the graphic thread.
   }
   
   
   
-  
-  /**Gets the working interface of the manager. 
-   * It can be used to set and get values from other widgets symbolic identified by its name.
-   * Note: It is possible too to store the {@link GralWidget} of specific widgets
-   * to get and set values and properties of this widgets non-symbolic.
-   * @return The manager.
+  /**Default implementation for a widget without children
+   * @return null, nonsense. 
    */
-  @Override public GralMng gralMng(){ return itsMng; }
+  public GralWidgetBase_ifc getFocusedWidget() { return null; }
+
+  
+  /**Returns the implementation widget or its Wrapper.
+   * Need cast due to implementation level.
+   * @return null if implementation is not existing. 
+   */
+  @Override public Object getImplWidget ( ) {
+    return this._wdgImpl == null ? null: this._wdgImpl.wdgimpl;
+  }
   
   
   /**Gets the panel where the widget is member of. 
    * @return The panel.
    */
-  public GralPanelContent getItsPanel(){ return _wdgPos.panel; }
+  public GralPanelContent getItsPanel(){ return (GralPanelContent)_wdgPos.parent; }
   
   
   /* (non-Javadoc)
-   * @see org.vishia.gral.ifc.GralWidget_ifc#repaint()
+   * @see org.vishia.gral.ifc.GralWidget_ifc#redraw()
    */
-  @Override public void repaint(){ 
-    //without arguments: latest with repaintDelayMax.
-    repaint(this.repaintDelay, this.repaintDelayMax);
+  @Override public void redraw(){ 
+    //without arguments: latest with redrawDelayMax.
+    redraw(this.redrawtDelay, this.redrawDelayMax);
     /*chg 2015-06-25 it is twice and not complete. An order was delayed in the future always.
     if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
       if(itsMng.currThreadIsGraphic()){
-        repaintGthread();     //do it immediately if no thread switch is necessary.
+        redrawGthread();     //do it immediately if no thread switch is necessary.
       } else {
-        repaintRequ.activateAt(System.currentTimeMillis() + repaintDelay);  //TODO repaintDelayMax
+        redrawRequ.activateAt(System.currentTimeMillis() + redrawDelay);  //TODO redrawDelayMax
       }
     }
     */
   }
   
   
-  /**The Implementation of repaint calls {@link #repaintGthread()} if it is the graphic thread and the delay is 0.
-   * Elsewhere the {@link #repaintRequ} is added as request to the graphic thread. 
-   * @see org.vishia.gral.ifc.GralWidget_ifc#repaint(int, int)
+  /**The Implementation of redraw calls {@link #redrawGthread()} if it is the graphic thread and the delay is 0.
+   * Elsewhere the {@link #redrawRequ} is added as request to the graphic thread. 
+   * @see org.vishia.gral.ifc.GralWidget_ifc#redraw(int, int)
+   *
+   * @param delay in ms to prevent too much calls of the graphic system
+   *   If delay is negative, and this operation is called in the graphic thread, it is executed immediately.
+   *   Else the absolute is used as delay.
+   * @param latest in ms to prevent to much procrastination on repeated calls with delay.
+   *   The current time of the first call of this redraw + latest is the latest time to activate the redraw event
+   *   though delay was given by newer calls.
+   * @param onlyDynamics true then only some appearances of the widget are redrawn, due to specified marker.
+   *   Especially the background is not drawn newly as first action. 
+   *   The value of the latest call of this operation is valid if the redraw event is delayed.
    */
-  @Override public void repaint(int delay, int latest){
-    if(itsMng !=null){ //NOTE: set of changes is possible before setToPanel was called. 
-      if(delay == 0 && itsMng.currThreadIsGraphic() && _wdgImpl !=null){
-        _wdgImpl.repaintGthread();
+  public void redraw ( int delay, int latest, boolean onlyDynamics ){
+    if(gralMng !=null && gralMng._mngImpl !=null && this._wdgImpl!=null ) { //NOTE: set of changes is possible before setToPanel was called. 
+      this._wdgImpl.bRedrawOnlyDynamics = onlyDynamics;
+      if(delay <= 0 && gralMng.currThreadIsGraphic() && _wdgImpl !=null){
+        _wdgImpl.redrawGthread();
       } else {
         long time = System.currentTimeMillis();
-        repaintRequ.activateAt(time + delay, latest ==0 ? 0 : time + latest);
+        redrawRequ.activateAt(time + Math.abs(delay), latest ==0 ? 0 : time + latest);
       }
     }
   }
   
-  
-  
+  public void redrawOnlyDynamics ( int delay, int latest ) {
+    redraw(delay, latest, true);
+  }
+
+  public void redraw1 ( int delay, int latest ) {
+    redraw(delay, latest, false);
+  }
+
+  @Override public void redraw(int delay, int latest){
+    redraw(delay, latest, false);
+  }
   /**Removes the widget from the lists in its panel and from the graphical representation.
    * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
    */
   @Override public boolean remove()
   {
-    if(_wdgImpl !=null) _wdgImpl.removeWidgetImplementation();
-    if(_wdgPos.panel !=null) {
-      _wdgPos.panel.removeWidget(this);
+    if(this._wdgImpl !=null) { 
+      this._wdgImpl.removeWidgetImplementation();
+      this._wdgImpl = null;
     }
-    itsMng.deregisterWidgetName(this);
+    if(_wdgPos.parent !=null && _wdgPos.parent instanceof GralPanelContent) {
+      ((GralPanelContent)_wdgPos.parent).removeWidget(this);
+    }
+    gralMng.deregisterWidgetName(this);
     return true;
   }
   
@@ -1848,39 +1956,64 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   /**Especially for test and debug, short info about widget.
    * @see java.lang.Object#toString()
    */
-  @Override public String toString()
-  { StringBuilder u = new StringBuilder(240);
-    u.append(whatIs).append(":").append(name).append(": ").append(sDataPath);
-    if(_wdgPos !=null && _wdgPos.panel !=null){
-      u.append(" @").append(_wdgPos.panel.name);
-    } else {
-      u.append(" @?");
-    }
-    if(variable !=null){
-      String vString = variable.toString();
-      u.append(" var=").append(vString);
-    }
-    //u.append('\n');
+  @Override public String toString ( ) { 
+    StringBuilder u = new StringBuilder(240);
+    toString(u);
     return u.toString();
   }
 
   
-  /**Methods which should be called back by events of the implementation layer.
+  
+  @Override public Appendable toString(Appendable u, String ... cond) {
+    try {
+      u.append(whatIs);
+      if(this instanceof GralLabel)
+        Debugutil.stop();
+      if(this.name !=null) { u.append(":").append(name);}
+      if(sDataPath !=null) { u.append(", data=").append(sDataPath);}
+      if(this.dyda.displayedText !=null) { u.append(", text=").append('\"').append(this.dyda.displayedText).append('\"');}
+      if(_wdgPos !=null){
+        this._wdgPos.toString(u, "p");
+      } else {
+        u.append("@?");
+      }
+      if(this._wdgImpl !=null) {
+      u.append( " pixel:").append(Integer.toString(this._wdgImpl.pixBounds.x)).append(',')
+                       .append(Integer.toString(this._wdgImpl.pixBounds.y)).append("+(")
+                       .append(Integer.toString(this._wdgImpl.pixBounds.dx)).append('*')
+                       .append(Integer.toString(this._wdgImpl.pixBounds.dy)).append(") ");
+      }
+      if(variable !=null){
+        String vString = variable.toString();
+        u.append(" var=").append(vString);
+      }
+    } catch(IOException exc) {
+      throw new RuntimeException("unexpected", exc);
+    }
+    return u;
+  }
+  
+  
+  
+  /**This is the super class of all GralWidget access classes of the implementation layer.
+   * The protected final operations are called usual from the implementation graphic classes.
+   * The non final operations can be overridden and they are called from GralWidget itself.
+   * Methods which should be called back by events of the implementation layer.
    * This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    */
-  public abstract static class ImplAccess implements GralWidgImpl_ifc {
+  public abstract static class ImplAccess implements GralWidgImplAccess_ifc {
     
     /**What is changed in the dynamic data, see {@link GralWidget.DynamicData#whatIsChanged}. */  
     public static final int chgText = 1, chgColorBack=2, chgColorText=4, chgFont = 8, chgColorLine = 0x10;
     
-    public static final int chgEditable = 0x20;
+    public static final int chgEditable = 0x20, chgPos = 0x80 ;
     
     public static final int chgVisibleInfo = 0x10000, chgObjects = 0x20000, chgFloat = 0x40000, chgIntg = 0x80000;
     
-    public static final int chgFocus = 0x10000000; 
+    public static final int chgFocus = 0x10000000, chgCurrTab = 0x20000000; 
     
-    public static final int chgPos = 0x20000000, chgVisible = 0x40000000, chgInvisible = 0x80000000;
+    public static final int chgVisible = 0x40000000, chgInvisible = 0x80000000;
     
     /**This is only documentation. These bits are used specialized in derived classes.*/
     public static final int chgBitsDerived = 0x0ff0ff00;
@@ -1888,37 +2021,77 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     public final GralWidget widgg;
     
     
-    /**Aggregation to the widget implementation which resolves the required implementation methods. */
-    protected GralWidgetImpl_ifc wdgimpl;
+    /**Aggregation to the widget implementation.
+     * This can be a {@link GralWidgetHelper} instance which refers the implementation widget
+     * or the widget itself. Should be cast due to implementation level. */
+    protected Object wdgimpl;
+    
+    /**The manager for the implementation. For example {@link org.vishia.gral.swt.SwtMng}
+     * 
+     */
+    protected final GralMng.ImplAccess mngImpl;
     
     /**Bounds of the implementation widget in its container. null if not used. */
-    public GralRectangle pixBounds;
+    public GralRectangle pixBounds = new GralRectangle(0,0,0,0);
     
     @Deprecated protected ImplAccess(GralWidget widgg, GralMng mng){
       this(widgg);
     }
+
+    protected boolean bRedrawOnlyDynamics;
     
     
-    /**Constructs the base of the graphic implemantion widget wrapper (SWT, AWT).
+    /**
+     * @param widgg
+     * @deprecated use {@link ImplAccess#ImplAccess(GralWidget, GralMng.ImplAccess)}
+     */
+    @Deprecated protected ImplAccess(GralWidget widgg){
+      this(widgg, widgg.gralMng._mngImpl);
+    }
+    
+    
+    /**Constructs the base of the graphic implementation widget wrapper (SWT, AWT).
      * Stores the reference to the GralWidget in this.{@link #widgg}
      * Stores the reference to the graphic implementation widget in {@link GralWidget#_wdgImpl}
      * Initializes the pos() from the given {@link GralMng#pos} if it is not given by construction. 
      * @param widgg The associated derived class of GralWidget.
      */
-    protected ImplAccess(GralWidget widgg){
+    protected ImplAccess(GralWidget widgg, GralMng.ImplAccess mngImpl){
       this.widgg = widgg;
       widgg._wdgImpl = this; 
+      this.mngImpl = mngImpl;
+      assert(mngImpl !=null);
 
-      if(widgg._wdgPos ==null) {
-        widgg._wdgPos = widgg.itsMng.getPosCheckNext();
-        widgg.registerWidget(); //yet now because before the panel was unknown
-      }
       widgg.lastTimeSetVisible = System.currentTimeMillis();
     }
     
     
+    /**Set the bounds of the widget from the stored GralPos.
+     * It can be overridden for special widgets, for example for depending bounds from content. 
+     */
+    @Override public void setPosBounds ( ) {
+      GralRectangle xyPix = mngImpl.calcWidgetPosAndSize(widgg.pos(), 600, 800);
+      if(this.widgg instanceof GralPanelContent) {         // it may be a tab of a tabbed panel
+        GralWidgetBase_ifc parent_ifc = widgg.pos().parent;    // its parent may be a tab folder
+        final int dy;
+        if(parent_ifc instanceof GralPanelContent) {       // may be a tab folder or not
+          dy = ((GralPanelContent)parent_ifc)._panel.pixelTab;  // size from top to the tab
+        } else { 
+          dy = 0; 
+        }
+        if(dy >0) {             // a tab folder has this dy or pixslTab designation
+          xyPix.y += dy;        // The panel is a little bit lower, space for the tabs.
+          xyPix.dy -= dy;
+        }
+      } //if check tab folder, pixelTab
+      //
+      setBoundsPixel(xyPix.x, xyPix.y, xyPix.dx, xyPix.dy ); //may be widget type specific, in its ImplAccess. 
+    }
     
-    
+    /**Access to the GralMng from the implementation level.  */
+    public final GralMng gralMng() { return this.widgg.gralMng; }
+
+
     /**This method is not intent to call by user. It may be called from all widget implementation 
      * if the focus of the widget is gained. Use {@link #setFocus()} to set a widget in the focus.
      * 
@@ -1926,41 +2099,43 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * Don't override this method in the graphic implementation!
      * It should be overridden only in a Gral widget inheritance only if necessary.
      */
-    public void XXXfocusGained(){
+    public final void XXXfocusGained(){
       //System.out.println(Assert.stackInfo("GralWidget - Debuginfo; focusgained", 1, 10));
       if(widgg.htmlHelp !=null){
-        widgg.itsMng.setHtmlHelp(widgg.htmlHelp);
+        widgg.gralMng.setHtmlHelp(widgg.htmlHelp);
       }
       if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); }
       //notify GralWidgetMng about focused widget.
-      widgg.itsMng.notifyFocus(widgg);
+      widgg.gralMng.notifyFocus(widgg);
     }
     
     /**Sets the state of the widget whether it seams to be visible.
-     * This method should not be invoked by the application. It is 
+     * This method should not be invoked by the application. It is
+     * It can be override if more as one widget is part of a comprehensive widget. 
      * @param visible
      */
-    public void setVisibleState(boolean visible){
+    protected void setVisibleState(boolean visible){
       widgg.setVisibleState(visible);
     }
 
     /**Access method to GralWidget's method. */
-    protected GralUserAction actionShow(){ return widgg.cfg.actionShow; }
+    protected final GralUserAction actionShow(){ return widgg.cfg.actionShow; }
     
     /**Access method to GralWidget's method. */
     //protected GralUserAction actionChanging(){ return widgg.cfg.actionChanging; }
     
     
     /**Access method to {@link GralWidget#dyda}. */
-    protected GralWidget.DynamicData dyda(){ return widgg.dyda; }
+    protected final GralWidget.DynamicData dyda(){ return widgg.dyda; }
     
     //public void setWidgetImpl(GralWidgImpl_ifc widg, GralMng mng){ widgg.wdgImpl = widg; widgg.itsMng = mng; }
 
     /**Notify that the text is changed in {@link GralWidget.DynamicData#bTextChanged} */
-    protected void setTextChanged(){ widgg.dyda.bTextChanged = true; }
+    protected final void setTextChanged(){ widgg.dyda.bTextChanged = true; }
     
     /**Invoked on touching a widget. */
     //protected void setTouched(){ widgg.dyda.bTouchedField = true; }
+    
     
     
     /**Implementation routine to set receiving a drag event and initializes the drag feature of the widget.
@@ -1988,12 +2163,14 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * starting with chg in this class. {@link #chgText} etc.
      * @return
      */
-    public int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
+    protected final int getChanged(){ return widgg.dyda.whatIsChanged.get(); }
     
-    public void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
+    protected final void acknChanged(int mask){ widgg.dyda.acknChanged(mask); }
     
     
-    protected ActionChange getActionChange(ActionChangeWhen when){ return widgg.getActionChange(when); }
+    protected final ActionChange getActionChange(ActionChangeWhen when){ return widgg.getActionChange(when); }
+    
+    public Object getWidgetImplementation() { return this.wdgimpl; }
     
     public static GralWidget gralWidgetFromImplData(Object data){
       if(data instanceof GralWidget) return (GralWidget)data;
@@ -2003,6 +2180,16 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
     }
     
     
+    /**Query once in the redraw handler, reset after them see {@link GralWidget#redraw(int, int, boolean)} 
+     * @return one time true after {@link GralWidget#redraw(int, int, boolean) with true as last argument.
+     */
+    public boolean redrawOnlyDynamics ( ) { 
+      
+      boolean ret = this.bRedrawOnlyDynamics;
+      this.bRedrawOnlyDynamics = false;
+      return ret;
+    }
+    
     /**This routine does not change the focus state in the implementation widget,
      * it denotes only that the GralWidget has the focus or not.
      * The method is static because it gets the widgg instance. 
@@ -2011,7 +2198,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
      * @param widgg the GralWidget instance
      * @param focus true on focus gained, false on focus lost.
      */
-    public static void setFocused(GralWidget widgg, boolean focus){
+    protected static void setFocused(GralWidget widgg, boolean focus){
       widgg.bHasFocus = focus;
       if(focus == false) { widgg.dyda.bTouchedField = false; }
     }
@@ -2024,22 +2211,28 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Returns the instance which extends the {@link ImplAccess} of this widget.
+   * <br>
+   * Note: to get the real widget implementation (or its wrapper) call {@link GralWidget#getImplWidget()}
+   * or call with this return value {@link ImplAccess#getWidgetImplementation()}
    * @return null if the widget has not an implementation yet.
    */
-  public ImplAccess getImpl(){ return _wdgImpl; }
+  public ImplAccess getImplAccess(){ return _wdgImpl; }
   
-  
-  /**This time order calls the {@link #repaintGthread()} in the graphical thread.
-   * It is used with delay and wind up whenever {@link #repaint(int, int)} with an delay is called.
+  //tag::redrawRequ[]
+  /**This time order calls the {@link #redrawGthread()} in the graphical thread for this widget.
+   * It is used with delay and wind up whenever {@link #redraw1(int, int)} with an delay is called.
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
-   * till the next request of {@link #repaint(int, int)} or {@link #repaint()}.
+   * till the next request of {@link #redraw1(int, int)} or {@link #redraw()}.
    */
-  private final GralGraphicTimeOrder repaintRequ = new GralGraphicTimeOrder("GralWidget.repaintRequ"){
+  private final GralGraphicTimeOrder redrawRequ = new GralGraphicTimeOrder("GralWidget.redrawRequ", this.gralMng){
     @Override public void executeOrder() {
-      if(_wdgImpl !=null) { _wdgImpl.repaintGthread(); }//Note: exception thrown in GralGraphicThread
+      if(_wdgImpl !=null) { _wdgImpl.redrawGthread(); }//Note: exception thrown in GralGraphicThread
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };
+  //end::redrawRequ[]
+  
+  
   
   
   /**Sets the state of the widget whether it seams to be visible.
@@ -2048,7 +2241,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
    */
   final public void setVisibleStateWidget(boolean visible){
     bVisibleState = visible;
-    String name = _wdgPos.panel == null ? "main window" : _wdgPos.panel.name;
+    String name = _wdgPos.parent == null ? "main window" : _wdgPos.parent.getName();
     System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + name + ":" + toString());
     lastTimeSetVisible = System.currentTimeMillis();
   }
@@ -2101,7 +2294,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   //@Override
   public void XXXrepaintGthread()
   {
-    if(_wdgImpl !=null) _wdgImpl.repaintGthread();
+    if(_wdgImpl !=null) _wdgImpl.redrawGthread();
   }
 
 
@@ -2123,7 +2316,7 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
   
   /**Sets the implementation widget visible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   //@Override 
   public void XXXsetVisibleGThread(boolean bVisible){ 
@@ -2139,3 +2332,24 @@ public class GralWidget implements GralWidget_ifc, GralSetValue_ifc, GetGralWidg
   
 }
 
+
+/**This class is only be used to set the #itsMng of the GralWidget
+ * before the class level initialization stuff of the constructor are processed.
+ * The order in Java for ctor initialization is:
+ * <ul>
+ * <li>first the super class (and its super class) where this cannot be used,
+ *   but argument values can be used if there are part of the superclass argument list.
+ * <li>second all class level initialization stuff (immediately initialization of class object members)
+ *   is executed. This are also the anonymous interface implementations. Arguments of the ctor cannot be used.
+ * <li>At least the statements of the ctor are executed. Only with this statements 
+ *   a (final) class variable can be set from ctor arguments.
+ * </ul>
+ * With this class first this super ctor of GralWidget is called, it sets the {@link GralWidgetSetMng#gralMng}
+ * which is accessible in the second phase.
+ * @since 2022-10, necessary for referenced GralMng, not as singleton.
+ *
+ */
+class GralWidgetSetMng extends ObjectVishia {
+  
+
+}

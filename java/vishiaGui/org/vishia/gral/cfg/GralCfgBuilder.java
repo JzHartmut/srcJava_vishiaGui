@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
@@ -67,7 +68,7 @@ public class GralCfgBuilder
   
   private final GralCfgData cfgData;
   
-  private final GralMngBuild_ifc gralMng;
+  private final GralMng gralMng;
   
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/
@@ -76,7 +77,7 @@ public class GralCfgBuilder
   private final Map<String, String> indexAlias = new TreeMap<String, String>();
   
   
-  public GralCfgBuilder(GralCfgData cfgData, GralMngBuild_ifc gui, File currentDir)
+  public GralCfgBuilder(GralCfgData cfgData, GralMng gui, File currentDir)
   {
     this.cfgData = cfgData;
     this.gralMng = gui;
@@ -112,47 +113,54 @@ public class GralCfgBuilder
    */
   public String buildGui(LogMessage log, int msgIdent)
   {
+    assert(false);
     String sError = null;
-    gralMng.getReplacerAlias().addDataReplace(cfgData.dataReplace);
+    this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
     
-    Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
-    if(setIdxPanels.size()==0){
-      //gralMng.selectPanel(cfgData.actPanel);
-      //==================>
-      String sErrorPanel = buildPanel(cfgData.actPanel);  
-      if(sErrorPanel !=null){
-        if(log !=null){
-          log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
-        }
-        if(sError == null){ sError = sErrorPanel; }
-        else { sError += "\n" + sErrorPanel; }
-      }
-    } else {
-      //some panels are given, therefore selects given panels by name or create tabbed panels.
-      for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
-        GralCfgPanel cfgPanel = panelEntry.getValue();
-        if(cfgPanel.windTitle !=null) {
-          Debugutil.stop();
-          GralWindow wind = new GralWindow(cfgPanel.windPos, cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
-          wind.createImplWidget_Gthread();
-        }
-        else {
-          //A tab in the main window
-          //==================>
-          gralMng.selectPanel(cfgPanel.name);
-        }
-        String sErrorPanel = buildPanel(cfgPanel);  
+    Set<Map.Entry<String, GralCfgElement>> iterWindow = this.cfgData.getWindows();
+    for(Map.Entry<String, GralCfgElement> eWin : iterWindow) {
+      GralCfgElement cfg = eWin.getValue();
+      GralCfgWindow win = (GralCfgWindow)cfg.widgetType;
+      
+      Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
+      if(setIdxPanels.size()==0){
+        //gralMng.selectPanel(cfgData.actPanel);
+        //==================>
+        String sErrorPanel = buildPanel(win.panelWin);  
         if(sErrorPanel !=null){
           if(log !=null){
             log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
           }
           if(sError == null){ sError = sErrorPanel; }
           else { sError += "\n" + sErrorPanel; }
-        } else {
-          stop();
+        }
+      } else {
+        //some panels are given, therefore selects given panels by name or create tabbed panels.
+        for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
+          GralCfgPanel cfgPanel = panelEntry.getValue();
+  //        if(cfgPanel.windTitle !=null) {
+  //          Debugutil.stop();
+  //          GralWindow wind = gralMng.addWindow(cfgPanel.windPos + "=" + cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
+  //          wind.createImplWidget_Gthread();
+  //        }
+  //        else {
+            //A tab in the main window
+            //==================>
+            gralMng.selectPanel(cfgPanel.name);
+  //        }
+          String sErrorPanel = buildPanel(cfgPanel);  
+          if(sErrorPanel !=null){
+            if(log !=null){
+              log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
+            }
+            if(sError == null){ sError = sErrorPanel; }
+            else { sError += "\n" + sErrorPanel; }
+          } else {
+            stop();
+          }
         }
       }
-    }    
+    }
     return sError;
   }
   
@@ -190,7 +198,7 @@ public class GralCfgBuilder
   throws ParseException
   {
     String sError = null;
-    cfge.setPos(gralMng);
+    //cfge.setPos(gralMng);
     if(cfge.widgetType.type !=null){
       GralCfgData.GuiCfgWidget typeData = cfgData.idxTypes.get(cfge.widgetType.type);
       if(typeData == null){
@@ -206,7 +214,7 @@ public class GralCfgBuilder
       stop();
     
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
-    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.actPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panelWin.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
     
@@ -285,11 +293,6 @@ public class GralCfgBuilder
       }
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
-      final int colorValue;
-      if(wText.color0 !=null){ colorValue = gralMng.getColorValue(wText.color0.color); }
-      //else if(wText.colorName !=null){ colorValue = gralMng.getColorValue(wText.colorName.color);}
-      else{ colorValue = 0; } //black
-      cfge.widgetType.color0 = null;  //it is used, don't set background.
       widgd = gralMng.addText(cfge.widgetType.text); 
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
@@ -332,13 +335,13 @@ public class GralCfgBuilder
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
-      GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, null);
+      GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, null, null);
       widgc.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.data;
         final GralColor colorLine;
         if(line.color0 !=null){
-          colorLine = GralColor.getColor(line.color0.color);
+          colorLine = line.color0.color;
         } else {
           colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
         }
@@ -366,7 +369,7 @@ public class GralCfgBuilder
           for(GralCfgData.GuiCfgCoord coord: cfgLine.coords){
             points.add(new GralPoint(coord.x, coord.y));
           }
-          gralMng.addLine(GralColor.getColor(cfgLine.color0.color), points);
+          gralMng.addLine(cfgLine.color0.color, points);
         } break;
         default: {
           widgd = null;
@@ -415,10 +418,10 @@ public class GralCfgBuilder
         widgd.setHtmlHelp(cfge.widgetType.help);
       }
       if(cfge.widgetType.color0 != null){
-        widgd.setBackColor(GralColor.getColor(cfge.widgetType.color0.color), 0);
+        widgd.setBackColor(cfge.widgetType.color0.color, 0);
       }
       if(cfge.widgetType.color1 != null){
-        widgd.setLineColor(GralColor.getColor(cfge.widgetType.color1.color), 0);
+        widgd.setLineColor(cfge.widgetType.color1.color, 0);
       }
       if(cfge.widgetType.dropFiles !=null){
         GralUserAction actionDrop = gralMng.getRegisteredUserAction(cfge.widgetType.dropFiles);

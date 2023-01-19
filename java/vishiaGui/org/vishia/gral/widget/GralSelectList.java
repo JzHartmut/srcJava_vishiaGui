@@ -3,13 +3,18 @@ package org.vishia.gral.widget;
 import java.util.List;
 import java.util.Map;
 
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
+import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 
@@ -31,13 +36,17 @@ import org.vishia.util.Removeable;
  *                                     |---idxLine------*>|
  *                                     |---tableLines---*>|
  * </pre>
+ * Hint: The GralSelectList should not be inherited from GralTable though it seems to be possible,
+ * because it is not primary a table. It is more obvious to break the inheritance.
  * @author Hartmut Schorrig
  *
  */
-public abstract class GralSelectList<UserData> implements Removeable //extends GralWidget
+public abstract class GralSelectList<UserData> extends GralWidgetBase implements Removeable //extends GralWidget
 {
   /**Version and history:
    * <ul>
+   * <li>2022-12-11 Hartmut chg: because new concept of Gral setToPanel is no more called. 
+   *   set the {@link #actionTable} now in the ctor which would be also proper in the past but now necessary.
    * <li>2018-10-28 Hartmut chg: {@link #createImplWidget_Gthread()} instead setToPanel(mng)
    * <li>2011-11-18 chg: This class does not inherit from GralWidget now. The GralWidget, which represents this class,
    *   is referenced with the public aggregation {@link #wdgdTable}. Only this instance is registered on a panel
@@ -74,7 +83,7 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   
 
   /**The table which is showing in the widget. */
-  public GralTable<UserData> wdgdTable;
+  final public GralTable<UserData> wdgdTable;
   
 
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.
@@ -87,13 +96,14 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   /**Not used yet, register actions? */
   protected Map<String, GralUserAction> actions;
   
-  protected GralSelectList(String posName, int rows, int[] columns, char size) //String name, GralWidgetMng mng)
-  {
+  protected GralSelectList(GralPos refPos, String posName, int rows, int[] columns) //String name, GralWidgetMng mng)
+  { super(refPos, posName, null);
     if(posName == null){
-      Assert.stop();
+      Debugutil.stop();
     }
-    wdgdTable = new GralTable<UserData>(posName, rows, columns);
-    wdgdTable.setVisible(true);
+    this.wdgdTable = new GralTable<UserData>(refPos, posName, rows, columns);
+    this.wdgdTable.specifyActionChange(null, this.actionTable, null, GralWidget_ifc.ActionChangeWhen.onAnyKey);
+    this.wdgdTable.setVisible(true);
   }
 
   
@@ -119,24 +129,34 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
    * @param columns
    * @param size
    */
-  public void XXXsetToPanel(GralMngBuild_ifc gralMng)
+  public void XXXXsetToPanel(GralMngBuild_ifc gralMng)
   {
-    wdgdTable.setToPanel(gralMng);
-    //wdgdTable = gralMng.addTable(name, rows, columns);
-    wdgdTable.setActionChange(actionTable);
+    //wdgdTable.setToPanel(gralMng);
+    //wdgdTable.setActionChange(actionTable);
   }
   
  
   
   /**
    */
-  public void createImplWidget_Gthread()
-  {
-    wdgdTable.createImplWidget_Gthread();
-    wdgdTable.setActionChange(actionTable);
+  @Override public boolean createImplWidget_Gthread() {
+    boolean ret = checkImplWidgetCreation(this.wdgdTable._wdgImpl);
+    if(ret) {
+      wdgdTable.createImplWidget_Gthread();
+      wdgdTable.setActionChange(actionTable);
+    }
+    return ret;
   }
   
- 
+  /**Removes the implementation widget, maybe to re-create with changed properties
+   * or also if the GralWidget itself should be removed.
+   * This is a internal operation not intent to use by an application. 
+   * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
+   */
+  @Override public void removeImplWidget_Gthread() {
+    this.wdgdTable.removeImplWidget_Gthread();                     // recursively call of same
+  }
+
   
   public void set(List<String[]> listData)
   {
@@ -146,10 +166,30 @@ public abstract class GralSelectList<UserData> implements Removeable //extends G
   }
   
   
+  @Override public boolean setVisible(boolean visible) { return this.wdgdTable.setVisible(visible); }
+  
+  
+  @Override public boolean isVisible() { return this.wdgdTable.isVisible(); }
+  
+  @Override public boolean isInFocus() { return this.wdgdTable.isInFocus(); }
+  
+  
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  public boolean setFocus(){ wdgdTable.setFocus(); return true; }
+  @Override public void setFocus ( ){ wdgdTable.setFocus();  }
+  
+  
+  
+  @Override public void setFocus ( int delay, int latest){ wdgdTable.setFocus(delay, latest);  }
+  
+  
+  
+  
+  @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {} //nothing, not for here.
+  
+  @Override public GralWidgetBase_ifc getFocusedWidget() { return null; }
+
   
   /**Removes all data and all widgets of this class. */
   @Override public boolean remove(){

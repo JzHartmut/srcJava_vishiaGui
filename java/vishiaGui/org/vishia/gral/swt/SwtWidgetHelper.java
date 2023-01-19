@@ -43,7 +43,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   public final static int version = 0x20111119;
   
   
-  private static SwtMng mngs;
+  //private static SwtMng mngs;
   
   public final SwtMng mng;
   
@@ -52,13 +52,15 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
 
 
   public SwtWidgetHelper(Control widgetSwt, SwtMng mng)
-  { if(SwtWidgetHelper.mngs !=null){ assert(SwtWidgetHelper.mngs == mng); }
-    else {SwtWidgetHelper.mngs = mng; }
+  { 
+//    if(SwtWidgetHelper.mngs !=null){ assert(SwtWidgetHelper.mngs == mng); }
+//    else {SwtWidgetHelper.mngs = mng; }
     this.widgetSwt = widgetSwt;
     this.mng = mng;
   }
 
 
+  @Override public Object getImplWidget ( ) { return this.widgetSwt; }
 
 
   public static GralColor getColor(Color swtColor)
@@ -68,23 +70,23 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   }
   
   
-  public static Color getColor(GralColor color){ return mngs.propertiesGuiSwt.colorSwt(color); }
+//  public static Color getColor(GralColor color){ return mng.propertiesGuiSwt.colorSwt(color); }
   
-  public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
-  { Color colorSwt = getColor(color);
-    Color colorSwtOld = swtWidget.getBackground();
-    swtWidget.setBackground(colorSwt);
-    return getColor(colorSwtOld);
-  }
+//  public static GralColor setBackgroundColor(GralColor color, Control swtWidget)
+//  { Color colorSwt = getColor(color);
+//    Color colorSwtOld = swtWidget.getBackground();
+//    swtWidget.setBackground(colorSwt);
+//    return getColor(colorSwtOld);
+//  }
 
   
-  public static GralColor setForegroundColor(GralColor color, Control swtWidget)
-  { 
-    Color colorSwt = (Color)color.colorGuimpl;
-    Color colorSwtOld = swtWidget.getForeground();
-    swtWidget.setForeground(colorSwt);
-    return getColor(colorSwtOld);
-  }
+//  public static GralColor setForegroundColor(GralColor color, Control swtWidget)
+//  { 
+//    Color colorSwt = (Color)color.colorGuimpl;
+//    Color colorSwtOld = swtWidget.getForeground();
+//    swtWidget.setForeground(colorSwt);
+//    return getColor(colorSwtOld);
+//  }
 
 
   /**Sets the correct TabItem if any widget at this TabItem is focused. That is not done by swt graphic
@@ -102,7 +104,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
       Object gralObj = parent1.getData();
       if(gralObj !=null && gralObj instanceof SwtPanel){
         SwtPanel gralPanel = (SwtPanel) gralObj;
-        TabItem tabitem = gralPanel.itsTabSwt;
+        TabItem tabitem = null; //gralPanel.itsTabSwt;
         if(tabitem !=null){
           tabitem.getParent().setSelection(tabitem);
         }
@@ -115,7 +117,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
     if(control == null){
       return false;         //TODO should not be.
     }
-    control.forceFocus();
+    //control.forceFocus();    //??https://stackoverflow.com/questions/4619704/what-is-the-difference-between-forcefocus-and-setfocus-in-swt
     return control.setFocus();
 
     
@@ -133,7 +135,7 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   public boolean setFocusGThread(){ return widgetSwt.setFocus(); }
 
   /**Sets the implementation widget vible or not.
-   * @see org.vishia.gral.base.GralWidgImpl_ifc#setVisibleGThread(boolean)
+   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
    */
   public void setVisibleGThread(boolean bVisible){ 
     widgetSwt.setVisible(bVisible);
@@ -154,6 +156,10 @@ public class SwtWidgetHelper implements GralWidgetImpl_ifc
   }
   
   
+  /**Calculates the absolute position of the widget on the screen. 
+   * It searches the whole window {@link Shell} and calculates from there through all composites.
+   * @return absolute Position and size on the screen.
+   */
   public GralRectangle getPixelPositionSize(){
     int posx = 0, posy = 0;
     Rectangle r = widgetSwt.getBounds();

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.util.Assert;
+import org.vishia.util.Debugutil;
 import org.vishia.util.IndexMultiTable;
 
 /**Super class of Menu root wrappers of the graphic implementation layer independent of the implementation graphic.
@@ -104,16 +105,20 @@ public class GralMenu //extends GralWidget
     
     public GralUserAction action;
     
-    public MenuEntry(){}
+    private MenuEntry(){}
   }
+  
+  public final GralWidget widgg;
   
   protected Map<String, MenuEntry> menus = new IndexMultiTable<String, MenuEntry>(IndexMultiTable.providerString);
   
   
-  _GraphicImpl _impl;
+  /**The implementation specific menu */
+  protected _GraphicImpl _impl;
   
 
-  public GralMenu() {
+  public GralMenu ( GralWidget widgg ) {
+    this.widgg = widgg;
   }
   
   
@@ -126,7 +131,7 @@ public class GralMenu //extends GralWidget
    * @param action called on menu activation.
    */
   public final void addMenuItem(String name, String sMenuPath, GralUserAction action) {
-    addMenuItem(null, name, sMenuPath, action);
+    addMenuItem(this.widgg, name, sMenuPath, action);
     //if(_impl !=null) { _impl.addMenuItemGthread(name, sMenuPath, action); } 
   }
   
@@ -142,6 +147,8 @@ public class GralMenu //extends GralWidget
    * @param action
    */
   public final void addMenuItem(GralWidget widggP, String nameWidgg, String sMenuPath, GralUserAction action){
+    if(widggP ==null)
+      Debugutil.stop();
     String[] names = sMenuPath.split("/");
     Map<String, GralMenu.MenuEntry> menustore = this.menus;
     int ii;
@@ -157,23 +164,40 @@ public class GralMenu //extends GralWidget
       } else {
         cAccelerator = 0;
       }
-      menuEntry = menustore.get(name);
-      if(menuEntry == null){
-        //create it.
-        menuEntry = new MenuEntry();
-        menustore.put(name, menuEntry);
-        menuEntry.name = name;
-        menuEntry.cAccelerator = cAccelerator;
-        if(ii < names.length -1) {
+      if(ii < names.length -1) {                 // an entry before in menu/path
+        menuEntry = menustore.get(name);
+        if(menuEntry == null){                   // create it the first time
+          //create it.
+          menuEntry = new MenuEntry();
+          menustore.put(name, menuEntry);
+          menuEntry.name = name;
+          menuEntry.cAccelerator = cAccelerator;
           menuEntry.subMenu = new IndexMultiTable<String, MenuEntry>(IndexMultiTable.providerString);
         }
+      } else {
+        menuEntry = menustore.get(name);
+        if(menuEntry == null){
+          //create it.
+          menuEntry = new MenuEntry();
+          menustore.put(name, menuEntry);
+          menuEntry.name = name;
+          menuEntry.cAccelerator = cAccelerator;
+        } else {
+          if(menuEntry.action != action && menuEntry.widgg != widggP) {
+            Debugutil.stop();              // using name twice?
+          }
+        }
+        
       }
       menustore = menuEntry.subMenu;
     }
     assert(menuEntry !=null);  //null if sMenuPath will be empty.
     menuEntry.action = action;  //store to the last one.
     menuEntry.widgg = widggP;
-    if(_impl !=null) { _impl._implMenu(); } 
+    if(widggP ==null || action ==null) {
+      Debugutil.stop();
+    }
+    if(this._impl !=null) { this._impl.createImplMenu(); } 
     
   }
   
@@ -190,7 +214,7 @@ public class GralMenu //extends GralWidget
    */
   public final void addMenuItem(String sMenuPath, GralUserAction gralAction){
     //if(_impl !=null) { _impl.addMenuItemGthread(sMenuPath, gralAction); } 
-    addMenuItem(null, null, sMenuPath, gralAction);;
+    addMenuItem(this.widgg, this.widgg.name, sMenuPath, gralAction);;
   }
   
   public final void setVisible(){
@@ -232,19 +256,19 @@ public class GralMenu //extends GralWidget
 
 
     /**Creates all necessary new implementation instances for this GralMenu. */
-    public final void _implMenu() {
-      _implMenu(getMenuImpl(), menus);
+    protected final void createImplMenu() {
+      createImplMenu(getMenuImpl(), GralMenu.this.menus);
     }
     
     
-    private final void _implMenu(Object parentMenu, Map<String, MenuEntry> menusP) {
+    private final void createImplMenu(Object parentMenu, Map<String, MenuEntry> menusP) {
       for(Map.Entry<String, MenuEntry> e: menusP.entrySet()) {
         MenuEntry child = e.getValue();
         if(child.menuImpl == null) {
-          _implMenuItem(parentMenu, child);
+          createImplMenuItem(parentMenu, child);
         }
         if(child.subMenu !=null) {
-          _implMenu(child.menuImpl, child.subMenu);
+          createImplMenu(child.menuImpl, child.subMenu);
         }
       }
     }
@@ -255,7 +279,7 @@ public class GralMenu //extends GralWidget
      * @param oParentMenu 
      * @param gralEntry
      */
-    protected abstract void _implMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry);
+    protected abstract void createImplMenuItem(Object oParentMenu, GralMenu.MenuEntry gralEntry);
 
   /**Adds any menu item
    * @param name name of the menu, it is used as widget name.
