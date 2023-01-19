@@ -3,6 +3,7 @@ package org.vishia.guiInspc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -163,6 +164,13 @@ public final class InspcCurveView
   
   final GralMng gralMng;
   
+  
+  /**A list with some favor paths for data files. */
+  List<GralFileSelector.FavorPath> listDataFavors = new LinkedList<GralFileSelector.FavorPath>();
+  
+  /**A list with some favor paths for cfg files. */
+  List<GralFileSelector.FavorPath> listCfgFavors = new LinkedList<GralFileSelector.FavorPath>();
+  
   final VariableContainer_ifc variables;
   
   private final static String[] colorCurveDefault = new String[]{"rd", "gn", "lbl", "or", "ma", "bn", "dgn", "drd", "cy", "bl", "gn2", "pu"};
@@ -264,7 +272,10 @@ public final class InspcCurveView
     //gralMng.setPosition(4, 0, 4, 0, '.');
     gralMng.setPosition(44, 56, 94, 104, '.');
     //this.widgFileSelector = null;
-    this.widgFileSelector = GralFileSelector.createGralFileSelectorWindow("FileSelection", "Read cfg", gralMng);   //"@screen, 50+40, 50+80"
+    this.listDataFavors.add(new GralFileSelector.FavorPath("tmp", "T:/tmp/curveViewData", FileRemote.clusterOfApplication));
+    this.listDataFavors.add(new GralFileSelector.FavorPath("test", "D:/vishia/emc/Test_emC/src/test/CurveView/curveViewData", FileRemote.clusterOfApplication));
+    this.listDataFavors.add(new GralFileSelector.FavorPath("aux", "D:/vishia/aux", FileRemote.clusterOfApplication));
+    this.widgFileSelector = GralFileSelector.createGralFileSelectorWindow(gralMng, "FileSelection", "Read cfg", this.listDataFavors);   //"@screen, 50+40, 50+80"
 //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
 //    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
 //    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
@@ -632,7 +643,8 @@ public final class InspcCurveView
   GralUserAction actionOpenWindow = new GralUserAction("actionOpenWindow"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){ 
       windCurve.setVisible(true); //setWindowVisible(true);
-      widgFileSelector.openDialog(fileCurveCfg, sBtnReadCfg, "read cfg", actionSelectFile); //setVisible(false);
+      widgFileSelector.selectFileTable("cfg", fileCurveCfg);
+      widgFileSelector.openDialog(fileCurveCfg, sBtnReadCfg, "read cfg", actionSelectFile, actionSelectFile); //setVisible(false);
       widgFilename.setVisible(false);
       widgBtnReadCfg.setVisible(true);
       widgCurve.setFocus();
@@ -1106,7 +1118,8 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) { 
       if(widgd == InspcCurveView.this.widgBtnReadCfg) {
         if(actionCode == KeyCode.mouse1Up) {
-          widgFileSelector.openDialog(fileCurveCfg, "select filel.cfg", "read cfg", this);
+          widgFileSelector.selectFileTable("cfg", fileCurveCfg);
+          widgFileSelector.openDialog(fileCurveCfg, "select filel.cfg", "read cfg", this, this);
           return true;
         }
       } else {
@@ -1123,7 +1136,7 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) { 
       if(widgd == InspcCurveView.this.widgBtnReadValues) {
         if(actionCode == KeyCode.mouse1Up) {
-          widgFileSelector.openDialog(fileCurveData, "select datafile.* (csv)", "read values", this);
+          widgFileSelector.openDialog(null /*fileCurveData*/, "select datafile.* (csv)", "read data", this, this);
           return true;
         }
       } else {
@@ -1179,7 +1192,7 @@ public final class InspcCurveView
         //windFileCfg.openDialog(fileCurveCfg, widgd.getCmd(), false, actionReadCfg);
         widgCurve.setVisible(false);
         widgFilename.setVisible(true);
-        widgFileSelector.openDialog(fileCurr, "file", "read", actionEnterFile);
+        widgFileSelector.openDialog(fileCurr, "file", "read", actionEnterFile, actionEnterFile);
 //        windFileSelector.setVisible(true);
 //        windFileSelector.fillIn(fileCurr, false);
 //        windFileSelector.setFocus();
@@ -1338,7 +1351,7 @@ public final class InspcCurveView
         assert(params[0] instanceof File);
         FileRemote file = (FileRemote)params[0];
         this.fileCurveData = file; //.getParentFile();
-        
+        this.windCurve.setTitle(file.getName());
         readCurve(file);
         fillTableTracks();
 

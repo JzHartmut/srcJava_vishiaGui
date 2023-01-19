@@ -73,6 +73,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2023-01-19 now also a file select window possible with favors, some enhancements.
    * <li>2023-01-18 chg The [Favor] button is removed, instead, the {@link #widgFavorTabs} as on left side
    *   the tab "+sel" to select the favor table. A more intuitive approach.  
    * <li>2023-01-18 new {@link #openDialog(FileRemote, String, String, GralUserAction)} now from the GralFileSelectWindow,
@@ -834,7 +835,14 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param mng
    * @return
    */
-  public static GralFileSelector createGralFileSelectorWindow(String posName, String sExec, GralMng mng) {
+  /**
+   * @param mng The GralMng is necessary because only the String given pos is used.
+   * @param posName
+   * @param sExec If given, it is the initial text for the [Exec] button, if null Ecec button is not present. 
+   * @param favors If given initial favors, at least an empty list. If null no favors possible.
+   * @return
+   */
+  public static GralFileSelector createGralFileSelectorWindow ( GralMng mng, String posName, String sExec, List<FavorPath> favors) {
     GralPos pos = null;
     try {
       pos = new GralPos(mng, "@screen,0..0,0..0");
@@ -844,7 +852,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     //new GralFileSelectWindow(posName, mng);
     int windProps = GralWindow_ifc.windResizeable;
     GralWindow wind = new GralWindow(pos, posName, null, windProps);
-    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", wind, 10, null, false, sExec, fileViewer, wdgFileProperties);
+    GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", wind, 10, null, favors !=null, sExec, fileViewer, wdgFileProperties);
+    if(favors !=null) {
+      thiz.addFavor(favors);
+    }
     return thiz;
   }
   
@@ -988,7 +999,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**This action will be called on context menu for the Favor tab to save its content.
    * It should be implemented at user level, for example save in a file.
-   * It is the opposite to {@link #add(FavorPath)} to fill the favor table. 
+   * It is the opposite to {@link #addFavor(FavorPath)} to fill the favor table. 
    */
   public GralUserAction setActionSaveFavors(GralUserAction newAction)
   { GralUserAction oldAction = this.actionUserSaveFavors;
@@ -1035,25 +1046,35 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   than show the label in the left cell (column)
    * @param favorPathInfo The favorite info
    */
-  public GralTableLine_ifc<FavorPath> add(FavorPath favorPathInfo)
-  {
+  public GralTableLine_ifc<FavorPath> addFavor(FavorPath favorPathInfo) {
+    GralTableLine_ifc<FavorPath> line;
     if(this.indexFavorPaths.get(favorPathInfo.selectName) == null){
       this.indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
-      GralTableLine_ifc<FavorPath> line = this.widgFavorTable.addLine(favorPathInfo.selectName, null, favorPathInfo);
+      line = this.widgFavorTable.addLine(favorPathInfo.selectName, null, favorPathInfo);
       line.setCellText(favorPathInfo.selectName, 0);
       line.setCellText(favorPathInfo.path, 1);
       line.redraw(100,100);
       return line;
     }
-    else return null;
+    else {
+      return null;
+    }
   }
 
+  
+  
+  public void addFavor(List<FavorPath> list) {
+    for(FavorPath favor : list) {
+      addFavor(favor);
+    }
+  }
+  
   
   
   public GralTableLine_ifc<FavorPath> add(String name, String path) {
     //FileRemote fpath = FileRemote.fromFile(new File(path));
     GralFileSelector.FavorPath favor = new GralFileSelector.FavorPath(name, path, FileRemote.clusterOfApplication);
-    return add(favor);
+    return addFavor(favor);
   }
 
   
@@ -1073,15 +1094,26 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param actionSelect Action which is called on Button ok. The first Object of exec(...,object) is the selected File
    *   or a File[] or List<File> if more as one file is selected. 
    */
-  public void openDialog(FileRemote startDir, String sTitle, String sBtnText, GralUserAction actionSelect){
-    this.actionOnExecButton = actionSelect;
+  public void openDialog(FileRemote startFile, String sTitle, String sBtnText
+      , GralUserAction actionEnter, GralUserAction actionButton){
+    this.actionOnExecButton = actionButton;
+    this.actionOnEnterFile = actionEnter;
     if(this.widgBtnExec !=null) {
       this.widgBtnExec.setText(sBtnText);
     }
-    this.fillIn(startDir, false);
-    this.widgSelectList.setVisible(true);
-    if(this.widgFavorTable !=null) {                       // file table should be shown.
-      this.widgFavorTable.setVisible(false);               // favor table should be hidden
+    if(startFile !=null) {
+      this.fillIn(startFile, false);
+      this.widgSelectList.setVisible(true);                // file table should be shown.
+      if(this.widgFavorTable !=null) {                     
+        this.widgFavorTable.setVisible(false);               // favor table should be hidden
+      }
+    } else {
+      if(this.widgFavorTable !=null) {                     // only if favor exist.
+        this.widgFavorTable.setVisible(true);              // favor table should be shown
+        this.widgSelectList.setVisible(true);              // file table should be hidden
+      } else {
+        // do nothing                                      // startFile not given, no Favors, only activate the window
+      }
     }
     if(this.windFileSelector !=null) {
       this.windFileSelector.setTitle(sTitle);
@@ -1114,7 +1146,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(this.widgFavorTable !=null) {
       GralTableLine_ifc<FavorPath> currentLine = null;
       for( FavorPath favorPathInfo: listfavorPaths){
-        GralTableLine_ifc<FavorPath> line = add(favorPathInfo);
+        GralTableLine_ifc<FavorPath> line = addFavor(favorPathInfo);
         if(currentLine == null){ currentLine = line; }  //first line
         if(favorPathInfo.selectName.equals(this.sCurrFavor)){
           currentLine = line;  //or the last selected one.
@@ -1740,7 +1772,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
   }
 
-  
+  public void selectFileTable(String sFavor, FileRemote startFile) {
+    if(sFavor !=null && this.widgFavorTable !=null) {
+      GralTable<FavorPath>.TableLineData lineFavor = this.widgFavorTable.getLine(sFavor);
+      if(lineFavor ==null) {
+        FavorPath favor = new FavorPath(sFavor, startFile);
+        lineFavor = (GralTable<FavorPath>.TableLineData)addFavor(favor);
+      }
+      selectFileTableFromFavor(lineFavor.getData(), startFile);
+    }
+  }
   
   void doFileLineSelect(GralTable<FileRemote>.TableLineData line){
     FileRemote file = line.getUserData();
@@ -1838,14 +1879,14 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(nColumnFocus == 1) {
       favor.sCurrDir = "";
     }
-    selectFileTableFromFavor(favor);
+    selectFileTableFromFavor(favor, null);
   }
 
   
   /**Called either from tab selection or from a line in the favor table ({@link #doActionSelectFileTableFromFavor()}.
    * @param favor The favor of the tab or line.
    */
-  protected void selectFileTableFromFavor ( FavorPath favor ) {
+  protected void selectFileTableFromFavor ( FavorPath favor, FileRemote fileStart ) {
     this.widgFavorTable.setVisible(false);
     String sFavor = favor.selectName; // favorLine.getCellText(0);
     //if(sFavor != this.sCurrFavor) {                        // only fillin newly if it is another favor
@@ -1859,9 +1900,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         this.widgFavorTabs.addItem(sFavor, -1, this.favorPathInfo);
       }
       this.widgFavorTabs.redraw();
-      FileRemote fStart = favor.fileCluster.getDir(favor.sCurrDir);
-      fillIn(fStart, false);       //bDoNotRefresh = false, refresh it in another thread
-      //File favorfile = new File(favor.sCurrFile);
+      if(fileStart !=null) {
+        fillIn(fileStart, false);
+      } else {
+        FileRemote fStart = favor.fileCluster.getDir(favor.sCurrDir);
+        fillIn(fStart, false);       //bDoNotRefresh = false, refresh it in another thread
+      }
+        //File favorfile = new File(favor.sCurrFile);
       //fillIn(FileRemote.fromFile(favorfile), false);
 //    }
     this.widgSelectList.wdgdTable.setVisible(true);
@@ -2100,6 +2145,26 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      * {@link #getOriginDir()}. */
     private FileRemote dir;
     
+    
+    /**Creates a FavorPath with given file
+     * @param selectName
+     * @param fileStart it is is a directory, its path is used, else the directory of the file. 
+     */
+    public FavorPath(String selectName, FileRemote fileStart) {
+      this.fileCluster = fileStart.itsCluster;
+      this.selectName = selectName;
+      if(fileStart.isDirectory()) {
+        this.path = fileStart.getAbsolutePath();
+      } else {
+        this.path = fileStart.getParent();
+      }
+    }
+    
+    /**Creates a Favor with string given directory path, should be existing. 
+     * @param selectName
+     * @param path it can be especially from a configuration file.
+     * @param fileCluster
+     */
     public FavorPath(String selectName, String path, FileCluster fileCluster)
     { this.fileCluster = fileCluster;
       this.path = path;
@@ -2466,7 +2531,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
             if(favor == null) {                              // the +sel fab
               doActivateFavor();
             } else {
-              selectFileTableFromFavor(favor);
+              selectFileTableFromFavor(favor, null);
             }
           } else {
             assert(false);

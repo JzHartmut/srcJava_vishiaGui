@@ -243,7 +243,7 @@
 2023-01-07 08:13:26  x     GralCommandSelector.java                 ::          8.473  1777158701 
 2023-01-16 15:47:59  x     GralFileProperties.java                  ::         23.116 -1044342786 
 2023-01-18 09:35:33  x     GralFileSelectWindow.java                ::          8.930 -1829818283 
-2023-01-19 09:46:50  x     GralFileSelector.java                    ::        107.217 -1953004214 
+2023-01-19 22:24:04  x     GralFileSelector.java                    ::        109.727 -0627135167 
 2023-01-18 23:10:21  x     GralHorizontalSelector.java              ::         11.290 -1486470905 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2023-01-03 23:37:09  x     GralInfoBox.java                         ::         15.580 -1967797956 
@@ -256,7 +256,7 @@
 
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2021-10-04 14:29:57  x     ButtonInspcCmd.java#                     ::           .520  1765509099 
-2023-01-18 09:37:56  x     InspcCurveView.java                      ::         63.795 -0196201113 
+2023-01-19 22:07:18  x     InspcCurveView.java                      ::         64.778  0308218741 
 2023-01-17 23:05:39  x     InspcCurveViewApp.java                   ::          7.139 -1672439724 
 2023-01-03 23:38:23  x     InspcFieldTable.java                     ::         24.832 -2060852980 
 2022-10-04 22:57:04  x     InspcGui.java#                           ::         22.714  0685651805 
