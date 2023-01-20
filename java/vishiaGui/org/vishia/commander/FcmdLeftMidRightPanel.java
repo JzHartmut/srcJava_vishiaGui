@@ -132,7 +132,7 @@ public class FcmdLeftMidRightPanel
     //
     nameGridPanel = FcmdWidgetNames.tabMainFavorites + cNr;
     tabLabelGridPanel = "a-F"+cNr;                         //The panel for selection from all favorites: 
-    GralPanelContent tabPanelFavorThemes = this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel);
+    GralPanelContent tabPanelFavorThemes = this.tabbedPanelFileCards.addTabPanel(nameGridPanel, tabLabelGridPanel, false);
     
     //GralPos refPos = tabPanelFavor1.pos(); //this.main.gui.gralMng.refPos();
     //try { refPos.setPosition(sPos); } catch (Exception exc) { }
@@ -255,7 +255,7 @@ public class FcmdLeftMidRightPanel
       }
     } 
     if(fileCard == null){                                  // not found: create a tab for it.
-      GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, favorFolder.label);
+      GralPanelContent tabFileCard = this.tabbedPanelFileCards.addTabPanel(labelTab, favorFolder.label, true);
       GralPos refPos;
       try {
         refPos = new GralPos(tabFileCard, "0..0, 0..0");

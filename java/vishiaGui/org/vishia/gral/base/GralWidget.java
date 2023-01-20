@@ -13,7 +13,6 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralFont;
 import org.vishia.gral.ifc.GralMngApplAdapter_ifc;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralSetValue_ifc;
 import org.vishia.gral.ifc.GralUserAction;
@@ -180,6 +179,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-20: confusion with {@link #setVisible(boolean)} and setVisibleStateWidget() solved: 
    * <li>2022-12-11 new: {@link ActionChangeSelect#onAnyKey}: This action was missing especially in a {@link GralTable},
    *   because only the common action was used without designation. Is it satisfying? Better have the specific action for key pressing. 
    *   The change was done maybe without necessity but with a systematically focus. 
@@ -517,7 +517,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * <li>U: a graphical value representation (bar etc)
    * <li>V: a graphical value enter representation (slider etc)
    * <li>w: A window.
-   * <li>xx@: A Tabbed Panel deprecated
+   * <li>^: A tabbed panel, for tab panels 
+   * <li>@: A Panel as tab of a tabbed panel
    * <li>$: Any Panel (composite)
    * <li>+: A canvas panel
    * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
@@ -1620,36 +1621,47 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   /**Sets the widget visible or not. It is the default implementation for all simple widgets:
    * Sets {@link ImplAccess#chgVisible} or {@link ImplAccess#chgInvisible} in {@link DynamicData#setChanged(int)}
    * and invokes {@link #redraw()} with the {@link #redrawtDelay} and {@link #redrawDelayMax}
-   * @param visible
-   * @return the old state.
+   * <br>
+   * the {@link #bVisibleState} is set due to argument, hence immediately {@link #isVisible()} returns this state.
+   * The implementation widget is set visible or not a little bit later due to the time order if this is not the graphic thread.
+   * <br>
+   * The state of the implementing graphics for sub widgets can be differ. If a parent widget is invisible, all sub widgets
+   * of the implementing graphic are also. But this state is not in any case transferred to all sub gral widgets.
+   * This problem may be solved in future TODO. In the moment all seems proper.
+   * <br>
+   * The visibility of the implementation widget is changed by {@link #redraw(int, int)} immediately in the graphic thread
+   * with the {@link ImplAccess#chgInvisible} or {@link ImplAccess#chgVisible} 
+   * 
+   * @param visible the state to set newly.
+   * @return the old state of visibility.
    */
   @Override public boolean setVisible ( boolean visible){
     //if(this instanceof GralTable)
-    this.gralMng.log.sendMsg(GralMng.LogMsg.setVisible, "setVisible: " + visible +" §" + this.name + this.pos());
+    boolean bLastVisible = this.bVisibleState;
+    String nameParent = _wdgPos.parent == null ? "main window" : _wdgPos.parent.getName();
+    if(visible) {
+      this.gralMng.log.sendMsg(GralMng.LogMsg.setVisible , "GralWidget set visible: %s@%s (%s)", this.name, nameParent, toString());
+    } else {
+      this.gralMng.log.sendMsg(GralMng.LogMsg.setInvisible , "GralWidget set invisible: %s@%s (%s)", this.name, nameParent, toString());
+    }
+    if(this.name.equals("tabFavorsAll1")) {
+      Debugutil.stop(); }
     if(this instanceof GralWindow)
       Debugutil.stop();
-    if(_wdgImpl == null) {
-      bVisibleState = visible;  //without graphic yet now
-    } else {
+    bVisibleState = visible;  //without graphic yet now
+    if(_wdgImpl != null) {
       if(gralMng.currThreadIsGraphic()) {
         _wdgImpl.setVisibleGThread(visible);   //sets the implementation widget visible.
       } else {
         dyda.setChanged(visible ? ImplAccess.chgVisible : ImplAccess.chgInvisible);
-        redraw();
+        redraw(-this.redrawtDelay, this.redrawDelayMax);
       }
     }
-    return bVisibleState;
+    lastTimeSetVisible = System.currentTimeMillis();
+    return bLastVisible;
   }
   
 
-  
-  
-  //@Override 
-  public GralRectangle XXXgetPixelPositionSize(){
-    if(_wdgImpl !=null) return _wdgImpl.getPixelPositionSize();
-    else throw new IllegalArgumentException("GralWidget - does not know its implementation widget; ");
-  }
-  
   
   @Override public boolean isChanged(boolean setUnchanged){ 
     boolean bChanged = dyda.bTextChanged;
@@ -2075,7 +2087,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
         GralWidgetBase_ifc parent_ifc = widgg.pos().parent;    // its parent may be a tab folder
         final int dy;
         if(parent_ifc instanceof GralPanelContent) {       // may be a tab folder or not
-          dy = ((GralPanelContent)parent_ifc)._panel.pixelTab;  // size from top to the tab
+          dy = 0; //((GralPanelContent)parent_ifc)._panel.pixelTab;  // size from top to the tab
         } else { 
           dy = 0; 
         }
@@ -2115,7 +2127,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
      * @param visible
      */
     protected void setVisibleState(boolean visible){
-      widgg.setVisibleState(visible);
+      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.setVisibleFromImpl, "set visible from Impl = " + (visible? "true" : "false") + this.widgg.toString());
+      widgg.bVisibleState = visible;
     }
 
     /**Access method to GralWidget's method. */
@@ -2235,22 +2248,6 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   
   
   
-  /**Sets the state of the widget whether it seams to be visible.
-   * This method should not be invoked by the application. It is 
-   * @param visible
-   */
-  final public void setVisibleStateWidget(boolean visible){
-    bVisibleState = visible;
-    String name = _wdgPos.parent == null ? "main window" : _wdgPos.parent.getName();
-    System.out.println((visible? "GralWidget set visible: " : "GralWidget set invisible: @") + name + ":" + toString());
-    lastTimeSetVisible = System.currentTimeMillis();
-  }
-
-
-  public void setVisibleState(boolean visible){
-    setVisibleStateWidget(visible);
-  }
-
 
   void stop(){
     
@@ -2315,20 +2312,20 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   }
   
   
-  /**Sets the implementation widget visible or not.
-   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
-   */
-  //@Override 
-  public void XXXsetVisibleGThread(boolean bVisible){ 
-    try{
-      if(_wdgImpl !=null){ 
-        setVisibleState(bVisible);  
-        _wdgImpl.setVisibleGThread(bVisible); 
-      }
-    } catch(Exception exc){
-      System.err.println("GralWidget - setFocusGThread fails");
-    }
-  }
+//  /**Sets the implementation widget visible or not.
+//   * @see org.vishia.gral.base.GralWidgImplAccess_ifc#setVisibleGThread(boolean)
+//   */
+//  //@Override 
+//  public void XXXsetVisibleGThread(boolean bVisible){ 
+//    try{
+//      if(_wdgImpl !=null){ 
+//        setVisibleState(bVisible);  
+//        _wdgImpl.setVisibleGThread(bVisible); 
+//      }
+//    } catch(Exception exc){
+//      System.err.println("GralWidget - setFocusGThread fails");
+//    }
+//  }
   
 }
 

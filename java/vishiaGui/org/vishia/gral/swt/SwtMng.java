@@ -486,7 +486,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       throw new IllegalArgumentException("missing Widget type: " + widgg.toString());
     }
     //-------------------------------- // It should be always possible to access GralWidget from the implementation Swt-Control
-    ((Control)wdga.getWidgetImplementation()).setData(widgg);        
+    Control widgSwt = (Control)wdga.getWidgetImplementation();
+    (widgSwt).setData(widgg);
+    boolean bSwtVisible = widgSwt.isVisible();
+    if(bSwtVisible && ! widgg.isVisible()) {
+      Debugutil.stop();
+    }
   }
   
 

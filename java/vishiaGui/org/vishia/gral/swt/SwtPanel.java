@@ -303,55 +303,55 @@ public class SwtPanel extends GralPanelContent.ImplAccess
 
 
 
-  public SelectionListener tabItemSelectListener = new SelectionListener(){
-
-    @Override
-    public void widgetDefaultSelected(SelectionEvent event)
-    {
-      widgetSelected(event);
-    }
-    
-
-    /**It is the selected method of the TabFolder.
-     * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-     */
-    @Override public void widgetSelected(SelectionEvent event)
-    {
-      try{
-        TabItem tab = (TabItem)event.item;    //The tab
-        Control container = tab.getControl(); //Its container
-        if(container != null){
-        //TabFolder tabFolder = tab.getParent();
-          Object data = container.getData();
-          if(data != null){
-            @SuppressWarnings("unchecked")
-            SwtPanel swtPanel = (SwtPanel)data;
-            GralPanelContent gralPanel = (GralPanelContent)(swtPanel.gralPanel);
-            List<GralWidget> widgetInfos = gralPanel.getWidgetList(); 
-            //widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
-            GralWidgetBase_ifc focusedWidget = gralPanel.getFocusedWidget();
-            if(focusedWidget !=null && focusedWidget instanceof GralWidget){
-              ((GralWidget)focusedWidget).setVisibleState(false);           //deactivate the last focused tab.
-            }
-       //?? gralPanel.setFocusedWidget( gralPanel );
-            //done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
-            gralPanel.setFocus();
-            //System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
-            //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
-            if(SwtPanel.this._panel.notifyingUserInstanceWhileSelectingTab !=null){
-              SwtPanel.this._panel.notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
-            }
-          }
-        }
-      }
-      catch(Exception exc){
-        String sMsg = exc.getMessage();
-        if(sMsg == null){ sMsg = "nullPointer"; }
-        System.err.println(sMsg);
-        exc.printStackTrace(System.err);
-      }
-    }
-  };
+//  public SelectionListener tabItemSelectListener = new SelectionListener(){
+//
+//    @Override
+//    public void widgetDefaultSelected(SelectionEvent event)
+//    {
+//      widgetSelected(event);
+//    }
+//    
+//
+//    /**It is the selected method of the TabFolder.
+//     * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+//     */
+//    @Override public void widgetSelected(SelectionEvent event)
+//    {
+//      try{
+//        TabItem tab = (TabItem)event.item;    //The tab
+//        Control container = tab.getControl(); //Its container
+//        if(container != null){
+//        //TabFolder tabFolder = tab.getParent();
+//          Object data = container.getData();
+//          if(data != null){
+//            @SuppressWarnings("unchecked")
+//            SwtPanel swtPanel = (SwtPanel)data;
+//            GralPanelContent gralPanel = (GralPanelContent)(swtPanel.gralPanel);
+//            List<GralWidget> widgetInfos = gralPanel.getWidgetList(); 
+//            //widgg.newWidgetsVisible = widgetInfos;  //the next call of getWidgetsVisible will be move this reference to widgetsVisible.
+//            GralWidgetBase_ifc focusedWidget = gralPanel.getFocusedWidget();
+//            if(focusedWidget !=null && focusedWidget instanceof GralWidget){
+//              ((GralWidget)focusedWidget).setVisibleState(false);           //deactivate the last focused tab.
+//            }
+//       //?? gralPanel.setFocusedWidget( gralPanel );
+//            //done with setFocus: widgg.focusedTab.setVisibleState(true);   //the currently focused tab.
+//            gralPanel.setFocus();
+//            //System.out.printf("Fcmd-selectTab; %s", panelContent.toString());
+//            //mng.log.sendMsg(0, "Fcmd-selectTab %s", panelContent.toString());
+//            if(SwtPanel.this._panel.notifyingUserInstanceWhileSelectingTab !=null){
+//              SwtPanel.this._panel.notifyingUserInstanceWhileSelectingTab.panelActivatedGui(widgetInfos);
+//            }
+//          }
+//        }
+//      }
+//      catch(Exception exc){
+//        String sMsg = exc.getMessage();
+//        if(sMsg == null){ sMsg = "nullPointer"; }
+//        System.err.println(sMsg);
+//        exc.printStackTrace(System.err);
+//      }
+//    }
+//  };
 
   
   

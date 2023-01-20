@@ -15,6 +15,7 @@ import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.util.Debugutil;
 
 
 
@@ -76,19 +77,19 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
     StringBuilder sLog = new StringBuilder();
     
     //final Rectangle areaParent = parent.getClientArea();
-    if (wdgg.isTabbed()) {
-      final TabFolder tabFolder = new TabFolder(parent, 0);
-      //faulty: super.panelSwtImpl.setBounds(areaParent);  // The tab folder should fill the whole area. Without the setBounds the
-                                                 // TabFolder is not visible.
-      swtMng.setPosAndSizeSwt(wdgg.pos(), tabFolder,0,0);  //area of tabFolder adequate pos
-      SwtMng.storeGralPixBounds(this, tabFolder);          // store the pixel size in the ImplAccess level
-      final Font fontTab = new Font(swtMng.displaySwt, "Arial", 10, SWT.ITALIC);
-      tabFolder.setFont(fontTab);
-      super.panelSwtImpl = tabFolder;            // typed access in SwtPanel
-      super.wdgimpl = tabFolder;                 // unified access in GraLWidget
-      sLog.append("new swt.TabFolder "); wdgg.pos().toString(sLog);
-    } 
-    else {
+//    if (wdgg.isTabbed()) {
+//      final TabFolder tabFolder = new TabFolder(parent, 0);
+//      //faulty: super.panelSwtImpl.setBounds(areaParent);  // The tab folder should fill the whole area. Without the setBounds the
+//                                                 // TabFolder is not visible.
+//      swtMng.setPosAndSizeSwt(wdgg.pos(), tabFolder,0,0);  //area of tabFolder adequate pos
+//      SwtMng.storeGralPixBounds(this, tabFolder);          // store the pixel size in the ImplAccess level
+//      final Font fontTab = new Font(swtMng.displaySwt, "Arial", 10, SWT.ITALIC);
+//      tabFolder.setFont(fontTab);
+//      super.panelSwtImpl = tabFolder;            // typed access in SwtPanel
+//      super.wdgimpl = tabFolder;                 // unified access in GraLWidget
+//      sLog.append("new swt.TabFolder "); wdgg.pos().toString(sLog);
+//    } 
+//    else {
       GralCanvasStorage canvasStore = wdgg.canvas();
       Composite panel;
       if(canvasStore !=null) {
@@ -108,40 +109,42 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       panel.setLayout(null);
       //this.XXXcurrColor = panel.getForeground();
       panel.setBackground(swtMng.getColorImpl(wdgg.getBackColor(0)));
-    }
+//    }
     //
-    if (parent instanceof TabFolder) {                     // This panel should be used as Tab of the parent TabFolder
-      final TabItem tab = new TabItem((TabFolder) parent, SWT.None);
-      if(wdgg._panel.labelTab !=null) {
-        tab.setText(wdgg._panel.labelTab);
-      } else {
-        tab.setText(wdgg.getName());
-      }
-      sLog.insert(0, ":new swt TabItem ").insert(0, tab.getText());
-      tab.setControl(this.panelSwtImpl);
-      Rectangle areaTab;
-      final GralWidgetBase_ifc parentPanelifc = wdgg.pos().parent;
-      final GralPanelContent parentPanel = (GralPanelContent) parentPanelifc;
-      final GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess) parentPanel.getImplAccess();
-      areaTab = super.panelSwtImpl.getClientArea();
-      @SuppressWarnings("unused") Rectangle boundsTab = super.panelSwtImpl.getBounds();
-      if (parentPanel._panel.pixelTab == 0) {              // on the first tab panel
-        final Rectangle areaParent = parent.getBounds();
-        parentPanel._panel.pixelTab = (short) (areaParent.height - areaTab.height);
-        //super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
-      } else {
-        super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
-      }
-    } else {
+//    if (parent instanceof TabFolder) {                     // This panel should be used as Tab of the parent TabFolder
+//      final TabItem tab = new TabItem((TabFolder) parent, SWT.None);
+//      if(wdgg._panel.labelTab !=null) {
+//        tab.setText(wdgg._panel.labelTab);
+//      } else {
+//        tab.setText(wdgg.getName());
+//      }
+//      sLog.insert(0, ":new swt TabItem ").insert(0, tab.getText());
+//      tab.setControl(this.panelSwtImpl);
+//      Rectangle areaTab;
+//      final GralWidgetBase_ifc parentPanelifc = wdgg.pos().parent;
+//      final GralPanelContent parentPanel = (GralPanelContent) parentPanelifc;
+//      final GralPanelContent.ImplAccess parentImplAccess = (GralPanelContent.ImplAccess) parentPanel.getImplAccess();
+//      areaTab = super.panelSwtImpl.getClientArea();
+//      @SuppressWarnings("unused") Rectangle boundsTab = super.panelSwtImpl.getBounds();
+//      if (parentPanel._panel.pixelTab == 0) {              // on the first tab panel
+//        final Rectangle areaParent = parent.getBounds();
+//        parentPanel._panel.pixelTab = (short) (areaParent.height - areaTab.height);
+//        //super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
+//      } else {
+//        super.panelSwtImpl.setBounds(0, parentPanel._panel.pixelTab, parentImplAccess.pixBounds.dx, parentImplAccess.pixBounds.dy - parentPanel._panel.pixelTab);
+//      }
+//    } else {
       swtMng.setPosAndSizeSwt(wdgg.pos(), super.panelSwtImpl, 0,0);  //area of panel adequate pos
+    if(wdgg.name.equals("tabFavorsAll1")) {
+      Debugutil.stop(); }
+      super.panelSwtImpl.setVisible(wdgg.isVisible());
       //super.panelSwtImpl.setBounds(areaParent);
       swtMng.listVisiblePanels_add(wdgg);
-    }
+//    }
     SwtMng.logBounds(sLog, super.panelSwtImpl);
     gralMng.log.sendMsg(GralMng.LogMsg.newPanel, sLog);
     
     SwtMng.storeGralPixBounds(this, super.panelSwtImpl);
-    this.panelSwtImpl.setVisible(true);
   }
 
 

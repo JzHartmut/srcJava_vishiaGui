@@ -61,6 +61,7 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
   
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-20 removed setVisibleStateWidget() 
    * <li>2016-08-31 Hartmut new: {@link #isGraphicDisposed()} especially used for GralWindow-dispose detection. 
    * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
    * <li>2015-10-11 Hartmut new: {@link #createImplWidget_Gthread()} without mng as parameter.
@@ -185,7 +186,7 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
    */
   //void setToPanel(GralMngBuild_ifc mng);
   
-  void setVisibleStateWidget(boolean visible);
+  //void setVisibleStateWidget(boolean visible);
   
   /**Sets the focus to the widget. . It can be called in any thread. If it is called in the graphic thread,
    * the repaint action is executed immediately in the thread. Elsewhere the graphic thread will be woken up.

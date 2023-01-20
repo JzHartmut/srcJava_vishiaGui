@@ -183,7 +183,7 @@ public class FcmdExecuter
     this.widgSelectJzExt = new GralTable<JZtxtcmdScript.Subroutine>(refPos, "@0..0,0..0=execChoice", 20, new int[]{47});
     this.widgSelectJzExt.specifyActionChange("exec", this.actionJZextAfterChoice, null, GralWidget_ifc.ActionChangeWhen.onEnter);
     //The GralCommandSelector is a table.
-    this.wdgPanelTabCmds = this.main.favorPathSelector.panelLeft.tabbedPanelFileCards.addTabPanel("cmd", "Cmd");
+    this.wdgPanelTabCmds = this.main.favorPathSelector.panelLeft.tabbedPanelFileCards.addTabPanel("cmd", "Cmd", false);
     refPos = new GralPos(this.wdgPanelTabCmds);
     this.cmdSelector = new GralCommandSelector(refPos, "@0..0,0..0=cmdSelector", 50, new int[]{0,-10}, cmdExecuter, main.gui.getOutputBox(), main.getterFileArguments);
     this.windConfirmExec.setVisible(false);

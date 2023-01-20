@@ -2582,7 +2582,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     { return false;  //TODO line visible. 
     }
 
-    @Override public void setVisibleStateWidget(boolean bVisible) { GralTable.this.setVisibleStateWidget(bVisible); }
+    //@Override public void setVisibleStateWidget(boolean bVisible) { GralTable.this.setVisibleStateWidget(bVisible); }
     
     @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) { } // unreleavant
     

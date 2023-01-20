@@ -492,12 +492,6 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
     return null;
   }
 
-  @Override public void setVisibleStateWidget (
-      boolean visible ) {
-    // TODO Auto-generated method stub
-    
-  }
-
   @Override public ImplAccess getImplAccess () {
     // TODO Auto-generated method stub
     return null;

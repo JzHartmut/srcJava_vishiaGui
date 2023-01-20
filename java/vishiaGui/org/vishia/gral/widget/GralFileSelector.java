@@ -717,7 +717,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     final String posPathDir, posFilename, posFileTable, posBtnExec;
     if(bWithFavor) {                                       // [favor] 
       this.widgFavorTabs = new GralHorizontalSelector<FavorPath>(refPos, "@0+2, 0..0=tabs-" + this.name, this.action.actionSetFromTabSelection);
-      this.widgFavorTabs.addItem("+sel", 0, null);
+      this.widgFavorTabs.addItem("+sel", 0, null, false);
       if(sExecBtn ==null) {
         posFilename = null;
         posPathDir = "@2+2, 0..0=infoLine-";
@@ -1875,7 +1875,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         favor.sCurrDir = favor.path;                      // use an existing favor
       }
       if( ! this.widgFavorTabs.setActItem(sFavor)){
-        this.widgFavorTabs.addItem(sFavor, -1, this.favorPathInfo);
+        this.widgFavorTabs.addItem(sFavor, -1, this.favorPathInfo, true);
       }
       this.widgFavorTabs.redraw();
       if(fileStart !=null) {

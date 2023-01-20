@@ -2779,11 +2779,14 @@ public GralButton addCheckButton(
   public static class LogMsg {
     public static final int ctorWdg = 1001;
     public static final int newPanel = 1010;
+    public static final int addTabPanel = 1012;
     
     public static final int newImplTable = 1051;
     
     public static final int setVisible = 1130;
-    public static final int setFocus = 1131;
+    public static final int setInvisible = 1131;
+    public static final int setVisibleFromImpl = 1132;
+    public static final int setFocus = 1133;
     
     public static final int gralTable_updateCells = 1201;
     public static final int gralFileSelector_fillin = 1211;

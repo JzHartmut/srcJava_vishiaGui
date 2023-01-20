@@ -57,10 +57,6 @@ public class GralScreen implements GralPanel_ifc {
     return this.gralMng;
   }
 
-  @Override public void setVisibleStateWidget ( boolean visible ) {
-    
-  }
-
   @Override public void setFocus () {
     this.focusedWindow.setFocus();
   }

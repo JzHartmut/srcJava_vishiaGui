@@ -39,6 +39,7 @@ import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
+import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
@@ -198,6 +199,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     GralMenu contextMenu = gralTable.getContextMenu();
     initSwtTable(swtTable, zColumn, mng, contextMenu, contextMenuColumns);
     vScrollBar = new Vscrollbar(swtTable);
+
+    swtTable.setVisible(gralTable.isVisible());            // sets the initial visible state of the composite of all cells and scrollbar.         
     super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
@@ -244,8 +247,12 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       
   /*package private*/ 
   static GralWidget.ImplAccess createTable(GralTable<?> gralTable, SwtMng mng) {
-    
+    GralWidgetBase_ifc panelg = gralTable.pos().parent;
+//    if(panelg.getName().equals("tabFavorsAll1")) {
+//      Debugutil.stop(); }
+
     Composite parent = mng.getWidgetsPanel(gralTable);
+    boolean parentVisible = parent.isVisible();
     @SuppressWarnings("unchecked")
     final SwtTable table = new SwtTable(gralTable, mng, parent); //, selectionColumn, selectionText);
     table.swtWidgHelper.widgetSwt.setData(table);
