@@ -744,7 +744,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       }
     }
     if(sExecBtn !=null) {
-      this.widgBtnExec = new GralButton(refPos, posBtnExec + this.name, sExecBtn, this.action.actionSaveButton);
+      this.widgBtnExec = new GralButton(refPos, posBtnExec + this.name, sExecBtn, this.action.actionExecButton);
       this.widgFilename = new GralTextField(refPos, posFilename + this.name, GralTextField.Type.editable);
     }
     //Text field for path above list
@@ -1272,17 +1272,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(!bSameDirectory){
       this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin GralFileSelector: " + dir );
       this.currentDir = dir;
-      this.sCurrentDir = dir.getAbsolutePath();  //though it may not exist, store it for refresh (may be exist later).
+      this.sCurrentDir = FileFunctions.normalizePath(dir).toString();  //though it may not exist, store it for refresh (may be exist later).
     } else {
       this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin sGralFileSelector: " + dir );
     }
-    String sPath = this.widgdPathDir.getText();            // prevent file name after last slash
-    int posFile = sPath.lastIndexOf('/');
-    int posFile1 = sPath.lastIndexOf('\\');
-    if(posFile1  > posFile) { posFile = posFile1; }
-    String sName = sPath.substring(posFile+1);             // name is "" if Slash on end or no slash because empty
-    String sPathNew = this.sCurrentDir + '/' + sName;      
-    this.widgdPathDir.setText(sPathNew, this.sCurrentDir.length()+1);    // set directory string, caret on end
+    this.widgdPathDir.setText(this.sCurrentDir);    // set directory string, caret on end
     if(!bSameDirectory || !this.widgSelectList.wdgdTable.fillinPending()){      //new request anytime if other directory, or if it is not pending.
       this.widgSelectList.wdgdTable.fillinPending(true);
       System.out.println("FcmdFileCard - start fillin; " + this.sCurrentDir + (bSameDirectory ? "; same" : "; new"));
@@ -1827,29 +1821,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     final String sFile = this.currentFile.getName();
     if(this.widgFilename !=null) {
       this.widgFilename.setText(sFile);
-    } else {
-      final String sTextPath = this.widgdPathDir.getText();
-      int posSlash = StringFunctions.lastIndexOfAnyChar(sTextPath, 0, -1, "\\/");
-      String sPath = sTextPath.substring(0, posSlash+1) + sFile;
-      this.widgdPathDir.setText(sPath, posSlash+1, true);
     }
   }
   
   
-  protected void doActionSave ( int key, GralWidget_ifc widgd, Object... params) {
+  protected void doActionExec ( int key, GralWidget_ifc widgd, Object... params) {
     if(GralFileSelector.this.actionOnExecButton !=null) {
-      String sFile;
-      if(this.widgFilename !=null) {
-        sFile = this.widgFilename.getText();               // widgFilename exist, gets its content
-      } else {
-        final String sTextPath = this.widgdPathDir.getText();
-        if(FileFunctions.isAbsolutePath(sTextPath)) {      // else get the filename from widgPathDir
-          int posSlash = StringFunctions.lastIndexOfAnyChar(sTextPath, 0, -1, "\\/++");
-          sFile = sTextPath.substring(posSlash+1);           // use the file name only
-        } else {
-          sFile = sTextPath;                                 // use the whole input as manual given file path
-        }
-      }
+      String sFile = this.widgFilename.getText();               // widgFilename exist, gets its content
       FileRemote fileExec;
       if(sFile.length()!=0) {                              // file name given in one of both?
         fileExec = this.currentDir.child(sFile);        // it may be an non existing file, use the given name.
@@ -2504,10 +2482,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   };
   
   
-  GralUserAction actionSaveButton = new GralUserAction("actionSaveButton"){
+  GralUserAction actionExecButton = new GralUserAction("actionSaveButton"){
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        doActionSave(key, widgd, params);
+        doActionExec(key, widgd, params);
         return true;
       } else return false;
     }
