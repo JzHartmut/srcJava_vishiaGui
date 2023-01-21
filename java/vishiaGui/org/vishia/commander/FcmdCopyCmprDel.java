@@ -1124,14 +1124,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           //widgButtonOk.setCmd("check");
           widgCopyState.setText("check?", 0);
           if(setVisible){
-            widgButtonOk.setPrimaryWidgetOfPanel();
             windConfirmCopy.setVisible(true);
+            widgButtonOk.setFocus(); //PrimaryWidgetOfPanel();
             main.gui.gralMng.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
           }
           //widgButtonMove.setValue(GralMng_ifc.cmdSet, 0, 0);
           zFiles = 0; zBytes = 0;
         }
-        windConfirmCopy.setFocus();
+        //xx windConfirmCopy.setFocus();
         //main.gralMng.setWindowsVisible(windConfirmCopy, posWindConfirmCopy);
         main.gui.gralMng.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".");
       }

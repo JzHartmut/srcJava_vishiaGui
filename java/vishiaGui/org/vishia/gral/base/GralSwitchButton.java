@@ -34,9 +34,9 @@ public class GralSwitchButton extends GralButton {
    * @param sDisabled
    * @param color maybe dismiss, elsewhere 3 colors for on, off and disabled
    */
-  public GralSwitchButton(GralPos refPos, String sPosName, String sTextOn, String sTextOff, String sDisabled, GralColor ... color) {
+  public GralSwitchButton(GralPos refPos, String sPosName, String sTextOff, String sTextOn, String sDisabled, GralColor ... color) {
     super(refPos, sPosName, null, null);
-    super.setSwitchMode(sTextOn, sTextOff, sDisabled);
+    super.setSwitchMode(sTextOff, sTextOn, sDisabled);
     if(color !=null) {
       assert(color.length==3);
       super.setSwitchMode(color[0], color[1], color[2]);

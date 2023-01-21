@@ -64,6 +64,10 @@ public class GralFileProperties extends GralWidgetBase {
    */
   public final static String version = "2023-01-15";
   
+  GralColor colorChanged = GralColor.getColor("pye");
+  GralColor colorUnchanged = GralColor.getColor("wh");
+  GralColor colorWrong = GralColor.getColor("pma");
+  
   
   final String buttonFilePropsChg = "change file";
 
@@ -75,7 +79,7 @@ public class GralFileProperties extends GralWidgetBase {
 
   final String buttonFilePropsAbort = "abort change";
 
-  final String buttonFilePropsOk = "done";
+  final String buttonFilePropsOk = "change done";
 
   final String buttonFilePropsCopy = "copy file";
 
@@ -89,16 +93,16 @@ public class GralFileProperties extends GralWidgetBase {
   
   GralPanelContent panel;
   
-  GralTextField_ifc widgName, widgDir, widgLink, widgDate, widgLength;
+  GralTextField widgName, widgNameNew, widgDir, widgLink, widgDate, widgLength;
   
   GralButton[] widgRd, widgWr, widgEx;
   GralButton widgUID, widgGID, widgSticky;
   GralButton widgHidden, widgDirectory;
-  GralButton widgBtnDirBytes;
   
   /**Action button. */
-  GralButton widGetAllProps, widgChrRecurs, widgChgFile, widgCopyFile;
+  GralButton widGetAllProps, widgChgRecurs, widgChgFile, widgCopyFile;
   
+  GralUserAction actionRefresh;
   
   DateFormat formatDate;
   
@@ -116,6 +120,20 @@ public class GralFileProperties extends GralWidgetBase {
   
   /**True then the window is opened. Write acutal file into. */
   boolean isVisible;
+  
+  String sNameNew;
+  
+  /**The time stamp string how written on {@link #showFileInfos(FileRemote)} 
+   * It is compared with maybe changed content in the {@link #widgDate}.
+   * Only if the content is changed, a new time stamp will be set.
+   */
+  String sDateOriginal;
+  
+  /**The flags how written on {@link #showFileInfos(FileRemote)} 
+   * It is compared with maybe changed content in the {@link #widgRd} etc..
+   * Only if the buttons are changed, a new time stamp will be set.
+   */
+  int nFlagsOriginal;
   
   /**True while a change commission is send and no answer is received yet. */
   //boolean busyChanging;
@@ -160,11 +178,14 @@ public class GralFileProperties extends GralWidgetBase {
     }
     this.evChg = new FileRemote.CallbackEvent(this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
     this.evCntLen = new FileRemote.CallbackEvent(this.evSrc, null, null, this.callbackCntLen, null, this.evSrc);
-    this.widgLink = new GralTextField(refPos, "@3.5-3++, 1..-1=link-" + this.name, "symbolic link", "t");
+    this.widgLink = new GralTextField(refPos, "@3.5-3.2++, 1..-1=link-" + this.name, "symbolic link", "t");
     this.widgDir = new GralTextField(refPos, "dir-" + this.name, "directory path", "t");
-    this.widgName = new GralTextField(refPos, "@10-4, =name-" + this.name, "filename", "t", GralTextField.Type.editable);
-    this.widgLength = new GralTextField(refPos, "@14-3.5, 1..24++=length-" + this.name, "file-length", "t");
-    this.widgDate = new GralTextField(refPos, "@,25..-1=data-" + this.name, "last modified", "t", GralTextField.Type.editable);
+    this.widgName = new GralTextField(refPos, "name-" + this.name, "filename", "t", GralTextField.Type.editable);
+    this.widgNameNew = new GralTextField(refPos, "name-" + this.name, "rename / copy to", "t", GralTextField.Type.editable);
+    this.widgNameNew.specifyActionChange(null, this.actionsetNameToRenameCopy, null);
+    this.widgLength = new GralTextField(refPos, "@+, 1..20=length-" + this.name, "file-length", "t");
+    this.widgLength.specifyActionChange("ct DirBytes", this.actionBtnCntLen, null);
+    this.widgDate = new GralTextField(refPos, "@+,1..18=data-" + this.name, "last modified", "t", GralTextField.Type.editable);
 //    GralColor colorBack = main.gui.gralMng.propertiesGui.colorBackground_;
     GralColor colorText = GralColor.getColor("bk");
     int ii;
@@ -173,12 +194,8 @@ public class GralFileProperties extends GralWidgetBase {
     GralColor colorDis = GralColor.getColor("gr");
     String textOn = "X", textOff = " ", textDis = "?";
     
-    this.widgBtnDirBytes = new GralButton(refPos, "@17-2, 1..20++0.2=dirBytes-" + this.name, "dirBytes", actionBtnCntLen);
-    this.widgBtnDirBytes.setDisableColorText(colorDis, " (file) ");
     //widgDirectory = main.gralMng.addCheckButton("FileProp:btndir", textOn, textOff, textDis, colorOn, colorOff, colorDis);
     //main.gralMng.addText("directory"); 
-    this.widgHidden = new GralSwitchButton(refPos, "@17-2, 22+2++0.2=btnhidden-" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
-    new GralLabel(refPos, "hidden"); 
     
     //bUnixSystem = true;
     if(bUnixSystem){
@@ -218,20 +235,24 @@ public class GralFileProperties extends GralWidgetBase {
 //      widgSticky = new GralCheckButton("FileProp:btnSticky", textOn, textOff, textDis, colorOn, colorOff, colorDis);
 //      new GralText("sticky"); 
     } else {
-      new GralLabel(refPos, "@20-2,1+2++1=rd-" + this.name, "rd", 1);
+      new GralLabel(refPos, "@23-2,1+2++1=rd-" + this.name, "rd", 1);
       new GralLabel(refPos, "wr");
       new GralLabel(refPos, "ex");
+      new GralLabel(refPos, "hidden"); 
       this.widgRd = new GralButton[1];
       this.widgWr = new GralButton[1];
       this.widgEx = new GralButton[1];
-      this.widgRd[0] = new GralSwitchButton(refPos, "@22-2,1+2++1=btnro" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      this.widgWr[0] = new GralSwitchButton(refPos, "btnro2" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      this.widgEx[0] = new GralSwitchButton(refPos, "btnro3" + this.name, textOn, textOff, textDis, colorOn, colorOff, colorDis);
-      
+      this.widgRd[0] = new GralSwitchButton(refPos, "@25-2,1+2++1=btnro" + this.name, textOff, textOn, textDis, colorOff, colorOn,  colorDis);
+      this.widgWr[0] = new GralSwitchButton(refPos, "btnro2" + this.name, textOff, textOn, textDis, colorOff, colorOn, colorDis);
+      this.widgEx[0] = new GralSwitchButton(refPos, "btnro3" + this.name, textOff, textOn, textDis, colorOff, colorOn, colorDis);
+      this.widgHidden = new GralSwitchButton(refPos, "btnhidden-" + this.name, textOff, textOn, textDis, colorOff, colorOn, colorDis);
     }
     this.widgCopyFile =  new GralButton(refPos, "@-12+3++1, -16..-1=buttonFilePropsCopy" + this.name, sCmdCopy, this.actionButton);
-    this.widgChrRecurs =   new GralButton(refPos, "buttonFilePropsChgRecursive" + this.name, sCmdChgRecurs, this.actionButton);
+    this.widgCopyFile.setCmd(sCmdCopy);
+    this.widgChgRecurs =   new GralButton(refPos, "buttonFilePropsChgRecursive" + this.name, sCmdChgRecurs, this.actionButton);
+    this.widgChgRecurs.setCmd(sCmdChgRecurs);
     this.widgChgFile = new GralButton(refPos, "buttonFilePropsChg" + this.name, sCmdChg,  this.actionButton);
+    this.widgChgFile.setCmd(sCmdChg);
   }
 
 
@@ -252,6 +273,11 @@ public class GralFileProperties extends GralWidgetBase {
   }
   
   
+  public void setActionRefresh(GralUserAction actionRefresh) {
+    this.actionRefresh = actionRefresh;
+  }
+  
+  
   /**Opens the view window and fills its content.
    * @param src The path which is selected as source. It may be a directory or a file.
    */
@@ -268,33 +294,43 @@ public class GralFileProperties extends GralWidgetBase {
    * @param src the file
    */
   public void showFileInfos(FileRemote src){
+    if(this.windFileProps !=null) {
+      this.isVisible = this.windFileProps.isVisible();
+    }
     if(this.isVisible && !this.evChg.isOccupied()){
       this.actFile = src;
       //TODO don't access the file system without user activity!!! need: a refresh button!!
       this.widgChgFile.setText("change file");
-      this.widgChrRecurs.setText("change recursive");
+      this.widgChgRecurs.setText("change recursive");
       this.widgCopyFile.setText("copy file");
       this.widgName.setText(src.getName());
       this.widgDir.setText(src.getParent());
-      String sDate = this.formatDate.format(new Date(src.lastModified()));
-      widgDate.setText(sDate);
+      this.sDateOriginal = this.formatDate.format(new Date(src.lastModified()));
+      this.widgDate.setText(this.sDateOriginal);
+      this.widgDate.setBackColor(this.colorUnchanged, -1);
       String sLength;
       long length = src.length();
-      sLength = "" + length;
+      if(length==0 && src.isDirectory()) {
+        sLength = "Enter / Mouse to count";
+      } else {
+        sLength = "" + length;
+      }
       if(length >= 10000 && length < 10000000){
         sLength += " = " + length/1000 + "k";
       } else if( length >= 10000000){
         sLength += " = " + length/1000000 + "M";
       }
       this.widgLength.setText(sLength);
-      if(src instanceof FileRemote && (src).isSymbolicLink()){
+      if(src.isSymbolicLink()){
         this.widgLink.setText(FileFunctions.getCanonicalPath(src));
       } else {
         this.widgLink.setText("");
       }
-      this.widgRd[0].setState(src.canRead() ? GralButton.State.On : GralButton.State.Off);
-      this.widgEx[0].setState(src.canExecute() ? GralButton.State.On : GralButton.State.Off);
-      this.widgWr[0].setState(src.canWrite() ? GralButton.State.On : GralButton.State.Off);
+      this.nFlagsOriginal = src.getFlagsTested();
+      
+      this.widgRd[0].setState((this.nFlagsOriginal & FileRemote.mCanRead)!=0 ? GralButton.State.On : GralButton.State.Off);
+      this.widgEx[0].setState((this.nFlagsOriginal & FileRemote.mExecute)!=0 ? GralButton.State.On : GralButton.State.Off);
+      this.widgWr[0].setState((this.nFlagsOriginal & FileRemote.mCanWrite)!=0 ? GralButton.State.On : GralButton.State.Off);
       if(this.bUnixSystem){
         this.widgRd[1].setState(GralButton.State.Disabled);
         this.widgRd[2].setState(GralButton.State.Disabled);
@@ -306,85 +342,102 @@ public class GralFileProperties extends GralWidgetBase {
         this.widgUID.setState(GralButton.State.Disabled);
         this.widgGID.setState(GralButton.State.Disabled);
       }
-      this.widgHidden.setState(src.isHidden() ? GralButton.State.On : GralButton.State.Off);
-      this.widgBtnDirBytes.setState(src.isDirectory() ? GralButton.State.On : GralButton.State.Disabled);
+      this.widgHidden.setState((this.nFlagsOriginal & FileRemote.mHidden)!=0 ? GralButton.State.On : GralButton.State.Off);
       //widgDirectory.setState(src.isDirectory() ? GralButton.State.On : GralButton.State.Off);
+      setRename();
     }
   }
   
   
-  boolean countLength ( GralWidget infos ) {
-  String name = GralFileProperties.this.widgName.getText();
-    if(name.equals(GralFileProperties.this.actFile.getName())){ name = null; } //don't change it.
+  void setRename() {
+    String name = GralFileProperties.this.widgName.getText();
+    String nameNew = GralFileProperties.this.widgNameNew.getText();
+    int pos1 = nameNew.indexOf('*');
+    int posDot = nameNew.lastIndexOf('.');
+    final String sRename;
+    if(pos1 >= 0) {                                        // found *
+      if(pos1 ==0 && posDot == 1) { // *.ext
+        posDot = name.lastIndexOf('.');
+        if(posDot >0) {
+          sRename = name.substring(0, posDot+1) + nameNew.substring(2);
+        } else {
+          sRename = name + nameNew.substring(1);
+        }
+      } else {
+        String name1 = posDot >=0 ? name.substring(0, posDot) : name;  // use name or name.ext
+        sRename = nameNew.substring(0, pos1) + name1 + nameNew.substring(pos1+1); 
+      }
+      this.widgNameNew.setBackColor(GralFileProperties.this.colorChanged, -1);;
+    } else if(nameNew.length()>0) {
+      sRename = nameNew;
+      this.widgNameNew.setBackColor(GralFileProperties.this.colorChanged, -1);;
+    } else {
+      sRename = null;   // dont change the name
+    }
+    this.sNameNew = sRename;
+    if(sRename !=null && !this.actFile.isSymbolicLink()) {
+      this.widgLink.setText("=>" + sRename);
+    }
+  }
+  
+  
+  boolean doActionButtons ( GralWidget infos ) {
     int noMask = 0;
-    int val = 0; //actFileRemote.getFlags();
-    int mask;
     String sDate = GralFileProperties.this.widgDate.getText();
     long date;
-    try{ 
-      Date date1 = GralFileProperties.this.formatDate.parse(sDate);
-      date = date1.getTime();
-    } catch(ParseException exc){
-      date = 0;
+    if(sDate.equals(this.sDateOriginal)) { date = 0; }      // date is not changed
+    else {
+      try{ 
+        Date date1 = GralFileProperties.this.formatDate.parse(sDate);
+        date = date1.getTime();
+      } catch(ParseException exc){
+        date = 0;
+        this.widgDate.setBackColor(this.colorWrong, -1);
+      }
     }
-    if(GralFileProperties.this.bUnixSystem){
-      mask = FileRemote.mCanRead | FileRemote.mCanWrite | FileRemote.mExecute;
-    } else {
-      mask = FileRemote.mCanWrite | FileRemote.mHidden;
-    }
+    int flags = this.nFlagsOriginal;
     switch(GralFileProperties.this.widgRd[0].getState()){
-      case Off:       val &= ~FileRemote.mCanRead; break;
-      case On:       val |= FileRemote.mCanRead; break;
-      case Disabled: mask &= ~FileRemote.mCanRead; break;
+      case Off:       flags &= ~FileRemote.mCanRead; break;
+      case On:       flags |= FileRemote.mCanRead; break;
     }
     switch(GralFileProperties.this.widgWr[0].getState()){
-      case Off:       val &= ~FileRemote.mCanWrite; break;
-      case On:       val |= FileRemote.mCanWrite; break;
-      case Disabled: mask &= ~FileRemote.mCanWrite; break;
+      case Off:       flags &= ~FileRemote.mCanWrite; break;
+      case On:       flags |= FileRemote.mCanWrite; break;
     }
     switch(GralFileProperties.this.widgEx[0].getState()){
-      case Off:       val &= ~FileRemote.mExecute; break;
-      case On:       val |= FileRemote.mExecute; break;
-      case Disabled: mask &= ~FileRemote.mExecute; break;
+      case Off:       flags &= ~FileRemote.mExecute; break;
+      case On:       flags |= FileRemote.mExecute; break;
     }
     if(GralFileProperties.this.bUnixSystem){
       switch(GralFileProperties.this.widgRd[1].getState()){
-        case Off:       val &= ~FileRemote.mCanReadGrp; break;
-        case On:       val |= FileRemote.mCanReadGrp; break;
-        case Disabled: mask &= ~FileRemote.mCanReadGrp; break;
+        case Off:       flags &= ~FileRemote.mCanReadGrp; break;
+        case On:       flags |= FileRemote.mCanReadGrp; break;
       }
       switch(GralFileProperties.this.widgWr[1].getState()){
-        case Off:       val &= ~FileRemote.mCanWriteGrp; break;
-        case On:       val |= FileRemote.mCanWriteGrp; break;
-        case Disabled: mask &= ~FileRemote.mCanWriteGrp; break;
+        case Off:       flags &= ~FileRemote.mCanWriteGrp; break;
+        case On:       flags |= FileRemote.mCanWriteGrp; break;
       }
       switch(this.widgEx[1].getState()){
-        case Off:       val &= ~FileRemote.mExecuteGrp; break;
-        case On:       val |= FileRemote.mExecuteGrp; break;
-        case Disabled: mask &= ~FileRemote.mExecuteGrp; break;
+        case Off:       flags &= ~FileRemote.mExecuteGrp; break;
+        case On:       flags |= FileRemote.mExecuteGrp; break;
       }
       switch(this.widgRd[2].getState()){
-        case Off:       val &= ~FileRemote.mCanReadAny; break;
-        case On:       val |= FileRemote.mCanReadAny; break;
-        case Disabled: mask &= ~FileRemote.mCanReadAny; break;
+        case Off:       flags &= ~FileRemote.mCanReadAny; break;
+        case On:       flags |= FileRemote.mCanReadAny; break;
       }
       switch(this.widgWr[2].getState()){
-        case Off:       val &= ~FileRemote.mCanWriteAny; break;
-        case On:       val |= FileRemote.mCanWriteAny; break;
-        case Disabled: mask &= ~FileRemote.mCanWriteAny; break;
+        case Off:       flags &= ~FileRemote.mCanWriteAny; break;
+        case On:       flags |= FileRemote.mCanWriteAny; break;
       }
       switch(this.widgEx[2].getState()){
-        case Off:       val &= ~FileRemote.mExecuteAny; break;
-        case On:       val |= FileRemote.mExecuteAny; break;
-        case Disabled: mask &= ~FileRemote.mExecuteAny; break;
+        case Off:       flags &= ~FileRemote.mExecuteAny; break;
+        case On:       flags |= FileRemote.mExecuteAny; break;
       }
     }
     switch(this.widgHidden.getState()){
-      case Off:       val &= ~FileRemote.mHidden; break;
-      case On:        val |=  FileRemote.mHidden; break;
-      case Disabled: mask &= ~FileRemote.mHidden; break;
+      case Off:       flags &= ~FileRemote.mHidden; break;
+      case On:        flags |=  FileRemote.mHidden; break;
     }
-    val &= mask;   //only used bits.
     boolean bAbort = false;
     if(infos.sCmd.equals(sCmdAbort)){
       if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
@@ -397,15 +450,17 @@ public class GralFileProperties extends GralWidgetBase {
       if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
         //cmds with callback
         this.widgChgFile.setText(this.buttonFilePropsChanging);
-        this.actFile.chgProps(name, mask, val, date, this.evChg);
+        int mask = (flags ^ this.nFlagsOriginal);
+        this.actFile.chgProps(this.sNameNew, mask, flags, date, this.evChg);
         //TODO main.refreshFilePanel(actFile.getParentFile());  //refresh the panel if the directory is shown there
       } else { bAbort = true; }
       //
     } else if(infos.sCmd.equals(sCmdChgRecurs)){
       if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
         //cmds with callback
-        this.widgChrRecurs.setText(this.buttonFilePropsChanging);
-        this.actFile.chgPropsRecursive(mask, val, date, this.evChg);
+        this.widgChgRecurs.setText(this.buttonFilePropsChanging);
+        int mask = ~(flags ^ this.nFlagsOriginal);
+        this.actFile.chgPropsRecursive(mask, flags, date, this.evChg);
       } else { bAbort = true; }
       //
     } else if(infos.sCmd.equals(sCmdCopy)){
@@ -442,7 +497,7 @@ public class GralFileProperties extends GralWidgetBase {
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){  //not on mouse down but on mouse up.
-        return countLength( infos );
+        return doActionButtons( infos );
       }
       return false;
       // /
@@ -458,6 +513,8 @@ public class GralFileProperties extends GralWidgetBase {
     }
   };
 
+  
+
 
   EventConsumer callbackChgProps = new EventConsumer()
   { @Override public int processEvent(EventObject evP)
@@ -465,10 +522,22 @@ public class GralFileProperties extends GralWidgetBase {
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
         showFileInfos(GralFileProperties.this.actFile);
         GralFileProperties.this.widgChgFile.setText(GralFileProperties.this.buttonFilePropsOk);
+        if(GralFileProperties.this.actionRefresh !=null) {
+          GralFileProperties.this.actionRefresh.exec(KeyCode.shiftAlt, GralFileProperties.this.windFileProps);
+        }
+        String sNewName = GralFileProperties.this.widgNameNew.getText();
+        if(sNewName.indexOf('*') <0) {
+          GralFileProperties.this.widgNameNew.setText("");
+          GralFileProperties.this.widgNameNew.setBackColor(GralFileProperties.this.colorUnchanged, -1);;
+        }
+
       } else {
         GralFileProperties.this.widgChgFile.setText(GralFileProperties.this.buttonFilePropsRetry);
       }
       ev.relinquish();
+      if(GralFileProperties.this.actionRefresh !=null) {
+        GralFileProperties.this.actionRefresh.exec(KeyCode.shiftAlt, GralFileProperties.this.windFileProps);
+      }
       return 1;
     } 
   
@@ -485,7 +554,7 @@ public class GralFileProperties extends GralWidgetBase {
   {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(keyCode)){
-        GralFileProperties.this.widgBtnDirBytes.setText("counting ...");
+        GralFileProperties.this.widgLength.setText("counting ...");
         if(0 != GralFileProperties.this.evCntLen.occupyRecall(100, GralFileProperties.this.evSrc, GralFileProperties.this.callbackCntLen, null, true)){
           GralFileProperties.this.actFile.countAllFileLength(GralFileProperties.this.evCntLen);
         }
@@ -493,7 +562,7 @@ public class GralFileProperties extends GralWidgetBase {
       return true;
   } };
   
-  EventConsumer callbackCntLen = new EventConsumer()
+  final EventConsumer callbackCntLen = new EventConsumer()
   { @Override public int processEvent(EventObject evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
@@ -502,7 +571,6 @@ public class GralFileProperties extends GralWidgetBase {
       } else {
         GralFileProperties.this.widgLength.setText("error count bytes");
       }
-      GralFileProperties.this.widgBtnDirBytes.setText(GralFileProperties.this.buttonFilePropsCntLen);
       ev.relinquish();
       return 1;
     } 
@@ -512,6 +580,18 @@ public class GralFileProperties extends GralWidgetBase {
   };
 
 
+  final GralUserAction actionsetNameToRenameCopy = new GralUserAction("actionsetNameToRenameCopy") {
+    @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params) {
+      String sText = GralFileProperties.this.widgNameNew.getText();
+      if( (keyCode == KeyCode.enter || keyCode == KeyCode.mouse2Double) && sText.length()==0  || keyCode == (KeyCode.ctrl + 'n') ) {
+        GralFileProperties.this.widgNameNew.setText(GralFileProperties.this.widgName.getText());
+      }
+      else if( keyCode == KeyCode.enter || keyCode == KeyCode.focusLost) {
+        setRename();
+      }
+      return true;
+  } };
+  
   
   
   

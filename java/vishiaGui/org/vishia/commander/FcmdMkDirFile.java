@@ -61,12 +61,13 @@ public class FcmdMkDirFile
     FcmdFileCard card = main.getLastSelectedFileCards()[0];
     if(card !=null){
       File dir = card.getCurrentDir();
-      widgParentPath.setText(dir.getAbsolutePath());
+      this.widgParentPath.setText(dir.getAbsolutePath());
     } else {
-      widgParentPath.setText("?? nothing selected ??");
+      this.widgParentPath.setText("?? nothing selected ??");
     }
+    this.widgName.setFocus();
     main.gui.gralMng.setHelpUrl(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.mkdirfile.");
-    windMk.setFocus(); //setWindowVisible(true);
+    //windMk.setFocus(); //setWindowVisible(true);
   }
   
 

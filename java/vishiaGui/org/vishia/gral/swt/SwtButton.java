@@ -154,6 +154,7 @@ public class SwtButton extends GralButton.GraphicImplAccess
   
   @Override public void redrawGthread(){
     super.prepareWidget();
+    //super.redrawGthread(); from GralWidget.ImplAccess
     GralWidget.DynamicData dyda = dyda();
     int chg = dyda.getChanged();
     if((chg & chgText) !=0 && dyda.displayedText !=null){ 
@@ -163,28 +164,33 @@ public class SwtButton extends GralButton.GraphicImplAccess
       acknChanged(chgColorText);
       SwtProperties props = swtWidgHelper.mng.propertiesGuiSwt;
       if(dyda.textColor !=null){
-        widgetSwt.setForeground(props.colorSwt(dyda.textColor));
+        this.widgetSwt.setForeground(props.colorSwt(dyda.textColor));
       }
       if(dyda.backColor !=null){
-        widgetSwt.setBackground(props.colorSwt(dyda.backColor));
+        this.widgetSwt.setBackground(props.colorSwt(dyda.backColor));
       }
       if(dyda.textFont !=null){
-        widgetSwt.setFont(props.fontSwt(dyda.textFont));
+        this.widgetSwt.setFont(props.fontSwt(dyda.textFont));
       }
     }
     if((chg & chgVisible) !=0) {
       acknChanged(chgVisible);
-      widgetSwt.setVisible(true);
+      this.widgetSwt.setVisible(true);
+      //widgetSwt.getShell().setVisible(true);
+    }
+    if((chg & chgFocus) !=0) {
+      acknChanged(chgFocus);
+      this.widgetSwt.setFocus();
       //widgetSwt.getShell().setVisible(true);
     }
     if((chg & chgInvisible) !=0) {
       acknChanged(chgInvisible);
-      widgetSwt.setVisible(false);
+      this.widgetSwt.setVisible(false);
       //widgetSwt.getShell().setVisible(false);
     }
     if((chg & chgColorText) !=0){ acknChanged(chgColorText); widgetSwt.setForeground(swtWidgHelper.mng.getColorImpl(dyda().textColor)); }
     if((chg & chgColorBack) !=0){ acknChanged(chgColorBack); widgetSwt.setBackground(swtWidgHelper.mng.getColorImpl(dyda().backColor)); }
-    widgetSwt.redraw();
+    this.widgetSwt.redraw();
   }
 
   

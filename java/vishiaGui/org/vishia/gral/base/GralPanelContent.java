@@ -233,7 +233,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     if(isTabbed()) {
       this.dyda.setChanged(GralWidget.ImplAccess.chgCurrTab);
     }
-    redraw1(-50,100);
+    redraw1(50,100);     // redraw deleayed because more changes on the same time.
   }
   
   

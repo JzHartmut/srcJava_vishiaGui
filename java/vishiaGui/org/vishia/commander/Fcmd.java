@@ -500,6 +500,7 @@ public class Fcmd //extends GuiCfg
 //    this.lastFilePanels.add(this.favorPathSelector.panelLeft);
 //    this.favorPathSelector.panelMid.cardFavorThemes.setFocus();
     this.gui.outputBox.setText("Test Outbox");
+    this.fileProps.setActionRefresh(this.favorPathSelector.actionRefreshFileTable);
   }
 
   //@Override
