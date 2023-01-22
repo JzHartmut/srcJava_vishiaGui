@@ -558,14 +558,18 @@ public class FcmdFileCard extends GralFileSelector
      * @see org.vishia.gral.ifc.GralUserAction#userActionGui(int, org.vishia.gral.base.GralWidget, java.lang.Object[])
      */
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
-      setActFilePanel_setColorCurrLine();                  // action on this card: It is the first one
-      mainPanel.bFavorCardHasFocus = false;
-      mainPanel.bFavorThemeCardHasFocus = false;
-      GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-      String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
-      Object oData = line.getUserData();
-      if(oData instanceof File){
-        actionOnFileSelection((FileRemote)oData, sFileCell);
+      // do it only if it is the current focused panel.    // prevent next operation for the second panel to sync!
+      if(FcmdFileCard.this.main.lastFilePanels.size()>=1 && FcmdFileCard.this.main.lastFilePanels.get(0) == FcmdFileCard.this.mainPanel) {
+        setActFilePanel_setColorCurrLine();                // action on this card: It is the first one
+        FcmdFileCard.this.mainPanel.bFavorCardHasFocus = false;
+        FcmdFileCard.this.mainPanel.bFavorThemeCardHasFocus = false;
+        @SuppressWarnings("unchecked") 
+        GralTableLine_ifc<FileRemote> line = (GralTableLine_ifc<FileRemote>) params[0];
+        String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
+        Object oData = line.getUserData();
+        if(oData instanceof File){
+          actionOnFileSelection((FileRemote)oData, sFileCell);
+        }
       }
       return true;
     }

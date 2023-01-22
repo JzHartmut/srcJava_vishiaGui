@@ -20,7 +20,7 @@
 2023-01-20 20:27:02  x     FcmdExecuter.java                        ::         16.567 -2145178721 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
 2023-01-22 12:36:18  x     FcmdFavorPathSelector.java               ::         31.728  0326414932 
-2023-01-22 13:26:45  x     FcmdFileCard.java                        ::         34.764 -2026335196 
+2023-01-22 15:15:14  x     FcmdFileCard.java                        ::         35.142  1505802792 
 2023-01-03 23:40:17  x     FcmdFilesCp.java                         ::          7.583  0779419410 
 2023-01-15 20:37:41  x     FcmdGui.java                             ::          1.623  1616198251 
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
@@ -244,7 +244,7 @@
 2023-01-07 08:13:26  x     GralCommandSelector.java                 ::          8.473  1777158701 
 2023-01-21 23:33:08  x     GralFileProperties.java                  ::         26.182  0686791148 
 2023-01-22 12:31:29  x     GralFileSelectWindow.java                ::          8.940 -0230463926 
-2023-01-22 13:51:02  x     GralFileSelector.java                    ::        109.009  1670908388 
+2023-01-22 15:15:22  x     GralFileSelector.java                    ::        109.009  1670908388 
 2023-01-20 21:03:12  x     GralHorizontalSelector.java              ::         12.849 -1336694146 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2023-01-20 19:10:55  x     GralInfoBox.java                         ::         15.457 -2088201195 
