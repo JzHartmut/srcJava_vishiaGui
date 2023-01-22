@@ -672,7 +672,7 @@ class FcmdFavorPathSelector
    */
   GralUserAction actionSortFilePerNameCase = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortName);
+      setSortOrderFiles(GralFileSelector.Constants.kSortName);
       return true;
   } };
   
@@ -681,7 +681,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerNameNonCase = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortNameNonCase);
+      setSortOrderFiles(GralFileSelector.Constants.kSortNameNonCase);
       return true;
   } };
   
@@ -690,14 +690,14 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerExtensionCase = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortExtension);
+      setSortOrderFiles(GralFileSelector.Constants.kSortExtension);
       return true;
   } };
   
   
   GralUserAction actionSortFilePerExtensionNonCase = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortExtensionNonCase);
+      setSortOrderFiles(GralFileSelector.Constants.kSortExtensionNonCase);
       return true;
   } };
   
@@ -707,7 +707,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerTimestamp = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortDateNewest);
+      setSortOrderFiles(GralFileSelector.Constants.kSortDateNewest);
       return true;
   } };
 
@@ -716,7 +716,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerTimestampOldestFirst = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortDateOldest);
+      setSortOrderFiles(GralFileSelector.Constants.kSortDateOldest);
       return true;
   } };
 
@@ -727,7 +727,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerLenghLargestFirst = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortSizeLargest);
+      setSortOrderFiles(GralFileSelector.Constants.kSortSizeLargest);
       return true;
   } };
 
@@ -736,7 +736,7 @@ class FcmdFavorPathSelector
   
   GralUserAction actionSortFilePerLenghSmallestFirst = new GralUserAction("")
   { @Override public boolean userActionGui(int key, GralWidget infos, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortSizeSmallest);
+      setSortOrderFiles(GralFileSelector.Constants.kSortSizeSmallest);
       return true;
   } };
 

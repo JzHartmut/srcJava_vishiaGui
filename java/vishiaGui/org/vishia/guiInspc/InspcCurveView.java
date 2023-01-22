@@ -1225,7 +1225,7 @@ public final class InspcCurveView
     @SuppressWarnings("synthetic-access") @Override 
     public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       GralTableLine_ifc<?> line = (GralTableLine_ifc<?>) params[0];
-      String sFileCell = line.getCellText(GralFileSelector.kColFilename);
+      String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
       widgFilename.setText(sFileCell);
       return true;
     }

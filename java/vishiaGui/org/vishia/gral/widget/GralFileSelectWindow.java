@@ -216,7 +216,7 @@ public class GralFileSelectWindow implements GralFileDialog_ifc
      */
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-      String sFileCell = line.getCellText(GralFileSelector.kColFilename);
+      String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
       Object oData = line.getUserData();
       if(false && oData instanceof File){
         String sName = ((File)oData).getName();

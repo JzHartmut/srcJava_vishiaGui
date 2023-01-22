@@ -223,7 +223,7 @@ public class FcmdFileCard extends GralFileSelector
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuFileEditContext, main.fcmdActions.actionEdit);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmCopyContext, main.copyCmd.actionConfirmCopy);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuConfirmFileDelContext, main.deleteCmd.actionConfirmDelete);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
+    this.gui.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteContext, main.executer.actionExecuteFileByExtension);
 //    wdgSelectList.wdgdTable.addContextMenuEntryGthread(1, "test", main.idents.menuExecuteCmdContext, main.executer.cmdSelector.actionExecCmdWithFiles);
 //    //selectList.wdgdTable.addContextMenuEntryGthread(1, "deSelDir", main.idents.deselectRecursFiles.menuContext, main.favorPathSelector.actionDeselectDirtree);
 //    wdgFavorCard.wdgdTable.specifyActionOnLineSelected(wdgFavorCard.actionFavorSelected);
@@ -466,7 +466,7 @@ public class FcmdFileCard extends GralFileSelector
     if(otherFileCard !=null){  //NOTE: though mid and right is selected, the otherFileCard may be null because no tab is open.
       String sDirName = getCurrentDir().getName();
       //check whether the other file card contains a entry with this directory name
-      GralTableLine_ifc<FileRemote> line = otherFileCard.widgSelectList.wdgdTable.getLine(sDirName);
+      GralTableLine_ifc<FileRemote> line = otherFileCard.gui.widgSelectList.wdgdTable.getLine(sDirName);
       if(line !=null){
         FileRemote dir = line.getUserData();
         bFillInReq = true;
@@ -476,7 +476,7 @@ public class FcmdFileCard extends GralFileSelector
       if(!bSameFile){
         //check whether the file is a directory and it is the directory of the other panel:
         boolean bToRoot = false;
-        if(currentFile.isDirectory()){
+        if(super.idata.currentFile.isDirectory()){
           FileRemote otherDir = otherFileCard.getCurrentDir();
           if(otherDir != null){
             String sDirPath = otherDir.getName();
@@ -492,11 +492,11 @@ public class FcmdFileCard extends GralFileSelector
             }
           }
         }
-        if(!bToRoot && otherFileCard !=null && otherFileCard.currentFile !=null){
+        if(!bToRoot && otherFileCard !=null && otherFileCard.idata.currentFile !=null){
           //check whether a sub dir is selected:
-          String sOtherSelectedFile = otherFileCard.currentFile.getName();
+          String sOtherSelectedFile = otherFileCard.idata.currentFile.getName();
           if(sOtherSelectedFile.equals(sDirName) && !bFillInReq){
-            otherFileCard.fillIn(otherFileCard.currentFile,false);
+            otherFileCard.fillIn(otherFileCard.idata.currentFile,false);
             otherFileCard.selectFile(sFileName);
           }
         }
@@ -527,13 +527,13 @@ public class FcmdFileCard extends GralFileSelector
         break;
       }
       if(panel.actFileCard !=null){                        // mark the current file card with green, last yellow
-        panel.actFileCard.widgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
+        panel.actFileCard.gui.widgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
         panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
       } else {
         panel.orderMainPanel = 0; //not used.
       }
     }
-    org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.widgSelectList.wdgdTable.getCurrentLine();
+    org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.gui.widgSelectList.wdgdTable.getCurrentLine();
     FileRemote fileCurr = line.getData();
     String fName = line.getCellText(1);
     FcmdLeftMidRightPanel p1 = this.main.lastFilePanels.size() <=0 ? null: this.main.lastFilePanels.get(0);
@@ -543,7 +543,7 @@ public class FcmdFileCard extends GralFileSelector
     char c2 = p2 == null? '.' : p2.cc;
     char c3 = p3 == null? '.' : p3.cc;
     String sOrderFilePanels = "" + c1 + c2 + c3;
-    this.gralMng().log.sendMsg(Fcmd.LogMsg.fmcdFileCard_setCurrFilePanel, "setCurrFilePanel : %s", sOrderFilePanels );
+    //this.gralMng().log.sendMsg(Fcmd.LogMsg.fmcdFileCard_setCurrFilePanel, "setCurrFilePanel : %s", sOrderFilePanels );
     actionOnFileSelection(fileCurr, fName);
   }
   
@@ -562,7 +562,7 @@ public class FcmdFileCard extends GralFileSelector
       mainPanel.bFavorCardHasFocus = false;
       mainPanel.bFavorThemeCardHasFocus = false;
       GralTableLine_ifc line = (GralTableLine_ifc) params[0];
-      String sFileCell = line.getCellText(GralFileSelector.kColFilename);
+      String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
       Object oData = line.getUserData();
       if(oData instanceof File){
         actionOnFileSelection((FileRemote)oData, sFileCell);
@@ -645,7 +645,7 @@ public class FcmdFileCard extends GralFileSelector
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
       List<GralFileSelector.FavorPath> listfavorPaths = FcmdFileCard.this.favorFolder.listfavorPaths;
       listfavorPaths.clear();                              // Build this list newly with all entries in the table.
-      for(GralTable<GralFileSelector.FavorPath>.TableLineData line : FcmdFileCard.this.widgFavorTable.iterLines()) {
+      for(GralTable<GralFileSelector.FavorPath>.TableLineData line : FcmdFileCard.this.gui.widgFavorTable.iterLines()) {
         GralFileSelector.FavorPath favor = line.getData();
         listfavorPaths.add(favor);
       }                                                    // and also write the file to disk for all favors (only one file for all).

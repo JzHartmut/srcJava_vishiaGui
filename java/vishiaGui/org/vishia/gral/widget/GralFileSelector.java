@@ -39,13 +39,12 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 import org.vishia.util.FileFunctions;
-import org.vishia.util.FileSystem;
+import org.vishia.util.FileFunctions;
 import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.MarkMask_ifc;
 import org.vishia.util.SortedTreeWalkerCallback;
-import org.vishia.util.StringFunctions;
 import org.vishia.util.StringFunctions_B;
 
 /**This class is a large widget which contains a list to select files in a directory, 
@@ -73,6 +72,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   /**Version, history and copyright/copyleft.
    * <ul>
+   * <li>2023-01-22 "big" refactoring: Sort data in sub classes because there was no overview on debugging. 
    * <li>2023-01-19 now also a file select window possible with favors, some enhancements.
    * <li>2023-01-18 chg The [Favor] button is removed, instead, the {@link #widgFavorTabs} as on left side
    *   the tab "+sel" to select the favor table. A more intuitive approach.  
@@ -94,15 +94,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   then this file is highlighted. Firstly used on InspcCurveViewApp to get cfg and data from the same directory,
    *   re-read the same file is before by saving the gotten file before. 
    * <li>2018-10-28 Hartmut: The Creation and Position is old style yet. Should invoked in the graphic thread. 
-   * TODO: create and position in other (main) thread, createImplWidget_Gthread for Swt incarnation.
+   * to do: create and position in other (main) thread, createImplWidget_Gthread for Swt incarnation.
    * <li>2018-10-28 Hartmut: The {@link #widgFavorTable} is unused yet, create only if position is given.
-   * <li>2018-10-28 Hartmut: questionWindow is removed yet, TODO: should have better solution. Status line!
+   * <li>2018-10-28 Hartmut: questionWindow is removed yet, to do: should have better solution. Status line!
    * <li>2018-10-28 Hartmut: {@link #GralFileSelector(String, int, int[], int[])}: The rows argument is used yet for table zLinesMax. 
    *   The old last argument size was never used. replaced by the column designation for the {@link #widgFavorTable}. 
    *   If it is null, do not create a {@link #widgFavorTable}.
    * <li>2016-05-02 Hartmut: actionFileSearch writes a result list in the panel of the file window. 
    *   Yet you can copy the path and insert in the directory text widget to select the file. 
-   *   TODO: Pressing enter to select, store the list etc.
+   *   to do: Pressing enter to select, store the list etc.
    * <li>2016-05-02 Hartmut now: derived from GralWidget, it is a large widget 
    * <li>2016-05-03 Hartmut new: {@link #setVisible(boolean)} for this large widget.
    * <li>2015-11-19 Hartmut chg: {@link #fillInCurrentDir()} does not refresh if it was refreshed in the last seconds.
@@ -148,7 +148,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   the other thread writes the content maybe delayed. The user can abort the access if a response is not kept.
    * <li>2012-07-28 Hartmut improved zipfile access.
    * <li>2012-07-29 Hartmut improved access to the file system using the new capabilities of FileRemote.
-   *  TODO consequently writing 'wait for response' in table and access to the file in another thread.
+   *  to do consequently writing 'wait for response' in table and access to the file in another thread.
    * <li>2012-07-01 Hartmut new {@link #setActionOnEnterPathNewFile(GralUserAction)}.
    *   Now this widget is used to select a file to read and save in an application other than the.File.commander.
    * <li>2012-07-01 Hartmut Refactoring usage of FileRemote: Normally the java.io.File is used.
@@ -168,7 +168,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   It means, that a File can't be access here. Therefore the path, name, date, length in the class {@link FileAndName}
    *   are the data represents on this process on PC. The access to the file is given with remote access. 
    *   Usage of inner class FileAndName containing path, name, date, length instead a File instance. 
-   * <li>2011-10-02 new: {@link #setActionOnEnterFile(GralUserAction)}. It executes this action if Enter is pressed (or mouse-left- or doubleclick-TODO).
+   * <li>2011-10-02 new: {@link #setActionOnEnterFile(GralUserAction)}. It executes this action if Enter is pressed (or mouse-left- or doubleclick-to do).
    * <li>2011-10-01 new: {@link #setOriginDir(File)} and {@link #fillInOriginDir()}.
    *   The origin dir is the directory of first selection or can be set by user. If the user navigates misty,
    *   the origin dir helps to find again the start point.
@@ -199,7 +199,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2018-10-28";
+  @SuppressWarnings("hiding") public static final String sVersion = "2018-10-28";
   
   //FileRemoteAccessor localFileAccessor = FileRemoteAccessorLocalFile.getInstance();
   
@@ -231,7 +231,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     /**Use {@link GralFileSelector#createWindowConfirmSearchGthread(GralMngBuild_ifc)} to create.
     */
     protected WindowConfirmSearch(GralPos refPos, String posName){
-      this.windConfirmSearch = new GralWindow(refPos, posName + "Window", "search in file tree", GralWindow.windConcurrently + GralWindow.windResizeable);
+      this.windConfirmSearch = new GralWindow(refPos, posName + "Window", "search in file tree", GralWindow_ifc.windConcurrently + GralWindow_ifc.windResizeable);
       String name = GralFileSelector.this.name;
       this.widgPath = new GralTextField(refPos, "@4-3.2++0.3, 1..-1=path-"+name, "path", "t", GralTextField.Type.editable);
       this.widgMask = new GralTextField(refPos, "mask-"+name, "search name/mask:", "t", GralTextField.Type.editable);
@@ -253,7 +253,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     public void confirmSearchInFiles(GralFileSelector fileSelector, Appendable searchOutput){
       this.fileSelector = fileSelector;
       this.searchOutput = searchOutput;
-      this.widgPath.setText(fileSelector.sCurrentDir);
+      this.widgPath.setText(fileSelector.idata.sCurrentDir);
       this.windConfirmSearch.setFocus(); //setWindowVisible(true);
     }
     
@@ -268,10 +268,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
           String text = WindowConfirmSearch.this.widgText.getText();
           List<File> files = new LinkedList<File>(); 
           try{
-            FileSystem.addFileToList(WindowConfirmSearch.this.fileSelector.currentDir, mask, files);
+            FileFunctions.addFileToList(WindowConfirmSearch.this.fileSelector.idata.currentDir, mask, files);
             WindowConfirmSearch.this.fileSelector.fillIn(files);
             if(text.length() > 0){
-              FileSystem.searchInFiles(files, text, WindowConfirmSearch.this.searchOutput);
+              FileFunctions.searchInFiles(files, text, WindowConfirmSearch.this.searchOutput);
             } else {
               try{ 
                 for(File file: files){
@@ -311,12 +311,12 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     
     
     
-    @Override public boolean actionOk(Object userData, GralTableLine_ifc line)
+    @Override public boolean actionOk(Object userData, GralTableLine_ifc<FileRemote> line)
     { boolean done = true;
       File file = (File)userData;
       String fileName;
       //File dir = data.file.getParentFile();
-      //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir) + "/";
+      //String sDir = dir ==null ? "/" : FileFunctions.getCanonicalPath(dir) + "/";
       String sName = line.getCellText(1);
       if(sName.equals("..")){
         actionLeft(userData, line);
@@ -330,8 +330,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         actionRightZip(userData, line);
       } else {
         doActionGetFileName(0,  null);
-        if(GralFileSelector.this.actionOnEnterFile !=null){
-          GralFileSelector.this.actionOnEnterFile.userActionGui(KeyCode.enter, GralFileSelector.this.widgdPathDir, file);
+        if(GralFileSelector.this.idata.actionOnEnterFile !=null){
+          GralFileSelector.this.idata.actionOnEnterFile.exec(KeyCode.enter, GralFileSelector.this.gui.widgdPathDir, file);
         } else {
           done = false;
         }
@@ -340,15 +340,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
     
     
-    private String getParentDir(File data){
-      int zPath = data.getParent().length();
-      int posSep = data.getParent().lastIndexOf('/',zPath-2);
-      if(posSep >=0){
-        String sDirP = data.getParent().substring(0, posSep+1);
-        return sDirP;
-      }
-      else return null;
-    }
+//    private String getParentDir(File data){
+//      int zPath = data.getParent().length();
+//      int posSep = data.getParent().lastIndexOf('/',zPath-2);
+//      if(posSep >=0){
+//        String sDirP = data.getParent().substring(0, posSep+1);
+//        return sDirP;
+//      }
+//      else return null;
+//    }
     
     
     /**The 'action left' for the FileSelector shows the parent directory.
@@ -360,15 +360,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      *   The parent of the file is the directory which is shown yet.
      * @see org.vishia.gral.widget.GralSelectList#actionLeft(java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
      */
-    @Override public void actionLeft(Object userData, GralTableLine_ifc line)
+    @Override public void actionLeft(Object userData, GralTableLine_ifc<FileRemote> line)
     {
       //FileRemote currentFile = (FileRemote)userData;
-      if(GralFileSelector.this.currentDir !=null){
-        String sDir = GralFileSelector.this.currentDir.getParent();
-        String sName = GralFileSelector.this.currentDir.getName();
-        FileRemote parentDir = GralFileSelector.this.currentDir.getParentFile();
+      if(GralFileSelector.this.idata.currentDir !=null){
+        String sDir = GralFileSelector.this.idata.currentDir.getParent();
+        //String sName = GralFileSelector.this.idata.currentDir.getName();
+        FileRemote parentDir = GralFileSelector.this.idata.currentDir.getParentFile();
         if(parentDir !=null){
-          GralFileSelector.this.idxSelectFileInDir.put(sDir, GralFileSelector.this.currentDir); //currentDir.getName());
+          GralFileSelector.this.idata.idxSelectFileInDir.put(sDir, GralFileSelector.this.idata.currentDir); //currentDir.getName());
           //System.out.println("GralFileSelector: " + sDir + ":" + sName);
           fillIn(parentDir, false); 
         }
@@ -376,11 +376,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
     
     
-    @Override public void actionRight(Object userData, GralTableLine_ifc line)
+    @Override public void actionRight(Object userData, GralTableLine_ifc<FileRemote> line)
     {
       FileRemote currentFile = (FileRemote)userData;
       //File dir = data.file.getParentFile();
-      //String sDir = dir ==null ? "/" : FileSystem.getCanonicalPath(dir);
+      //String sDir = dir ==null ? "/" : FileFunctions.getCanonicalPath(dir);
       //String sName = line.getCellText(1);
       if(currentFile.isDirectory()){
         //save the last selection of that level
@@ -391,7 +391,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
     
     
-    public void actionRightZip(Object userData, GralTableLine_ifc line)
+    public void actionRightZip(Object userData, GralTableLine_ifc<FileRemote> line)
     {
       FileRemote currentFile = (FileRemote)userData;
       FileRemote fileZipAsDir = FileAccessZip.examineZipFile(currentFile);
@@ -404,11 +404,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     /* (non-Javadoc)
      * @see org.vishia.gral.widget.SelectList#actionUserKey(int, java.lang.Object, org.vishia.gral.ifc.GralTableLine_ifc)
      */
-    @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc lineP) { 
+    @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc<FileRemote> lineP) { 
       boolean ret = true;
       if(keyCode == KeyCode.F9) {
         assert(lineP instanceof GralTable.TableLineData);
-        @SuppressWarnings("unchecked") GralTable<FileRemote>.TableLineData line = (GralTable<FileRemote>.TableLineData) lineP;
+        GralTable<FileRemote>.TableLineData line = (GralTable<FileRemote>.TableLineData) lineP;
         showFileInfo(line);
       } else {
         ret = this.outer.actionUserKey(keyCode, oData, lineP);
@@ -424,126 +424,361 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   
+  public static final class Constants {
+
+    /**Number of columns of the table. */
+    public static final int zColumns = 4;
+    /**Column which contains the designation of entry.
+     * <ul>
+     * <li>"/" a directory
+     * <li>">" a linked directory (unix systems, symbolic link)
+     * <li>" " space, normal file
+     * <li>"*" a linked file
+     * <li>"#" comparison result: there are differences
+     * <li>"+" comparison result: contains more
+     * <li>"-" comparison result: contains less
+     * 
+     * </ul>
+     */
+    public static final int kColDesignation = 0;
+    /**Column which contains the filename. The column contains either the name of the file
+     * or ".." or "--unknown--".
+     */
+    public static final int kColFilename = 1;
+    /**Column which contains the length of file
+     */
+    public static final int kColLength = 2;
+    /**Column which contains the time stamp
+     */
+    public static final int kColDate = 3;
+    public static final char kSortName = 'n';
+    public static final char kSortNameNonCase = 'N';
+    public static final char kSortExtension = 'x';
+    public static final char kSortExtensionNonCase = 'X';
+    public static final char kSortDateNewest = 'd';
+    public static final char kSortDateOldest = 'o';
+    public static final char kSortSizeLargest = 'l';
+    public static final char kSortSizeSmallest = 's';
+    
+  }
   
   
   
-  
-  
-  
-  /**Number of columns of the table. */
-  public static final int zColumns = 4;
-  
-  /**Column which contains the designation of entry.
-   * <ul>
-   * <li>"/" a directory
-   * <li>">" a linked directory (unix systems, symbolic link)
-   * <li>" " space, normal file
-   * <li>"*" a linked file
-   * <li>"#" comparison result: there are differences
-   * <li>"+" comparison result: contains more
-   * <li>"-" comparison result: contains less
-   * 
-   * </ul>
-   */
-  public static final int kColDesignation = 0;
-  
-  /**Column which contains the filename. The column contains either the name of the file
-   * or ".." or "--unknown--".
-   */
-  public static final int kColFilename = 1;
-  
-  /**Column which contains the length of file
-   */
-  public static final int kColLength = 2;
-  
-  /**Column which contains the time stamp
-   */
-  public static final int kColDate = 3;
-  
-  public static final char kSortName = 'n';
-  
-  public static final char kSortNameNonCase = 'N';
-  
-  public static final char kSortExtension = 'x';
-  
-  public static final char kSortExtensionNonCase = 'X';
-  
-  public static final char kSortDateNewest = 'd';
-  
-  public static final char kSortDateOldest = 'o';
-  
-  public static final char kSortSizeLargest = 'l';
-  
-  public static final char kSortSizeSmallest = 's';
   
   
   public static MenuTexts contextMenuTexts = new MenuTexts();
   
   
-  private char sortOrder = kSortName, sortOrderLast = '0';
-  
-  /**Determines which time are present in the date/time column.
-   * m a c for last modified, last access, creation
-   */
-  protected char showTime = 'm';
-  
-  protected final GralWindow windFileSelector;
-  
-  protected final GralHorizontalSelector<FavorPath> widgFavorTabs;
-  
-  
-  /**The widget for showing the path. */
-  protected GralTextField widgdPathDir;
+  protected static final class InternalData {
+    char sortOrder = Constants.kSortName, sortOrderLast = '0';
+    
+    /**Determines which time are present in the date/time column.
+     * m a c for last modified, last access, creation
+     */
+    protected char showTime = 'm';
 
+    /**Stores the last selected and used favor path (pressing enter or double click)
+     * to select the same line if the favor path will be re-opened.
+     */
+    String sCurrFavor = "";
 
-  /**This widget is only available if the "Execute" button is also present. 
-   * It regards from the sExecBtn argument of the ctor.
-   */
-  protected GralTextField widgFilename;
+    /**Association to the current used favor path selection.
+    * Note that this instance is re-used for more as one selection.
+    */
+    FavorPath favorPathInfo;
 
-  /**This button is present only if created with sExecBtn parameter on construction, elsewhere null.
-   * The text of this button can be changed by {@link #openDialog(FileRemote, String, String, GralUserAction)}.
-   * It is the execute button for save, save as, read etc. It calls the {@link #actionOnExecButton}.
-   * <br>
-   * If this button is not present, other possibilities to evaluate the selected file may be given.
-   * The {@link #currentDir()} or {@link #currentFile()} can invoked anytime from other threads.
-   * {@link #actionOnEnterFile} is called ( see {@link #setActionOnEnterFile(GralUserAction)} also
-   * pressing Enter on a file in the current file table.  
-   */
-  protected GralButton  widgBtnExec;
+    GralColor colorBack;
 
+    GralColor colorBackPending;
 
+    GralColor colorMarkFavor = GralColor.getColor("lgn");
 
-  /**The implementation of SelectList. */
-  protected FileSelectList widgSelectList;
-  
-  
-  protected final GralTable<FavorPath> widgFavorTable;
-  
-  protected final GralViewFileContent windView;
-  
-  protected final GralFileProperties widgFileProperties;
-
-  /**Index of all entries in the visible list. */
-  final Map<String, FavorPath> indexFavorPaths;
-  
-  /**Stores the last selected and used favor path (pressing enter or double click)
-   * to select the same line if the favor path will be re-opened.
-   */
-  String sCurrFavor = "";
-  
-  /**Association to the current used favor path selection.
-  * Note that this instance is re-used for more as one selection.
-  */
-  FavorPath favorPathInfo;
-
-
-  GralColor colorBack, colorBackPending;
-  
-  GralColor colorMarkFavor = GralColor.getColor("lgn");
-  
-  private final IndexMultiTable<String, GralTableLine_ifc<FileRemote>> idxLines = 
+    protected final IndexMultiTable<String, GralTableLine_ifc<FileRemote>> idxLines = 
     new IndexMultiTable<String, GralTableLine_ifc<FileRemote>>(IndexMultiTable.providerString);
+
+    //String name; 
+    //final int rows; 
+    //final int[] columns; 
+    //final char size;
+    
+    
+    /**This index stores the last selected file for any directory path which was used.
+     * If the directory path is reused later, the same file will be selected initially.
+     * It helps by navigation through the file tree.
+     * <ul>
+     * <li>The key is the path in canonical form with '/' as separator (in windows too!) 
+     *   but without terminating '/'.
+     * <li>The value is the name of the file in this directory.   
+     * </ul>
+     */
+    protected final Map<String, FileRemote> idxSelectFileInDir = new TreeMap<String, FileRemote>();
+
+    /**The time after 1970 when the fillin was invoked and finished at last.
+     * timeFillinFinished=0, then pending.
+     */
+    protected long timeFillinInvoked;
+
+    /**The time after 1970 when the fillin was invoked and finished at last.
+     * timeFillinFinished=0, then pending.
+     */
+    protected long timeFilesRefreshed;
+
+    /**The time after 1970 when the fillin was invoked and finished at last.
+     * timeFillinFinished=0, then pending.
+     */
+    protected long timeFillinFinished;
+
+    /**Duration of last fillin. */
+    protected int durationRefresh;
+
+    /**Duration of last fillin. */
+    protected int durationFillin;
+
+    protected int refreshCount;
+
+    boolean donotCheckRefresh = true;
+
+    String sDatePrefixNewer = "";
+
+    SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MM-dd HH:mm:ss");
+
+    String sDatePrefixToday = "";
+
+    SimpleDateFormat dateFormatToday = new SimpleDateFormat("@ HH:mm:ss");
+
+    String sDatePrefixYear = "";
+
+    SimpleDateFormat dateFormatYear = new SimpleDateFormat("MMM-dd HH:mm:ss");
+
+    String sDatePrefixOlder = "";
+
+    SimpleDateFormat dateFormatOlder = new SimpleDateFormat("yy-MM-dd HH:mm:ss");
+
+    //final MainCmd_ifc mainCmd;
+    
+    /**The current shown directory. */
+    protected FileRemote currentDir;
+
+    /**Currently selected file in the table.
+     * Hint: Access from derived class knows protected idata, this should be public.*/
+    public FileRemote currentFile;
+
+    String sCurrentDir;
+
+    /**On call of {@link #setNewDirFile(String)} the file name to select after refresh. */
+    String sFileToSelect = "";
+
+    /**Name of the current file.
+     * 
+     */
+    //String sCurrentFile;
+    
+    
+    /**The directory which was used on start. */
+    FileRemote originDir;
+
+    /**This action will be called any time when the selection of a current file is changed. */
+    protected GralUserAction actionOnFileSelected;
+
+    /**This action will be called on pressing enter or mouse-click on a simple file.
+     * It is usual for read-file or such.
+     */
+    protected GralUserAction actionOnEnterFile;
+
+    /**This action will be called on pressing the save button or adequate key.
+     * It is usual for write-file handling.
+     * The writing itself will be done in this called routine.
+     */
+    private GralUserAction actionOnExecButton;
+
+    /**This action will be called on pressing enter or mouse-click on a directory.
+     * Usual the directory can be entered and showed. But the user can do any other action.
+     * If this action returns false, the default behavior: enter the directory will be done.
+     */
+    private GralUserAction actionOnEnterDirectory;
+
+    /**This action will be called on pressing enter or mouse-click on the path text field
+     * if it contains any text which can't assigned to an existing file.
+     * 
+     */
+    private GralUserAction actionOnEnterPathNewFile;
+
+    /**
+     * 
+     */
+    protected GralUserAction actionUserSaveFavors;
+
+    GralUserAction actionSetFileAttribs;
+    
+      
+  }
+  protected final InternalData idata = new InternalData();
+  
+  
+  
+  
+  /**Inner data of Graphical User Interface.
+   * Hint: The instance is protected to access only from inherited .
+   * The class and all members are public.
+   */
+  public static final class Gui {
+  
+    public final GralWindow windFileSelector;
+    
+    public final GralHorizontalSelector<FavorPath> widgFavorTabs;
+    
+    
+    /**The widget for showing the path. */
+    public GralTextField widgdPathDir;
+  
+  
+    /**This widget is only available if the "Execute" button is also present. 
+     * It regards from the sExecBtn argument of the ctor.
+     */
+    public GralTextField widgFilename;
+  
+    /**This button is present only if created with sExecBtn parameter on construction, elsewhere null.
+     * The text of this button can be changed by {@link #openDialog(FileRemote, String, String, GralUserAction)}.
+     * It is the execute button for save, save as, read etc. It calls the {@link #actionOnExecButton}.
+     * <br>
+     * If this button is not present, other possibilities to evaluate the selected file may be given.
+     * The {@link #currentDir()} or {@link #currentFile()} can invoked anytime from other threads.
+     * {@link #actionOnEnterFile} is called ( see {@link #setActionOnEnterFile(GralUserAction)} also
+     * pressing Enter on a file in the current file table.  
+     */
+    public GralButton  widgBtnExec;
+  
+  
+  
+    /**The implementation of SelectList. */
+    public FileSelectList widgSelectList;
+    
+    
+    public final GralTable<FavorPath> widgFavorTable;
+    
+    public final GralViewFileContent windView;
+    
+    public final GralFileProperties widgFileProperties;
+
+    /**Index of all entries in the visible list. */
+    final Map<String, FavorPath> indexFavorPaths;
+    
+    
+    Gui ( GralFileSelector thisf
+        , GralWindow windFileSelector, int rows, int[] columns
+        , boolean bWithFavor, String sExecBtn
+        , GralViewFileContent fileViewer
+        , GralFileProperties wdgFileProperties
+        ) {
+      GralMng panelMng = thisf.gralMng;
+      StringBuilder sLog = new StringBuilder(100);
+      sLog.append("new GralFileSelector ");
+      this.windFileSelector = windFileSelector;              // may be null if not an own window
+      GralPos refPos = thisf._wdgPos.clone().setAsFrame(); //panelMng.getPositionInPanel();
+      refPos.toString(sLog);
+      panelMng.log.sendMsg(GralMng.LogMsg.ctorWdg, sLog);
+      //GralWidgetBase_ifc panel = refPos.parent;
+      if(bWithFavor) {
+        this.indexFavorPaths = new TreeMap<String, FavorPath>();
+        
+        this.widgFavorTable = new GralTable<FavorPath>(refPos, "@2..0,0..0=favorTable-" + thisf.name, 50, new int[] {10, -20});
+        this.widgFavorTable.specifyActionChange(null, thisf.action.actionFavorTable, null);
+        this.widgFavorTable.setColumnProportional((new int[] { 3, 10}));
+        this.widgFavorTable.setColumnEditable(0, true);
+        this.widgFavorTable.setColumnEditable(1, true);
+        GralMenu menuFavor = this.widgFavorTable.getContextMenu();
+        menuFavor.addMenuItem("save", thisf.action.actionSaveFavors);
+        this.widgFavorTable.setVisible(true);
+      } else {
+        this.indexFavorPaths = null;
+        this.widgFavorTable = null;
+      }
+      thisf.idata.colorBack = GralColor.getColor("wh");
+      thisf.idata.colorBackPending = GralColor.getColor("pma");
+      //this.mainCmd = mainCmd;
+      
+      //String sPanel = panel.getName();
+      final String posPathDir, posFilename, posFileTable, posBtnExec;
+      if(bWithFavor) {                                       // [favor] 
+        this.widgFavorTabs = new GralHorizontalSelector<FavorPath>(refPos, "@0+2, 0..0=tabs-" + thisf.name, thisf.action.actionSetFromTabSelection);
+        this.widgFavorTabs.addItem("+sel", 0, null, false);
+        if(sExecBtn ==null) {
+          posFilename = null;
+          posPathDir = "@2+2, 0..0=infoLine-";
+          posBtnExec = null;
+          posFileTable = "@4..0, 0..0=fileTable-";
+        } else {
+          posFilename = "@2+2, 0..-9=name-";                   // only used if [exec]
+          posPathDir = "@4+2, 0..-9=infoLine-";
+          posBtnExec = "@2.5+3, -8.5..-0.5=save-";                       // [exec] right top below [favor]
+          posFileTable = "@6..0, 0..0=fileTable-";
+        }
+      } else {
+        this.widgFavorTabs = null;
+        if(sExecBtn ==null) {
+          posFilename = null;
+          posPathDir = "@0+2, 0..0=infoLine-";
+          posBtnExec = null;
+          posFileTable = "@2..0, 0..0=fileTable-";
+        } else {
+          posFilename = "@0+2, 0..-9=name-";                   // only used if [exec]
+          posPathDir = "@2+2, 0..-9=infoLine-";
+          posBtnExec = "@0.5+3, -8.5..-0.5=save-";                       // [exec] right top below [favor]
+          posFileTable = "@4..0, 0..0=fileTable-";
+        }
+      }
+      if(sExecBtn !=null) {
+        this.widgBtnExec = new GralButton(refPos, posBtnExec + thisf.name, sExecBtn, thisf.action.actionExecButton);
+        this.widgFilename = new GralTextField(refPos, posFilename + thisf.name, GralTextField.Type.editable);
+      }
+      //Text field for path above list
+      this.widgdPathDir = new GralTextField(refPos, posPathDir + thisf.name, GralTextField.Type.editable);
+      this.widgdPathDir.specifyActionChange(null, thisf.action.actionSetPath, null);
+      this.widgdPathDir.setBackColor(panelMng.getColor("pye"), -1);  //color pastel yellow
+      GralMenu menuFolder = this.widgdPathDir.getContextMenu();
+      menuFolder.addMenuItem("x", "refresh [cR]", thisf.action.actionRefreshFileTable);
+      menuFolder.addMenuItem("g", "get filename [cN]", thisf.action.actionGetFileName);
+      final int[] columns1 = columns !=null ? columns : new int[]{2,0,-6,-12};
+      this.widgSelectList = thisf.new FileSelectList(refPos, thisf, posFileTable + thisf.name, rows, columns1);
+      if(this.widgFavorTable !=null) {
+        this.widgSelectList.setVisible(false);
+      }
+      this.widgSelectList.wdgdTable.setVisible(true);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, thisf.action.actionRefreshFileTable);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, thisf.action.actionSwitchoffCheckRefresh);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOn, thisf.action.actionSwitchonCheckRefresh);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameCase, thisf.action.actionSortFilePerNameCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameNonCase, thisf.action.actionSortFilePerNameNonCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtCase, thisf.action.actionSortFilePerExtensionCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtNonCase, thisf.action.actionSortFilePerExtensionNonCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortDateNewest, thisf.action.actionSortFilePerTimestamp);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortOldest, thisf.action.actionSortFilePerTimestampOldestFirst);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastModifiedTime, thisf.action.actionShowLastModifiedTime);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastAccessTime, thisf.action.actionShowLastAccessTime);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showCreationTime, thisf.action.actionShowCreationTime);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sizeLarge, thisf.action.actionSortFilePerLenghLargestFirst);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortSizeSmall, thisf.action.actionSortFilesPerLenghSmallestFirst);
+      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.deselectRecursFiles, thisf.action.actionDeselectDirtree);
+
+      //store this in the GralWidgets to get back from widgets later.
+      this.widgdPathDir.setData(this);
+      this.widgSelectList.wdgdTable.setData(this);
+      this.widgSelectList.wdgdTable.specifyActionOnLineSelected(thisf.action.actionOnFileSelection);
+      this.widgSelectList.wdgdTable.specifyActionOnLineMarked(thisf.action.actionOnMarkLine);
+      
+      this.windView = fileViewer;
+      this.widgFileProperties = wdgFileProperties;
+      thisf.windSearch = thisf.new WindowConfirmSearch(refPos, "@screen,7+32, 40+40=search-" + thisf.name);
+      
+    }
+    
+  }
+  
+  protected final Gui gui;
+  
+  
+  
+  
   
   
   
@@ -553,55 +788,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   //final char size;
   
 
-  /**This index stores the last selected file for any directory path which was used.
-   * If the directory path is reused later, the same file will be selected initially.
-   * It helps by navigation through the file tree.
-   * <ul>
-   * <li>The key is the path in canonical form with '/' as separator (in windows too!) 
-   *   but without terminating '/'.
-   * <li>The value is the name of the file in this directory.   
-   * </ul>
-   */
-  private final Map<String, FileRemote> idxSelectFileInDir = new TreeMap<String, FileRemote>(); 
+   
   
   //int lineSelected;
   
-  /**The time after 1970 when the fillin was invoked and finished at last.
-   * timeFillinFinished=0, then pending.
-   */
-  protected long timeFillinInvoked, timeFilesRefreshed, timeFillinFinished;
-  
-  /**Duration of last fillin. */
-  protected int durationRefresh, durationFillin;
-  
-  protected int refreshCount;
-  
-  boolean donotCheckRefresh = true;
-  
-  String sDatePrefixNewer = "";
-  SimpleDateFormat dateFormatNewer = new SimpleDateFormat("?yy-MM-dd HH:mm:ss"); 
-  
-  String sDatePrefixToday = "";
-  SimpleDateFormat dateFormatToday = new SimpleDateFormat("@ HH:mm:ss"); 
-  
-  String sDatePrefixYear = "";
-  SimpleDateFormat dateFormatYear = new SimpleDateFormat("MMM-dd HH:mm:ss"); 
-  
-  String sDatePrefixOlder = "";
-  SimpleDateFormat dateFormatOlder = new SimpleDateFormat("yy-MM-dd HH:mm:ss"); 
+   
   
   //final MainCmd_ifc mainCmd;
 
-  /**The current shown directory. */
-  protected FileRemote currentDir;
   
-  /**Currently selected file in the table.*/
-  protected FileRemote currentFile;
-  
-  String sCurrentDir;
-  
-  /**On call of {@link #setNewDirFile(String)} the file name to select after refresh. */
-  String sFileToSelect = "";
   
   /**Name of the current file.
    * 
@@ -609,46 +804,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   //String sCurrentFile;
   
   
-  /**The directory which was used on start. */
-  FileRemote originDir;
   
-  
-  
-  /**This action will be called any time when the selection of a current file is changed. */
-  protected GralUserAction actionOnFileSelected;
-  
-
-  /**This action will be called on pressing enter or mouse-click on a simple file.
-   * It is usual for read-file or such.
-   */
-  private GralUserAction actionOnEnterFile;
-
-  /**This action will be called on pressing the save button or adequate key.
-   * It is usual for write-file handling.
-   * The writing itself will be done in this called routine.
-   */
-  private GralUserAction actionOnExecButton;
-
-  /**This action will be called on pressing enter or mouse-click on a directory.
-   * Usual the directory can be entered and showed. But the user can do any other action.
-   * If this action returns false, the default behavior: enter the directory will be done.
-   */
-  private GralUserAction actionOnEnterDirectory;
-  
-  
-  /**This action will be called on pressing enter or mouse-click on the path text field
-   * if it contains any text which can't assigned to an existing file.
-   * 
-   */
-  private GralUserAction actionOnEnterPathNewFile;
-  
-  
-  /**
-   * 
-   */
-  protected GralUserAction actionUserSaveFavors;
-  
-  GralUserAction actionSetFileAttribs;
   
   
   //private GralInfoBox questionWindow;
@@ -669,7 +825,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param rows Number of rows intended to use for the file list (max length)
    * @param columns should have the form <code>new int[]{2,0,-6,-12}</code>, the width of field for size, datd can be justified.
    *   last is date (timestamp), before last is file size, first is mark. The 0 is the rest length of the file name.
-   *   TODO proportional determination? 
+   *   to do proportional determination? 
    * @param bWithFavor true then a favor table is created, select favor. False: prevent this capability
    * @param sExecBtn if given then this widget contains a [exec] button for file-save action etc. with this text. 
    *   The text can be changed also with {@link #openDialog(FileRemote, String, String, GralUserAction)}
@@ -686,105 +842,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       )
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPosParent, posName, null);
-    GralMng panelMng = this.gralMng;
-    StringBuilder sLog = new StringBuilder(100);
-    sLog.append("new GralFileSelector ");
-    this.windFileSelector = windFileSelector;              // may be null if not an own window
-    GralPos refPos = this._wdgPos.clone().setAsFrame(); //panelMng.getPositionInPanel();
-    refPos.toString(sLog);
-    panelMng.log.sendMsg(GralMng.LogMsg.ctorWdg, sLog);
-    GralWidgetBase_ifc panel = refPos.parent;
-    if(bWithFavor) {
-      this.indexFavorPaths = new TreeMap<String, FavorPath>();
-      
-      this.widgFavorTable = new GralTable<FavorPath>(refPos, "@2..0,0..0=favorTable-" + this.name, 50, new int[] {10, -20});
-      this.widgFavorTable.specifyActionChange(null, this.action.actionFavorTable, null);
-      this.widgFavorTable.setColumnProportional((new int[] { 3, 10}));
-      this.widgFavorTable.setColumnEditable(0, true);
-      this.widgFavorTable.setColumnEditable(1, true);
-      GralMenu menuFavor = this.widgFavorTable.getContextMenu();
-      menuFavor.addMenuItem("save", this.action.actionSaveFavors);
-      this.widgFavorTable.setVisible(true);
-    } else {
-      this.indexFavorPaths = null;
-      this.widgFavorTable = null;
-    }
-    this.colorBack = GralColor.getColor("wh");
-    this.colorBackPending = GralColor.getColor("pma");
-    //this.mainCmd = mainCmd;
-    
-    String sPanel = panel.getName();
-    final String posPathDir, posFilename, posFileTable, posBtnExec;
-    if(bWithFavor) {                                       // [favor] 
-      this.widgFavorTabs = new GralHorizontalSelector<FavorPath>(refPos, "@0+2, 0..0=tabs-" + this.name, this.action.actionSetFromTabSelection);
-      this.widgFavorTabs.addItem("+sel", 0, null, false);
-      if(sExecBtn ==null) {
-        posFilename = null;
-        posPathDir = "@2+2, 0..0=infoLine-";
-        posBtnExec = null;
-        posFileTable = "@4..0, 0..0=fileTable-";
-      } else {
-        posFilename = "@2+2, 0..-9=name-";                   // only used if [exec]
-        posPathDir = "@4+2, 0..-9=infoLine-";
-        posBtnExec = "@2.5+3, -8.5..-0.5=save-";                       // [exec] right top below [favor]
-        posFileTable = "@6..0, 0..0=fileTable-";
-      }
-    } else {
-      this.widgFavorTabs = null;
-      if(sExecBtn ==null) {
-        posFilename = null;
-        posPathDir = "@0+2, 0..0=infoLine-";
-        posBtnExec = null;
-        posFileTable = "@2..0, 0..0=fileTable-";
-      } else {
-        posFilename = "@0+2, 0..-9=name-";                   // only used if [exec]
-        posPathDir = "@2+2, 0..-9=infoLine-";
-        posBtnExec = "@0.5+3, -8.5..-0.5=save-";                       // [exec] right top below [favor]
-        posFileTable = "@4..0, 0..0=fileTable-";
-      }
-    }
-    if(sExecBtn !=null) {
-      this.widgBtnExec = new GralButton(refPos, posBtnExec + this.name, sExecBtn, this.action.actionExecButton);
-      this.widgFilename = new GralTextField(refPos, posFilename + this.name, GralTextField.Type.editable);
-    }
-    //Text field for path above list
-    this.widgdPathDir = new GralTextField(refPos, posPathDir + this.name, GralTextField.Type.editable);
-    this.widgdPathDir.specifyActionChange(null, this.action.actionSetPath, null);
-    this.widgdPathDir.setBackColor(panelMng.getColor("pye"), -1);  //color pastel yellow
-    GralMenu menuFolder = this.widgdPathDir.getContextMenu();
-    menuFolder.addMenuItem("x", "refresh [cR]", this.action.actionRefreshFileTable);
-    menuFolder.addMenuItem("g", "get filename [cN]", this.action.actionGetFileName);
-    final int[] columns1 = columns !=null ? columns : new int[]{2,0,-6,-12};
-    this.widgSelectList = new FileSelectList(refPos, this, posFileTable + this.name, rows, columns1);
-    if(this.widgFavorTable !=null) {
-      this.widgSelectList.setVisible(false);
-    }
-    this.widgSelectList.wdgdTable.setVisible(true);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, this.action.actionRefreshFileTable);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, this.action.actionSwitchoffCheckRefresh);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOn, this.action.actionSwitchonCheckRefresh);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameCase, this.action.actionSortFilePerNameCase);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameNonCase, this.action.actionSortFilePerNameNonCase);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtCase, this.action.actionSortFilePerExtensionCase);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtNonCase, this.action.actionSortFilePerExtensionNonCase);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortDateNewest, this.action.actionSortFilePerTimestamp);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortOldest, this.action.actionSortFilePerTimestampOldestFirst);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastModifiedTime, this.action.actionShowLastModifiedTime);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastAccessTime, this.action.actionShowLastAccessTime);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showCreationTime, this.action.actionShowCreationTime);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sizeLarge, this.action.actionSortFilePerLenghLargestFirst);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortSizeSmall, this.action.actionSortFilesPerLenghSmallestFirst);
-    this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.deselectRecursFiles, this.action.actionDeselectDirtree);
-
-    //store this in the GralWidgets to get back from widgets later.
-    this.widgdPathDir.setData(this);
-    this.widgSelectList.wdgdTable.setData(this);
-    this.widgSelectList.wdgdTable.specifyActionOnLineSelected(this.action.actionOnFileSelection);
-    this.widgSelectList.wdgdTable.specifyActionOnLineMarked(this.action.actionOnMarkLine);
-    
-    this.windView = fileViewer;
-    this.widgFileProperties = wdgFileProperties;
-    this.windSearch = new WindowConfirmSearch(refPos, "@screen,7+32, 40+40=search-" + name);
+    this.gui = new Gui(this, windFileSelector, rows, columns, bWithFavor, sExecBtn, fileViewer, wdgFileProperties);
   }
   
   
@@ -798,14 +856,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   public void setDateFormat(String sFormat){
-    this.dateFormatOlder = new SimpleDateFormat(sFormat);
+    this.idata.dateFormatOlder = new SimpleDateFormat(sFormat);
   }
   
 
-  
-  private void createGraphic(GralMng panelMng) {
-
-  }
   
   
   /**Sets the widgets of this instance to a panel.
@@ -889,9 +943,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 //    return wind;
 //  }
   
-  public String getCurrentDirPath(){ return this.sCurrentDir; }
+  public String getCurrentDirPath(){ return this.idata.sCurrentDir; }
   
-  public void setOriginDir(FileRemote dir){ this.originDir = dir; }
+  public void setOriginDir(FileRemote dir){ this.idata.originDir = dir; }
 
   
   /**Sets the sort order of entries.
@@ -909,7 +963,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param sortOrder
    */
   public void setSortOrder(char sortOrder){
-    this.sortOrder = sortOrder;
+    this.idata.sortOrder = sortOrder;
   }
   
   
@@ -943,18 +997,18 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      * @param actionOnLineSelected The action, null to switch off this functionality.
      */
     public void setActionOnFileSelected(GralUserAction actionOnLineSelected){
-      this.actionOnFileSelected = actionOnLineSelected;
+      this.idata.actionOnFileSelected = actionOnLineSelected;
     }
 
 
     /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
      * a mouse double-click is done on a file.
-     * @param newAction The action to use. The action is invoked with TODO
+     * @param newAction The action to use. The action is invoked with to do
      * @return The current assigned action or null.
      */
     public GralUserAction setActionOnEnterFile(GralUserAction newAction)
-    { GralUserAction oldAction = this.actionOnEnterFile;
-      this.actionOnEnterFile = newAction;
+    { GralUserAction oldAction = this.idata.actionOnEnterFile;
+      this.idata.actionOnEnterFile = newAction;
       return oldAction;
     }
     
@@ -962,13 +1016,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     
     /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
      * a mouse double-click is done on a file.
-     * @param newAction The action to use. The action is invoked with TODO
+     * @param newAction The action to use. The action is invoked with to do
      * @return The current assigned action or null.
      */
     public GralUserAction setActionOnSaveButton(GralUserAction newAction, String textButton)
-    { GralUserAction oldAction = this.actionOnExecButton;
-      this.actionOnExecButton = newAction;
-      this.widgBtnExec.setText(textButton);
+    { GralUserAction oldAction = this.idata.actionOnExecButton;
+      this.idata.actionOnExecButton = newAction;
+      this.gui.widgBtnExec.setText(textButton);
       return oldAction;
     }
     
@@ -976,12 +1030,12 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     
   /**Sets the action which is called if any file is entered. It means the Enter-Key is pressed or
    * a mouse double-click is done on a file.
-   * @param newAction The action to use. The action is invoked with TODO
+   * @param newAction The action to use. The action is invoked with to do
    * @return The current assigned action or null.
    */
   public void setActionOnFocusedFileTable(GralUserAction newAction) { 
     //GralUserAction oldAction = this.wdgSelectList.ac;
-    this.widgSelectList.wdgdTable.specifyActionChange("focused", newAction, null, GralWidget_ifc.ActionChangeWhen.onFocusGained);
+    this.gui.widgSelectList.wdgdTable.specifyActionChange("focused", newAction, null, GralWidget_ifc.ActionChangeWhen.onFocusGained);
   }
   
   
@@ -991,8 +1045,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * If this action returns false, the default behavior: enter the directory will be done.
    */
   public GralUserAction setActionOnEnterDirectory(GralUserAction newAction)
-  { GralUserAction oldAction = this.actionOnEnterDirectory;
-    this.actionOnEnterDirectory = newAction;
+  { GralUserAction oldAction = this.idata.actionOnEnterDirectory;
+    this.idata.actionOnEnterDirectory = newAction;
     return oldAction;
   }
   
@@ -1002,8 +1056,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * It is the opposite to {@link #addFavor(FavorPath)} to fill the favor table. 
    */
   public GralUserAction setActionSaveFavors(GralUserAction newAction)
-  { GralUserAction oldAction = this.actionUserSaveFavors;
-    this.actionUserSaveFavors = newAction;
+  { GralUserAction oldAction = this.idata.actionUserSaveFavors;
+    this.idata.actionUserSaveFavors = newAction;
     return oldAction;
   }
   
@@ -1015,8 +1069,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * 
    */
   public GralUserAction setActionOnEnterPathNewFile(GralUserAction newAction)
-  { GralUserAction oldAction = this.actionOnEnterPathNewFile;
-    this.actionOnEnterPathNewFile = newAction;
+  { GralUserAction oldAction = this.idata.actionOnEnterPathNewFile;
+    this.idata.actionOnEnterPathNewFile = newAction;
     return oldAction;
   }
   
@@ -1024,20 +1078,20 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   /**Sets the action which is called if any file is set to the table. 
-   * @param newAction The action to use. The action is invoked with TODO
+   * @param newAction The action to use. The action is invoked with to do
    * @return The current assigned action or null.
    */
   public GralUserAction setActionSetFileLineAttrib(GralUserAction newAction)
-  { GralUserAction oldAction = this.actionSetFileAttribs;
-    this.actionSetFileAttribs = newAction;
+  { GralUserAction oldAction = this.idata.actionSetFileAttribs;
+    this.idata.actionSetFileAttribs = newAction;
     return oldAction;
   }
   
   
   public void clear()
   {
-    this.indexFavorPaths.clear();
-    this.widgFavorTable.clearTable();
+    this.gui.indexFavorPaths.clear();
+    this.gui.widgFavorTable.clearTable();
   }
   
   
@@ -1048,9 +1102,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   public GralTableLine_ifc<FavorPath> addFavor(FavorPath favorPathInfo) {
     GralTableLine_ifc<FavorPath> line;
-    if(this.indexFavorPaths.get(favorPathInfo.selectName) == null){
-      this.indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
-      line = this.widgFavorTable.addLine(favorPathInfo.selectName, null, favorPathInfo);
+    if(this.gui.indexFavorPaths.get(favorPathInfo.selectName) == null){
+      this.gui.indexFavorPaths.put(favorPathInfo.selectName, favorPathInfo);
+      line = this.gui.widgFavorTable.addLine(favorPathInfo.selectName, null, favorPathInfo);
       line.setCellText(favorPathInfo.selectName, 0);
       line.setCellText(favorPathInfo.path, 1);
       line.redraw(100,100);
@@ -1096,28 +1150,28 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   public void openDialog(FileRemote startFile, String sTitle, String sBtnText
       , GralUserAction actionEnter, GralUserAction actionButton){
-    this.actionOnExecButton = actionButton;
-    this.actionOnEnterFile = actionEnter;
-    if(this.widgBtnExec !=null) {
-      this.widgBtnExec.setText(sBtnText);
+    this.idata.actionOnExecButton = actionButton;
+    this.idata.actionOnEnterFile = actionEnter;
+    if(this.gui.widgBtnExec !=null) {
+      this.gui.widgBtnExec.setText(sBtnText);
     }
     if(startFile !=null) {
       this.fillIn(startFile, false);
-      this.widgSelectList.setVisible(true);                // file table should be shown.
-      if(this.widgFavorTable !=null) {                     
-        this.widgFavorTable.setVisible(false);               // favor table should be hidden
+      this.gui.widgSelectList.setVisible(true);                // file table should be shown.
+      if(this.gui.widgFavorTable !=null) {                     
+        this.gui.widgFavorTable.setVisible(false);               // favor table should be hidden
       }
     } else {
-      if(this.widgFavorTable !=null) {                     // only if favor exist.
-        this.widgFavorTable.setVisible(true);              // favor table should be shown
-        this.widgSelectList.setVisible(true);              // file table should be hidden
+      if(this.gui.widgFavorTable !=null) {                     // only if favor exist.
+        this.gui.widgFavorTable.setVisible(true);              // favor table should be shown
+        this.gui.widgSelectList.setVisible(true);              // file table should be hidden
       } else {
         // do nothing                                      // startFile not given, no Favors, only activate the window
       }
     }
-    if(this.windFileSelector !=null) {
-      this.windFileSelector.setTitle(sTitle);
-      this.windFileSelector.setWindowVisible(true);
+    if(this.gui.windFileSelector !=null) {
+      this.gui.windFileSelector.setTitle(sTitle);
+      this.gui.windFileSelector.setWindowVisible(true);
     } else {
     }
     this.setFocus();
@@ -1125,10 +1179,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   public void closeDialog() {
-    if(this.windFileSelector !=null) {
-      this.windFileSelector.setWindowVisible(false);
+    if(this.gui.windFileSelector !=null) {
+      this.gui.windFileSelector.setWindowVisible(false);
     } else {
-      this.widgSelectList.setVisible(false);
+      this.gui.widgSelectList.setVisible(false);
     }
   }
   
@@ -1142,23 +1196,23 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     clear();
     int lineCt =0;
     StringBuilder sLog = new StringBuilder();
-    sLog.append("GralFileSelector - fillFavorPaths: ").append(this.widgFavorTable.name);
-    if(this.widgFavorTable !=null) {
+    sLog.append("GralFileSelector - fillFavorPaths: ").append(this.gui.widgFavorTable.name);
+    if(this.gui.widgFavorTable !=null) {
       GralTableLine_ifc<FavorPath> currentLine = null;
       for( FavorPath favorPathInfo: listfavorPaths){
         GralTableLine_ifc<FavorPath> line = addFavor(favorPathInfo);
         if(currentLine == null){ currentLine = line; }  //first line
-        if(favorPathInfo.selectName.equals(this.sCurrFavor)){
+        if(favorPathInfo.selectName.equals(this.idata.sCurrFavor)){
           currentLine = line;  //or the last selected one.
         }
         lineCt +=1;
       }
-      this.widgFavorTable.setCurrentLine(currentLine, 3, 1);
+      this.gui.widgFavorTable.setCurrentLine(currentLine, 3, 1);
       sLog.append( " lines: ").append(Integer.toString(lineCt)).append(" follows: doActivateFavor()");
       this.gralMng.log.sendMsg(GralMng.LogMsg.ctorWdg, sLog);
       doActivateFavor();
       //this.wdgFavorTable.bPrepareVisibleArea = true;
-      this.widgFavorTable.redraw1(0, 0);
+      this.gui.widgFavorTable.redraw1(0, 0);
     }
 
   }
@@ -1171,7 +1225,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   public void fillInOriginDir()
   {
-    fillIn(this.originDir, false);
+    fillIn(this.idata.originDir, false);
   }
   
   
@@ -1181,32 +1235,32 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * more as one time after another, for example for all files of a directory without calculation effort.
    */
   public void fillInCurrentDir(){
-    if(this.currentDir !=null && !this.widgSelectList.wdgdTable.fillinPending()) {
+    if(this.idata.currentDir !=null && !this.gui.widgSelectList.wdgdTable.fillinPending()) {
       //assume that a yet tested directory should not refreshed twice because another thread had refreshed already.
       //yet is 2 seconds.
-      boolean bDonotRefresh = this.currentDir.isTested(System.currentTimeMillis() - 2000);
-      fillIn(this.currentDir, bDonotRefresh);
+      boolean bDonotRefresh = this.idata.currentDir.isTested(System.currentTimeMillis() - 2000);
+      fillIn(this.idata.currentDir, bDonotRefresh);
     }
   }
   
 
 
-  private void fillIn(List<File> files) {
+  protected void fillIn(List<File> files) {
   
-    this.widgSelectList.wdgdTable.clearTable();
-    this.idxLines.clear();
+    this.gui.widgSelectList.wdgdTable.clearTable();
+    this.idata.idxLines.clear();
     for(File file1: files ){
-      FileCluster fc = this.currentDir.itsCluster;
-      FileRemote file = fc.getFile(FileSystem.normalizePath(file1.getAbsolutePath()), null);
-      String name = file.getName();
+      FileCluster fc = this.idata.currentDir.itsCluster;
+      FileRemote file = fc.getFile(FileFunctions.normalizePath(file1.getAbsolutePath()), null);
+      //String name = file.getName();
       String path = file.getCanonicalPath();
-      GralTableLine_ifc<FileRemote> tline = this.widgSelectList.wdgdTable.insertLine(path, 0, null, file);
-      tline.setCellText("?", kColDesignation);
-      tline.setCellText(path, kColFilename);
-      tline.setCellText(""+file.length(), kColLength);
+      GralTableLine_ifc<FileRemote> tline = this.gui.widgSelectList.wdgdTable.insertLine(path, 0, null, file);
+      tline.setCellText("?", Constants.kColDesignation);
+      tline.setCellText(path, Constants.kColFilename);
+      tline.setCellText(""+file.length(), Constants.kColLength);
       long timeNow = System.currentTimeMillis();
       long fileTime;
-      switch(this.showTime){
+      switch(this.idata.showTime){
         case 'm': fileTime = file.lastModified(); break;
         case 'c': fileTime = file.creationTime(); break;
         case 'a': fileTime = file.lastAccessTime(); break;
@@ -1217,18 +1271,18 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       Date timestamp = new Date(fileTime);
       String sDate;
       if(diffTime < -10 * 3600000L){
-        sDate = this.sDatePrefixNewer + this.dateFormatNewer.format(timestamp);
+        sDate = this.idata.sDatePrefixNewer + this.idata.dateFormatNewer.format(timestamp);
       } else if(diffTime < 18*3600000){
         //files today
-        sDate = this.sDatePrefixToday + this.dateFormatToday.format(timestamp);
+        sDate = this.idata.sDatePrefixToday + this.idata.dateFormatToday.format(timestamp);
       } else if(diffTime < 320 * 24* 3600000L){
-        sDate = this.sDatePrefixYear + this.dateFormatYear.format(timestamp);
+        sDate = this.idata.sDatePrefixYear + this.idata.dateFormatYear.format(timestamp);
       } else {
-        sDate = this.sDatePrefixOlder + this.dateFormatOlder.format(timestamp);
+        sDate = this.idata.sDatePrefixOlder + this.idata.dateFormatOlder.format(timestamp);
       }
-      tline.setCellText(sDate, kColDate);
-      tline.setBackColor(this.colorBack, -1);
-      this.idxLines.put(path, tline);
+      tline.setCellText(sDate, Constants.kColDate);
+      tline.setBackColor(this.idata.colorBack, -1);
+      this.idata.idxLines.put(path, tline);
     }
   }
 
@@ -1237,7 +1291,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   public void forcefillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
   {
-    this.widgSelectList.wdgdTable.fillinPending(false);
+    this.gui.widgSelectList.wdgdTable.fillinPending(false);
     fillIn(fileIn, bCompleteWithFileInfo);
   }
   
@@ -1254,69 +1308,69 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   public void fillIn(FileRemote fileIn, boolean bDonotRefrehs) //String path)
   { long timenow = System.currentTimeMillis();
-    this.timeFillinInvoked = timenow;
+    this.idata.timeFillinInvoked = timenow;
     final FileRemote dir, file;
     if(!fileIn.isDirectory()){
       dir = fileIn.getParentFile(); file = fileIn;
-      String sDir = FileSystem.getCanonicalPath(dir); //with / as separator!
-      String sFile = fileIn.getName();
-      this.idxSelectFileInDir.put(sDir, fileIn); //sFile);
+      String sDir = FileFunctions.getCanonicalPath(dir); //with / as separator!
+      //String sFile = fileIn.getName();
+      this.idata.idxSelectFileInDir.put(sDir, fileIn); //sFile);
     } else {
       dir = fileIn; file = null;
     }
-    if(this.originDir == null){ 
-      this.originDir = dir;    //should exist in any case.
+    if(this.idata.originDir == null){ 
+      this.idata.originDir = dir;    //should exist in any case.
     }
     fileIn.internalAccess().setRefreshed();
-    boolean bSameDirectory = dir == this.currentDir;
+    boolean bSameDirectory = dir == this.idata.currentDir;
     if(!bSameDirectory){
       this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin GralFileSelector: " + dir );
-      this.currentDir = dir;
-      this.sCurrentDir = FileFunctions.normalizePath(dir).toString();  //though it may not exist, store it for refresh (may be exist later).
+      this.idata.currentDir = dir;
+      this.idata.sCurrentDir = FileFunctions.normalizePath(dir).toString();  //though it may not exist, store it for refresh (may be exist later).
     } else {
       this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin sGralFileSelector: " + dir );
     }
-    this.widgdPathDir.setText(this.sCurrentDir);    // set directory string, caret on end
-    if(!bSameDirectory || !this.widgSelectList.wdgdTable.fillinPending()){      //new request anytime if other directory, or if it is not pending.
-      this.widgSelectList.wdgdTable.fillinPending(true);
-      System.out.println("FcmdFileCard - start fillin; " + this.sCurrentDir + (bSameDirectory ? "; same" : "; new"));
-      final ERefresh eRefresh;
+    this.gui.widgdPathDir.setText(this.idata.sCurrentDir);    // set directory string, caret on end
+    if(!bSameDirectory || !this.gui.widgSelectList.wdgdTable.fillinPending()){      //new request anytime if other directory, or if it is not pending.
+      this.gui.widgSelectList.wdgdTable.fillinPending(true);
+      System.out.println("FcmdFileCard - start fillin; " + this.idata.sCurrentDir + (bSameDirectory ? "; same" : "; new"));
+      @SuppressWarnings("unused") final ERefresh eRefresh;
       if(bSameDirectory){
         //it is a refresh.
-        if(true || (timenow - dir.timeChildren) > 4000){
+        //if(true || (timenow - dir.timeChildren) > 4000){
           eRefresh = ERefresh.refreshAll; //needs to refresh
-        } else {
-          eRefresh = ERefresh.doNothing;  //do nothing, it is actual
-        }
+        //} else {
+        //  eRefresh = ERefresh.doNothing;  //do nothing, it is actual
+        //}
       } else {
         //other directory
-        this.currentFile = null;
+        this.idata.currentFile = null;
               //the directory is unknown yet.
           //GralTableLine_ifc<FileRemote> tline = selectList.wdgdTable.insertLine(null, 0, null, null);
-          //tline.setCellText("--waiting--", kColFilename);
+          //tline.setCellText("--waiting--", Constants.kColFilename);
           eRefresh = ERefresh.refreshChildren;  //do nothing, it is shown and refreshed in execFillIn
       }
-      if(!bSameDirectory || this.sortOrder != this.sortOrderLast){
-        this.widgSelectList.wdgdTable.clearTable();
-        this.idxLines.clear();
+      if(!bSameDirectory || this.idata.sortOrder != this.idata.sortOrderLast){
+        this.gui.widgSelectList.wdgdTable.clearTable();
+        this.idata.idxLines.clear();
         if(dir.getParentFile() !=null){
-          GralTableLine_ifc<FileRemote> tline = this.widgSelectList.wdgdTable.insertLine("..", 0, null, dir);
-          tline.setCellText("<", kColDesignation);
-          tline.setCellText("..", kColFilename);
-          tline.setCellText("", kColLength);
-          tline.setCellText("", kColDate);
+          GralTableLine_ifc<FileRemote> tline = this.gui.widgSelectList.wdgdTable.insertLine("..", 0, null, dir);
+          tline.setCellText("<", Constants.kColDesignation);
+          tline.setCellText("..", Constants.kColFilename);
+          tline.setCellText("", Constants.kColLength);
+          tline.setCellText("", Constants.kColDate);
           //tline.setBackColor(this.colorBackPending, -1);
-          this.idxLines.put("..", tline);
+          this.idata.idxLines.put("..", tline);
         }
         //Build the table lines newly.
       } else {
-        for(GralTable<?>.TableLineData line: this.widgSelectList.wdgdTable.iterLines()){
+        for(GralTable<?>.TableLineData line: this.gui.widgSelectList.wdgdTable.iterLines()){
           //if(!line.getCellText(kColFilename).equals("..")){
-            line.setBackColor(this.colorBackPending, -1);
+            line.setBackColor(this.idata.colorBackPending, -1);
           //}
         }
       }
-      this.sortOrderLast = this.sortOrder;
+      this.idata.sortOrderLast = this.idata.sortOrder;
       ////
       if(bDonotRefrehs) {
         //do not refresh, show given files.
@@ -1328,7 +1382,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
           }
         }
         finishShowFileTable();   //removed lines with not existing files, 
-        this.widgSelectList.wdgdTable.setFocus();
+        this.gui.widgSelectList.wdgdTable.setFocus();
         ////
       } else {
         //refresh it in an extra thread therefore show all lines with colorBackPending. 
@@ -1339,7 +1393,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(file !=null) {
       selectFile(file.getName());
     }
-    this.widgSelectList.wdgdTable.redraw(500,500);          // use a long redraw with purple color because meanwhile some files may be filled.
+    this.gui.widgSelectList.wdgdTable.redraw(500,500);          // use a long redraw with purple color because meanwhile some files may be filled.
   }
   
   
@@ -1351,22 +1405,22 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   {
     String key = buildKey(file1, true, null);
     boolean[] found = new boolean[1];
-    GralTableLine_ifc<FileRemote> tline = this.idxLines.search(key, false, found);
+    GralTableLine_ifc<FileRemote> tline = this.idata.idxLines.search(key, false, found);
     
     if(!found[0]){ //no such line with this file
       String name = file1.getName();  //use the file name as key in the table for the table line.
       if(tline ==null){
         //on empty table, first line.
-        tline = this.widgSelectList.wdgdTable.insertLine(name, 0, null, file1);
+        tline = this.gui.widgSelectList.wdgdTable.insertLine(name, 0, null, file1);
       }else {
         //insert after found line.
         tline = tline.addNextLine(name, null, file1);
       }
-      tline.setCellText(file1.getName(), kColFilename);
-      this.idxLines.add(key, tline);
+      tline.setCellText(file1.getName(), Constants.kColFilename);
+      this.idata.idxLines.add(key, tline);
     }
     completeLine(tline, file1, System.currentTimeMillis());
-    tline.setBackColor(this.colorBack, -1); //set for the whole line.
+    tline.setBackColor(this.idata.colorBack, -1); //set for the whole line.
   }
   
   
@@ -1378,44 +1432,44 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   void finishShowFileTable()
   {
-    this.widgSelectList.wdgdTable.fillinPending(false);
-    this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillinFinished, "GralFileSelector - finish fillin; " + this.sCurrentDir);
-    if(this.sFileToSelect.length()>0) {
-      FileRemote file = this.currentDir.getChild(this.sFileToSelect);
+    this.gui.widgSelectList.wdgdTable.fillinPending(false);
+    this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillinFinished, "GralFileSelector - finish fillin; " + this.idata.sCurrentDir);
+    if(this.idata.sFileToSelect.length()>0) {
+      FileRemote file = this.idata.currentDir.getChild(this.idata.sFileToSelect);
       if(file !=null && file.exists()) {
-        String sDir = FileFunctions.getCanonicalPath(this.currentDir); //with / as separator!
-        this.idxSelectFileInDir.put(sDir, file);
+        String sDir = FileFunctions.getCanonicalPath(this.idata.currentDir); //with / as separator!
+        this.idata.idxSelectFileInDir.put(sDir, file);
     } }
     
-    Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = this.idxLines.entrySet().iterator();
+    Iterator<Map.Entry<String, GralTableLine_ifc<FileRemote>>> iter = this.idata.idxLines.entrySet().iterator();
     while(iter.hasNext()){
       Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
       GralTableLine_ifc<FileRemote> tline = entry.getValue();
       if(tline.getKey().equals("..")){
-        tline.setBackColor(this.colorBack, -1); //set for the whole line.
-      } else if(tline.getBackColor(-1) == this.colorBackPending){
-        this.widgSelectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
+        tline.setBackColor(this.idata.colorBack, -1); //set for the whole line.
+      } else if(tline.getBackColor(-1) == this.idata.colorBackPending){
+        this.gui.widgSelectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
         iter.remove();
       }
     }
-    this.widgSelectList.wdgdTable.setBackColor(this.colorBack, GralTable_ifc.kEmptyArea);
-    if(this.currentFile == null){
-      this.currentFile = this.idxSelectFileInDir.get(this.sCurrentDir);
+    this.gui.widgSelectList.wdgdTable.setBackColor(this.idata.colorBack, GralTable_ifc.kEmptyArea);
+    if(this.idata.currentFile == null){
+      this.idata.currentFile = this.idata.idxSelectFileInDir.get(this.idata.sCurrentDir);
     }
     GralTableLine_ifc<FileRemote> tline;
-    if(this.currentFile !=null){
-      String key = buildKey(this.currentFile, true, null);
-      tline = this.idxLines.search(key); //maybe line before
+    if(this.idata.currentFile !=null){
+      String key = buildKey(this.idata.currentFile, true, null);
+      tline = this.idata.idxLines.search(key); //maybe line before
     } else {
-      tline = this.widgSelectList.wdgdTable.getFirstLine();  //first line is selected
+      tline = this.gui.widgSelectList.wdgdTable.getFirstLine();  //first line is selected
     }
     if(tline !=null){
-      this.widgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
-      this.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
+      this.gui.widgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
+      this.idata.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
     }
-    this.widgSelectList.wdgdTable.redraw(50, 100);
-    if(this.actionOnFileSelected !=null) {
-      this.actionOnFileSelected.exec(KeyCode.activated, tline, tline);
+    this.gui.widgSelectList.wdgdTable.redraw(50, 100);
+    if(this.idata.actionOnFileSelected !=null) {
+      this.idata.actionOnFileSelected.exec(KeyCode.activated, tline, tline);
     }
   }
   
@@ -1449,9 +1503,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       }
     }
     else { sDesign = " ";}
-    tline.setCellText(sDir + sDesign, kColDesignation);
+    tline.setCellText(sDir + sDesign, Constants.kColDesignation);
     long fileTime;
-    switch(this.showTime){
+    switch(this.idata.showTime){
       case 'm': fileTime = file.lastModified(); break;
       case 'c': fileTime = file.creationTime(); break;
       case 'a': fileTime = file.lastAccessTime(); break;
@@ -1462,16 +1516,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     Date timestamp = new Date(fileTime);
     String sDate;
     if(diffTime < -10 * 3600000L){
-      sDate = this.sDatePrefixNewer + this.dateFormatNewer.format(timestamp);
+      sDate = this.idata.sDatePrefixNewer + this.idata.dateFormatNewer.format(timestamp);
     } else if(diffTime < 18*3600000){
       //files today
-      sDate = this.sDatePrefixToday + this.dateFormatToday.format(timestamp);
+      sDate = this.idata.sDatePrefixToday + this.idata.dateFormatToday.format(timestamp);
     } else if(diffTime < 320 * 24* 3600000L){
-      sDate = this.sDatePrefixYear + this.dateFormatYear.format(timestamp);
+      sDate = this.idata.sDatePrefixYear + this.idata.dateFormatYear.format(timestamp);
     } else {
-      sDate = this.sDatePrefixOlder + this.dateFormatOlder.format(timestamp);
+      sDate = this.idata.sDatePrefixOlder + this.idata.dateFormatOlder.format(timestamp);
     }
-    tline.setCellText(sDate, kColDate);
+    tline.setCellText(sDate, Constants.kColDate);
     //line[kColDate] = sDate;
     //
     String sLength;
@@ -1491,7 +1545,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     } else {
       sLength = String.format("%2.0f G", fileLength / (1024 * 1024.0f));
     }
-    tline.setCellText(sLength, kColLength);
+    tline.setCellText(sLength, Constants.kColLength);
     tline.setContentIdent(fileTime);
     //line[kColLength] = sLength;
     
@@ -1499,37 +1553,40 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   ////
-  protected String buildKey(FileRemote file, boolean bAllCompleteWithFileInfo, String[] retSortName){
+  protected String buildKey(FileRemote file, boolean bAllCompleteWithFileInfoP, String[] retSortName){
     String sort, sortName;
-    if(!file.isTested()){
+    final boolean bAllCompleteWithFileInfo;
+    if(file.isTested()){
+      bAllCompleteWithFileInfo = bAllCompleteWithFileInfoP;
+    } else {
       bAllCompleteWithFileInfo = false;
     }
-    switch(this.sortOrder){
-    case kSortName: {
+    switch(this.idata.sortOrder){
+    case Constants.kSortName: {
       String sName = file.getName();
       if(file.isDirectory()){ sName += "/"; }
       sortName = sort = (file.isDirectory()? "D" : "F") + sName;
     } break;
-    case kSortNameNonCase: {
+    case Constants.kSortNameNonCase: {
       String sName = file.getName().toLowerCase();
       if(file.isDirectory()){ sName += "/"; }
       sortName = sort = (file.isDirectory()? "D" : "F") + sName;
     } break;
-    case kSortExtension: {
+    case Constants.kSortExtension: {
       String sName = file.getName();
       int posDot = sName.lastIndexOf('.');
       String sExt = sName.substring(posDot+1);
       if(file.isDirectory()){ sName += "/"; }
       sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
     } break;
-    case kSortExtensionNonCase: {
+    case Constants.kSortExtensionNonCase: {
       String sName = file.getName().toLowerCase();
       int posDot = sName.lastIndexOf('.');
       String sExt = sName.substring(posDot+1);
       if(file.isDirectory()){ sName += "/"; }
       sortName = sort = (file.isDirectory()? "D" : "F") + sExt + sName;
     } break;
-    case kSortDateNewest: {
+    case Constants.kSortDateNewest: {
       String sName = file.getName().toLowerCase();
       if(bAllCompleteWithFileInfo){
         long nDate = -file.lastModified();
@@ -1538,7 +1595,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else { sort = ""; }
       sortName = (file.isDirectory()? "D" : "F") + sName;
     } break;
-    case kSortDateOldest: {
+    case Constants.kSortDateOldest: {
       String sName = file.getName().toLowerCase();
       if(bAllCompleteWithFileInfo){
         long nDate = file.lastModified();
@@ -1547,7 +1604,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else { sort = ""; }
       sortName = (file.isDirectory()? "D" : "F") + sName;
     } break;
-    case kSortSizeLargest: {
+    case Constants.kSortSizeLargest: {
       String sName = file.getName().toLowerCase();
       if(bAllCompleteWithFileInfo){
         long nSize = 0x7fffffffffffffffL - file.length();
@@ -1556,7 +1613,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else { sort = ""; }
       sortName = (file.isDirectory()? "D" : "F") + sName;
     } break;
-    case kSortSizeSmallest: {
+    case Constants.kSortSizeSmallest: {
       String sName = file.getName().toLowerCase();
       if(bAllCompleteWithFileInfo){
         long nSize = file.length();
@@ -1575,17 +1632,17 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   public void checkRefresh(long since){
-    if(this.currentDir !=null 
-      && (  !this.donotCheckRefresh && !this.currentDir.isTested(since - 5000)
-         || this.currentDir.shouldRefresh()
+    if(this.idata.currentDir !=null 
+      && (  !this.idata.donotCheckRefresh && !this.idata.currentDir.isTested(since - 5000)
+         || this.idata.currentDir.shouldRefresh()
        )   ){
-      fillIn(this.currentDir, false);
+      fillIn(this.idata.currentDir, false);
     }
   }
   
   
   
-  public String getLabelCurrFavor ( ) { return this.sCurrFavor; }
+  public String getLabelCurrFavor ( ) { return this.idata.sCurrFavor; }
   
   //public FileRemote getCurrentDir(){ return currentDir; }
 
@@ -1595,11 +1652,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   public File XXXgetSelectedFile()
   {
-    if(this.widgSelectList.wdgdTable == null){
+    if(this.gui.widgSelectList.wdgdTable == null){
       stop();
       return null;
     }
-    GralTableLine_ifc<FileRemote> line = this.widgSelectList.wdgdTable.getCurrentLine();
+    GralTableLine_ifc<FileRemote> line = this.gui.widgSelectList.wdgdTable.getCurrentLine();
     if(line !=null){
       File data = line.getUserData();
       return data;
@@ -1630,23 +1687,23 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   If the current file is marked, return all marked files. 
    */
   public List<FileRemote> getSelectedFiles(boolean bAlsoDirs, int mask)
-  { if(this.widgSelectList.wdgdTable == null){
+  { if(this.gui.widgSelectList.wdgdTable == null){
       stop();
       return null;
-    } else if(this.currentFile == null){
+    } else if(this.idata.currentFile == null){
       return null;
-    } else if(this.currentFile.isMarked(0x1)){
+    } else if(this.idata.currentFile.isMarked(0x1)){
       List<FileRemote> list = new LinkedList<FileRemote>();
-      for(GralTableLine_ifc<FileRemote> line: this.widgSelectList.wdgdTable.getMarkedLines(mask)){
+      for(GralTableLine_ifc<FileRemote> line: this.gui.widgSelectList.wdgdTable.getMarkedLines(mask)){
         FileRemote file = line.getUserData();
         if(bAlsoDirs || !file.isDirectory()){
           list.add(file);
         }
       }
       return list;
-    } else if(bAlsoDirs || !this.currentFile.isDirectory()) {
+    } else if(bAlsoDirs || !this.idata.currentFile.isDirectory()) {
       List<FileRemote> list = new LinkedList<FileRemote>();
-      list.add(this.currentFile);
+      list.add(this.idata.currentFile);
       return list;
     } else { //no mark file selected, current file is a directory.
       return null;
@@ -1659,7 +1716,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @return true if found and selected.
    */
   public boolean selectFile(String name){
-    return this.widgSelectList.wdgdTable.setCurrentLine(name);
+    return this.gui.widgSelectList.wdgdTable.setCurrentLine(name);
     
   }
   
@@ -1668,45 +1725,45 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * Note: If the .. is selected, the current file is the parent directory.
    * If any directory is selected, this is the currentFile(). Check with {@link java.io.File#isDirectory()}.
    */
-  public FileRemote currentFile(){ return this.currentFile; }
+  public FileRemote currentFile(){ return this.idata.currentFile; }
   
   /**Gets the directory which is currently shown.
    * Note: If the .. is selected, the current directory is the directory where the .. is located,
    * whereby the {@link #currentFile()} is the parent. Elsewhere this method returns the parent of
    * {@link #currentFile()}.
    */
-  public FileRemote currentDir(){ return this.currentDir; }
+  public FileRemote currentDir(){ return this.idata.currentDir; }
   
   /**same as {@link #currentDir()}. */
-  public FileRemote getCurrentDir(){ return this.currentDir; }
+  public FileRemote getCurrentDir(){ return this.idata.currentDir; }
   
   
   
   /**Sets the focus of the associated table widget.
    * @return true if focused.
    */
-  public void setFocus() { 
+  @Override public void setFocus() { 
     GralHorizontalSelector.Item<FavorPath> favorTab;
-    if(this.widgFavorTabs ==null                           // favors not existing
-     || (favorTab = this.widgFavorTabs.getActItem()) ==null // tabs not existing
+    if(this.gui.widgFavorTabs ==null                           // favors not existing
+     || (favorTab = this.gui.widgFavorTabs.getActItem()) ==null // tabs not existing
      || favorTab.data !=null                               // or +sel tab is not selected
       ) {
-      this.widgSelectList.wdgdTable.setFocus();
+      this.gui.widgSelectList.wdgdTable.setFocus();
     } else {
-      this.widgFavorTable.setFocus();
+      this.gui.widgFavorTable.setFocus();
     }
   }
   
   
-  public void setFocus ( int delay, int latest) { 
+  @Override public void setFocus ( int delay, int latest) { 
     GralHorizontalSelector.Item<FavorPath> favorTab;
-    if(this.widgFavorTabs ==null                           // favors not existing
-     || (favorTab = this.widgFavorTabs.getActItem()) ==null // tabs not existing
+    if(this.gui.widgFavorTabs ==null                           // favors not existing
+     || (favorTab = this.gui.widgFavorTabs.getActItem()) ==null // tabs not existing
      || favorTab.data !=null                               // or +sel tab is not selected
       ) {
-      this.widgSelectList.wdgdTable.setFocus(delay, latest);
+      this.gui.widgSelectList.wdgdTable.setFocus(delay, latest);
     } else {
-      this.widgFavorTable.setFocus(delay, latest);
+      this.gui.widgFavorTable.setFocus(delay, latest);
     }
   }
   
@@ -1714,61 +1771,61 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   
-  @Override public boolean isInFocus(){ return this.widgSelectList.wdgdTable.isInFocus(); }
+  @Override public boolean isInFocus(){ return this.gui.widgSelectList.wdgdTable.isInFocus(); }
   
-  @Override public boolean isVisible(){ return this.widgSelectList.wdgdTable.isVisible(); }
+  @Override public boolean isVisible(){ return this.gui.widgSelectList.wdgdTable.isVisible(); }
   
   
   @Override public boolean setVisible(boolean visible)
   {
     GralHorizontalSelector.Item<FavorPath> favorTab;
-    if(this.widgFavorTabs ==null                           // favors not existing
-     || (favorTab = this.widgFavorTabs.getActItem()) ==null // tabs not existing
+    if(this.gui.widgFavorTabs ==null                           // favors not existing
+     || (favorTab = this.gui.widgFavorTabs.getActItem()) ==null // tabs not existing
      || favorTab.data !=null                               // or +sel tab is not selected
       ) {
-      this.widgSelectList.wdgdTable.setVisible(visible);
+      this.gui.widgSelectList.wdgdTable.setVisible(visible);
     } else {
-      this.widgFavorTable.setVisible(visible);
+      this.gui.widgFavorTable.setVisible(visible);
     }
-    this.widgdPathDir.setVisible(visible);
-    return this.widgSelectList.wdgdTable.isVisible(); 
+    this.gui.widgdPathDir.setVisible(visible);
+    return this.gui.widgSelectList.wdgdTable.isVisible(); 
   }
   
   void stop(){}
 
   @Override public boolean remove(){ 
-    this.widgSelectList.remove();
-    this.widgdPathDir.remove();
-    this.idxSelectFileInDir.clear();
-    this.currentDir = null;
+    this.gui.widgSelectList.remove();
+    this.gui.widgdPathDir.remove();
+    this.idata.idxSelectFileInDir.clear();
+    this.idata.currentDir = null;
     return true;
   }
   
 
   
   @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {
-    if(widg == this.widgFavorTable) {
-      this.widgFavorTabs.setActItem("+sel");
+    if(widg == this.gui.widgFavorTable) {
+      this.gui.widgFavorTabs.setActItem("+sel");
     } else {
-      //TODO focus maybe also on widgBtnFavor
+      //to do focus maybe also on widgBtnFavor
     }
   }
 
   @Override public GralWidgetBase_ifc getFocusedWidget() { 
     GralHorizontalSelector.Item<FavorPath> favorTab;
-    if(this.widgFavorTabs ==null                           // favors not existing
-     || (favorTab = this.widgFavorTabs.getActItem()) ==null // tabs not existing
+    if(this.gui.widgFavorTabs ==null                           // favors not existing
+     || (favorTab = this.gui.widgFavorTabs.getActItem()) ==null // tabs not existing
      || favorTab.data !=null                               // or +sel tab is not selected
       ) {
-      return this.widgSelectList;
+      return this.gui.widgSelectList;
     } else {
-      return this.widgFavorTable;
+      return this.gui.widgFavorTable;
     }
   }
 
   public void selectFileTable(String sFavor, FileRemote startFile) {
-    if(sFavor !=null && this.widgFavorTable !=null) {
-      GralTable<FavorPath>.TableLineData lineFavor = this.widgFavorTable.getLine(sFavor);
+    if(sFavor !=null && this.gui.widgFavorTable !=null) {
+      GralTable<FavorPath>.TableLineData lineFavor = this.gui.widgFavorTable.getLine(sFavor);
       if(lineFavor ==null) {
         FavorPath favor = new FavorPath(sFavor, startFile);
         lineFavor = (GralTable<FavorPath>.TableLineData)addFavor(favor);
@@ -1779,30 +1836,30 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   void doFileLineSelect(GralTable<FileRemote>.TableLineData line){
     FileRemote file = line.getUserData();
-    String sName = line.getCellText(kColFilename);
-    if(file.isTested() && file.exists()) {                       //TODO: if the file is not refreshed, new network access, the GUI hangs a long time.
+    String sName = line.getCellText(Constants.kColFilename);
+    if(file.isTested() && file.exists()) {                       //to do: if the file is not refreshed, new network access, the GUI hangs a long time.
       if(sName.equals("..")){
-        GralFileSelector.this.currentFile = file; //the dir is used as selected current file
-        GralFileSelector.this.currentDir = file;  //the same, the directory of this panel.
+        GralFileSelector.this.idata.currentFile = file; //the dir is used as selected current file
+        GralFileSelector.this.idata.currentDir = file;  //the same, the directory of this panel.
           
       } else {
-        GralFileSelector.this.currentDir = file.getParentFile();
-        GralFileSelector.this.currentFile = file;
+        GralFileSelector.this.idata.currentDir = file.getParentFile();
+        GralFileSelector.this.idata.currentFile = file;
         String sDir = file.getParent();
-        GralFileSelector.this.idxSelectFileInDir.put(sDir, file);    //store the last selection.
+        GralFileSelector.this.idata.idxSelectFileInDir.put(sDir, file);    //store the last selection.
       }
       //System.out.println("GralFileSelector: " + sDir + ":" + sName);
-      if(GralFileSelector.this.actionOnFileSelected !=null){
-        GralFileSelector.this.actionOnFileSelected.exec(0, GralFileSelector.this.widgSelectList.wdgdTable, line, file);
+      if(GralFileSelector.this.idata.actionOnFileSelected !=null){
+        GralFileSelector.this.idata.actionOnFileSelected.exec(0, GralFileSelector.this.gui.widgSelectList.wdgdTable, line, file);
       }
-      if(line.getCellText(kColDesignation).startsWith("?")) {
+      if(line.getCellText(Constants.kColDesignation).startsWith("?")) {
         completeLine(line, file, System.currentTimeMillis());
       }
-      if(this.widgFileProperties !=null && this.widgFileProperties.isVisible()) {
-        this.widgFileProperties.showFileInfos(file);
+      if(this.gui.widgFileProperties !=null && this.gui.widgFileProperties.isVisible()) {
+        this.gui.widgFileProperties.showFileInfos(file);
       }
     } else {
-      //File should be refreshed TODO
+      //File should be refreshed to do
     }
   }
   
@@ -1818,25 +1875,25 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param params unused
    */
   protected void doActionGetFileName ( int key, GralWidget_ifc widgd, Object... params) {
-    final String sFile = this.currentFile.getName();
-    if(this.widgFilename !=null) {
-      this.widgFilename.setText(sFile);
+    final String sFile = this.idata.currentFile.getName();
+    if(this.gui.widgFilename !=null) {
+      this.gui.widgFilename.setText(sFile);
     }
   }
   
   
   protected void doActionExec ( int key, GralWidget_ifc widgd, Object... params) {
-    if(GralFileSelector.this.actionOnExecButton !=null) {
-      String sFile = this.widgFilename.getText();               // widgFilename exist, gets its content
+    if(GralFileSelector.this.idata.actionOnExecButton !=null) {
+      String sFile = this.gui.widgFilename.getText();               // widgFilename exist, gets its content
       FileRemote fileExec;
       if(sFile.length()!=0) {                              // file name given in one of both?
-        fileExec = this.currentDir.child(sFile);        // it may be an non existing file, use the given name.
+        fileExec = this.idata.currentDir.child(sFile);        // it may be an non existing file, use the given name.
       } else {
-        fileExec = this.widgSelectList.wdgdTable.getCurrentLine().getData(); // use the immediately selected file
+        fileExec = this.gui.widgSelectList.wdgdTable.getCurrentLine().getData(); // use the immediately selected file
       }
 //      String sDir = this.currentDir.getAbsolutePath();
 //      String sPath = sDir + '/' + sFile;
-      GralFileSelector.this.actionOnExecButton.exec(key, widgd, fileExec);
+      GralFileSelector.this.idata.actionOnExecButton.exec(key, widgd, fileExec);
     }
 
   }
@@ -1846,8 +1903,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * and show the adequate file table.
    */
   public void doActionSelectFileTableFromFavor ( ) {
-    int nColumnFocus = this.widgFavorTable.getColumnInFocus();
-    GralTable<FavorPath>.TableLineData favorLine = this.widgFavorTable.getCurrentLine();
+    int nColumnFocus = this.gui.widgFavorTable.getColumnInFocus();
+    GralTable<FavorPath>.TableLineData favorLine = this.gui.widgFavorTable.getCurrentLine();
     FavorPath favor = favorLine.getData();
     String sFavorDir = favorLine.getCellText(1);
     if(!sFavorDir.equals(favor.path)) {
@@ -1865,19 +1922,19 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param favor The favor of the tab or line.
    */
   protected void selectFileTableFromFavor ( FavorPath favor, FileRemote fileStart ) {
-    this.widgFavorTable.setVisible(false);
+    this.gui.widgFavorTable.setVisible(false);
     String sFavor = favor.selectName; // favorLine.getCellText(0);
     //if(sFavor != this.sCurrFavor) {                        // only fillin newly if it is another favor
       this.gralMng.log().sendMsg(GralMng.LogMsg.gralFileSelector_selectFavor, "select from favor" + sFavor);
-      this.sCurrFavor = sFavor;
-      this.favorPathInfo = favor;
+      this.idata.sCurrFavor = sFavor;
+      this.idata.favorPathInfo = favor;
       if(favor.sCurrDir == null || favor.sCurrDir.length()==0) {
         favor.sCurrDir = favor.path;                      // use an existing favor
       }
-      if( ! this.widgFavorTabs.setActItem(sFavor)){
-        this.widgFavorTabs.addItem(sFavor, -1, this.favorPathInfo, true);
+      if( ! this.gui.widgFavorTabs.setActItem(sFavor)){
+        this.gui.widgFavorTabs.addItem(sFavor, -1, this.idata.favorPathInfo, true);
       }
-      this.widgFavorTabs.redraw();
+      this.gui.widgFavorTabs.redraw();
       if(fileStart !=null) {
         fillIn(fileStart, false);
       } else {
@@ -1887,8 +1944,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         //File favorfile = new File(favor.sCurrFile);
       //fillIn(FileRemote.fromFile(favorfile), false);
 //    }
-    this.widgSelectList.wdgdTable.setVisible(true);
-    this.widgSelectList.wdgdTable.setFocus();
+    this.gui.widgSelectList.wdgdTable.setVisible(true);
+    this.gui.widgSelectList.wdgdTable.setFocus();
   }
   
   
@@ -1898,26 +1955,26 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * calling {@link #updateFavorWithCurrentDir()}
    */
   public void doActivateFavor ( ) {
-    this.widgFavorTabs.setActItem("+sel");
-    this.widgSelectList.wdgdTable.setVisible(false);
-    if(this.currentFile !=null) {
+    this.gui.widgFavorTabs.setActItem("+sel");
+    this.gui.widgSelectList.wdgdTable.setVisible(false);
+    if(this.idata.currentFile !=null) {
       updateFavorWithCurrentDir();               // store the current dir of the sCurrFavor before change favor.
     }
     //this.wdgFavorTable.redraw1(100, 100);
     //this.wdgFavorTable.setVisible(true);
-    for(Map.Entry<String, FavorPath> eFavor : indexFavorPaths.entrySet()) {
+    for(Map.Entry<String, FavorPath> eFavor : this.gui.indexFavorPaths.entrySet()) {
       FavorPath favor = eFavor.getValue();
-      GralTable<FavorPath>.TableLineData favorLine = this.widgFavorTable.getLine(favor.selectName);
+      GralTable<FavorPath>.TableLineData favorLine = this.gui.widgFavorTable.getLine(favor.selectName);
       if(favorLine !=null) {                     // mark the line in left column with green if it is an active favor.
         if(favor.sCurrDir !=null) {
-          favorLine.setBackColor(this.colorMarkFavor, 0);
+          favorLine.setBackColor(this.idata.colorMarkFavor, 0);
         } else {
           favorLine.cleanSpecialColorsOfLine();
         }
       }
     }
-    this.widgFavorTable.setCurrentColumn(0);
-    this.widgFavorTable.setFocus();               // set the favor table visiable and in focus
+    this.gui.widgFavorTable.setCurrentColumn(0);
+    this.gui.widgFavorTable.setFocus();               // set the favor table visiable and in focus
   }
   
   
@@ -1926,34 +1983,34 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     int posFile = sPath.lastIndexOf('/');
     int posFile1 = sPath.lastIndexOf('\\');
     if(posFile1  > posFile) { posFile = posFile1; }
-    this.sFileToSelect = sPath.substring(posFile+1);       // name given after last /name or \name may be ""
+    this.idata.sFileToSelect = sPath.substring(posFile+1);       // name given after last /name or \name may be ""
     sPath = sPath.substring(0, posFile);
-    FileRemote dir = GralFileSelector.this.originDir.itsCluster.getDir(sPath);
+    FileRemote dir = GralFileSelector.this.idata.originDir.itsCluster.getDir(sPath);
     {
       //file.refreshProperties(null);
-      if(true || dir.isDirectory()){
+//      if(true || dir.isDirectory()){
         fillIn(dir, false);
-        this.widgSelectList.wdgdTable.setFocus();
-      } else {
-        File parent = dir.getParentFile();
-        if(parent !=null && parent.exists()){
-          if(GralFileSelector.this.actionOnEnterPathNewFile !=null){
-            GralFileSelector.this.actionOnEnterPathNewFile.userActionGui(KeyCode.enter, GralFileSelector.this.widgdPathDir, dir);
-          } else {
-            String question = "Do you want to create file\n"
-              +dir.getName()
-              + "\n  in directory\n"
-              + parent.getPath();
-//            questionWindow.setText(question);
-//            questionWindow.setActionOk(confirmCreate);
-//            questionWindow.setFocus(); //setWindowVisible(true);
-          }
-        } else {
-//          questionWindow.setText("unknown path");
-//          questionWindow.setActionOk(null);
-//          questionWindow.setFocus(); //setWindowVisible(true);
-        }
-      }
+        this.gui.widgSelectList.wdgdTable.setFocus();
+//      } else {
+//        File parent = dir.getParentFile();
+//        if(parent !=null && parent.exists()){
+//          if(GralFileSelector.this.idata.actionOnEnterPathNewFile !=null){
+//            GralFileSelector.this.idata.actionOnEnterPathNewFile.userActionGui(KeyCode.enter, GralFileSelector.this.gui.widgdPathDir, dir);
+//          } else {
+//            String question = "Do you want to create file\n"
+//              +dir.getName()
+//              + "\n  in directory\n"
+//              + parent.getPath();
+////            questionWindow.setText(question);
+////            questionWindow.setActionOk(confirmCreate);
+////            questionWindow.setFocus(); //setWindowVisible(true);
+//          }
+//        } else {
+////          questionWindow.setText("unknown path");
+////          questionWindow.setActionOk(null);
+////          questionWindow.setFocus(); //setWindowVisible(true);
+//        }
+//      }
     }
     //widg.getMng().widgetHelper.showContextMenu(widg);
 
@@ -1966,79 +2023,16 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * via {@link #widgFavorTabs}.
    */
   protected void updateFavorWithCurrentDir() {
-    if(this.sCurrFavor !=null && this.currentDir !=null) {
-      GralTable<FavorPath>.TableLineData favorLine = this.widgFavorTable.getLine(this.sCurrFavor);
+    if(this.idata.sCurrFavor !=null && this.idata.currentDir !=null) {
+      GralTable<FavorPath>.TableLineData favorLine = this.gui.widgFavorTable.getLine(this.idata.sCurrFavor);
       if(favorLine !=null) {
         FavorPath favor = favorLine.getData();
-        String sDir = this.currentDir.getAbsolutePath();
+        String sDir = this.idata.currentDir.getAbsolutePath();
         favor.sCurrDir = sDir;
         this.gralMng.log().sendMsg(GralMng.LogMsg.gralFileSelector_updateFavor,"update favor " + favor.selectName + " ->" + sDir);
       }
     }
   }
-  
-  /**Called if a tab is used to change the selection in the favorTab. 
-   * The adequate action is done too with selection in the favor tab. 
-   * */
-  protected void setFromTabSelection ( GralFileSelector.FavorPath favorPathNew ) {
-    //before changing the content of this fileTable, store the current directory
-    //to restore if this favor respectively selection is used ones more.
-    FileRemote dir = null;
-    String sCurrentDir;
-//    if(GralFileSelector.this.favorPathInfo !=null){
-//      dir = getCurrentDir();
-//      if(dir != null){
-//        sCurrentDir = dir.getAbsolutePath();
-//        if(sCurrentDir !=null){
-//          mainPanel.indexActualDir.put(favorPathInfo.selectName, sCurrentDir);
-//    } } }
-//    //main.favorPathSelector.actFavorPathInfo = favorPathNew; //The last used selection (independent of tab left, middle, right)
-//    if(favorPathNew == null){
-//      //TODO clear filecard
-//      this.wdgFavorCard.sActSelectedFavorPath = "??NO FavorPath.selectName";
-//      System.out.println("actionSetFromTabSelection: favorPathNew = null");
-//      this.main.favorPathSelector.bSyncMidRight = false;
-//    } else {
-//      this.wdgFavorCard.sActSelectedFavorPath = favorPathNew.selectName;
-//      this.sTabSelection = this.label + "." + favorPathNew.selectName;
-//      this.main.favorPathSelector.bSyncMidRight = 
-//          this.syncTabSelection !=null 
-//          && this.syncPartnerTabSelection !=null 
-//          && this.syncTabSelection.equals(this.sTabSelection)
-//          && this.mainPanel.partnerPanelToSync() !=null
-//          && this.mainPanel.partnerPanelToSync().actFileCard !=null
-//          && this.syncPartnerTabSelection.equals(this.mainPanel.partnerPanelToSync().actFileCard.sTabSelection);
-//      GralColor syncColor = this.main.favorPathSelector.bSyncMidRight ? GralColor.getColor("gn") : GralColor.getColor("wh");
-//      this.main.statusLine.widgSyncInfoLeft.setBackColor(syncColor,0);
-//      this.main.statusLine.widgSyncInfoRight.setBackColor(syncColor,0);
-//      if(this.mainPanel.cc == 'm') {
-//        if(this.syncTabSelection ==null) {
-//          this.main.statusLine.widgSyncInfoRight.setText("");
-//        } else {
-//          this.main.statusLine.widgSyncInfoLeft.setText(this.syncTabSelection);
-//          this.main.statusLine.widgSyncInfoRight.setText(this.syncPartnerTabSelection);
-//        }
-//      }
-//      else if(this.mainPanel.cc == 'r') {
-//        if(this.syncTabSelection ==null) {
-//          this.main.statusLine.widgSyncInfoLeft.setText("");
-//        } else {
-//          this.main.statusLine.widgSyncInfoLeft.setText(this.syncPartnerTabSelection);
-//          this.main.statusLine.widgSyncInfoRight.setText(this.syncTabSelection);
-//        }
-//      }
-//      System.out.println("actionSetFromTabSelection: " + favorPathNew.selectName);
-//      sCurrentDir  = mainPanel.indexActualDir.get(favorPathNew.selectName);
-//      if(sCurrentDir == null){
-//        sCurrentDir = favorPathNew.path;
-//      }
-//      //dir = new FileRemote(currentDir);  
-//      dir = main.fileCluster.getFile(sCurrentDir, null);
-//      FcmdFileCard.this.setNewContent(favorPathNew, dir);
-//    }
-    
-  }
-
   
   
 
@@ -2047,9 +2041,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param line The line in fileTable
    */
   protected void showFileInfo(GralTable<FileRemote>.TableLineData line) {
-    if(GralFileSelector.this.widgFileProperties !=null) {
-      GralFileSelector.this.widgFileProperties.setVisible(true);
-      GralFileSelector.this.widgFileProperties.showFileInfos(line.getData());
+    if(GralFileSelector.this.gui.widgFileProperties !=null) {
+      GralFileSelector.this.gui.widgFileProperties.setVisible(true);
+      GralFileSelector.this.gui.widgFileProperties.showFileInfos(line.getData());
     }
   }
   
@@ -2068,7 +2062,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
     else if(keyCode == KeyCode.F3) {
       FileRemote file = line.getUserData();
-      this.windView.view(file);
+      this.gui.windView.view(file);
     }
     return false;
   }
@@ -2081,7 +2075,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    */
   @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
     this.windSearch.windConfirmSearch.createImplWidget_Gthread();
-    if(this.widgSelectList.createImplWidget_Gthread()) {
+    if(this.gui.widgSelectList.createImplWidget_Gthread()) {
       return true;
     }
     else return false;
@@ -2094,12 +2088,12 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
    */
   @Override public void removeImplWidget_Gthread() {
-    this.widgSelectList.removeImplWidget_Gthread();                     // recursively call of same
-    this.widgFavorTabs.removeImplWidget_Gthread();                     // recursively call of same
-    this.widgFavorTable.removeImplWidget_Gthread();                     // recursively call of same
-    this.widgdPathDir.removeImplWidget_Gthread();                     // recursively call of same
-    //TODO this.windSearch.removeImplWidget_Gthread();                     // recursively call of same
-    this.windView.removeImplWidget_Gthread();
+    this.gui.widgSelectList.removeImplWidget_Gthread();                     // recursively call of same
+    this.gui.widgFavorTabs.removeImplWidget_Gthread();                     // recursively call of same
+    this.gui.widgFavorTable.removeImplWidget_Gthread();                     // recursively call of same
+    this.gui.widgdPathDir.removeImplWidget_Gthread();                     // recursively call of same
+    //to do this.windSearch.removeImplWidget_Gthread();                     // recursively call of same
+    this.gui.windView.removeImplWidget_Gthread();
   }
 
   
@@ -2179,7 +2173,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
           if(line != null){
             doFileLineSelect(line);
           } else {
-              //try refresh the file and show in callback. TODO
+              //try refresh the file and show in callback. to do
               Debugutil.stop();
           }
         }
@@ -2315,69 +2309,69 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   GralUserAction actionSortFilePerNameCase = new GralUserAction("actionSortFilePerNameCase")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortName);
+      setSortOrderFiles(Constants.kSortName);
       return true;
   } };
 
 
   GralUserAction actionSortFilePerNameNonCase = new GralUserAction("actionSortFilePerNameNonCase")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortNameNonCase);
+      setSortOrderFiles( Constants.kSortNameNonCase);
       return true;
   } };
 
 
   GralUserAction actionSortFilePerExtensionCase = new GralUserAction("actionSortFilePerExtensionCase")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortExtension);
+      setSortOrderFiles( Constants.kSortExtension);
       return true;
   } };
 
   GralUserAction actionSortFilePerExtensionNonCase = new GralUserAction("actionSortFilePerExtensionNonCase")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortExtensionNonCase);
+      setSortOrderFiles( Constants.kSortExtensionNonCase);
       return true;
   } };
 
   GralUserAction actionSortFilePerTimestamp = new GralUserAction("actionSortFilePerTimestamp")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortDateNewest);
+      setSortOrderFiles( Constants.kSortDateNewest);
       return true;
   } };
 
   GralUserAction actionSortFilePerTimestampOldestFirst = new GralUserAction("actionSortFilePerTimestampOldestFirst")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortDateOldest);
+      setSortOrderFiles( Constants.kSortDateOldest);
       return true;
   } };
 
   GralUserAction actionShowLastModifiedTime = new GralUserAction("actionSortFilePerTimestamp")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      GralFileSelector.this.showTime = 'm';
+      GralFileSelector.this.idata.showTime = 'm';
       return true;
   } };
 
   GralUserAction actionShowLastAccessTime = new GralUserAction("actionSortFilePerTimestamp")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      GralFileSelector.this.showTime = 'a';
+      GralFileSelector.this.idata.showTime = 'a';
       return true;
   } };
 
   GralUserAction actionShowCreationTime = new GralUserAction("actionSortFilePerTimestamp")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      GralFileSelector.this.showTime = 'c';
+      GralFileSelector.this.idata.showTime = 'c';
       return true;
   } };
 
   GralUserAction actionSortFilePerLenghLargestFirst = new GralUserAction("actionSortFilePerLenghLargestFirst")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortSizeLargest);
+      setSortOrderFiles( Constants.kSortSizeLargest);
       return true;
   } };
 
   GralUserAction actionSortFilesPerLenghSmallestFirst = new GralUserAction("actionSortFilesPerLenghSmallestFirst")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
-      setSortOrderFiles(GralFileSelector.kSortSizeSmallest);
+      setSortOrderFiles( Constants.kSortSizeSmallest);
       return true;
   } };
 
@@ -2400,11 +2394,11 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   GralUserAction actionDeselectDirtree = new GralUserAction("actionDeselectDirtree")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
     //if(fileCard !=null){
-    if(GralFileSelector.this.currentFile !=null){
+    if(GralFileSelector.this.idata.currentFile !=null){
       Thread run1 = new Thread("actionDeselectDirtree") {
         @Override public void run() {
-          GralFileSelector.this.currentFile.resetMarkedRecurs(0xffffffff, null);
-          GralFileSelector.this.currentFile.setDirShouldRefresh();
+          GralFileSelector.this.idata.currentFile.resetMarkedRecurs(0xffffffff, null);
+          GralFileSelector.this.idata.currentFile.setDirShouldRefresh();
       } };
       run1.start();
     }
@@ -2419,8 +2413,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * <br>
    * Implementation note: The last focused file tab is searched using {@link Fcmd#getLastSelectedFileCards()}.
    */
-  GralUserAction actionRefreshFileTable = new GralUserAction(){
-    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+  GralUserAction actionRefreshFileTable = new GralUserAction("actionRefreshFileTable"){
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
         fillInCurrentDir();
         return true;
@@ -2434,7 +2428,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   GralUserAction actionSwitchoffCheckRefresh = new GralUserAction("actionSwitchoffCheckRefresh"){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        GralFileSelector.this.donotCheckRefresh = true;
+        GralFileSelector.this.idata.donotCheckRefresh = true;
         return true;
       } else return false;
     }
@@ -2446,15 +2440,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   GralUserAction actionSwitchonCheckRefresh = new GralUserAction("actionSwitchoffCheckRefresh"){
     @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){  //supress both mouse up and down reaction
-        GralFileSelector.this.donotCheckRefresh = false;
+        GralFileSelector.this.idata.donotCheckRefresh = false;
         return true;
       } else return false;
     }
   };
   
-  GralUserAction confirmCreate = new GralUserAction()
+  GralUserAction confirmCreate = new GralUserAction("confirmCreate")
   {
-    @Override public boolean userActionGui(int key, GralWidget widgd, Object... params){ 
+    @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params){ 
       return true;
     }
   };
@@ -2506,11 +2500,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
             favor.sCurrDir = null;                 // deactivated favor
           } else if(actionCode == KeyCode.activated) {
             updateFavorWithCurrentDir();
-            if(favor == null) {                              // the +sel fab
-              doActivateFavor();
-            } else {
-              selectFileTableFromFavor(favor, null);
-            }
+            selectFileTableFromFavor(favor, null);
           } else {
             assert(false);
           }
@@ -2523,8 +2513,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     /**This action is called if a tab is selected. */
     GralUserAction actionSaveFavors = new GralUserAction("actionSaveFavors"){
       @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
-        if(GralFileSelector.this.actionUserSaveFavors !=null) {
-          GralFileSelector.this.actionUserSaveFavors.exec(KeyCode.activated, GralFileSelector.this.widgFavorTable);
+        if(GralFileSelector.this.idata.actionUserSaveFavors !=null) {
+          GralFileSelector.this.idata.actionUserSaveFavors.exec(KeyCode.activated, GralFileSelector.this.gui.widgFavorTable);
         }
         return true;      
     } };

@@ -19,8 +19,8 @@
 2023-01-03 23:42:37  x     FcmdEdit.java                            ::          8.193 -1780324974 
 2023-01-20 20:27:02  x     FcmdExecuter.java                        ::         16.567 -2145178721 
 2022-12-21 18:18:58  x     FcmdFavorCard.java                       ::         10.954 -1487566046 
-2023-01-14 20:07:35  x     FcmdFavorPathSelector.java               ::         31.648  0717419318 
-2023-01-18 09:35:45  x     FcmdFileCard.java                        ::         34.702  0644120530 
+2023-01-22 12:36:18  x     FcmdFavorPathSelector.java               ::         31.728  0326414932 
+2023-01-22 13:26:45  x     FcmdFileCard.java                        ::         34.764 -2026335196 
 2023-01-03 23:40:17  x     FcmdFilesCp.java                         ::          7.583  0779419410 
 2023-01-15 20:37:41  x     FcmdGui.java                             ::          1.623  1616198251 
 2018-04-07 09:12:17  x     FcmdHistorie.java                        ::           .983  0816669975 
@@ -243,8 +243,8 @@
 2023-01-03 23:29:42  x     GralColorSelector.java                   ::          7.355  1841523366 
 2023-01-07 08:13:26  x     GralCommandSelector.java                 ::          8.473  1777158701 
 2023-01-21 23:33:08  x     GralFileProperties.java                  ::         26.182  0686791148 
-2023-01-18 09:35:33  x     GralFileSelectWindow.java                ::          8.930 -1829818283 
-2023-01-20 20:26:18  x     GralFileSelector.java                    ::        108.503  1450070101 
+2023-01-22 12:31:29  x     GralFileSelectWindow.java                ::          8.940 -0230463926 
+2023-01-22 13:51:02  x     GralFileSelector.java                    ::        109.009  1670908388 
 2023-01-20 21:03:12  x     GralHorizontalSelector.java              ::         12.849 -1336694146 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2023-01-20 19:10:55  x     GralInfoBox.java                         ::         15.457 -2088201195 
@@ -257,7 +257,7 @@
 
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2021-10-04 14:29:57  x     ButtonInspcCmd.java#                     ::           .520  1765509099 
-2023-01-19 22:07:18  x     InspcCurveView.java                      ::         64.778  0308218741 
+2023-01-22 12:34:41  x     InspcCurveView.java                      ::         64.788 -0369298487 
 2023-01-17 23:05:39  x     InspcCurveViewApp.java                   ::          7.139 -1672439724 
 2023-01-03 23:38:23  x     InspcFieldTable.java                     ::         24.832 -2060852980 
 2022-10-04 22:57:04  x     InspcGui.java#                           ::         22.714  0685651805 
