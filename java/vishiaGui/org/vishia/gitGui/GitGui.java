@@ -55,6 +55,9 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2023-01-28 Hartmut {@link #actionCommit} Now an existing script "+buildTimestamps.sh" is called instead {@link FileList#list()}
+   *   because this script contains options which files should be placed in the list. It is the same script callable by the user.
+   *   Hence the problem that the ".filelist" contains unnecessary (stupid) file, is solved.
    * <li>2022-06-06 Hartmut the error msg on {@link #execCmd(String, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)} using
    *   {@link #exec_ShowStatus} is improved. It is now appended, to preserve a error message from some commands one after another.
    *   For example on {@link #actionDiffVersion} {@link #startDiffView(String, RevisionEntry, RevisionEntry)}.
@@ -127,7 +130,7 @@ public class GitGui
    * 
    * 
    */
-  public final String sVersion = "2022-06-06";  
+  public final String sVersion = "2023-01-28";  
 
 
   static class RevisionEntry
@@ -186,6 +189,23 @@ public class GitGui
    * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
    * and prepares the {@link #wdgTableFiles}.
    */
+  CmdExecuter.ExecuteAfterFinish exec_FileListDone = new CmdExecuter.ExecuteAfterFinish()
+  { @Override
+    public void exec(int errorcode, Appendable out, Appendable err)
+    { if(errorcode !=0) {
+        GitGui.this.wdgBtnCommit.setText("filelist error");
+        GitGui.this.wdgInfo.setText(GitGui.this.gitOut);
+        GitGui.this.gitOut.clear();
+      }
+    }
+  }; 
+
+
+
+  /**This code snippet is executed after the 'git diff' command for 2 revisions are executed. 
+   * It is used as last argument of {@link CmdExecuter#execute(String[], boolean, String, List, List, org.vishia.cmd.CmdExecuter.ExecuteAfterFinish)}
+   * and prepares the {@link #wdgTableFiles}.
+   */
   CmdExecuter.ExecuteAfterFinish exec_CommitDone = new CmdExecuter.ExecuteAfterFinish()
   { @Override
     public void exec(int errorcode, Appendable out, Appendable err)
@@ -207,12 +227,21 @@ public class GitGui
    */
   GralUserAction actionCommit = new GralUserAction("actionCommit")
   { @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      File gitCommit = new File(GitGui.this.sWorkingDir, ".gitCommit");
-      if(gitCommit.length() > 3) {
-        try{ FileList.list(GitGui.this.sWorkingDir, "*", GitGui.this.sFileList);
+      String nameFileListSh = "+buildTimestamps.sh";
+      File fileList = new File(GitGui.this.workingDir, nameFileListSh);
+      if(fileList.exists()) {
+        String sFilelistCmd = "./" + nameFileListSh;     // call existing +buildTimestamps.sh to build the file list 
+        String[] argsFileList = prepArgs(sFilelistCmd);  // exec_CommitDone: Writes an error message if sh failes.
+        GitGui.this.gitCmd.addCmd(argsFileList, null, GitGui.this.listOut, null, GitGui.this.workingDir, GitGui.this.exec_FileListDone);
+      } else {                                           // +buildTimestamps.sh not found, then
+        try{ FileList.list(GitGui.this.sWorkingDir, "*", GitGui.this.sFileList);  //build from all files without mask
         } catch(Exception exc){
           GitGui.this.wdgInfo.setText("_filelist.lst problem: " + exc.getMessage());
         }
+      }
+      //
+      File gitCommit = new File(GitGui.this.sWorkingDir, ".gitCommit");
+      if(gitCommit.length() > 3) {
         String sGitCmd = "git";
         if(! GitGui.this.sGitDir.startsWith(GitGui.this.sWorkingDir)) {
           sGitCmd += " '--git-dir=" + GitGui.this.sGitDir + "'";

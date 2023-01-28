@@ -565,10 +565,14 @@ public class FcmdFileCard extends GralFileSelector
         FcmdFileCard.this.mainPanel.bFavorThemeCardHasFocus = false;
         @SuppressWarnings("unchecked") 
         GralTableLine_ifc<FileRemote> line = (GralTableLine_ifc<FileRemote>) params[0];
-        String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
-        Object oData = line.getUserData();
-        if(oData instanceof File){
-          actionOnFileSelection((FileRemote)oData, sFileCell);
+        if(line ==null) {
+          FcmdFileCard.this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillinFinished, "ERROR no selected line");
+        } else {
+          String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
+          Object oData = line.getUserData();
+          if(oData instanceof File){
+            actionOnFileSelection((FileRemote)oData, sFileCell);
+          }
         }
       }
       return true;
