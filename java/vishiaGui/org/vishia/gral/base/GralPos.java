@@ -48,14 +48,14 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * (see {@link org.vishia.gral.area9.GuiCallingArgs#sSize}) respectively the parameter size of {@link GralGridProperties#GralGridProperties(char size)}.
    * <br><br>
    * <b>Fine positions</b>:<br>
-   * Either the positions are given with 2 integer values as 'fundamental positions'. 
-   * That are the position described above.
-   * Or they can be given with a float value or a second int named 'fractional part'. From the float value
-   * only the first digit after point is used, a fractional part can be given
-   * with a value from 0 to 9. 
+   * Either the positions are given as float value. Then the intger part (left from dot) is the grid position itself, 
+   * as grid unit, described above.
+   * One digit after dot as fractional part is the fine position or fine grid unit, described following. 
+   * <br>If positions are given as integer values, the value is  grid unit * 10 + fine grid unit.
+   * The fine grid unit is in range 0..9.
    * <br><br>
-   * The fine position divides one gral position into 5 or into 6 fine positions. 
-   * The odd numbers divide into 6 positions. In this kind a gral position is able to divide by 2, 3 and 6:
+   * The fine grid units divides one Gral grid position into 5 or into 6 fine positions. 
+   * The odd numbers divide into 6 positions. In this kind a Gral grid position is able to divide by 2, 3 and 6:
    * <ul>
    * <li>1: 1/6 = 0.1333
    * <li>3: 1/3 = 0.3333
@@ -72,14 +72,74 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * </ul>
    * The fine positioning enables a fine positioning of widgets in respect to the fundamental positions.
    * <br><br>
-   * <b>Positions as user arguments</b>:<br>
-   * Positions may be given with absolute values of grid units regarded to the actual panel or in related to the 
-   * last or parent position. In that cases the constant values are added to the number, see the following list.
-   * The position is given in form 'from..to' for the line and column or in form 'from' and 'size'. 
-   * The size may be given positive or negative. A positive size is counted from top or left to bottom or right.
-   * It means that the 'from' position is top or left. But a negative size is counted from right or bottom
-   * and the 'from' position is the right or bottom column and line.
+   * <b>Bit designations for the stored numeric values of the position in this class</b>:<br>
+   * Though the position arguments to set a position may be given relative to other ones 
+   * as {@link #samesize}, {@link #size}, {@link #same}, {@link #next} and {@link #refer}, the position values are stored
+   * as absolute positions anyway. That are the elements {@link #x}, and {@link #y} with its values in
+   * {@link Coordinate}.
+   * The {@link Coordinate#p1} is the lesser value, left and top, 
+   * and {@link Coordinate#p2},the end position is the greater value, right or bottom.
+   * <br>
+   * If the values are (10 * grid units + fine unit) if they are not designated as {@link #ratio} or {@link #useNatSize}.
+   * A negative value, counts from the given spread in the {@link #parent} from bottom or right side. 
+   * <br>
+   * The {@link Coordinate#p1} is used for left or top and {@link Coordinate#p2} is used for right and bottom.
+   * The pixel values (calculated with {@link #calcWidgetPosAndSize(GralGridProperties, int, int, int, int)})
+   * uses the known height and width from the parent if the implementation graphic is active. It depends from resizing actions. 
+   * If then the left or top pixel value is greater then the right or bottom pixel value because left or top is given as positive value
+   * and the other is given negative (from bottom or right) and the size is too less, it is calculated in this kind, 
+   * and the widget may be invisible or an position error may occur. This is a result of a bad given positioning.   
+   * <br>
+   * This form of storing is better to calculate the pixel position while building the graphic and it is better
+   * to calculate related position too.    
+   * <br>
+   * Generally the stored numeric value is integer in range 0x8001 .. 0x7fff for the position itself. 
+   *   This means a grid range of 6400 which is proper for display sized of more as 30000 pixel.
+   * <br>For specific calculations some mask bits can be added:     
+   * <ul>
+   * <li>An additional value {@link #useNatSize} means, the position is given as pixel units. 
+   *   This is only usable for images which should not be scaled.
+   * <li>An additional value {@link #ratio} means, the position value in range 0..1000 is related to the spread of the parent
+   *   as ratio. This feature is still TODO. It is important for resize. 
+   * </ul>
    * <br><br>
+   * <b>Positions as numeric arguments</b>:
+   * The designations {@link #ratio} and {@value #useNatSize} can be immediately used too for setting the positions.
+   * Additional some more designations are possible, which calculates the position to store from other given stored positions:
+   * <ul>
+   * <li>Without designation the numeric value is the absolute values of grid units + fine grid units 
+   *   regarded to the spread of the {@link #parent} panel or comprehensive widget.
+   *   Whereas negative numbers counts from bottom or right side. The 0 for end position is the bottom or right of the #parent.
+   *   <br>The numeric values must be in range -1600.0 till 1600.0 as float or adequate -16000 ... 16000 (more exact 0xc001..0x3fff).
+   *   This is enough for display pixel sizes till ranges of 10000. The real possible range is 16 bit, 0x8001..0x7fff.
+   * <li>The value {@link #same} (without additional value!) means, using the same position value as the reference position
+   *   (given as 'refPos' in the setPosition...(...) operations. If the refPos is null, it means don't change this value.
+   * <li>The value {@link #next} (without additional value!) for the left and top position means,
+   *   calculate this positions from the refPos with the given direction and border in {@link Coordinate#pb}. 
+   *   If the direction in {@link Coordinate#dirNext} is 'l' or 'r' for the x position or 'u' or 'd' for the y position, 
+   *   then this position is incremented.
+   *   The other position is not incremented, because the same value for dirNext is stored there. 
+   *   Hence 'd' increments the {@link #y}. {@link Coordinate#p1} but not the {@link #x}.   
+   * <li>An additional value {@link #refer} (0x80000) means, the position is related to the given refPos, 
+   *   or the yet given own position if refPos = null. Of course the additional calculated position should not exceed
+   *   the range of 0x8000 ... 0x7fff respectively should be inside the viewable spread. It means the additional value
+   *   is usual in a small range + or - 1..100.0f or 1..1000 for integer presentation. 
+   * <li>An additional value {@link #size} for the right and bottom coordinate means, the value is added to the value of left or top.
+   *   It is given as size. Whereby a negative size means, the position as first argument is the bottom or right position, 
+   *   the top or left position is calculated with the size. 
+   *   For example calling <code>setPosition(null, 10.0f, -3.5f + GralPos.size, 20, 12 + GralPos.size) </code> means,
+   *   the absolute postion is 6.5..10 in y direction and 20..32 in x direction.          
+   * <li>The value {@link #samesize} (without additional value!) means, the end values are calculated using the size of the refPos
+   *   or the given size before of the own positions if refPos = null. 
+   *   For example For example calling <code>setPosition(null, 4 + GralPos.refer, GralPos.samesize, 20, 12 + GralPos.size) </code> means,
+   *   that on given position in y 6.5..10 the new position is 10.5..14.
+   * <li>The additional value {@link #areaNr} is only usable for the {@link GralArea9Panel} as selection for the sub panel.   
+   * </ul>
+   * 
+   * Fine positions are given always from left or top of the fundamental positions. 
+   * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
+   * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
+    * <br><br>
    * <b>Position writing style in a gral script:</b><br>
    * The appearance of a graphic can be given with a script using {@link org.vishia.gral.cfg.GralCfgZbnf}.
    * The writing style of positions in the script regards a stinting short style to give positions,
@@ -109,49 +169,16 @@ java org.vishia.gral.base.GralPos.testScanSize();
    *   and height 3. The column isn't given, it is taken form the last: Because the column position is cumulated,
    *   it is the 22 yet.
    * <li>If no position is given, the position is the next position. In this example @7-3,27+5.
-   * <li>@,&2+10: The ampersand determines a relative position related to the last one. In this example
+   * <li>@,+2+10: The '+' on the first value determines a relative position related to the last one. In this example
    *   the new column is 24 to 34. There is 2 units space.
-   * <li>@ $2-2,$+20: The dollar determines a relative position related to the last absolute given position. 
+   * <li>@ +-2-2,+0+20: A negative relative position related to the last absolute given position
+   *   should be written firstly with the '+' to prevent confusion with the '-' designation for counting from bottom or right side. 
    *   In this example it is line 7 and column 10. The new position is calculated with that values to line 9. 
    *   The column 10 is the same column related to the last given absolute.
    *   This kind of specification allows determining some positions in lines and columns, 
    *   whereby the absolute position is given only one time. (feature TODO)
    * <li>@ %50-2,%10..%90: The positions are calculated from the size of the panel in percent. (feature TODO)  
    * </ul>
-   * <br><br>
-   * <b>Ranges and Designation of position parameter</b>:
-   * <ul>
-   * <li>Positive number in range 0...about 100..200 up to 1000: Grid Unit from left or top.
-   * <li>Negative number in range 0, -1...about -200..-200 up to 1000: Gral Unit from right or bottom.
-   *   0 for lineEnd or columnEnd means the right or bottom.
-   * <li>{@link #same} or {@link #refer} added with a number in range of -1000..1000: This given position 
-   *   refers to the parent position with the given distance. same and refer is equate, the difference 
-   *   is in semantic only. Use {@link #same} without distance, use {@link #refer} +/- distance.
-   *   If {@link #same} or {@link #refer} is used for the line or column, and the second position is given
-   *   with '{@link #size} - size' then the bottom or right value of the parent is referred.
-   *  
-   * <li>{@link #size} + number applied at lineEnd or columnEnd: 
-   *   The size is given instead from..to. Because the size value is positive, the line and column value is left or top. 
-   * <li>{@link #size} - number applied at lineEnd or columnEnd: The size is given negative.  
-   *   The absolute value is the size. Because the size is negative it is measured from right to left
-   *   respectively bottom to top. It means the given line and column is the right or the bottom line. 
-   *   If the position is given using {@link #same} or {@link #refer}, the related end position
-   *   is used. 
-   * <li> {@link GralPos#next} and {@link GralPos#nextBlock}   
-   * <li>as width or height or as percent value from the panel size.
-   * </ul>
-   * Fine positions are given always from left or top of the fundamental positions. 
-   * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
-   * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
-   * <br><br>
-   * <b>The position values in this class</b>:<br>
-   * Though the position parameters may be given as size, with bottom line etc the position values are stored
-   * as absolute positions anyway. That are the elements {@link #x}, and {@link #y} with its values in
-   * {@link Coordinate}.
-   * The x and y is the lesser value, left and top, and the xEnd and yEnd is the greater value, right or bottom.
-   * This form of storing is better to calculate the pixel position while building the graphic and it is better
-   * to calculate related position too.    
-   * <br><br>
    * 
  * @author Hartmut Schorrig
  *
@@ -160,6 +187,9 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-30 chg: {@link #set10Position(int, int, int, int, char, int, GralPos)} now instead setFinePositon(...),
+   *   this is a explicitly different name to the old concept with two values for grid and fine grid position. 
+   *   Designation of some operations as deprecated, comment some stuff.   
    * <li>2023-01-03 chg: Now the origin parameter is removed. It is non sensible and never used for positions.
    *   Only for a text label it is sensible.  
    * <li>2022-12-30 meaningful refactoring. Now the positions are stored with fine grid units in only one number. 
@@ -612,7 +642,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       direction = 0;
     }
 
-    setFinePosition(line.p1, line.p2, col.p1, col.p2, direction, border, posParent1);
+    set10Position(line.p1, line.p2, col.p1, col.p2, direction, border, posParent1);
   }
   
   
@@ -730,7 +760,7 @@ public class GralPos extends ObjectVishia implements Cloneable
     type = ((int)columnEndOrSize & (mSpecialType)) == kSpecialType ? (int)columnEndOrSize: ((int)columnEndOrSize + kTypAdd_) & mType_;
     int xe = (int)(10 * (columnEndOrSize - type)) + type;
     
-    setFinePosition(y, ye, x, xe, direction, (int)(10 * border), refPos);
+    set10Position(y, ye, x, xe, direction, (int)(10 * border), refPos);
   }
   
 
@@ -766,20 +796,13 @@ public class GralPos extends ObjectVishia implements Cloneable
   /**Sets a fine position only with integer values, 
    * instead float as in {@link #setPosition(GralPos, float, float, float, float, int, char, float)}
    * This operation is not recommended, should use the float version.
-   * @param yPos grid position for line, can also contain {@link #refer} etc.
-   * @param yPosf fine grid position for line always in down direction
-   * @param ye end grid position for line, , can also contain {@link #size} etc.
-   * @param yef end fine grid position for line
-   * @param xPos grid position for column, can also contain {@link #refer} etc
-   * @param xPosf yPosf fine grid position for column always in right direction
-   * @param xe
-   * @param xef
-   * @param direction
-   * @param border
-   * @param borderFrac
-   * @param refPos
+   * It is the old form till 2022, where the grid positions and fine positions were stored in two different variables. 
+   * The nwer variant {@link #set10Position(int, int, int, int, char, int, GralPos)} use only one value for grid and fine position
+   * but with factor 10. 
+   * @deprecated use {@link #set10Position(int, int, int, int, char, int, GralPos)} for immediately replacement with 10*line + yPosf etc.
+   *   or use {@link #setPosition(GralPos, float, float, float, float, char, float)}
    */
-  public void setFinePosition(int line, int yPosf, int lineEndOrSize, int yef
+  @Deprecated public void setFinePosition(int line, int yPosf, int lineEndOrSize, int yef
       , int column, int xPosf, int columnEndOrSize, int xef, char direction
       , int border, int borderFrac
       , GralPos refPos)
@@ -792,39 +815,38 @@ public class GralPos extends ObjectVishia implements Cloneable
     int x = (10 * (column-type)) + type;
     type = (columnEndOrSize & (mSpecialType)) == kSpecialType ? columnEndOrSize: (columnEndOrSize + kTypAdd_) & mType_;
     int xe = (10 * (columnEndOrSize - type)) + type;
-    setFinePosition(y + yPosf, ye + yef, x + xPosf, xe + xef, direction, 10*border + borderFrac, refPos);
+    set10Position(y + yPosf, ye + yef, x + xPosf, xe + xef, direction, 10*border + borderFrac, refPos);
   }
   
   /**Sets the position for the next widget to add in the container.
-   * Implementation note: This is the core function to calculate positions. It is called from all other ones.
-   * @param yPos y-Position in y-Units, count from top of the box. It is the bottom line of the widget.
-   *              If <0, then it counts from bottom of the parent.
-   * @param xPos x-Position in x-Units, count from left of the box. 
-   *              If <0, then the previous position is valid still.
-   *              It < 0 then line = 0 is not a proper value. To show a text in the first line, use line=2.
-   * @param heigth: The height of the line. If <0, then the param line is the bottom line of the widget, 
-   *                and (line-height) is the top line. If 0 then the last value of height is not changed. 
-   * @param length: The number of columns. If <0, then the param column is the right column, 
-   *                and column-length is the left column. If 0 then the last value of length is not changed.
+   * This is the core function to calculate positions. It is called from all other ones.
+   * It calls {@link Coordinate#set(int, int, String, Coordinate)} for both coordinates.
+   * <ul>
+   * <li>All positions are grid fine units. It means 10* grid unit + fine unit. The fine unit is 0..9.
+   * <li>The position counts from 0 ... from top or left in the spread of the given {@link #parent} widget
+   *   or it counts from negative till ... 0 from bottom or right. For the end positions: 0 is bottom or right. 
+   * <li>The positions yPos, xPos can be given with {@link #same}, {@link #next}.
+   *   It is related to the refPos or this.
+   * <li>The positions ye, xe can be given with {@link #samesize}, 
+   *   then the end position is calculated from the start position and the size of the parent (or the given size)
+   * <li>The values of all positions can be completed (| or +) with {@link #refer}, {@link #ratio}, {@link #useNatSize},
+   * <li>The values of the end positons ye, xe can be completed (| or +) with {@link #size}  
+   * <li>The end positions can be completed (or or +) with  {@link #size},    
+   * </ul> 
+   * <i>Note: The fine unit continues the position in the same direction as the grid unit. This is since 2022-12,
+   *   in the past (2009..2022) the fine position counts always from top and left, also on negative grid positions.
+   *   That is a detail, the now found solution is more understandable.
+   *   Also changed in 2022-12: before, there were two integer numbers for grid and fine potition. 
+   *   Now as described, the integer position is 10 * the grid position + fine positon from 0..9</i> 
+   * @param yPos start position of the spread (top)
+   * @param xPos start position of the spread (left)
+   * @param ye: end position of the spread (bottom) or the size with + {@link #size}
+   * @param xe  end position of the spread (right) or the size with + {@link #size}
    * @param direction: direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down
-   * @param refPos if given, the parent is the base for calculation. If null, this itself is the base.
-   *
-   * @param yPos yPos 
-   * @param yPosf fractional part of yPos, 0, 1..9
-   * @param ye
-   * @param yef
-   * @param xPos
-   * @param xPosf
-   * @param xe
-   * @param xef
-   * @param direction
-   * @param border
-   * @param borderFrac
-   * @param refPos The reference position for relative coordinates. If null use this itself. 
-   * @param bRefFrame true then the given position is the frame for absolute given new positions.
-   *   false then the frame is the panel, the positions are written absolutely.
+   * @param border border for a next position calculation.
+   * @param refPos If given, it is the base for calculation. If null, this itself is the base.
    */
-  public void setFinePosition(int yPos, int ye
+  public void set10Position(int yPos, int ye
       , int xPos, int xe, char direction
       , int border
       , GralPos refPos)
@@ -875,13 +897,15 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   
   
-  public void setSize(float height, float width, GralPos frame)
-  { 
-    int y2 = (int)(height);
-    int y2f = y2 >=0 ? (int)((height - y2)* 10.001F) : (int)((height - y2)* -10.001F);  
-    int x2 = (int)(width);
-    int x2f = x2 >=0 ? (int)((width - x2)* 10.001F) : (int)((width - x2)* -10.001F); 
-    setFinePosition(GralPos.next, 0,  y2 + GralPos.size, y2f, GralPos.next, 0, x2 + GralPos.size, x2f, '.', 0, 0, frame);
+  /**Sets the position, direction as frame, but the size as given. 
+   * @param height grid units + .fine units
+   * @param width
+   * @param frame if null, it does not change the own values.
+   */
+  public void setSize(float height, float width, GralPos frame) { 
+    int y2 = (int)(height*10.0f + 0.05f);
+    int x2 = (int)(width*10.0f + 0.05f);
+    set10Position(GralPos.same, y2 + GralPos.size, GralPos.same, x2 + GralPos.size, '.', 0, frame);
   }
   
   
@@ -1001,6 +1025,9 @@ public class GralPos extends ObjectVishia implements Cloneable
   }
   
   
+  /**Returns the height in grid position + fine position as one digit after dot.
+   * @return for example 5.3 5 grid units + 3 fine units.
+   */
   public float height()
   { float height;
     if(y.p1 * y.p2 >= 0){
@@ -1014,6 +1041,9 @@ public class GralPos extends ObjectVishia implements Cloneable
   }
   
   
+  /**Returns the width in grid position + fine position as one digit after dot.
+   * @return for example 5.3 5 grid units + 3 fine units.
+   */
   public float width()
   { float width;
     if(y.p1 > 0 && x.p2 > 0){ width = (x.p2 - y.p1)/10.0f; }
@@ -1027,6 +1057,7 @@ public class GralPos extends ObjectVishia implements Cloneable
   
   
   
+  /**Creates a new position instance with the same values. */
   @Override public GralPos clone(){
     //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
     GralPos newObj = new GralPos(this.parent);
@@ -1048,8 +1079,9 @@ public class GralPos extends ObjectVishia implements Cloneable
    *   during building the Gui. This instance is furthermore used as currently calculated,
    *   the widget aggregates a
    * @throws ParseException
+   * @deprecated use {@link #setPosition(CharSequence)} 
    */
-  public GralPos calcNextPos(String posString) throws ParseException {
+  @Deprecated public GralPos calcNextPos(String posString) throws ParseException {
     if(posString.equals("!")) {  //new window, initialize the position without parent because it is top.
       parent = null;
       setFinePosition(0,0,0,0,0,0,0,0,'d', 0,0, null);
@@ -1314,12 +1346,14 @@ public class GralPos extends ObjectVishia implements Cloneable
   public static class Coordinate
   {
     /**The start position for the spread. 
+     * The value is 10* grid position + fine position
      * If there are positive numbers, they count from left to right respectively top to bottom. 
      * If the value is negative, the absolute is the distance from right respectively bottom. 
      */
     public int p1;
     
     /**The end position for the spread. 
+     * The value is 10* grid position + fine position
      * If there are positive numbers, they count from left to right respectively top to bottom. 
      * If the value is negative or 0, the absolute is the distance from right respectively bottom. 
      */

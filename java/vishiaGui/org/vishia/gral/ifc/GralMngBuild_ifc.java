@@ -212,7 +212,7 @@ public interface GralMngBuild_ifc
    * @param direction direction for a next widget, use 'r', 'l', 'u', 'd' for right, left, up, down
    * @deprecated. Use {@link #setPosition(float, float, float, float, char, int)}.                
    */
-  public void setPositionSize(int line, int column, int height, int length, char direction);
+  @Deprecated public void setPositionSize(int line, int column, int height, int length, char direction);
   
   
   /**Sets the position.
@@ -225,7 +225,7 @@ public interface GralMngBuild_ifc
    * @param column
    * @param columnEndOrSize
    */
-  public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
+  @Deprecated public void setPosition(float line, float lineEndOrSize, float column, float columnEndOrSize
     , char direction );
   
   
@@ -237,11 +237,11 @@ public interface GralMngBuild_ifc
    * @param columnEnd
    * @deprecated. 
    */
-  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
+  @Deprecated public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
     , char direction);
 
 
-  public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
+  @Deprecated public void setPosition(GralPos framePos, float line, float lineEnd, float column, float columnEnd
     , char direction, float border);
 
 
@@ -254,7 +254,7 @@ public interface GralMngBuild_ifc
    * @param direction
    * @param border
    */
-  public void setPosition(float line, float lineEnd, float column, float columnEnd
+  @Deprecated public void setPosition(float line, float lineEnd, float column, float columnEnd
     , char direction, float border);
 
 
@@ -271,7 +271,7 @@ public interface GralMngBuild_ifc
    * @param direction Direction of the next position if that is not given than or {@link GralPos#next} is given than.
    *        A value other then r, l, u, d let the direction unchanged from previous call.
    */
-  public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
+  @Deprecated public void setFinePosition(int y, int yFrac, int yEnd, int yEndFrac
       , int x, int xFrac, int xEnd, int xEndFrac
       , char direction, int border, int borderFrac, GralPos frame);
   
