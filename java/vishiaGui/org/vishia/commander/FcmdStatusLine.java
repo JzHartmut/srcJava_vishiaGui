@@ -133,7 +133,7 @@ public class FcmdStatusLine
     }
     main.statusLine.widgFilePath.setText(sPath);
     if(main.fileProps.isVisible()){
-      this.main.fileProps.showFileInfos(file);
+      this.main.fileProps.showFileInfos(file, this.main.currentFileCard);
     }
     main.fileViewer.quickView();
     

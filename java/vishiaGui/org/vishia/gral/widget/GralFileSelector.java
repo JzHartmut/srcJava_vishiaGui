@@ -1289,10 +1289,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
 
 
-  public void forcefillIn(FileRemote fileIn, boolean bCompleteWithFileInfo) //String path)
+  public void forcefillIn(FileRemote fileIn, boolean bDonotRefrehs) //String path)
   {
     this.gui.widgSelectList.wdgdTable.fillinPending(false);
-    fillIn(fileIn, bCompleteWithFileInfo);
+    fillIn(fileIn, bDonotRefrehs);
   }
   
   /**Fills the content with given directory.
@@ -1314,7 +1314,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       dir = fileIn.getParentFile(); file = fileIn;
       String sDir = FileFunctions.getCanonicalPath(dir); //with / as separator!
       //String sFile = fileIn.getName();
-      this.idata.idxSelectFileInDir.put(sDir, fileIn); //sFile);
+      this.idata.idxSelectFileInDir.put(sDir, fileIn);     // store the input file to select it for this dir.
     } else {
       dir = fileIn; file = null;
     }
@@ -1464,6 +1464,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       tline = this.gui.widgSelectList.wdgdTable.getFirstLine();  //first line is selected
     }
     if(tline !=null){
+      FileRemote fileFound = tline.getUserData();
+      if(fileFound != this.idata.currentFile) {
+        tline = tline.nextSibling();                       // go to the next line if the file if the found line 
+      }                                                    // is another one, because file is deleted, renamed etc.
       this.gui.widgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
       this.idata.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
     }
@@ -1856,7 +1860,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         completeLine(line, file, System.currentTimeMillis());
       }
       if(this.gui.widgFileProperties !=null && this.gui.widgFileProperties.isVisible()) {
-        this.gui.widgFileProperties.showFileInfos(file);
+        this.gui.widgFileProperties.showFileInfos(file, this);
       }
     } else {
       //File should be refreshed to do
@@ -1984,6 +1988,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     int posFile1 = sPath.lastIndexOf('\\');
     if(posFile1  > posFile) { posFile = posFile1; }
     this.idata.sFileToSelect = sPath.substring(posFile+1);       // name given after last /name or \name may be ""
+    if(posFile == 2 && sPath.charAt(1) == ':') { posFile = 3; };
     sPath = sPath.substring(0, posFile);
     FileRemote dir = GralFileSelector.this.idata.originDir.itsCluster.getDir(sPath);
     {
@@ -2043,7 +2048,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   protected void showFileInfo(GralTable<FileRemote>.TableLineData line) {
     if(GralFileSelector.this.gui.widgFileProperties !=null) {
       GralFileSelector.this.gui.widgFileProperties.setVisible(true);
-      GralFileSelector.this.gui.widgFileProperties.showFileInfos(line.getData());
+      GralFileSelector.this.gui.widgFileProperties.showFileInfos(line.getData(), this);
     }
   }
   
