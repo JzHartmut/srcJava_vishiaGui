@@ -406,7 +406,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      */
     @Override public boolean actionUserKey(int keyCode, Object oData, GralTableLine_ifc<FileRemote> lineP) { 
       boolean ret = true;
-      if(keyCode == KeyCode.F9) {
+      if(keyCode == KeyCode.alt + KeyCode.enter) {
         assert(lineP instanceof GralTable.TableLineData);
         GralTable<FileRemote>.TableLineData line = (GralTable<FileRemote>.TableLineData) lineP;
         showFileInfo(line);
@@ -744,21 +744,21 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         this.widgSelectList.setVisible(false);
       }
       this.widgSelectList.wdgdTable.setVisible(true);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refresh, thisf.action.actionRefreshFileTable);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOff, thisf.action.actionSwitchoffCheckRefresh);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, null, contextMenuTexts.refreshCyclicOn, thisf.action.actionSwitchonCheckRefresh);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameCase, thisf.action.actionSortFilePerNameCase);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortNameNonCase, thisf.action.actionSortFilePerNameNonCase);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtCase, thisf.action.actionSortFilePerExtensionCase);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortExtNonCase, thisf.action.actionSortFilePerExtensionNonCase);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortDateNewest, thisf.action.actionSortFilePerTimestamp);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortOldest, thisf.action.actionSortFilePerTimestampOldestFirst);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastModifiedTime, thisf.action.actionShowLastModifiedTime);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showLastAccessTime, thisf.action.actionShowLastAccessTime);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.showCreationTime, thisf.action.actionShowCreationTime);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sizeLarge, thisf.action.actionSortFilePerLenghLargestFirst);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.sortSizeSmall, thisf.action.actionSortFilesPerLenghSmallestFirst);
-      this.widgSelectList.wdgdTable.addContextMenuEntryGthread(1, "sort", contextMenuTexts.deselectRecursFiles, thisf.action.actionDeselectDirtree);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, null, contextMenuTexts.refresh, thisf.action.actionRefreshFileTable);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, null, contextMenuTexts.refreshCyclicOff, thisf.action.actionSwitchoffCheckRefresh);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, null, contextMenuTexts.refreshCyclicOn, thisf.action.actionSwitchonCheckRefresh);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortNameCase, thisf.action.actionSortFilePerNameCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortNameNonCase, thisf.action.actionSortFilePerNameNonCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortExtCase, thisf.action.actionSortFilePerExtensionCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortExtNonCase, thisf.action.actionSortFilePerExtensionNonCase);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortDateNewest, thisf.action.actionSortFilePerTimestamp);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortOldest, thisf.action.actionSortFilePerTimestampOldestFirst);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.showLastModifiedTime, thisf.action.actionShowLastModifiedTime);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.showLastAccessTime, thisf.action.actionShowLastAccessTime);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.showCreationTime, thisf.action.actionShowCreationTime);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sizeLarge, thisf.action.actionSortFilePerLenghLargestFirst);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.sortSizeSmall, thisf.action.actionSortFilesPerLenghSmallestFirst);
+      this.widgSelectList.wdgdTable.addContextMenuEntry(1, "sort", contextMenuTexts.deselectRecursFiles, thisf.action.actionDeselectDirtree);
 
       //store this in the GralWidgets to get back from widgets later.
       this.widgdPathDir.setData(this);

@@ -93,7 +93,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
     gralMenu.super(widgg);                 // GralMenu._GraphicImpl as super class
     this.window = swtWidg.getShell();
     this.menuSwt = new Menu(swtWidg);       // The SWT main context menu entry.
-    swtWidg.setMenu(menuSwt);               // associated to the SWT widget.
+    swtWidg.setMenu(this.menuSwt);               // associated to the SWT widget.
     createImplMenu();                            // associates all sub menues to the context menu entry.
   }
 
@@ -153,7 +153,7 @@ public class SwtMenu extends GralMenu._GraphicImpl
 
   @Override
   public void setVisible(){
-    menuSwt.setVisible(true);
+    this.menuSwt.setVisible(true);
   }
   
   

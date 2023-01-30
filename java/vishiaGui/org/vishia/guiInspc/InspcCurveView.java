@@ -333,16 +333,16 @@ public final class InspcCurveView
     widgTableVariables.specifyActionOnLineSelected(actionSelectVariableInTable);
     widgTableVariables.setActionChange(actionKeyHandlingTable);
     //widgTableVariables.set
-    widgTableVariables.addContextMenuEntryGthread(0, null, "switch on-off <F2>", this.actionOnOffTrack);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "insert variable", this.actionInsertVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "replace variable", this.actionReplaceVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "swap variable", this.actionSwapVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "delete variable", this.actionDeleteVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "shift variable", this.actionShiftVariable);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "set color", this.actionColorSelectorOpen);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "group scale", this.actionShareScale);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "ungroup scale", this.actionUnshareScale);
-    widgTableVariables.addContextMenuEntryGthread(0, null, "bold all selected", this.actionBoldSelected);
+    widgTableVariables.addContextMenuEntry(0, null, "switch on-off <F2>", this.actionOnOffTrack);
+    widgTableVariables.addContextMenuEntry(0, null, "insert variable", this.actionInsertVariable);
+    widgTableVariables.addContextMenuEntry(0, null, "replace variable", this.actionReplaceVariable);
+    widgTableVariables.addContextMenuEntry(0, null, "swap variable", this.actionSwapVariable);
+    widgTableVariables.addContextMenuEntry(0, null, "delete variable", this.actionDeleteVariable);
+    widgTableVariables.addContextMenuEntry(0, null, "shift variable", this.actionShiftVariable);
+    widgTableVariables.addContextMenuEntry(0, null, "set color", this.actionColorSelectorOpen);
+    widgTableVariables.addContextMenuEntry(0, null, "group scale", this.actionShareScale);
+    widgTableVariables.addContextMenuEntry(0, null, "ungroup scale", this.actionUnshareScale);
+    widgTableVariables.addContextMenuEntry(0, null, "bold all selected", this.actionBoldSelected);
     gralMng.setPosition(/*22*/-19, GralPos.size +3, -8, 0, 'd', 0);
     widgScale = gralMng.addTextField("scale", true, "scale/div", "t");
     widgScale.setActionFocused(actionFocusScaling);         //store which field, set color

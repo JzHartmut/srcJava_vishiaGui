@@ -229,7 +229,7 @@ public class StimuliSelector
       this.wdgTables[iTable] = new GralTable<Map<String, DataAccess.Variable<Object>>>(this.gralMng.refPos(), name, 20, columnWidths); //new GralTable<>(name, columnWidths);
       this.wdgTables[iTable].specifyActionChange("actionTouchLine", this.actionTouchLine, null);
       this.wdgTables[iTable].specifyActionOnLineSelected(this.actionSelectInTable);
-      StimuliSelector.this.wdgTables[iTable].addContextMenuEntryGthread(1, "test", "add to select rule", this.actionTouchLine);
+      StimuliSelector.this.wdgTables[iTable].addContextMenuEntry(1, "test", "add to select rule", this.actionTouchLine);
       this.wdgTables[iTable].setData(new Integer(iTable +1));
       //, GralWidget_ifc.ActionChangeWhen.onCtrlEnter, GralWidget_ifc.ActionChangeWhen.onMouse1Double);
       //this.wdgTables[iTable].specifyContextMenu(null);

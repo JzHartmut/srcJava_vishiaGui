@@ -89,7 +89,7 @@ import org.vishia.util.TreeNode_ifc;
  * 
  * <br><br>
  * <b>Adding an context menu</b>: <br>
- * The {@link #addContextMenuEntryGthread(int, String, String, GralUserAction)} can be invoked for the table only in the graphic thread. 
+ * The {@link #addContextMenuEntry(int, String, String, GralUserAction)} can be invoked for the table only in the graphic thread. 
  * Use any {@link GralGraphicTimeOrder} to do that, use a callback with this time order on the creation of the table. 
  * 
  * @author Hartmut Schorrig
@@ -100,6 +100,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-01-06 Hartmut new: key combination sh + enter now for activating context menu. 
+   *   Is it a good choice? In MS-Windows also sh-F10 activates the context menu (sometimes). 
+   *   But it is general a good idea to activate it manually per key stroke. 
+   * <li>2023-01-06 Hartmut rename: {@link #addContextMenuEntry(int, String, String, GralUserAction)} instead addContextMenuEntryGthread(...).
+   *   It was the faulty name meanwhile, able to add in any thread.
    * <li>2023-01-06 Hartmut new: {@link #setCurrentColumn(int)} important to focus a column,
    *   if the evaluation of click/enter should depend from the selected column.  At long last it works. 
    * <li>2023-01-02 Hartmut new: {@link #getFirstLine()} sometimes necessary, why this was not existing till now?
@@ -539,7 +544,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @param sMenuPath same like {@link GralMenu#addMenuItem(String, String, GralUserAction)}
    * @param action the action invoked on menu entered.
    */
-  public void addContextMenuEntryGthread(int col, String menuname, String sMenuPath, GralUserAction action){
+  public void addContextMenuEntry(int col, String menuname, String sMenuPath, GralUserAction action){
     GralMenu menu = getContextMenuColumn(col);
     menu.addMenuItem(this, menuname, sMenuPath, action);
   }
@@ -577,7 +582,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   }
   
   /**Adds a context menu entries to all cells of the designated column. This method can't be used 
-   * if either {@link #getContextMenuColumn(int)} or {@link #addContextMenuEntryGthread(int, String, String, GralUserAction)}
+   * if either {@link #getContextMenuColumn(int)} or {@link #addContextMenuEntry(int, String, String, GralUserAction)}
    * are called before. That is because either only one context menu can be added to all cells of a column
    * (saves resources) or internal an extra context menu with the same appearance can be addes to all cells
    * of the column. Using this method creates a context menu and its entry for all cells of the column
@@ -824,12 +829,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *  Return index of the first not defined line (current length of table) if line==null
    */
   public int getIxLine(GralTableLine_ifc<UserData> line) {
-    for(int ix = 0; ix < linesForCell.length; ++ix) {
-      TableLineData line1 = linesForCell[ix];
+    for(int ix = 0; ix < this.linesForCell.length; ++ix) {
+      TableLineData line1 = this.linesForCell[ix];
       if(line1 == line) return ix;
     }
     return -1; //not found;
   }
+  
   
   
   @Override public TableLineData insertLine(String lineKey, int row, String[] lineTexts, UserData userData) {
@@ -1250,220 +1256,230 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
   }  
   
-      /**Handle all standard keys of table. 
-     * It should call in the key event handler from the implementation class.
-     * <br>Keys:
-     * <ul>
-     * <li>pgup: 
-     * <li>up
-     * <li>dn
-     * <li>pgdn
-     * <li>{@link #keyMarkUp}
-     * <li>{@link #keyMarkDn}
-     * <li>calls {@link GralMng#getRegisteredUserAction(String what)} with what="KeyAction"
-     *   and invokes the returned action method. With them all standard key actions of this application
-     *   may be done if a {@link GralUserAction} is registered for that.  
-     * </ul>
-     * @param keyCode Encoding see {@link KeyCode}.
-     * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
-     */
-    protected boolean processKeys(int keyCode){
-      if(keyCode == KeyCode.enter)
-        Debugutil.stop();
-      boolean done = true;
-      long time = System.currentTimeMillis();
-      lineSelectedNew = null;  //on any key, clear highlighted mouse down cell, if it is set yet.
-      if(lastKey == keyCode){ keyRepetition +=1;  //same key
-      } else {
-        keyRepetition = 1; //other key.
-      }
-      //NOTE: prevent to fast key action if the last redraw is yet finished.
-      //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
-      long timeDiff = time - timeLastRedraw;
-      if( this.keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
-        this.keyDone = false;                              // execution pending
-        switch(keyCode){
-        case KeyCode.tab: {                                // tab and sh-tab switches between columns
-          if(colSelectedixCellC < columnWidthsGral.length-1) { 
-            colSelectedixCellC +=1; 
+  /**Handle all standard keys of table. 
+   * It should call in the key event handler from the implementation class.
+   * <br>Keys:
+   * <ul>
+   * <li>pgup: 
+   * <li>up
+   * <li>dn
+   * <li>pgdn
+   * <li>{@link #keyMarkUp}
+   * <li>{@link #keyMarkDn}
+   * <li>calls {@link GralMng#getRegisteredUserAction(String what)} with what="KeyAction"
+   *   and invokes the returned action method. With them all standard key actions of this application
+   *   may be done if a {@link GralUserAction} is registered for that.  
+   * </ul>
+   * @param keyCode Encoding see {@link KeyCode}.
+   * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
+   */
+  protected boolean processKeys(int keyCode){
+    if(keyCode == KeyCode.enter)
+      Debugutil.stop();
+    boolean done = true;
+    long time = System.currentTimeMillis();
+    lineSelectedNew = null;  //on any key, clear highlighted mouse down cell, if it is set yet.
+    if(lastKey == keyCode){ keyRepetition +=1;  //same key
+    } else {
+      keyRepetition = 1; //other key.
+    }
+    //NOTE: prevent to fast key action if the last redraw is yet finished.
+    //The draw needs to much time in Linux-GTK with an Atom processor (Lenovo)
+    long timeDiff = time - timeLastRedraw;
+    if( this.keyDone || keyCode == KeyCode.mouse1Double || timeDiff > -11110){  //use 50 ms for timeout if keyDone isn't set.  
+      this.keyDone = false;                              // execution pending
+      switch(keyCode){
+      case KeyCode.tab: {                                // tab and sh-tab switches between columns
+        if(colSelectedixCellC < columnWidthsGral.length-1) { 
+          colSelectedixCellC +=1; 
+        }
+      } break;
+      case KeyCode.shift + KeyCode.tab: {
+        if(colSelectedixCellC >= 1) { 
+          colSelectedixCellC -=1; 
+        }
+      } break;
+      case KeyCode.pgup: {
+        if(lineSelectedixCell > 2){
+          lineSelectedixCell = 2;
+        } else {
+          int shifted = shiftVisibleArea(-zLineVisible);  //shifted = -1 if all shifted
+          lineSelectedixCell -= zLineVisible + shifted;
+          if(lineSelectedixCell <0){
+            lineSelectedixCell = 0;  //limit it on top.
           }
-        } break;
-        case KeyCode.shift + KeyCode.tab: {
-          if(colSelectedixCellC >= 1) { 
-            colSelectedixCellC -=1; 
-          }
-        } break;
-        case KeyCode.pgup: {
+        }
+        lineSelected = linesForCell[lineSelectedixCell];
+        nLineFirst = -1;  //get new, undefined elsewhere.
+        //the table has the focus, because the key action is done only if it is so.
+        //set the new cell focused, in the paint routine.
+        gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+        actionOnLineSelected(KeyCode.userSelect, lineSelected);
+        keyActionDone.activate();
+      } break;
+      case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
+      case KeyCode.up: {
+        if(!searchContent(true)) {
           if(lineSelectedixCell > 2){
-            lineSelectedixCell = 2;
+            lineSelectedixCell -=1;
           } else {
-            int shifted = shiftVisibleArea(-zLineVisible);  //shifted = -1 if all shifted
-            lineSelectedixCell -= zLineVisible + shifted;
+            int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
+            lineSelectedixCell -= 1 + shifted;
             if(lineSelectedixCell <0){
               lineSelectedixCell = 0;  //limit it on top.
             }
           }
           lineSelected = linesForCell[lineSelectedixCell];
-          nLineFirst = -1;  //get new, undefined elsewhere.
-          //the table has the focus, because the key action is done only if it is so.
-          //set the new cell focused, in the paint routine.
-          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          keyActionDone.activate();
-        } break;
-        case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
-        case KeyCode.up: {
-          if(!searchContent(true)) {
-            if(lineSelectedixCell > 2){
-              lineSelectedixCell -=1;
-            } else {
-              int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
-              lineSelectedixCell -= 1 + shifted;
-              if(lineSelectedixCell <0){
-                lineSelectedixCell = 0;  //limit it on top.
-              }
-            }
-            lineSelected = linesForCell[lineSelectedixCell];
-            
-          }
-          //the table has the focus, because the key action is done only if it is so.
-          //set the new cell focused, in the paint routine.
-          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          keyActionDone.activate();
-        } break;
-        case KeyCode.pgdn: {
-          if(lineSelectedixCell < zLineVisible -3){
-            lineSelectedixCell = zLineVisible -3;
-          } else {
-            int shifted = shiftVisibleArea(zLineVisible);
-            lineSelectedixCell += zLineVisible - shifted;
-            if(lineSelectedixCell >= zLineVisible){
-              lineSelectedixCell = zLineVisible -1;  //limit it on top.
-            }
-          }
-          while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
-               && lineSelectedixCell >0    
-            ){
-            lineSelectedixCell -=1;
-          }
-          nLineFirst = -1;  //get new, undefined elsewhere.
-          //the table has the focus, because the key action is done only if it is so.
-          //set the new cell focused, in the paint routine.
-          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          actionOnLineSelected(KeyCode.userSelect, lineSelected);
-          keyActionDone.activate();
-        } break;
-        default:
-          if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
-            ) {                                            // arrow down, mouse wheel down
-            if(keyCode == keyMarkDn && lineSelected !=null){
-              GralTableLine_ifc<?> line = lineSelected;    //mark the lines
-              if((line.getMark() & FileMark.select)!=0){
-                //it is selected yet
-                line.setNonMarked(FileMark.select, line.getUserData());
-              } else {
-                line.setMarked(FileMark.select, line.getUserData());
-              }
-            }
-            if(!searchContent(false)) {
-              if(lineSelectedixCell < zLineVisible -3){
-                lineSelectedixCell +=1;
-              } else {
-                int shifted = shiftVisibleArea(1);
-                lineSelectedixCell += 1 - shifted;
-                if(lineSelectedixCell >= zLineVisible){
-                  lineSelectedixCell = zLineVisible -1;  //limit it on top.
-                }
-              }
-              while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
-                   && lineSelectedixCell >0    
-                ){
-                lineSelectedixCell -=1;
-              }
-              nLineFirst = -1;  //get new, undefined elsewhere.
-            }
-            //the table has the focus, because the key action is done only if it is so.
-            //set the new cell focused, in the paint routine.
-            gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-            actionOnLineSelected(KeyCode.userSelect, lineSelected);
-            
-            keyActionDone.activate();
-          } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
-            keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
-            searchChars.appendCodePoint(keyCode);
-            searchContent(false);
-            redraw();
-          } else if(keyCode == KeyCode.esc){               // --- esc cleans the search chars 
-            searchChars.setLength(0);
-            redraw();
-          } else if(keyCode == KeyCode.back && searchChars.length() >0){
-            searchChars.setLength(searchChars.length()-1);
-            redraw();
-          } else if(lineSelected !=null && keyCode == keyOpenChild){
-            if(lineSelected.tbl_lineCanHaveChildren){
-              actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
-            }
-            if(lineSelected.hasChildren()){           //only if it has children currently really.
-              lineSelected.showChildren(true, true, true);
-              //lineSelected.countChildren(true, nLineFirst);  //count the children.
-              //fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
-              //repaint();
-            }
-          } else if(lineSelected !=null && keyCode == keyCloseChild){
-            if(lineSelected !=null && lineSelected.tbl_showChildren){
-              lineSelected.showChildren(false, false);
-              fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
-              redraw();
-            }
-          } else {
-            done = false;
-          }
-        }//switch
-        if(done == false && keyCode == keyMarkDn && lineSelected !=null){
-          GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
-          if((line.getMark() & 1)!=0){
-            //it is selected yet
-            line.setNonMarked(1, line.getUserData());
-          } else {
-            line.setMarked(1, line.getUserData());
-          }
-          
-          keyActionDone.activate();
-          done = true;
-        }
-        if(!done /*&& lineSelected !=null*/){
-          GralWidget_ifc.ActionChange action = null;
-          if(keyCode == KeyCode.enter) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter); }
-          else if(keyCode == (KeyCode.ctrl + KeyCode.enter)) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onCtrlEnter); }
-          else if(keyCode == KeyCode.mouse1Double) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Double); }
-          if(action ==null) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey); }
-          //?? if(action ==null) { action = getActionChangeStrict(null, false); }  //any action for the table
-          if(action !=null){
-            Object[] args = action.args();
-            if(args == null){ done = action.action().exec(keyCode, this, lineSelected); }
-            else { done = action.action().exec(keyCode, this, args, lineSelected); }
-          }
-        } //if(table.)
-        if(!done && gralMng.userMainKeyAction() !=null){
-          done = gralMng.userMainKeyAction().exec(keyCode, getCurrentLine());
-        }
-        if(!done){
-          GralUserAction mainKeyAction = gralMng.getRegisteredUserAction("KeyAction");
-          if(mainKeyAction !=null){
-            //old form called because compatibility, if new for with int-parameter returns false.
-            if(!mainKeyAction.exec(keyCode, this)){
-              done = mainKeyAction.exec(keyCode, this, new Integer(keyCode));
-            }
-          }
-        }
-        keyRepetition = 0;  //because it was done.
-      }//if not redraw pending.
-      lastKey = keyCode;
-      return done;
-    }
 
-  
+        }
+        //the table has the focus, because the key action is done only if it is so.
+        //set the new cell focused, in the paint routine.
+        gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+        actionOnLineSelected(KeyCode.userSelect, lineSelected);
+        keyActionDone.activate();
+      } break;
+      case KeyCode.pgdn: {
+        if(lineSelectedixCell < zLineVisible -3){
+          lineSelectedixCell = zLineVisible -3;
+        } else {
+          int shifted = shiftVisibleArea(zLineVisible);
+          lineSelectedixCell += zLineVisible - shifted;
+          if(lineSelectedixCell >= zLineVisible){
+            lineSelectedixCell = zLineVisible -1;  //limit it on top.
+          }
+        }
+        while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
+            && lineSelectedixCell >0    
+            ){
+          lineSelectedixCell -=1;
+        }
+        nLineFirst = -1;  //get new, undefined elsewhere.
+        //the table has the focus, because the key action is done only if it is so.
+        //set the new cell focused, in the paint routine.
+        gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+        actionOnLineSelected(KeyCode.userSelect, lineSelected);
+        keyActionDone.activate();
+      } break;
+      default:
+        if(keyCode == KeyCode.shift + KeyCode.enter) {     // The key combination sh+Enter is up to now (2023-01) used as right mouse:
+          int col = this.getColumnInFocus();               // gets the context menu of the selected column
+          GralMenu menu = this.getContextMenuColumn(col);
+          if(menu == null) {
+            menu = this.getContextMenu();                  // if not exists get the context menu of the table
+          }
+          if(menu !=null) {
+            menu.setVisible();
+          }
+        }
+        else if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
+            ) {                                            // arrow down, mouse wheel down
+          if(keyCode == keyMarkDn && lineSelected !=null){
+            GralTableLine_ifc<?> line = lineSelected;    //mark the lines
+            if((line.getMark() & FileMark.select)!=0){
+              //it is selected yet
+              line.setNonMarked(FileMark.select, line.getUserData());
+            } else {
+              line.setMarked(FileMark.select, line.getUserData());
+            }
+          }
+          if(!searchContent(false)) {
+            if(lineSelectedixCell < zLineVisible -3){
+              lineSelectedixCell +=1;
+            } else {
+              int shifted = shiftVisibleArea(1);
+              lineSelectedixCell += 1 - shifted;
+              if(lineSelectedixCell >= zLineVisible){
+                lineSelectedixCell = zLineVisible -1;  //limit it on top.
+              }
+            }
+            while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
+                && lineSelectedixCell >0    
+                ){
+              lineSelectedixCell -=1;
+            }
+            nLineFirst = -1;  //get new, undefined elsewhere.
+          }
+          //the table has the focus, because the key action is done only if it is so.
+          //set the new cell focused, in the paint routine.
+          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
+          actionOnLineSelected(KeyCode.userSelect, lineSelected);
+
+          keyActionDone.activate();
+        } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
+          keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
+          searchChars.appendCodePoint(keyCode);
+          searchContent(false);
+          redraw();
+        } else if(keyCode == KeyCode.esc){               // --- esc cleans the search chars 
+          searchChars.setLength(0);
+          redraw();
+        } else if(keyCode == KeyCode.back && searchChars.length() >0){
+          searchChars.setLength(searchChars.length()-1);
+          redraw();
+        } else if(lineSelected !=null && keyCode == keyOpenChild){
+          if(lineSelected.tbl_lineCanHaveChildren){
+            actionOnRefreshChildren(lineSelected);  //may get or refresh children, callback in user.
+          }
+          if(lineSelected.hasChildren()){           //only if it has children currently really.
+            lineSelected.showChildren(true, true, true);
+            //lineSelected.countChildren(true, nLineFirst);  //count the children.
+            //fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
+            //repaint();
+          }
+        } else if(lineSelected !=null && keyCode == keyCloseChild){
+          if(lineSelected !=null && lineSelected.tbl_showChildren){
+            lineSelected.showChildren(false, false);
+            fillVisibleAreaBehind(lineSelected, lineSelectedixCell);
+            redraw();
+          }
+        } else {
+          done = false;
+        }
+      }//switch
+      if(done == false && keyCode == keyMarkDn && lineSelected !=null){
+        GralTableLine_ifc<?> line = lineSelected; //tableLines.get(ixLine);
+        if((line.getMark() & 1)!=0){
+          //it is selected yet
+          line.setNonMarked(1, line.getUserData());
+        } else {
+          line.setMarked(1, line.getUserData());
+        }
+
+        keyActionDone.activate();
+        done = true;
+      }
+      if(!done /*&& lineSelected !=null*/){
+        GralWidget_ifc.ActionChange action = null;
+        if(keyCode == KeyCode.enter) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter); }
+        else if(keyCode == (KeyCode.ctrl + KeyCode.enter)) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onCtrlEnter); }
+        else if(keyCode == KeyCode.mouse1Double) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onMouse1Double); }
+        if(action ==null) { action = getActionChange(GralWidget_ifc.ActionChangeWhen.onAnyKey); }
+        //?? if(action ==null) { action = getActionChangeStrict(null, false); }  //any action for the table
+        if(action !=null){
+          Object[] args = action.args();
+          if(args == null){ done = action.action().exec(keyCode, this, lineSelected); }
+          else { done = action.action().exec(keyCode, this, args, lineSelected); }
+        }
+      } //if(table.)
+      if(!done && gralMng.userMainKeyAction() !=null){
+        done = gralMng.userMainKeyAction().exec(keyCode, getCurrentLine());
+      }
+      if(!done){
+        GralUserAction mainKeyAction = gralMng.getRegisteredUserAction("KeyAction");
+        if(mainKeyAction !=null){
+          //old form called because compatibility, if new for with int-parameter returns false.
+          if(!mainKeyAction.exec(keyCode, this)){
+            done = mainKeyAction.exec(keyCode, this, new Integer(keyCode));
+          }
+        }
+      }
+      keyRepetition = 0;  //because it was done.
+    }//if not redraw pending.
+    lastKey = keyCode;
+    return done;
+  }
+
+
   
   
   

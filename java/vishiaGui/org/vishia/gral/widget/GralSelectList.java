@@ -223,12 +223,16 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   protected abstract boolean actionUserKey(int key, Object userData, GralTableLine_ifc<UserData> line);
   
   
-  private final GralUserAction actionTable = new GralUserAction("actionTable")
-  {
-
-    @Override public boolean userActionGui(int keyCode, GralWidget widgdTable, Object... params)
-    {
-      //assert(sIntension.equals("table-key"));
+  /**This is the enhancement to key handling of a common table. It regards additionally keyleft and keyright,
+   * which is default use with the alt key. See {@link #setLeftRightKeys(int, int)},
+   * calling {@link #actionLeft(Object, GralTableLine_ifc)} and {@link #actionRight(Object, GralTableLine_ifc)}.
+   * <br>
+   * it supports also enter or double click which both calls {@link #actionOk(Object, GralTableLine_ifc)}
+   * All other key codes calls {@link #actionUserKey(int, Object, GralTableLine_ifc)}
+   * All this operations should be overridden by the implementing class.
+   */
+  private final GralUserAction actionTable = new GralUserAction("actionTable") {
+    @Override public boolean userActionGui(int keyCode, GralWidget widgdTable, Object... params) {
       @SuppressWarnings("unchecked")
       GralTableLine_ifc<UserData> line = (GralTableLine_ifc<UserData>)params[0];
       Object data = line == null ? null : line.getUserData();

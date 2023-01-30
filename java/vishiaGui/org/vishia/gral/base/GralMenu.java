@@ -306,7 +306,7 @@ public class GralMenu //extends GralWidget
    * @param sMenuPath
    * @param action
    */
-  @Deprecated
+  //@Deprecated
   //public abstract void addMenuItemGthread(GralWidget widggMenu, String name, String sMenuPath, GralUserAction action);
   
   
@@ -322,6 +322,7 @@ public class GralMenu //extends GralWidget
    */
   //public abstract void addMenuItemGthread(String sMenuPath, GralUserAction gralAction);
   
+  /**Activates programmatically the context menu, as alternative to user handling. */
   public abstract void setVisible();
   
   /**Returns the implementation instance for the menu. */
