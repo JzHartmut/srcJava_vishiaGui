@@ -197,7 +197,7 @@ public class GralFileProperties extends GralWidgetBase {
     this.widgDir = new GralTextField(refPos, "dir-" + this.name, "directory path", "t");
     this.widgName = new GralTextField(refPos, "@+,1..-9=name-" + this.name, "filename", "t", GralTextField.Type.editable);
     this.widgNameNew = new GralTextField(refPos, "name-" + this.name, "rename | copy to | mkdir/file ", "t", GralTextField.Type.editable);
-    this.widgNameNew.specifyActionChange(null, this.actionsetNameToRenameCopy, null);
+    this.widgNameNew.specifyActionChange("setNameToRenameCopy", this.actionsetNameToRenameCopy, null);
     this.widgLength = new GralTextField(refPos, "@+, 1..20=length-" + this.name, "file-length", "t");
     this.widgLength.specifyActionChange("ct DirBytes", this.actionBtnCntLen, null);
     this.widgDate = new GralTextField(refPos, "@+,1..18=data-" + this.name, "last modified", "t", GralTextField.Type.editable);
@@ -653,12 +653,16 @@ public class GralFileProperties extends GralWidgetBase {
 
   final GralUserAction actionsetNameToRenameCopy = new GralUserAction("actionsetNameToRenameCopy") {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params) {
-      String sText = GralFileProperties.this.widgNameNew.getText();
-      if( (keyCode == KeyCode.enter || keyCode == KeyCode.mouse2Double) && sText.length()==0  || keyCode == (KeyCode.ctrl + 'n') ) {
-        GralFileProperties.this.widgNameNew.setText(GralFileProperties.this.widgName.getText());
-      }
-      else if( keyCode == KeyCode.enter || keyCode == KeyCode.focusLost) {
-        setRename();
+      if(keyCode != KeyCode.focusGained && keyCode != KeyCode.focusLost) {
+        String sText = GralFileProperties.this.widgNameNew.getText();
+        
+        if( (keyCode == KeyCode.enter || keyCode == KeyCode.mouse1Double)  && sText.length()==0  || keyCode == (KeyCode.ctrl + 'n') ) {
+          String sName = GralFileProperties.this.widgName.getText();
+          GralFileProperties.this.widgNameNew.setText(sName, -1);
+        }
+        else if( keyCode == KeyCode.enter || keyCode == KeyCode.focusLost) {
+          setRename();
+        }
       }
       return true;
   } };

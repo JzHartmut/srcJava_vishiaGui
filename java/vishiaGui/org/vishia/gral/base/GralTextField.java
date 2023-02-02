@@ -26,6 +26,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2023-01-17 enhanced {@link #setText(CharSequence, int, boolean)} now also with negative charetPos count from left.
    * <li>2023-01-17 new {@link #setText(CharSequence, int, boolean)} for unconditional write, this is if a text field itself
    *   causes the operation which the call setText(). 
    * <li>2022-01-29 Hartmut chg: Now only one implementation {@link GraphicImplAccess} 
@@ -88,7 +89,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2022-01-29";
+  public static final String version = "2023-02-02";
   
 
   public enum Type{ password, editable};
@@ -584,8 +585,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
    * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
    */
-  @Override public void setText(CharSequence arg, int caretPos)
-  { setText(arg, caretPos, false);
+  @Override public void setText(CharSequence arg, int caretPos) { 
+    setText(arg, caretPos, false);
   }
   
   
@@ -596,7 +597,8 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    * Note: If the current content is equals with the new one with the same cursor position, a repaint request is not forced.
    * Therewith the cursor can be positioned inside. But if the content is changed, it is set with this given one.
    * @param arg the new text
-   * @param caretPos <=0 not used, >=0 the caret position 
+   * @param caretPos >=0 the caret position, <0 the caret pos counted from left, -1 is after last char.
+   *   If too less or to big, correct it to left or right. 
    * @param bSetAlways if not true then the text is not set if typing of the field is in progress.
    *   Then {@link DynamicData#bTouchedField} is true. set a text from outside will be attack this typing.
    *   Typing by the user has a higher priority. It is important for example for currently shown values,
@@ -605,8 +607,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
    *   for example type a control-Key during edit to force actions on this text field itself. 
    * @see org.vishia.gral.ifc.GralTextField_ifc#setText(java.lang.CharSequence, int)
    */
-  public void setText(CharSequence arg, int caretPos, boolean bSetAlways)
+  public void setText(CharSequence arg, int caretPosP, boolean bSetAlways)
   {
+    int zArg = arg.length();
+    int caretPos = caretPosP >=0 ? caretPosP : zArg + caretPosP +1;  //negative: from end, -1 is the end. 
+    if(caretPos <0) { caretPos = 0; }
+    else if(caretPos > zArg) { caretPos = zArg; }
+    
     this.bShouldInitialize= false;  //it is done.
     if( ( bSetAlways
         || this.dyda.displayedText == null   //set the text if no text is stored. Initially!

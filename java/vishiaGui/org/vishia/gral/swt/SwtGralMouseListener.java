@@ -26,6 +26,10 @@ public final class SwtGralMouseListener
 {
   /**Version, History and copyright
    * <ul>
+   * <li>2023-02-01 Hartmut chg: in {@link MouseListenerGralAction#mouseDoubleClick(MouseEvent) seems to was an error.
+   *   Specific action (strict) should be gotten if a bit in {@link GralWidget.ConfigData#mMouseToActionChange} was set,
+   *     use the common foundable action if NO bit is set, if only the common action is given. Not vice versa.
+   *     This effect tags the availability of mouse action handling in special cases.  
    * <li>2015-09-21 Hartmut chg: The capabilities of {@link MouseListenerNoAction} is contained in {@link MouseListenerGralAction} yet.
    *   Therefore it is possible to get a mouse action in any {@link GralWidget#setActionChange(GralUserAction)}.
    * <li>2014-09-21 Hartmut chg: Using of {@link GralWidget#toString()} for double click info.
@@ -58,7 +62,7 @@ public final class SwtGralMouseListener
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120309;
+  public static final int version = 20230201;
 
 
   /**This class implements a MouseListener which does not call a user method.
@@ -223,7 +227,7 @@ public final class SwtGralMouseListener
           Point size = widgetSwt.getSize();
           widgg.cfg.mouseWidgetAction.mouse1Double(keyCode, xMousePress, yMousePress, size.x, size.y, widgg);
         } 
-        boolean bStrict = (widgg.cfg.mMouseToActionChange & GralMouseWidgetAction_ifc.mUserDouble) ==0;  //search strict if no special bit is given.
+        boolean bStrict = (widgg.cfg.mMouseToActionChange & GralMouseWidgetAction_ifc.mUserDouble) !=0;  //search strict if no special bit is given.
         //then a strict mouse doube action wins.
         GralWidget_ifc.ActionChange action = widgg.getActionChangeStrict(GralWidget_ifc.ActionChangeWhen.onMouse1Double, bStrict); 
         if(action !=null){

@@ -1466,9 +1466,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(tline !=null){
       FileRemote fileFound = tline.getUserData();
       if(fileFound != this.idata.currentFile) {
-        tline = tline.nextSibling();                       // go to the next line if the file if the found line 
+        GralTableLine_ifc<FileRemote> nextline = tline.nextSibling();                       // go to the next line if the file if the found line 
+        if(nextline !=null) {
+          tline = nextline;
+        }
       }                                                    // is another one, because file is deleted, renamed etc.
       this.gui.widgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
+      if(tline !=null)
       this.idata.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
     }
     this.gui.widgSelectList.wdgdTable.redraw(50, 100);
