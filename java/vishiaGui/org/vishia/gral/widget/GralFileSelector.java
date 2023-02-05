@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.fileRemote.FileRemoteCallback;
+import org.vishia.fileRemote.FileRemoteProgressTimeOrder;
+import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralSwitchButton;
 import org.vishia.gral.base.GralMenu;
@@ -812,7 +814,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   private enum ERefresh{ doNothing, refreshAll, refreshChildren}
 
-  //private final EventSource evSrc = new EventSource("GralFileSelector"){};
+  private final EventSource evSrc = new EventSource("GralFileSelector"){};
   
   
   
@@ -1302,7 +1304,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   If it is a file this line is marked. 
    *   Elsewhere that line is marked which's file is found in #idxSelectFileInDir due to the fileIn directory. 
    * @param bDonotRefrehs false then invoke an extra thread to walk through the file system, 
-   *   see @{@link FileRemote#refreshPropertiesAndChildren(FileRemoteCallback)} and {@link #callbackChildren1}.
+   *   see @{@link FileRemote#refreshPropertiesAndChildren(FileRemoteWalkerCallback)} and {@link #callbackChildren1}.
    *   If true then it is presumed that the FileRemote children are refreshed in the last time already.
    *   The fill the table newly with given content in this thread.
    */
@@ -1387,7 +1389,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else {
         //refresh it in an extra thread therefore show all lines with colorBackPending. 
         //Remove lines which remains the colorBackPending after refreshing.
-        dir.refreshPropertiesAndChildren(this.action.callbackChildren1, false);
+        dir.refreshPropertiesAndChildren(this.action.callbackChildren1, false, progress);
       }
     }
     if(file !=null) {
@@ -1487,7 +1489,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   @SuppressWarnings("boxing")
   private void completeLine(GralTableLine_ifc<FileRemote> tline, FileRemote file, long timeNow){
     final String sDesign, sDir;
-    int mark = file.mark ==null ? 0 : file.mark.getMark();
+    int mark = file.getMark();
     if(file.isSymbolicLink()){ 
       sDir =  file.isDirectory() ? ">" : "s"; 
     }
@@ -2170,6 +2172,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
   
+  @SuppressWarnings("serial") 
+  protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", evSrc, null, 200) {
+
+    @Override protected void executeOrder () {
+      // TODO Auto-generated method stub
+      
+    }
+  };
+
   protected class Callbacks { 
 
     /**Action to show the file properties in the info line. This action is called anytime if a line
@@ -2239,7 +2250,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     };
 
     
-  public FileRemoteCallback callbackChildren1 = new FileRemoteCallback()
+  protected final FileRemoteWalkerCallback callbackChildren1 = new FileRemoteWalkerCallback()
   {
 
     @Override public void start(FileRemote startDir){}
@@ -2248,7 +2259,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       return Result.cont; 
     }
 
-    @Override public Result finishedParentNode(FileRemote file, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote file) {
       //don't call showFile(file) because it is the parent which should be shown.
       return Result.cont; 
     }
@@ -2258,7 +2269,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       return Result.cont;
     }
 
-    @Override public void finished(FileRemote startDir, SortedTreeWalkerCallback.Counters cnt)
+    @Override public void finished(FileRemote startDir)
     {
       finishShowFileTable();
     }
@@ -2267,11 +2278,6 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     { return false;
     }
   };
-  
-  
-  
-  
-  
   
   
   /**Action on [Enter]-key on the path text field.

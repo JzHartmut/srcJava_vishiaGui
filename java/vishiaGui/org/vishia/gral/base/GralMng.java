@@ -492,7 +492,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   private final ConcurrentLinkedQueue<GralGraphicTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicTimeOrder>();
 
   
-  EventTimerThread orderList = new EventTimerThread("GraphicOrderTimeMng"); //this);
+  public final EventTimerThread gthread = new EventTimerThread("GraphicOrderTimeMng"); //this);
 
   
   /**The graphic specific implementation part of the GralMng
@@ -1273,7 +1273,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
 
   
   
-  public EventTimerThread orderList(){ return orderList; }
+  public EventTimerThread orderList(){ return this.gthread; }
   
   
   /**Adds the order to execute in the graphic dispatching thread.
@@ -1375,7 +1375,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     //The last action, set the GuiThread
     synchronized(this){
-      orderList.start();
+      gthread.start();
       bStarted = true;
       this.notify();      //wakeup the waiting calling thread.
     }
@@ -1385,7 +1385,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     while (!bShouldExitImplGraphic) {
       step();
     }
-    orderList.close();
+    gthread.close();
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
       GralWindow wind = ewind.getValue();
       wind.removeImplWidget_Gthread();

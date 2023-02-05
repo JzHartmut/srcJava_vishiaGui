@@ -66,6 +66,7 @@ public class GralFileProperties extends GralWidgetBase {
   public final static String version = "2023-01-15";
   
   GralColor colorChanged = GralColor.getColor("pye");
+  GralColor colorProgress = GralColor.getColor("lor");
   GralColor colorUnchanged = GralColor.getColor("wh");
   GralColor colorWrong = GralColor.getColor("pma");
   GralColor colorGrayed = GralColor.getColor("gr");
@@ -91,18 +92,25 @@ public class GralFileProperties extends GralWidgetBase {
 
   final String buttonFilePropsCntLen = "count length all files in dir";
 
-  GralWindow_ifc windFileProps;
+  final GralWindow_ifc windFileProps;
   
-  GralPanelContent panel;
+  final GralPanelContent panel;
   
-  GralTextField widgName, widgNameNew, widgDir, widgLink, widgDate, widgLength;
+  final GralTextField widgName, widgNameNew, widgDir, widgLink, widgDate, widgLength;
   
-  GralButton[] widgRd, widgWr, widgEx;
-  GralButton widgUID, widgGID, widgSticky;
-  GralButton widgHidden, widgDirectory;
+  final GralButton[] widgRd, widgWr, widgEx;
+  final GralButton widgUID, widgGID, widgSticky;
+  final GralButton widgHidden, widgDirectory;
   
   /**Action button. */
-  GralButton widGetAllProps, widgChgRecurs, widgChgFile, widgCopyFile, widgDelFile, widgRename, widgCreateDirFile;
+  final GralButton widGetAllProps, widgChgRecurs, widgChgFile, widgCopyFile, widgDelFile, widgRename, widgCreateDirFile;
+
+  /**This button is changed on start of an file action. 
+   * On callback set the callback info. */
+  GralButton widgBtnCallback;
+  
+  /**This text should be set after action to {@link #widgBtnCallback}. */
+  String sWidgCallbackTextOk, sWidgCallbackTextNok;
   
   /**This action is called after changing the file.
    * See {@link #setActionRefresh(GralUserAction)}.
@@ -249,6 +257,19 @@ public class GralFileProperties extends GralWidgetBase {
 //      main.gui.gralMng.setPosition(26, GralPos.size -2, 18, GralPos.size +2, 'r', 0.2f);
 //      widgSticky = new GralCheckButton("FileProp:btnSticky", textOn, textOff, textDis, colorOn, colorOff, colorDis);
 //      new GralText("sticky"); 
+
+      //TODO:
+      this.widgDirectory = null;
+      this.widGetAllProps = null;
+      this.widgEx = null;
+      this.widgHidden = null;
+      this.widgSticky = null;
+      this.widgGID = null;
+      this.widgUID = null;
+      this.widgRd = null;
+      this.widgWr = null;
+      
+    
     } else {
       new GralLabel(refPos, "@23-2,1+2++1=rd-" + this.name, "rd", 1);
       new GralLabel(refPos, "wr");
@@ -261,6 +282,11 @@ public class GralFileProperties extends GralWidgetBase {
       this.widgWr[0] = new GralSwitchButton(refPos, "btnro2" + this.name, textOff, textOn, textDis, colorOff, colorOn, colorDis);
       this.widgEx[0] = new GralSwitchButton(refPos, "btnro3" + this.name, textOff, textOn, textDis, colorOff, colorOn, colorDis);
       this.widgHidden = new GralSwitchButton(refPos, "btnhidden-" + this.name, textOff, textOn, textDis, colorOff, colorOn, colorDis);
+      this.widgGID = null;
+      this.widgUID = null;
+      this.widgDirectory = null;
+      this.widGetAllProps = null;
+      this.widgSticky = null;
     }
     this.widgDelFile = new GralButton(refPos, "@10.3-3++0.5,-8.5..-0.5=btnDel" + this.name, "delete", this.actionButton);
     this.widgCreateDirFile = new GralButton(refPos, "btnCreate" + this.name, "mkdir/ file", this.actionButton);
@@ -496,11 +522,29 @@ public class GralFileProperties extends GralWidgetBase {
       }
     }
     else if(btn == this.widgCopyFile){
-      if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
-        if(name !=null && !name.equals(this.actFile.getName())){
+      if(this.evChg.occupy(this.evSrc, this.callbackCopyMove, null, true)){
+        this.widgBtnCallback = this.widgCopyFile;
+        this.sWidgCallbackTextOk = "copy done";
+        this.sWidgCallbackTextNok = "error copy";
+        String sFileDst = this.widgNameNew.getText();
+        if(sFileDst !=null && !sFileDst.equals(this.actFile.getName())){
           this.widgCopyFile.setText(this.buttonFilePropsCopying);
-          FileRemote fileNew = this.actFile.getParentFile().child(name);
-          this.actFile.copyTo(fileNew, this.evChg, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
+          this.widgCopyFile.setBackColor(this.colorProgress, -1);
+          final FileRemote fileNew;
+          if(sFileDst.indexOf('/')>=0 || sFileDst.indexOf('\\')>=0){ // new new name contains / \
+            //------------ then build an absoute file relative to the act file, if it is not absoute by itself.
+            CharSequence sNameAbs = FileFunctions.absolutePath(sFileDst, this.actFile.getParentFile());
+            final String sFileDstUsed;
+            if(sNameAbs.charAt(sNameAbs.length()-1)=='/') {// if sNameAbs is a directory
+              sFileDstUsed = sNameAbs.toString() + this.actFile.getName();  // then complete it with the given name.
+            } else {
+              sFileDstUsed = sNameAbs.toString();
+            }
+            fileNew = FileRemote.get(sFileDstUsed);
+          } else {                                         // copy beside, only othe name
+            fileNew = this.actFile.getParentFile().child(sFileDst);
+          }
+          this.actFile.copyTo(fileNew, this.evChg); //, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
         } else {
           this.widgCopyFile.setText("copy - name?");
         }
@@ -633,6 +677,9 @@ public class GralFileProperties extends GralWidgetBase {
       return true;
   } };
   
+  
+  
+  
   final EventConsumer callbackCntLen = new EventConsumer()
   { @Override public int processEvent(EventObject evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
@@ -651,6 +698,32 @@ public class GralFileProperties extends GralWidgetBase {
   };
 
 
+
+  
+  /**Callback this in the execution thread of the file system. 
+   * 
+   */
+  final EventConsumer callbackCopyMove = new EventConsumer() { 
+    @Override public int processEvent ( EventObject evP) { 
+      FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
+      if(ev.getCmd() == FileRemote.CallbackCmd.done) {
+        GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorUnchanged, -1);
+        GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextOk);
+      } else {
+        GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorWrong, -1);
+        GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextNok);
+      }
+      ev.relinquish();
+      return 1;
+    } 
+  
+    @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
+
+  };
+
+  
+  
+  
   final GralUserAction actionsetNameToRenameCopy = new GralUserAction("actionsetNameToRenameCopy") {
     @Override public boolean userActionGui(int keyCode, GralWidget infos, Object... params) {
       if(keyCode != KeyCode.focusGained && keyCode != KeyCode.focusLost) {

@@ -8,7 +8,7 @@ import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.fileRemote.FileRemoteCallback;
+import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.fileRemote.FileRemoteProgressTimeOrder;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
@@ -220,6 +220,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * The event can be used to affect the copying process.
    */
   FileRemote.CallbackEvent evCurrentFile;
+  
   
   Actions action;
   
@@ -534,7 +535,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   /**Starts the execution of mark in another thread. Note that the mark works with the walk-file algorithm
    * and refreshes the files therewith. The #action.showFilesProcessing is used as callback.
-   * See {@link FileRemote#refreshAndMark(int, boolean, String, int, int, FileRemoteCallback)}.
+   * See {@link FileRemote#refreshAndMark(int, boolean, String, int, int, FileRemoteWalkerCallback)}.
    */
   final void execMark(){
     setTexts(Estate.busyCheck);
@@ -557,7 +558,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   final protected void execDel(){
     if(state == Estate.checked){
-      srcFile.deleteMarkedInThread(FileMark.select, callbackFromFilesExec);      
+      srcFile.deleteMarkedInThread(FileMark.select, callbackFromFilesExec, action.progress);      
     } else if(state == Estate.start){
     }
   }
@@ -937,27 +938,27 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   }
   
   
-  void showFinishState(CharSequence start, SortedTreeWalkerCallback.Counters cnt)
+  void showFinishState(CharSequence start)
   {
-    FcmdCopyCmprDel.this.zFiles = cnt.nrofLeafss;
-    FcmdCopyCmprDel.this.zBytes = cnt.nrofBytes;
-    formatShow.reset();
-    formatShow.add(start);
-    formatShow.add(" Files:").addint(cnt.nrofLeafSelected, "3333333331");
-    //StringBuilder u = new StringBuilder();
-    //u.append("Files:").append(Integer.toString(cnt.nrofLeafSelected));
-    if(cnt.nrofLeafSelected != cnt.nrofLeafss){  //u.append(" (").append(Integer.toString(cnt.nrofLeafSelected)).append(")"); }
-      formatShow.add(" /").addint(cnt.nrofLeafss, "3333333331");
-    }
-    if(cnt.nrofBytes > 1000000){
-      formatShow.addint(cnt.nrofBytes/1000, ", 33331.111 MByte");
-    }
-    else if(cnt.nrofBytes > 1000){
-      formatShow.addint(cnt.nrofBytes, ", 331.111 kByte");
-    } else {
-      formatShow.addint(cnt.nrofBytes, ", 331 Byte");
-    }
-    widgCopyState.setText(formatShow.toString());
+//    FcmdCopyCmprDel.this.zFiles = cnt.nrofLeafss;
+//    FcmdCopyCmprDel.this.zBytes = cnt.nrofBytes;
+//    formatShow.reset();
+//    formatShow.add(start);
+//    formatShow.add(" Files:").addint(cnt.nrofLeafSelected, "3333333331");
+//    //StringBuilder u = new StringBuilder();
+//    //u.append("Files:").append(Integer.toString(cnt.nrofLeafSelected));
+//    if(cnt.nrofLeafSelected != cnt.nrofLeafss){  //u.append(" (").append(Integer.toString(cnt.nrofLeafSelected)).append(")"); }
+//      formatShow.add(" /").addint(cnt.nrofLeafss, "3333333331");
+//    }
+//    if(cnt.nrofBytes > 1000000){
+//      formatShow.addint(cnt.nrofBytes/1000, ", 33331.111 MByte");
+//    }
+//    else if(cnt.nrofBytes > 1000){
+//      formatShow.addint(cnt.nrofBytes, ", 331.111 kByte");
+//    } else {
+//      formatShow.addint(cnt.nrofBytes, ", 331 Byte");
+//    }
+//    widgCopyState.setText(formatShow.toString());
   }
   
   void actionConfirmCopy(){
@@ -969,7 +970,15 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   protected class Actions
   {
-    
+    @SuppressWarnings("serial") 
+    protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", evSrc, null, 200) {
+
+      @Override protected void executeOrder () {
+        // TODO Auto-generated method stub
+        
+      }
+    };
+
     @SuppressWarnings("serial") 
     FileRemoteProgressTimeOrder showFilesProcessing = 
         new FileRemoteProgressTimeOrder("showFilesProcessing", evSrc, main.gui.gralMng.orderList(), 100) 
@@ -1670,7 +1679,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   
   
-  FileRemoteCallback callbackFromFilesCheck = new FileRemoteCallback() {
+  FileRemoteWalkerCallback callbackFromFilesCheck = new FileRemoteWalkerCallback() {
     @Override public void start(FileRemote startDir) {  
       fileProcessed = null;
     }
@@ -1687,7 +1696,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     /**Finish a directory, check whether a file panel should be refreshed.
      * @see org.vishia.util.SortedTreeWalkerCallback#finishedParentNode(java.lang.Object, org.vishia.util.SortedTreeWalkerCallback.Counters)
      */
-    @Override public Result finishedParentNode(FileRemote dir, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote dir) {
       main.refreshFilePanel(dir);
       return Result.cont;      
     }
@@ -1709,8 +1718,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       return false;
     }
 
-    @Override public void finished(FileRemote startFile, SortedTreeWalkerCallback.Counters cnt) {  
-      showFinishState("checked ", cnt);
+    @Override public void finished(FileRemote startFile) {  
+      showFinishState("checked ");
       main.refreshFilePanel(startFile.getParentFile());  //The start file is any file or directory in parent. A directory is refreshed by finishParentNode already.
       setTexts(Estate.checked);
     }
@@ -1720,7 +1729,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   
   
-  FileRemoteCallback callbackFromFilesExec = new FileRemoteCallback() {
+  FileRemoteWalkerCallback callbackFromFilesExec = new FileRemoteWalkerCallback() {
     @Override public void start(FileRemote startDir) {  }
     
     @Override public Result offerParentNode(FileRemote file) {
@@ -1732,12 +1741,12 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       }
     }
     
-    @Override public Result finishedParentNode(FileRemote dir, FileRemoteCallback.Counters cnt) {
+    @Override public Result finishedParentNode(FileRemote dir) {
       if(dir.isSymbolicLink()) {
         return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
       } else {
         String path = dir.getAbsolutePath();
-        showFinishState(path, cnt);
+        showFinishState(path);
         main.refreshFilePanel(dir);
         return Result.cont;
       }
@@ -1754,8 +1763,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       return false;
     }
 
-    @Override public void finished(FileRemote startFile, SortedTreeWalkerCallback.Counters cnt) {  
-      showFinishState("done", cnt);
+    @Override public void finished(FileRemote startFile) {  
+      showFinishState("done");
       setTexts(Estate.finit);
       main.refreshFilePanel(startFile.getParentFile());  //The start file is any file or directory in parent. A directory is refreshed by finishParentNode already.
     }

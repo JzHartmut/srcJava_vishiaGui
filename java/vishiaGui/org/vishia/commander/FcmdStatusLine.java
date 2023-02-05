@@ -107,11 +107,11 @@ public class FcmdStatusLine
       int parentId = filep !=null ? filep.ident(): 0;
       info.append(" #").append(filer.ident()).append('/').append(parentId).append(" flags=0x")
       .append(Integer.toHexString(filer.getFlags()));
-      if(file.mark !=null){
-        int mark = file.mark.getMark();
+      if(file.mark() !=null){
+        int mark = file.mark().getMark();
         info.append(" sel=").append(Integer.toHexString((mark >>16) & 0xffff)).append('\'').append(Integer.toHexString(mark & 0xffff));
         if(file.isDirectory()){
-          info.append("; files=").append(file.mark.nrofFilesSelected());
+          info.append("; files=").append(file.mark().nrofFilesSelected());
         }
       }
     }

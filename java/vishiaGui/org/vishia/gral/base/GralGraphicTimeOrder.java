@@ -100,7 +100,7 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
    * @param name The name is only used for showing in debugging.
    */
   protected GralGraphicTimeOrder(String name, GralMng gralMng)
-  { super(name, new EnqueueInGraphicThread(gralMng), gralMng.orderList);
+  { super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     this.gralMng = gralMng;
   }
   
