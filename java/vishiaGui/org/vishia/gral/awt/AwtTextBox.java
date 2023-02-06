@@ -4,6 +4,7 @@ import java.awt.Container;
 import java.awt.Label;
 import java.awt.TextArea;
 import java.io.IOException;
+import java.util.EventObject;
 
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralTextBox;
@@ -64,23 +65,27 @@ public class AwtTextBox extends GralTextBox.GraphicImplAccess
 
   
   protected GralGraphicTimeOrder changeTextBoxTrail = new GralGraphicTimeOrder("AwtTextBox.changeTextBoxTrail", widgg.gralMng())
-  { @Override public void executeOrder()
-    { if(newText.length() >0){
+  { //@Override 
+    @Override public int processEvent ( EventObject ev ) {
+      if(newText.length() >0){
         textFieldSwt.append(newText.toString());
         newText.setLength(0);
       }
+      return 0;
     }
   };
   
   
   protected GralGraphicTimeOrder changeText = new GralGraphicTimeOrder("AwtTextBox.changeTextB", widgg.gralMng())
-  { @Override public void executeOrder()
-    { if(newText.length() >0){
+  { //@Override 
+    @Override public int processEvent ( EventObject ev ) {
+      if(newText.length() >0){
         textFieldSwt.setText(newText.toString());
         newText.setLength(0);
       }
       //countExecution();
       //windowMng.removeDispatchListener(this);
+      return 0;
     }
   };
   

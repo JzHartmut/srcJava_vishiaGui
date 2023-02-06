@@ -1,6 +1,5 @@
 package org.vishia.gral.swt;
 
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;

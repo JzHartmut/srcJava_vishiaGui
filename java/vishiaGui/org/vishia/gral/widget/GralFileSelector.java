@@ -2172,15 +2172,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
   
-  @SuppressWarnings("serial") 
-  protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", evSrc, null, 200) {
-
-    @Override protected void executeOrder () {
-      // TODO Auto-generated method stub
-      
-    }
-  };
-
+  protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", this.evSrc, null, null, 200);
+  
+  
   protected class Callbacks { 
 
     /**Action to show the file properties in the info line. This action is called anytime if a line

@@ -1,7 +1,6 @@
 package org.vishia.gral.ifc;
 
 import org.vishia.gral.awt.AwtFactory;
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;

@@ -17,8 +17,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
-import org.vishia.gral.base.GralGraphicThread;
-import org.vishia.gral.base.GralGraphicThread.ImplAccess;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
@@ -31,7 +29,7 @@ import org.vishia.util.Debugutil;
  * It doesn't depend of complex functionality of the org.vishia.gral. But that implementations based on this.
  * This class can be used for a simple SWT graphic implementation.
  */
-class SwtGraphicThread extends GralGraphicThread.ImplAccess //implements Runnable
+class SwtGraphicThread //extends GralGraphicThread.ImplAccess //implements Runnable
 {
   /**Version, history and license.
    * <ul>

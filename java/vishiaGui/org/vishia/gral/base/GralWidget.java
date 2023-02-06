@@ -2,6 +2,7 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -2238,8 +2239,9 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * till the next request of {@link #redraw1(int, int)} or {@link #redraw()}.
    */
   private final GralGraphicTimeOrder redrawRequ = new GralGraphicTimeOrder("GralWidget.redrawRequ", this.gralMng){
-    @Override public void executeOrder() {
+    public int processEvent ( EventObject ev) {
       if(_wdgImpl !=null) { _wdgImpl.redrawGthread(); }//Note: exception thrown in GralGraphicThread
+      return 0;
     }
     @Override public String toString(){ return name + ":" + GralWidget.this.name; }
   };

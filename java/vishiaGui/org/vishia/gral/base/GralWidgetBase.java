@@ -2,8 +2,10 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.EventObject;
 import java.util.List;
 
+import org.vishia.event.EventConsumer;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.ObjectVishia;
 
@@ -335,7 +337,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   }
 
   @SuppressWarnings("serial") 
-  public static class TimeOrderCreateImplWidget extends GralGraphicTimeOrder {
+  public static class TimeOrderCreateImplWidget extends GralGraphicTimeOrder implements EventConsumer {
 
     final GralWidgetBase fromWdg;
     
@@ -344,11 +346,11 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
       this.fromWdg = fromWdg;
     }
 
-    @Override protected void executeOrder () {
-      fromWdg.createImplWidget_Gthread();
+    @Override public int processEvent ( EventObject ev ) {
+      this.fromWdg.createImplWidget_Gthread();
+      return 0;
     }
   }
 
-  
   
 }

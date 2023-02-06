@@ -5,7 +5,6 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableContainer_ifc;
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;

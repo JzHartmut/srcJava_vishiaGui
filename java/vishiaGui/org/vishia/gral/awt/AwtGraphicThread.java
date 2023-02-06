@@ -3,11 +3,10 @@ package org.vishia.gral.awt;
 import java.awt.Frame;
 import java.io.IOException;
 
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.msgDispatch.LogMessage;
 
-public class AwtGraphicThread extends GralGraphicThread.ImplAccess
+public class AwtGraphicThread //extends GralGraphicThread.ImplAccess
 {
 
   /**Version, history and license.

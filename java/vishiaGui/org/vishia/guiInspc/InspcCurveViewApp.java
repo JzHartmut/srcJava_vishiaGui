@@ -3,11 +3,11 @@ package org.vishia.guiInspc;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.EventObject;
 
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
@@ -35,16 +35,19 @@ public class InspcCurveViewApp
   Args argData = new Args();
   
   
+  @SuppressWarnings("serial") 
   InspcCurveViewApp ( ) {
     this.gralMng = new GralMng();
+    
     this.reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl", this.gralMng) {
-      @Override protected void executeOrder () {
+      @Override public int processEvent ( EventObject ev) {
         try {
-          InspcCurveViewApp.this.curveView.windCurve.reportAllContentImpl(log);
-          log.flush();
+          InspcCurveViewApp.this.curveView.windCurve.reportAllContentImpl(InspcCurveViewApp.this.log);
+          InspcCurveViewApp.this.log.flush();
         } catch (Exception e) {
           System.out.append("unexpected Exception " + e.getMessage());
         }
+        return 0;
       }
     };
   }

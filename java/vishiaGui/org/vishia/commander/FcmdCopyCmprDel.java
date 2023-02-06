@@ -558,7 +558,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   final protected void execDel(){
     if(state == Estate.checked){
-      srcFile.deleteMarkedInThread(FileMark.select, callbackFromFilesExec, action.progress);      
+      srcFile.deleteMarkedInThread(FileMark.select, callbackFromFilesExec, action.showFilesProcessing);      
     } else if(state == Estate.start){
     }
   }
@@ -970,25 +970,31 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   protected class Actions
   {
-    @SuppressWarnings("serial") 
-    protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", evSrc, null, 200) {
+    
+    protected final EventConsumer progressEv = new EventConsumer() {
 
-      @Override protected void executeOrder () {
-        // TODO Auto-generated method stub
-        
+      @Override public int processEvent ( EventObject ev ) {
+        FileRemoteProgressTimeOrder progress = (FileRemoteProgressTimeOrder)ev;
+        showCurrentProcessedFileAndDir(progress); //this.currFile, this.nrFilesProcessed, this.bDone); 
+        return 0;
       }
+      
     };
-
+    
+    
     @SuppressWarnings("serial") 
-    FileRemoteProgressTimeOrder showFilesProcessing = 
-        new FileRemoteProgressTimeOrder("showFilesProcessing", evSrc, main.gui.gralMng.orderList(), 100) 
-    {
-      @Override public void executeOrder() { 
-        //System.out.println("showFilesProcessing");
-        showCurrentProcessedFileAndDir(this); //this.currFile, this.nrFilesProcessed, this.bDone); 
-        //this.currFile = null;  //to invoke second time.
-      }
-    };
+    protected final FileRemoteProgressTimeOrder showFilesProcessing = new FileRemoteProgressTimeOrder("GralFileSelector", evSrc, null, null, 200);
+    
+//    @SuppressWarnings("serial") 
+//    FileRemoteProgressTimeOrder showFilesProcessing = 
+//        new FileRemoteProgressTimeOrder("showFilesProcessing", evSrc, main.gui.gralMng.orderList(), 100) 
+//    {
+//      @Override public void executeOrder() { 
+//        //System.out.println("showFilesProcessing");
+//        showCurrentProcessedFileAndDir(this); //this.currFile, this.nrFilesProcessed, this.bDone); 
+//        //this.currFile = null;  //to invoke second time.
+//      }
+//    };
   }  
 
   /**Shows the state of FileRemote, especially for debug and problems. */

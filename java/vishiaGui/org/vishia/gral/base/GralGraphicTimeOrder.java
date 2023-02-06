@@ -3,22 +3,26 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
-import org.vishia.event.TimeOrder;
+import org.vishia.event.EventTimeout;
 
 
 /**This is the base class for user classes, which contains code, that should be executed in the graphic thread.
- * The method {@link #executeOrder()} should be overridden with the functionality which should be executed
- * in the graphic thread before the system's dispatching routine starts.
+ * Because this class inherits from {@link EventConsumer} the operation {@link EventConsumer#processEvent(EventObject)}
+ * need to be overridden. Whereby the argument event is type of the overridden type itself.
+ * Hence it is not necessary to evaluate, it is this itself.
  *   
  * @author Hartmut Schorrig.
  *
  */
 @SuppressWarnings("serial") 
-public abstract class GralGraphicTimeOrder extends TimeOrder
+public abstract class GralGraphicTimeOrder extends EventTimeout implements EventConsumer
 {
   
   /**Version and history.
    * <ul>
+   * <li>2015-01-10 Hartmut now because the GralMng is also the {@link org.vishia.event.EventTimerThread}
+   *   the operation EnqueueInGraphicThread is no more necessary. The event can immediately executed in the graphic thread.
+   *   
    * <li>2015-01-10 Hartmut renamed from <code>GralDispatchCallbackWorker</code>
    * <li>2012-02-14 Hartmut corr: {@link #addToGraphicThread(GralGraphicThread, int)}:
    *   For time saving: If an instance is added already and its new execution time
@@ -67,25 +71,25 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
   
     final GralMng gralMng;
   
-  /**To create the instance for the EventConsumer to enqueue time orders in the graphic thread queue.
-   * NOTE: class is need, not an anonymous instance, because initialization in super(..., new Enqueu...)
-   */
-  private static class EnqueueInGraphicThread implements EventConsumer {
-    
-    protected final GralMng gralMng;
-
-    public EnqueueInGraphicThread(GralMng gralMng) {
-      this.gralMng = gralMng;
-    }
-
-        @Override public int processEvent(EventObject ev)
-    { //the manager is known application global
-      this.gralMng.storeEvent(ev);
-      return mEventConsumed;
-    }
-
-  };
-  
+//  /**To create the instance for the EventConsumer to enqueue time orders in the graphic thread queue.
+//   * NOTE: class is need, not an anonymous instance, because initialization in super(..., new Enqueu...)
+//   */
+//  private static class EnqueueInGraphicThread implements EventConsumer {
+//    
+//    protected final GralMng gralMng;
+//
+//    public EnqueueInGraphicThread(GralMng gralMng) {
+//      this.gralMng = gralMng;
+//    }
+//
+//        @Override public int processEvent(EventObject ev)
+//    { //the manager is known application global
+//      this.gralMng.storeEvent(ev);
+//      return mEventConsumed;
+//    }
+//
+//  };
+//  
   
 
   /**Super constructor for all graphic time orders.
@@ -99,8 +103,11 @@ public abstract class GralGraphicTimeOrder extends TimeOrder
    * </pre>  
    * @param name The name is only used for showing in debugging.
    */
-  protected GralGraphicTimeOrder(String name, GralMng gralMng)
-  { super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
+  protected GralGraphicTimeOrder(String name, GralMng gralMng) { 
+    super(null, gralMng);
+    occupy(gralMng.evSrc, this, gralMng, true);            // occupy the time order which is also the event. 
+    //super( new EnqueueInGraphicThread(gralMng), gralMng.gthread);
+    //super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     this.gralMng = gralMng;
   }
   

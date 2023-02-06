@@ -2,6 +2,7 @@ package org.vishia.gral.base;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.EventObject;
 
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -460,13 +461,15 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   /**Code snippet for initializing the GUI area (panel). This snippet will be executed
    * in the GUI-Thread if the GUI is created. 
    */
+  @SuppressWarnings("serial") 
   GralGraphicTimeOrder createImplWindow = new GralGraphicTimeOrder("GralWindow.createImplWindow", this.gralMng)
   {
-    @Override public void executeOrder()
-    { GralMng mng = gralMng();
+    @Override public int processEvent ( EventObject ev) {
+      GralMng mng = gralMng();
       mng.selectPrimaryWindow();
       GralWindow.this.createImplWidget_Gthread();
       GralWindow.this.setVisible(true);
+      return 0;
     }
   };
 

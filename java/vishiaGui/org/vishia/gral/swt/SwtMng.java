@@ -44,7 +44,6 @@ import org.vishia.gral.base.GralArea9Panel;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralCurveView;
-import org.vishia.gral.base.GralGraphicThread;
 import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;

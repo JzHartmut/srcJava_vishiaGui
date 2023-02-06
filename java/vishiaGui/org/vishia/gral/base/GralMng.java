@@ -18,10 +18,10 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.vishia.byteData.VariableContainer_ifc;
+import org.vishia.event.EventSource;
 import org.vishia.event.EventTimerThread;
 //import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralCurveView.CommonCurve;
-import org.vishia.gral.base.GralGraphicThread.ImplAccess;
 import org.vishia.gral.cfg.GralCfgBuilder;
 import org.vishia.gral.cfg.GralCfgData;
 import org.vishia.gral.cfg.GralCfgDesigner;
@@ -59,6 +59,7 @@ import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Assert;
 import org.vishia.util.CheckVs;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.FileFunctions;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -80,10 +81,16 @@ import org.vishia.util.TimedValues;
  *
  */
 @SuppressWarnings("synthetic-access") 
-public class GralMng implements GralMngBuild_ifc, GralMng_ifc
+public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-14 Hartmut chg: Now the EventTimerThread and the graphic thread is one thread.
+   *   This has the advantage that an expired time order (now as {@link org.vishia.event.EventTimeout}
+   *   can immediately execute its {@link org.vishia.event.EventWithDst#evDst}. {@link org.vishia.event.EventConsumer#processEvent(EventObject)}
+   *   in the same thread, without dequeue and enqueue in the graphic thread. Lesser number of thread switches.
+   *   <br>But because the graphic thread wait operation in SWT cannot wake up in a given time, it needs a timer thread
+   *   only used for wake up. This is the {@link #awakeThread}.
    * <li>2022-11-14 Hartmut new {@link LogMsg} with some constants for organization of log messages 
    *   with the {@link LogMessage#sendMsg(int, CharSequence, Object...)} approach. 
    *   The real logged messages can be filtered with this numbers.
@@ -492,8 +499,16 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   private final ConcurrentLinkedQueue<GralGraphicTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicTimeOrder>();
 
   
-  public final EventTimerThread gthread = new EventTimerThread("GraphicOrderTimeMng"); //this);
-
+  private final Thread awakeThread;
+  
+  /**True then the dispatcher sleeps, does not work.
+   * Only then the {@link #awakeThread} should awake the dispatcher. */
+  private boolean bDispatcherSleeps;
+  
+  public EventSource evSrc = new EventSource("gralMng") {
+    
+  };
+  
   
   /**The graphic specific implementation part of the GralMng
    * This implementation should care about the correct implementation widgets. 
@@ -517,18 +532,19 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
    * 
    * @param log maybe null firstly, then use {@link #setLog(LogMessage)}
    */
-  public GralMng(LogMessage log)
-  { //this.propertiesGui = props;
-      this.log = log;
+  public GralMng(LogMessage log) { 
+    super("gralMng");                            // EventTimerThread name is "gralMng"
+    this.log = log;
+    this.awakeThread = new Thread(this.runAwakeThread, "awakeGraphicDispatcher");  
     this.gralProps = new GralGridProperties();  
     //its a user action able to use in scripts.
     userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
     //if(GralMng.singleton ==null) { GralMng.singleton = this; } 
     this.screen = new GralScreen(this);       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
-    this.idxPanels.put("screen", screen);
+    this.idxPanels.put("screen", this.screen);
     this.posThreadSafe = new TreeMap<Long, PosThreadSafe>();
     this.posCurrent = new PosThreadSafe(this);
-    this.posThreadSafe.put(posCurrent.threadId, posCurrent);
+    this.posThreadSafe.put(this.posCurrent.threadId, this.posCurrent);
   }
 
   
@@ -1258,22 +1274,31 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
   };
 
-  /**Stores an event in the queue, able to invoke from any thread.
-   * @param ev
+//  /**Stores an event in the queue, able to invoke from any thread.
+//   * @param ev
+//   */
+//  public void storeEvent(EventObject ev){
+//    if(ev instanceof GralGraphicTimeOrder) { 
+//      queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
+//      //System.out.println("storeEventPaint, wakeup");
+//      this._mngImpl.wakeup();
+//   } else {
+//      throw new IllegalArgumentException("can only store events of type GralGraphicTimeOrder");
+//    }
+//  }
+
+
+  
+  /**Necessary operation to wakeup the graphic thread. It sleeps in OS-management. 
+   * This operation is called just if a new event is enqueued, on {@link EventTimerThread#storeEvent(EventObject)}.
+   * See {@link EventTimerThread#wakeup_()}
    */
-  /*package private*/ void storeEvent(EventObject ev){
-    if(ev instanceof GralGraphicTimeOrder) { 
-      queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
-      //System.out.println("storeEventPaint, wakeup");
-      this._mngImpl.wakeup();
-   } else {
-      throw new IllegalArgumentException("can only store events of type GralGraphicTimeOrder");
-    }
+  @Override protected void wakeup_ ( ) {
+    this._mngImpl.wakeup();
   }
 
   
-  
-  public EventTimerThread orderList(){ return this.gthread; }
+  public EventTimerThread orderList(){ return this; }
   
   
   /**Adds the order to execute in the graphic dispatching thread.
@@ -1328,6 +1353,18 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   public void closeApplication ( ) { this.bShouldExitImplGraphic = true; this.bShouldExitMain = true; }
 
   
+  /**Creates and starts the thread. If this routine is called from the user, the thread runs
+   * till the close() method was called. If this method is not invoked from the user,
+   * the thread is created and started automatically if {@link #storeEvent(EventCmdtype)} was called.
+   * In that case the thread stops its execution if the event queue is empty and about 5 seconds
+   * are gone.  */
+  @Override protected void createThread_ ( ){ 
+    super.threadTimer = new Thread(this.runGraphicThread, this.threadName);
+  }  
+
+  
+  
+  
   /**The run method of the graphic thread. This method is started in the constructor of the derived class
    * of this, which implements the graphic system adapter. 
    * <ul>
@@ -1357,6 +1394,7 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
       //it it should not be minimized, then close, never set Invisible, because it is not possible to set visible again.
       this.windPrimary.windProps |= GralWindow.windRemoveOnClose;
     }
+    //======================================================= On start create the implementation of all yet known GralWindow 
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
       GralWindow wind = ewind.getValue();
       //boolean bVisible = wind == this.windPrimary;
@@ -1375,17 +1413,27 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
     }
     //The last action, set the GuiThread
     synchronized(this){
-      gthread.start();
-      bStarted = true;
-      this.notify();      //wakeup the waiting calling thread.
+      this.awakeThread.start();                                     // Starts the timer wake up thread
+      this.bStarted = true;
+      this.notify();                                       // wake up the waiting calling thread.
     }
-    checkTimes.init();
-    checkTimes.adjust();
-    checkTimes.cyclTime();
-    while (!bShouldExitImplGraphic) {
-      step();
+    this.checkTimes.init();                                // a checker for calculation time usage
+    this.checkTimes.adjust();
+    this.checkTimes.cyclTime();
+    super.bThreadRun = true;
+    super.stateThreadTimer = 'r';
+    //while(EventTimerThread.this.stateThreadTimer == 'r' && EventTimerThread.this.bThreadRun ){
+    while (!this.bShouldExitImplGraphic) {                 // run so long the graphic should run
+      this.bDispatcherSleeps = false;
+      stepGraphicThread();
+      if(!this.bShouldExitImplGraphic){ 
+        //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
+        this.bDispatcherSleeps = true;
+        this._mngImpl.graphicThreadSleep();
+        this.bDispatcherSleeps = false;
+      }
     }
-    gthread.close();
+    super.stateThreadTimer = 'f';
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
       GralWindow wind = ewind.getValue();
       wind.removeImplWidget_Gthread();
@@ -1401,7 +1449,103 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   }
 
   
+  /**The step routine of the graphic thread
+   * 
+   */
+  private int stepGraphicThread()
+  {
+    boolean bContinueDispatch;
+    int ctOsEvents = 0;
+    do { //================================================== first manage all os-events
+      try{ 
+        bContinueDispatch = this._mngImpl.dispatchOsEvents();  // do it due the implementation graphic
+      }
+      catch(Throwable exc){
+        System.out.println(exc.getMessage());
+        exc.printStackTrace(System.out);
+        bContinueDispatch = ctOsEvents < 1000;             // if any exception on dispatching, continue but only limited.
+      }
+      ctOsEvents +=1;
+      //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
+    } while(bContinueDispatch);
+    if(this.debugPrint){ System.out.println("GralGraphicThread - dispatched os events, " + ctOsEvents); }
+    this.checkTimes.calcTime();
+    this.isWakedUpOnly = false;
+    //System.out.println("dispatched");
+    if(!this.bShouldExitImplGraphic){
+      if(this.isWakedUpOnly){
+        ExcUtil.stop();
+      }
+      //it may be waked up by the operation system or by calling Display.wake().
+      //if wakeUp() is called, isWakedUpOnly is set.
+      this.checkTimes.cyclTime();
+      //execute stored orders.
+      GralGraphicTimeOrder order;
+      boolean bSleep = true;
+      int ctOrders = 0;
+      super.stepThread();
+//      while( (order = queueOrdersToExecute.poll()) !=null) {
+//        order.stateOfEvent = 'r';
+//        try{ 
+//          order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
+//        } catch(Throwable exc){
+//          CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
+//          System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.
+//        }
+//        order.relinquish();
+//        bSleep = false;
+//        ctOrders +=1;
+//      }
+      if(debugPrint){ System.out.println("GralGraphicThread - dispatched graphic orders, " + ctOrders); }
+      //===================================================== manage all os-events again, may be because of events.
+      ctOsEvents = 0;
+      do { 
+        try{ 
+          bContinueDispatch = this._mngImpl.dispatchOsEvents();  // do it due the implementation graphic
+        }
+        catch(Throwable exc){
+          System.out.println(exc.getMessage());
+          exc.printStackTrace(System.out);
+          bContinueDispatch = ctOsEvents < 1000;             // if any exception on dispatching, continue but only limited.
+        }
+        ctOsEvents +=1;
+        //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
+      } while(bContinueDispatch);
+    } 
+    return 0;
+  }
   
+
+  
+  /**This thread has only the task to wake up the graphic thread.
+   * <br>It uses the super#timeCheckNew to determine how many ms to wakeup.
+   * <br>If the graphic thread is active in the moment, it waits 10 ms, then check again. 
+   * <br>If any time order has elapsed or will be elapsed in the next 2 ms, 
+   * then wake up the graphic thread calling {@link ImplAccess#wakeup()}
+   */
+  protected void runAwakeThread ( ) {
+    while(!this.bShouldExitImplGraphic) {
+      final long timeWait;
+      final boolean bWakeupDispatcher = this.bDispatcherSleeps;
+      if(!bWakeupDispatcher) {
+        timeWait = 10;                                     // wait 10 ns so long the dispatcher works
+      } else {
+        timeWait = super.timeCheckNew - System.currentTimeMillis();
+      }
+      if(timeWait > 2) {                                   // do not wait if in next 2 ms time orders are elapsed
+        synchronized(this) {
+          try { this.wait(timeWait);
+          } catch (InterruptedException e) { }
+        }
+      }
+      if(bWakeupDispatcher) {                              // the graphic dispatcher has slept before. 
+        this._mngImpl.wakeup();                            // time elapsed, now wakeup, also if it works per accident just now.
+      } else {
+        assert(timeWait == 10);                            // the graphic dispatcher has not slept before.
+      }                                                    // check again after 10 ms.
+    }
+  }
+
   
   public void closeMainWindow() {
     this.windPrimary.windProps |= GralWindow_ifc.windRemoveOnClose; //if not set till now.
@@ -1409,64 +1553,6 @@ public class GralMng implements GralMngBuild_ifc, GralMng_ifc
   
 
   
-  void step()
-  {
-    boolean bContinueDispatch;
-    int ctOsEvents = 0;
-    do{
-      try{ bContinueDispatch = this._mngImpl.dispatchOsEvents();
-      /*  
-      try {
-          Thread.sleep(10);
-        } catch (InterruptedException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }*/
-      }
-      catch(Throwable exc){
-        System.out.println(exc.getMessage());
-        exc.printStackTrace(System.out);
-        bContinueDispatch = true; //false;
-      }
-      ctOsEvents +=1;
-      //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
-    } while(bContinueDispatch);
-    if(debugPrint){ System.out.println("GralGraphicThread - dispatched os events, " + ctOsEvents); }
-    checkTimes.calcTime();
-    isWakedUpOnly = false;
-    //System.out.println("dispatched");
-    if(!bShouldExitImplGraphic){
-      if(isWakedUpOnly){
-        Assert.stop();
-      }
-      //it may be waked up by the operation system or by calling Display.wake().
-      //if wakeUp() is called, isWakedUpOnly is set.
-      checkTimes.cyclTime();
-      //execute stored orders.
-      GralGraphicTimeOrder order;
-      boolean bSleep = true;
-      int ctOrders = 0;
-      while( (order = queueOrdersToExecute.poll()) !=null) {
-        order.stateOfEvent = 'r';
-        try{ 
-          order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
-        } catch(Throwable exc){
-          CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
-          System.err.append(excText);  //contains the stack trace in one line, up to 99 levels.
-        }
-        order.relinquish();
-        bSleep = false;
-        ctOrders +=1;
-      }
-      if(debugPrint){ System.out.println("GralGraphicThread - dispatched graphic orders, " + ctOrders); }
-      if(bSleep){ //if any order is executed, don't sleep yet because some os events may forced therefore. Dispatch it!
-        //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
-        this._mngImpl.graphicThreadSleep();
-      }
-    }    
-  }
-  
-
   
   protected void checkAdmissibility(boolean value){
     if(!value){
@@ -2257,6 +2343,13 @@ public GralButton addCheckButton(
   private Runnable runGraphicThread = new Runnable() {
     @Override public void run () {
       GralMng.this.runGraphicThread();
+    }
+  };
+  
+  
+  private Runnable runAwakeThread = new Runnable() {
+    @Override public void run () {
+      GralMng.this.runAwakeThread();
     }
   };
   

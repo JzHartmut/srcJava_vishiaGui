@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.lang.reflect.Array;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1495,10 +1496,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected final GralGraphicTimeOrder keyActionDone = new GralGraphicTimeOrder("GralTableKeyDone", this.gralMng()) {
     @Override
-    public void executeOrder() {
+    public int processEvent ( EventObject ev) {
       gi.bFocused = true;  //to focus while repainting
       _wdgImpl.redrawGthread();
       keyDone = true;
+      return 0;
       //System.out.println("Key done");
     }
   };

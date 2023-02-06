@@ -18,7 +18,6 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
-import org.vishia.gral.cfg.GralCfgWindow_Old;
 import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
