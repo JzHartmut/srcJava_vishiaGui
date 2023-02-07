@@ -3,6 +3,7 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
+import org.vishia.event.EventThread_ifc;
 import org.vishia.event.EventTimeout;
 
 
@@ -104,8 +105,10 @@ public abstract class GralGraphicTimeOrder extends EventTimeout implements Event
    * @param name The name is only used for showing in debugging.
    */
   protected GralGraphicTimeOrder(String name, GralMng gralMng) { 
-    super(null, gralMng);
-    occupy(gralMng.evSrc, this, gralMng, true);            // occupy the time order which is also the event. 
+    super(name, gralMng);
+    EventThread_ifc execThread = null;                     // definitive null to use the timer thread to execute. 
+    //                                                     // note: if use gralMng, the same as timer thread, the event will be enqueued first after expire.
+    occupy(gralMng.evSrc, this, execThread, true);         // occupy the time order which is also the event. 
     //super( new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     //super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     this.gralMng = gralMng;

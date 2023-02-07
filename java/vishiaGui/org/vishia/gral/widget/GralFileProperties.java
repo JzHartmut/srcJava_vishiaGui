@@ -198,9 +198,9 @@ public class GralFileProperties extends GralWidgetBase {
     } else {
       this.bUnixSystem = System.getenv("WINDIR") == null;
     }
-    this.evBack = new FileRemote.CallbackEvent(this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
-    this.evChg = new FileRemote.CallbackEvent(this.evSrc, null, null, null, null, this.evSrc);
-    this.evCntLen = new FileRemote.CallbackEvent(this.evSrc, null, null, this.callbackCntLen, null, this.evSrc);
+    this.evBack = new FileRemote.CallbackEvent("GralFileProperties-evBack", this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
+    this.evChg = new FileRemote.CallbackEvent("GralFileProperties-evChg", this.evSrc, null, null, null, null, this.evSrc);
+    this.evCntLen = new FileRemote.CallbackEvent("GralFileProperties-evCntLen", this.evSrc, null, null, this.callbackCntLen, null, this.evSrc);
     this.widgLink = new GralTextField(refPos, "@3.5-3.2++, 1..-1=link-" + this.name, "symbolic link", "t");
     this.widgDir = new GralTextField(refPos, "dir-" + this.name, "directory path", "t");
     this.widgName = new GralTextField(refPos, "@+,1..-9=name-" + this.name, "filename", "t", GralTextField.Type.editable);

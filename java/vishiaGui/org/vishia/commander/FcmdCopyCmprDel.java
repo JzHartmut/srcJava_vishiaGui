@@ -583,7 +583,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source
     }
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent(evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
+    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdCopyCmprDelCallback", evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
     //====>
     //srcFile.moveChecked(sFilesSrc, fileDst, callback);
     setTexts(Estate.busy);
@@ -983,7 +983,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
     
     @SuppressWarnings("serial") 
-    protected final FileRemoteProgressTimeOrder showFilesProcessing = new FileRemoteProgressTimeOrder("GralFileSelector", evSrc, null, null, 200);
+    protected final FileRemoteProgressTimeOrder showFilesProcessing = new FileRemoteProgressTimeOrder("GralFileSelector", null, evSrc, null, 200);
     
 //    @SuppressWarnings("serial") 
 //    FileRemoteProgressTimeOrder showFilesProcessing = 
@@ -1680,7 +1680,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * Therefore it can be occupied usual without waiting, at least with thread switch to finish execution of the event.
    * See {@link EventCmdPingPongType#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
    */
-  FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent(evConsumerCallbackFromFileMachine, null, evSrc); 
+  FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent("FcmdCopyCmpDel", evConsumerCallbackFromFileMachine, null, evSrc); 
   
 
   

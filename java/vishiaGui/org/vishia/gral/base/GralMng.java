@@ -1433,6 +1433,9 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
         this.bDispatcherSleeps = false;
       }
     }
+    synchronized(this.awakeThread) {                       // the awakeThread goes only in wait if !bShouldExitImplGraphic
+      this.awakeThread.notify();                           // notify the awakeThread to finish it. Elsewhere it waits still.
+    }
     super.stateThreadTimer = 'f';
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
       GralWindow wind = ewind.getValue();
@@ -1533,16 +1536,20 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
         timeWait = super.timeCheckNew - System.currentTimeMillis();
       }
       if(timeWait > 2) {                                   // do not wait if in next 2 ms time orders are elapsed
-        synchronized(this) {
-          try { this.wait(timeWait);
-          } catch (InterruptedException e) { }
+        synchronized(this.awakeThread) {
+          if( !this.bShouldExitImplGraphic) {
+            try { this.awakeThread.wait(timeWait);
+            } catch (InterruptedException e) { }
+          }
         }
       }
-      if(bWakeupDispatcher) {                              // the graphic dispatcher has slept before. 
-        this._mngImpl.wakeup();                            // time elapsed, now wakeup, also if it works per accident just now.
+      if(!this.bShouldExitImplGraphic) {                   // check whether meanwhile the graphic is not closed...
+      if( bWakeupDispatcher ) {                            // the graphic dispatcher has slept before.
+        this._mngImpl.wakeup();                            // time elapsed, now wake up, also if it works per accident just now.
       } else {
         assert(timeWait == 10);                            // the graphic dispatcher has not slept before.
       }                                                    // check again after 10 ms.
+      }
     }
   }
 

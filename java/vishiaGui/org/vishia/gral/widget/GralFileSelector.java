@@ -2172,7 +2172,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
   
-  protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", this.evSrc, null, null, 200);
+  protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", null, this.evSrc, null, 200);
   
   
   protected class Callbacks { 
