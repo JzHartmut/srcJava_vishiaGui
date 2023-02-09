@@ -4,7 +4,7 @@ import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventThread_ifc;
-import org.vishia.event.TimeEntry;
+import org.vishia.event.TimeOrder;
 import org.vishia.event.EventWithDst;
 
 
@@ -13,7 +13,7 @@ import org.vishia.event.EventWithDst;
  * need to be overridden. Whereby the argument event is type of the overridden type itself.
  * Hence it is not necessary to evaluate, it is this itself.
  * <br>
- * The instance of this class contains the {@link TimeEntry} which is necessary for the management of the execution time 
+ * The instance of this class contains the {@link TimeOrder} which is necessary for the management of the execution time 
  * using the {@link GralMng} as {@link org.vishia.event.EventTimerThread}.
  *   
  * @author Hartmut Schorrig.
@@ -25,7 +25,7 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
   
   /**Version and history.
    * <ul>
-   * <li>2015-01-10 Hartmut now because the GralMng is also the {@link org.vishia.event.EventTimerThread}
+   * <li>2023-02-08 Hartmut now because the GralMng is also the {@link org.vishia.event.EventTimerThread}
    *   the operation EnqueueInGraphicThread is no more necessary. The event can immediately executed in the graphic thread.
    *   
    * <li>2015-01-10 Hartmut renamed from <code>GralDispatchCallbackWorker</code>
@@ -97,7 +97,7 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
 //  
   
     
-    public final TimeEntry timeOrder;
+    //public final TimeEntry timeOrder;
 
 
   /**Super constructor for all graphic time orders.
@@ -113,10 +113,10 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
    */
   protected GralGraphicEventTimeOrder(String name, GralMng gralMng) { 
     //super(name, gralMng);
-    super(name, gralMng.evSrc, null, null);
+    super(name, gralMng, gralMng.evSrc, null, gralMng);
     super.setDst(this);                                    // use this same instance also as EventConsumer, calls the overridden operation processEvent(...)
-    this.timeOrder = new TimeEntry(name, gralMng, this);
-    EventThread_ifc execThread = null;                     // definitive null to use the timer thread to execute. 
+    //this.timeOrder = new TimeEntry(name, gralMng, this);
+    //EventThread_ifc execThread = null;                     // definitive null to use the timer thread to execute. 
     //                                                     // note: if use gralMng, the same as timer thread, the event will be enqueued first after expire.
     //occupy(gralMng.evSrc, this, execThread, true);         // occupy the time order which is also the event. 
     //super( new EnqueueInGraphicThread(gralMng), gralMng.gthread);
@@ -126,9 +126,5 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
   
 
   
-  /**Activates the graphic order to execute immediately as next call in the graphic thread. */
-  public void activate(){
-    this.gralMng.storeEvent(this);
-  }
   
 }

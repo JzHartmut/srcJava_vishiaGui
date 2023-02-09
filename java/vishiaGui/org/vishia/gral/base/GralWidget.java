@@ -604,7 +604,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   
   /**Standard delay to redraw if {@link #redraw()} is called without arguments. 
    * It delays a few time because an additional process can be occur in a short time after, and only one redraw should be invoked.
-   * The redrawDelayMax limits are shifting to the future. See {@link org.vishia.event.TimeEntry}, that is used.
+   * The redrawDelayMax limits are shifting to the future. See {@link org.vishia.event.TimeOrder}, that is used.
    * 
    */
   protected int redrawtDelay = 50, redrawDelayMax = 100;

@@ -1315,8 +1315,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //the table has the focus, because the key action is done only if it is so.
         //set the new cell focused, in the paint routine.
         gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        actionOnLineSelected(KeyCode.userSelect, lineSelected);
-        keyActionDone.activate();
+        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
       case KeyCode.up: {
@@ -1331,13 +1330,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             }
           }
           lineSelected = linesForCell[lineSelectedixCell];
-
         }
         //the table has the focus, because the key action is done only if it is so.
         //set the new cell focused, in the paint routine.
         gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        actionOnLineSelected(KeyCode.userSelect, lineSelected);
-        keyActionDone.activate();
+        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       case KeyCode.pgdn: {
         if(lineSelectedixCell < zLineVisible -3){
@@ -1358,8 +1355,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //the table has the focus, because the key action is done only if it is so.
         //set the new cell focused, in the paint routine.
         gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        actionOnLineSelected(KeyCode.userSelect, lineSelected);
-        keyActionDone.activate();
+        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       default:
         if(keyCode == KeyCode.shift + KeyCode.enter) {     // The key combination sh+Enter is up to now (2023-01) used as right mouse:
@@ -1403,9 +1399,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          actionOnLineSelected(KeyCode.userSelect, lineSelected);
-
-          keyActionDone.activate();
+          keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
         } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
           keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
           searchChars.appendCodePoint(keyCode);
@@ -1445,8 +1439,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } else {
           line.setMarked(1, line.getUserData());
         }
-
-        keyActionDone.activate();
+        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
         done = true;
       }
       if(!done /*&& lineSelected !=null*/){
@@ -1497,6 +1490,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected final GralGraphicEventTimeOrder keyActionDone = new GralGraphicEventTimeOrder("GralTableKeyDone", this.gralMng()) {
     @Override
     public int processEvent ( EventObject ev) {
+      actionOnLineSelected(KeyCode.userSelect, lineSelected);
       gi.bFocused = true;  //to focus while repainting
       _wdgImpl.redrawGthread();
       keyDone = true;

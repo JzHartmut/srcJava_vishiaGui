@@ -86,7 +86,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   /**Version, history and license.
    * <ul>
    * <li>2022-11-14 Hartmut chg: Now the EventTimerThread and the graphic thread is one thread.
-   *   This has the advantage that an expired time order (now as {@link org.vishia.event.TimeEntry}
+   *   This has the advantage that an expired time order (now as {@link org.vishia.event.TimeOrder}
    *   can immediately execute its {@link org.vishia.event.EventWithDst#evDst}. {@link org.vishia.event.EventConsumer#processEvent(EventObject)}
    *   in the same thread, without dequeue and enqueue in the graphic thread. Lesser number of thread switches.
    *   <br>But because the graphic thread wait operation in SWT cannot wake up in a given time, it needs a timer thread
@@ -1306,8 +1306,10 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * @param order
    */
   public void addDispatchOrder(GralGraphicEventTimeOrder order){ 
-    order.activate();
-    //orderList.addTimeOrder(order); 
+    super.storeEvent(order);                               // stores the order as event in the own queue, also if called in the own graphic thread.
+    //commented: order.sendEvent();                        // this is longer, does the same
+    //old order.activate();
+    //old orderList.addTimeOrder(order); 
   }
 
   //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
