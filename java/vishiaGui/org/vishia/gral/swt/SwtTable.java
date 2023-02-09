@@ -663,8 +663,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      */
     @Override public void focusLost(FocusEvent ev){ 
       //System.out.println("Cell focus lost");
-      SwtTable.this.focusLostTable();
       if(!bRedrawPending){
+        SwtTable.this.focusLostTable();         // do not call during redrawpending, supress unnecessary redraw action.
         //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
         GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
         Text widgSwt = (Text)ev.widget;
