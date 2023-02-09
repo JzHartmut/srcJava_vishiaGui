@@ -4,19 +4,23 @@ import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventThread_ifc;
-import org.vishia.event.EventTimeout;
+import org.vishia.event.TimeEntry;
+import org.vishia.event.EventWithDst;
 
 
 /**This is the base class for user classes, which contains code, that should be executed in the graphic thread.
  * Because this class inherits from {@link EventConsumer} the operation {@link EventConsumer#processEvent(EventObject)}
  * need to be overridden. Whereby the argument event is type of the overridden type itself.
  * Hence it is not necessary to evaluate, it is this itself.
+ * <br>
+ * The instance of this class contains the {@link TimeEntry} which is necessary for the management of the execution time 
+ * using the {@link GralMng} as {@link org.vishia.event.EventTimerThread}.
  *   
  * @author Hartmut Schorrig.
  *
  */
 @SuppressWarnings("serial") 
-public abstract class GralGraphicTimeOrder extends EventTimeout implements EventConsumer
+public abstract class GralGraphicEventTimeOrder extends EventWithDst implements EventConsumer
 {
   
   /**Version and history.
@@ -92,6 +96,9 @@ public abstract class GralGraphicTimeOrder extends EventTimeout implements Event
 //  };
 //  
   
+    
+    public final TimeEntry timeOrder;
+
 
   /**Super constructor for all graphic time orders.
    * Usual a anonymous class is used for the instance: <pre>
@@ -104,11 +111,14 @@ public abstract class GralGraphicTimeOrder extends EventTimeout implements Event
    * </pre>  
    * @param name The name is only used for showing in debugging.
    */
-  protected GralGraphicTimeOrder(String name, GralMng gralMng) { 
-    super(name, gralMng);
+  protected GralGraphicEventTimeOrder(String name, GralMng gralMng) { 
+    //super(name, gralMng);
+    super(name, gralMng.evSrc, null, null);
+    super.setDst(this);                                    // use this same instance also as EventConsumer, calls the overridden operation processEvent(...)
+    this.timeOrder = new TimeEntry(name, gralMng, this);
     EventThread_ifc execThread = null;                     // definitive null to use the timer thread to execute. 
     //                                                     // note: if use gralMng, the same as timer thread, the event will be enqueued first after expire.
-    occupy(gralMng.evSrc, this, execThread, true);         // occupy the time order which is also the event. 
+    //occupy(gralMng.evSrc, this, execThread, true);         // occupy the time order which is also the event. 
     //super( new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     //super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     this.gralMng = gralMng;

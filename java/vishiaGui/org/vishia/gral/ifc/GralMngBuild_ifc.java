@@ -10,7 +10,7 @@ import java.util.Set;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralCurveView;
-import org.vishia.gral.base.GralGraphicTimeOrder;
+import org.vishia.gral.base.GralGraphicEventTimeOrder;
 import org.vishia.gral.base.GralHtmlBox;
 import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMenu;

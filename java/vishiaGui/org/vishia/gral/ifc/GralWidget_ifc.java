@@ -31,14 +31,14 @@ import org.vishia.util.Removeable;
  *   in a faster time than 100 ms if it is not a high speed animated graphic. The delayed repaint request
  *   saves calculation time if more as one property is changed on the same widget.
  * <li>The delayed repaint request queues the instance {@link GralWidget#repaintRequ} (only private visible)
- *   of {@link org.vishia.gral.base.GralGraphicTimeOrder} in the central queue of requests using 
- *   {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicTimeOrder)}. 
+ *   of {@link org.vishia.gral.base.GralGraphicEventTimeOrder} in the central queue of requests using 
+ *   {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(org.vishia.gral.base.GralGraphicEventTimeOrder)}. 
  *   The {@link org.vishia.gral.base.GralGraphicThread} is known by {@link org.vishia.gral.base.GralWidget#gralMng}.
  * <li>If for example 20 widgets are changed in maybe 40 properties, that queue contains the 20 instances of
- *   {@link org.vishia.gral.base.GralGraphicTimeOrder}. Any of them may have a specific delay. 
+ *   {@link org.vishia.gral.base.GralGraphicEventTimeOrder}. Any of them may have a specific delay. 
  *   The graphic thread organizes it in a proper kind of time.
- * <li>If a {@link org.vishia.gral.base.GralGraphicTimeOrder} is dequeued in the graphic thread, 
- *   its method {@link org.vishia.gral.base.GralGraphicTimeOrder#executeOrder(boolean)} is invoked. 
+ * <li>If a {@link org.vishia.gral.base.GralGraphicEventTimeOrder} is dequeued in the graphic thread, 
+ *   its method {@link org.vishia.gral.base.GralGraphicEventTimeOrder#executeOrder(boolean)} is invoked. 
  *   This method calls {@link GralWidgImplAccess_ifc#redrawGthread()} via the association {@link org.vishia.gral.base.GralWidget#_wdgImpl}.
  * <li>The <code>rerepaintGthread()</code> method is overridden in the implementation layer
  *   with the necessary statements to transfer the non-graphic data of this {@link GralWidget} especially
@@ -272,12 +272,12 @@ public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
    * With the set methods the user stores the text, color etc. in graphic-independent attributes. Then the method
    * {@link #redraw(int, int)} is invoked with the standard delay of {@link #redrawtDelay} and {@link #redrawDelayMax}.
    * With that the widget-specific private instance of {@link #repaintRequ} is added to the queue of requests
-   * in the {@link GralGraphicThread#addTimeOrder(GralGraphicTimeOrder)}. In the requested time that 
+   * in the {@link GralGraphicThread#addTimeEntry(GralGraphicEventTimeOrder)}. In the requested time that 
    * dispatch order is executed in the graphic thread. It calls {@link GralWidgImplAccess_ifc#redrawGthread()}. 
    * That method is implemented in the graphic implementation layer of the widget. It sets the appropriate values 
    * from the independent Gral attributes to the implementation specifics and invoke a redraw of the graphic layer.
    * <br><br>
-   * If more as one attribute is changed one after another, only one instance of the {@link GralGraphicTimeOrder}
+   * If more as one attribute is changed one after another, only one instance of the {@link GralGraphicEventTimeOrder}
    * is queued. All changed attributes are stored in {@link DynamicData#whatIsChanged} and the
    * {@link GralWidgImplAccess_ifc#redrawGthread()} quests all changes one after another. 
    * It means that a thread switch is invoked only one time per widget for more as one change.

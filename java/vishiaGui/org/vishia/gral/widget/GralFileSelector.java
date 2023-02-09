@@ -16,7 +16,7 @@ import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.fileRemote.FileRemoteProgressTimeOrder;
+import org.vishia.fileRemote.FileRemoteProgressEvent;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralSwitchButton;
@@ -2172,7 +2172,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
   
-  protected final FileRemoteProgressTimeOrder progress = new FileRemoteProgressTimeOrder("GralFileSelector", null, this.evSrc, null, 200);
+  protected final FileRemoteProgressEvent progress = new FileRemoteProgressEvent("GralFileSelector", null, this.evSrc, null, 200);
   
   
   protected class Callbacks { 

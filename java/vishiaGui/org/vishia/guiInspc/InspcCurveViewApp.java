@@ -8,7 +8,7 @@ import java.util.EventObject;
 import org.vishia.byteData.VariableContainer_ifc;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.gral.base.GralGraphicTimeOrder;
+import org.vishia.gral.base.GralGraphicEventTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWindow;
@@ -39,7 +39,7 @@ public class InspcCurveViewApp
   InspcCurveViewApp ( ) {
     this.gralMng = new GralMng();
     
-    this.reportAllContentImpl = new GralGraphicTimeOrder("reportAllContentImpl", this.gralMng) {
+    this.reportAllContentImpl = new GralGraphicEventTimeOrder("reportAllContentImpl", this.gralMng) {
       @Override public int processEvent ( EventObject ev) {
         try {
           InspcCurveViewApp.this.curveView.windCurve.reportAllContentImpl(InspcCurveViewApp.this.log);
@@ -122,7 +122,7 @@ public class InspcCurveViewApp
       
   }
   
-  final GralGraphicTimeOrder reportAllContentImpl;
+  final GralGraphicEventTimeOrder reportAllContentImpl;
 
   
   

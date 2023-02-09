@@ -287,7 +287,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
       if(this.gralMng.currThreadIsGraphic()){
         return createImplWidget_Gthread();      // call immediately the graphic thread operation.
       } else {
-        GralGraphicTimeOrder order = new TimeOrderCreateImplWidget(this);
+        GralGraphicEventTimeOrder order = new TimeOrderCreateImplWidget(this);
         this.gralMng.addDispatchOrder(order);
         return true;
       }
@@ -337,7 +337,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   }
 
   @SuppressWarnings("serial") 
-  public static class TimeOrderCreateImplWidget extends GralGraphicTimeOrder implements EventConsumer {
+  public static class TimeOrderCreateImplWidget extends GralGraphicEventTimeOrder implements EventConsumer {
 
     final GralWidgetBase fromWdg;
     

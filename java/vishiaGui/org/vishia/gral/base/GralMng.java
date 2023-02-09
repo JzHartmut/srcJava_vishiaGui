@@ -86,7 +86,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   /**Version, history and license.
    * <ul>
    * <li>2022-11-14 Hartmut chg: Now the EventTimerThread and the graphic thread is one thread.
-   *   This has the advantage that an expired time order (now as {@link org.vishia.event.EventTimeout}
+   *   This has the advantage that an expired time order (now as {@link org.vishia.event.TimeEntry}
    *   can immediately execute its {@link org.vishia.event.EventWithDst#evDst}. {@link org.vishia.event.EventConsumer#processEvent(EventObject)}
    *   in the same thread, without dequeue and enqueue in the graphic thread. Lesser number of thread switches.
    *   <br>But because the graphic thread wait operation in SWT cannot wake up in a given time, it needs a timer thread
@@ -175,7 +175,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows. 
    * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
    *   The graphical implementation extends the {@link ImplAccess}. 
-   * <li>2012-04-20 Hartmut bugfix: If a {@link GralGraphicTimeOrder} throws an exception,
+   * <li>2012-04-20 Hartmut bugfix: If a {@link GralGraphicEventTimeOrder} throws an exception,
    *   it was started again because it was in the queue yet. The proplem occurs on build graphic. It
    *   was repeated till all graphic handles are consumed. Now the {@link #queueGraphicOrders} entries
    *   are deleted first, then executed. TODO use this class only for SWT, use the adequate given mechanism
@@ -491,12 +491,12 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   
   /**Queue of orders to execute in the graphic thread before dispatching system events. 
    * Any instance will be invoked in the dispatch-loop.
-   * See {@link #addTimeOrder(Runnable)}. 
+   * See {@link #addTimeEntry(Runnable)}. 
    * An order can be stayed in this queue for ever. It is invoked any time after the graphic thread 
    * is woken up and before the dispatching of graphic-system-event will be started.
    * An order may be run only one time, than it should delete itself from this queue in its run-method.
    * */
-  private final ConcurrentLinkedQueue<GralGraphicTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicTimeOrder>();
+  private final ConcurrentLinkedQueue<GralGraphicEventTimeOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicEventTimeOrder>();
 
   
   private final Thread awakeThread;
@@ -1302,10 +1302,10 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   
   
   /**Adds the order to execute in the graphic dispatching thread.
-   * It is the same like order.{@link GralGraphicTimeOrder#activate()}.
+   * It is the same like order.{@link GralGraphicEventTimeOrder#activate()}.
    * @param order
    */
-  public void addDispatchOrder(GralGraphicTimeOrder order){ 
+  public void addDispatchOrder(GralGraphicEventTimeOrder order){ 
     order.activate();
     //orderList.addTimeOrder(order); 
   }
@@ -1316,8 +1316,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
   
   public void addEvent(EventObject event) {
-    assert(event instanceof GralGraphicTimeOrder);  //should be
-    queueOrdersToExecute.add((GralGraphicTimeOrder)event);
+    assert(event instanceof GralGraphicEventTimeOrder);  //should be
+    queueOrdersToExecute.add((GralGraphicEventTimeOrder)event);
     this._mngImpl.wakeup();
   }
   
@@ -1483,7 +1483,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       //if wakeUp() is called, isWakedUpOnly is set.
       this.checkTimes.cyclTime();
       //execute stored orders.
-      GralGraphicTimeOrder order;
+      GralGraphicEventTimeOrder order;
       boolean bSleep = true;
       int ctOrders = 0;
       super.stepThread();

@@ -12,7 +12,7 @@ import javax.script.ScriptException;
 import org.vishia.cmd.JZtxtcmdExecuter;
 import org.vishia.cmd.JZtxtcmdScript;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralGraphicTimeOrder;
+import org.vishia.gral.base.GralGraphicEventTimeOrder;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextBox;
