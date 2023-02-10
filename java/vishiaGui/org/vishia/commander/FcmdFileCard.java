@@ -559,6 +559,9 @@ public class FcmdFileCard extends GralFileSelector
      */
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       // do it only if it is the current focused panel.    // prevent next operation for the second panel to sync!
+      if(actionCode == KeyCode.activated) {
+        FcmdFileCard.this.main.setLastSelectedPanel(FcmdFileCard.this.mainPanel);
+      }
       if(FcmdFileCard.this.main.lastFilePanels.size()>=1 && FcmdFileCard.this.main.lastFilePanels.get(0) == FcmdFileCard.this.mainPanel) {
         setActFilePanel_setColorCurrLine();                // action on this card: It is the first one
         FcmdFileCard.this.mainPanel.bFavorCardHasFocus = false;
@@ -574,6 +577,8 @@ public class FcmdFileCard extends GralFileSelector
             actionOnFileSelection((FileRemote)oData, sFileCell);
           }
         }
+      } else {
+        Debugutil.stop();
       }
       return true;
     }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
+import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
@@ -22,6 +23,7 @@ import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralLabel;
+import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Debugutil;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
@@ -135,6 +137,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   FileRemote srcDir, srcFile;
   
+  
+  @SuppressWarnings("serial") 
+  protected final FileRemoteProgressEvent progress;
+
+  
   boolean srcSomeFiles;
   
   /**If more as one files are selected to copy, the names are contained here separated with ' : '.
@@ -219,7 +226,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   /**This reference is set with the callback of operation cmd. 
    * The event can be used to affect the copying process.
    */
-  FileRemote.CallbackEvent evCurrentFile;
+//  FileRemote.CallbackEvent evCurrentFile;
   
   
   Actions action;
@@ -229,6 +236,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.main = main;
     String name = cmdArg.name;
     this.action = new Actions();
+    this.progress = new FileRemoteProgressEvent(name + "-Progress", main.gui.gralMng, null, this.action.progressEv, 200);
     GralPos refPos = new GralPos(main.gui.gralMng.screen);
     int windprops = GralWindow_ifc.windConcurrently; // + GralWindow.windResizeable;
     this.windConfirmCopy = new GralWindow(refPos, "@screen,30+37,30+70=" + name + "Window", cmdArg.name, windprops); 
@@ -534,7 +542,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   /**Starts the execution of mark in another thread. Note that the mark works with the walk-file algorithm
-   * and refreshes the files therewith. The #action.showFilesProcessing is used as callback.
+   * and refreshes the files therewith. The #this.progress is used as callback.
    * See {@link FileRemote#refreshAndMark(int, boolean, String, int, int, FileRemoteWalkerCallback)}.
    */
   final void execMark(){
@@ -549,8 +557,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     int depths = srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
     long bMarkSelect = srcSomeFiles ? 0x200000000L + FileMark.select : 0;
     //====>
-    //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, action.showFilesProcessing);
-    srcFile.refreshAndMark(false, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, action.showFilesProcessing);
+    //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
+    srcFile.refreshAndMark(false, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     widgCopyNameDst.setText(srcDir.getStateDevice());
     bFirstSelect = false;
   }
@@ -558,7 +566,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   final protected void execDel(){
     if(state == Estate.checked){
-      srcFile.deleteMarkedInThread(FileMark.select, callbackFromFilesExec, action.showFilesProcessing);      
+      srcFile.deleteMarkedInThread(FileMark.select, callbackFromFilesExec, this.progress);      
     } else if(state == Estate.start){
     }
   }
@@ -583,7 +591,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source
     }
-    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdCopyCmprDelCallback", evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
+//    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdCopyCmprDelCallback", evSrc, srcFile, null, evConsumerCallbackFromFileMachine, null, evSrc);
     //====>
     //srcFile.moveChecked(sFilesSrc, fileDst, callback);
     setTexts(Estate.busy);
@@ -614,7 +622,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       sDstDir = srcDir.getAbsolutePath() + "/" + sDstDir;
     }
     //====>
-    srcFile.copyChecked(sDstDir, sDstMask, modeCopy(), null, action.showFilesProcessing);  //, evCallback);
+    srcFile.copyChecked(sDstDir, sDstMask, modeCopy(), null, this.progress);  //, evCallback);
     //String stateCopy = copyStates.getStateInfo();
     setTexts(Estate.busy);
     //widgCopyState.setText("State: " + stateCopy);
@@ -632,18 +640,18 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     byte[] search = { 0x0d, 0x0a};
     boolean bOk = true;
     //check whether the event is able to occupy, use it to check.
-    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
-      if(evCallback.occupyRecall(1000, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
-        System.err.println("FcmdCopyCmd event occupy hangs");
-        bOk = false;
-      }
-    }
+//    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+//      if(evCallback.occupyRecall(1000, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+//        System.err.println("FcmdCopyCmd event occupy hangs");
+//        bOk = false;
+//      }
+//    }
     if(bOk) {
       String sSrcMask= widgFromConditions.getText();
-      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state, 
+//      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state, 
       //it is a check of sendEvent and it should relinguish the event.
       //====>
-      srcFile.refreshAndSearch(0, sSrcMask, 0, search, null, action.showFilesProcessing); //evCallback); //evCallback able to use from callback.
+      srcFile.refreshAndSearch(0, sSrcMask, 0, search, null, this.progress); //evCallback); //evCallback able to use from callback.
       //setTexts(Estate.busy);
     } else {
       widgCopyState.setText("evCallback hangs");
@@ -680,18 +688,18 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     else { dirDst = fileDst.getParentFile(); } 
     boolean bOk = true;
     //check whether the event is able to occupy, use it to check.
-    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
-      if(evCallback.occupyRecall(1000, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
-        System.err.println("FcmdCopyCmd event occupy hangs");
-        bOk = false;
-      }
-    }
+//    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+//      if(evCallback.occupyRecall(1000, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
+//        System.err.println("FcmdCopyCmd event occupy hangs");
+//        bOk = false;
+//      }
+//    }
     if(bOk) {
       String sSrcMask= widgFromConditions.getText();
-      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state, 
+//      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state, 
       //it is a check of sendEvent and it should relinguish the event.
       //====>
-      srcFile.refreshAndCompare(dirDst, 0, sSrcMask, 0, null, action.showFilesProcessing); //evCallback); //evCallback able to use from callback.
+      srcFile.refreshAndCompare(dirDst, 0, sSrcMask, 0, null, this.progress); //evCallback); //evCallback able to use from callback.
       //setTexts(Estate.busy);
     } else {
       widgCopyState.setText("evCallback hangs");
@@ -708,9 +716,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //ev.copyAbortAll();
       //ev.sendEvent(FileRemote.cmdAbortAll);
     }
-    if(action.showFilesProcessing.evAnswer.getDst() !=null) { //don't send if the destination is not set.
-      action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.abortAll, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
-    }
+    progress.setAbort();
     String sDirSrc = widgShowSrc.getText();
     //FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
     if(srcDir !=null) { srcDir.abortAction(); }  //to set stateMachine of copy in ready state 
@@ -720,7 +726,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     listEvCheck.clear();
     listEvCopy.clear();
     filesToCopy.clear();
-    FcmdCopyCmprDel.this.evCurrentFile = null;
+//    FcmdCopyCmprDel.this.evCurrentFile = null;
     //bLockSrc = false;
     //widgButtonOk.setText("close");
     //widgButtonOk.setCmd("close");
@@ -880,6 +886,31 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     
   }
   
+
+  boolean bRunTestProgressThread;
+  
+  class TestProgressThread extends  Thread {
+    
+    
+    public TestProgressThread() {
+      super("testProgressThread");
+      start();
+    }
+
+    
+    @Override public void run() {
+      System.out.println(LogMessage.timeCurr("testProgressThread"));
+      //progress.timeOrder.activate(200);
+      while(bRunTestProgressThread) {
+        progress.nrFilesProcessed +=1;
+        synchronized(this) { try{ wait(200);} catch(InterruptedException exc) {}}
+      }
+      System.out.println(LogMessage.timeCurr("stop testProgressThread"));
+      progress.bDone = true;
+    }
+  };
+  
+  TestProgressThread testProgressThread;
   
   
   /**Invoked with a time order.
@@ -896,8 +927,16 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     if(order.bDone) {
       widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
-      setTexts(Estate.finit);
+      //setTexts(Estate.finit);
+    } else {
+      progress.timeOrder.activate(200);                    // re-activate showing in 200 ms steo.
     }
+    
+    
+    zFiles = order.nrFilesProcessed;
+    zBytes = order.nrofBytesFileCopied;
+    widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+    
     if(order.quest() !=null) {
       switch(order.quest()){
         case askDstOverwr: 
@@ -936,6 +975,10 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     u.append("; Files:").append(Integer.toString(zFiles)).append(": ");
     widgCopyState.setText(u.toString());
   }
+  
+  
+  
+  
   
   
   void showFinishState(CharSequence start)
@@ -982,8 +1025,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     };
     
     
-    @SuppressWarnings("serial") 
-    protected final FileRemoteProgressEvent showFilesProcessing = new FileRemoteProgressEvent("GralFileSelector", null, evSrc, null, 200);
     
 //    @SuppressWarnings("serial") 
 //    FileRemoteProgressTimeOrder showFilesProcessing = 
@@ -1002,6 +1043,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   {
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        progress.timeOrder.activate(200);
         if(srcFile !=null) { widgCopyState.setText(srcFile.getStateDevice()); }
         else { widgCopyState.setText("no source file"); }
       }
@@ -1171,7 +1213,16 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){ 
          if(!widgButtonCheck.isDisabled()){
          //if(state == Estate.start || state == Estate.checked) { //widgg.sCmd.equals("check")){    
-           execMark();
+           //testonly: execMark();
+           if(bRunTestProgressThread) {
+             bRunTestProgressThread = false;
+           } else {
+             bRunTestProgressThread = true;
+             testProgressThread = new TestProgressThread();
+             progress.clear();
+             progress.timeOrder.activate(200);
+             
+           }
          }
        }
        return true;
@@ -1367,6 +1418,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         if(state == Estate.start) { //widgg.sCmd.equals("check")){    
+          progress.clear();
           if(cmd == Ecmd.delete){
             execMark();
           } else if(cmd == Ecmd.copy || bFineSelect){
@@ -1378,6 +1430,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           } else if(cmd == Ecmd.search){
             execSearch();
           }
+          progress.timeOrder.activate(50);
         } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
           switch(cmd){
             case copy: execCopy(); break;
@@ -1390,7 +1443,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           closeWindow();
         } else {
           //should be state pause
-          action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+//          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
         }
       }
       return true;
@@ -1400,9 +1453,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   
   
-  protected GralUserAction actionButtonAbort = new GralUserAction("actionButtonAbort")
-  { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+  protected GralUserAction actionButtonAbort = new GralUserAction("actionButtonAbort") { 
+    @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         switch(state){ //inactive, start, checked, busyCheck, busy, quest, error, finit
           case start: {
             setTexts(Estate.finit);
@@ -1433,14 +1486,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected GralUserAction actionOverwriteFile = new GralUserAction(sTextExecuteForFile)
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstOverwr
-             || action.showFilesProcessing.quest() == FileRemote.CallbackCmd.askDstReadonly) {
-          action.showFilesProcessing.modeCopyOper = modeCopy();
-          action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.overwrite, modeCopy() ); 
+        if(FcmdCopyCmprDel.this.progress.quest() == FileRemote.CallbackCmd.askDstOverwr
+             || FcmdCopyCmprDel.this.progress.quest() == FileRemote.CallbackCmd.askDstReadonly) {
+          FcmdCopyCmprDel.this.progress.modeCopyOper = modeCopy();
+          FcmdCopyCmprDel.this.progress.setAnswer(FileRemote.Cmd.overwr ); 
           widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
           widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
         } else {
-          action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+//          FcmdCopyCmprDel.this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
         }
         //widgCopyNameDst.setText("");
         widgCopyState.setText("skipped");
@@ -1459,16 +1512,16 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected GralUserAction actionButtonSkipFile = new GralUserAction("actionButtonSkipFile")
   { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(evCurrentFile !=null){
-          int modeCopyOper = modeCopy();
-          //action.showFilesProcessing.answer(FileRemoteProgressTimeOrder.Answer.abortFile);
-          action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.abortFile, modeCopy() ); 
-        }
-        else if(action.showFilesProcessing !=null) {
-          action.showFilesProcessing.modeCopyOper = modeCopy();
-          action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.abortFile, modeCopy() ); //;
+//        if(evCurrentFile !=null){
+//          int modeCopyOper = modeCopy();
+//          //this.progress.answer(FileRemoteProgressTimeOrder.Answer.abortFile);
+//          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.abortFile, modeCopy() ); 
+//        }
+//        else if(this.progress !=null) {
+          FcmdCopyCmprDel.this.progress.modeCopyOper = modeCopy();
+          FcmdCopyCmprDel.this.progress.setAnswer(FileRemote.Cmd.abortCopyFile ); //;
          
-        }
+//        }
         widgCopyNameDst.setText("");
         widgCopyState.setText("skipped");
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
@@ -1483,14 +1536,15 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * should be aborted and that file should be deleted.
    * 
    */
-  protected GralUserAction actionButtonSkipDir = new GralUserAction("actionButtonSkipDir")
-  { @Override public boolean userActionGui(int key, GralWidget widgg, Object... params)
-    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(evCurrentFile !=null){
-          int modeCopyOper = modeCopy();
-          //evCurrentFile.copySkipDir(modeCopyOper);
-        }
-        action.showFilesProcessing.evAnswer.send(FileRemoteProgressEvent.Answer.abortDir, modeCopy() ); //triggerStateMachine(evSrc, FileRemote.Cmd.abortAll);
+  protected GralUserAction actionButtonSkipDir = new GralUserAction("actionButtonSkipDir") { 
+    @Override public boolean userActionGui(int key, GralWidget widgg, Object... params) { 
+      if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+//        if(evCurrentFile !=null){
+//          int modeCopyOper = modeCopy();
+//          //evCurrentFile.copySkipDir(modeCopyOper);
+//        }
+        FcmdCopyCmprDel.this.progress.modeCopyOper = modeCopy();
+        FcmdCopyCmprDel.this.progress.setAnswer(FileRemote.Cmd.abortCopyDir ); //;
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }
@@ -1555,115 +1609,115 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   
   
-  /**Instance of an event consumer which is used for all callback actions from the FileRemote machine.
-   * The given event contains a command which depends on the action which is done by the file state machine or the file process.
-   * Especially
-   * <ul>
-   * <li>{@link FileRemote.CallbackCmd#nrofFilesAndBytes}: shows the progress of the action. 
-   * </ul>
-   */
-  EventConsumer evConsumerCallbackFromFileMachine = new EventConsumer(){
-    @Override public int processEvent(EventObject ev)
-    {
-      FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
-      FileRemote.CallbackCmd cmd = ev1.getCmd();
-      String sCmd = cmd.name();
-      System.out.println("FcmdCopy - callbackCopy;" + sCmd);
-      switch(ev1.getCmd()){
-        case start: {
-          setTexts(Estate.busy);
-        } break;
-        case doneCheck:{ ///
-          //if(listEvCheck.remove(ev)){  ///
-            FcmdCopyCmprDel.this.evCurrentFile = ev1;
-            zFiles = ev1.nrofFiles;
-            zBytes = ev1.nrofBytesAll;
-            //int nrofPendingFiles = listEvCheck.size();
-            //if(nrofPendingFiles == 0){
-              //TODO check dst space
-              widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
-              //widgButtonOk.setText("copy");
-              //widgButtonOk.setCmd("copy");
-              //widgButtonSrc.setText("set src");
-              //widgButtonSrc.setCmd("setSrc");
-            //}
-            
-          //} else {
-            //unexpected doneCheck:
-          //}
-          setTexts(Estate.checked);
-        } break;
-        case copyDir:{
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-          String sPath = StringFunctions.z_StringJc(ev1.fileName);
-          widgCopyNameDst.setText(sPath);
-        } break;
-        case nrofFilesAndBytes:{
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-          int percent = ev1.promilleCopiedBytes / 10;
-          widgProgressFile.setValue(percent);
-          widgProgressAll.setValue(ev1.promilleCopiedFiles / 10);
-          widgCopyNameDst.setText(StringFunctions.z_StringJc(ev1.fileName));
-          widgCopyState.setText("... " + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
-        }break;
-        case askDstOverwr: {
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-          widgCopyNameDst.setText("exists: " + StringFunctions.z_StringJc(ev1.fileName));
-          widgSkipFile.setBackColor(GralColor.getColor("am"), 0);
-          widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
-        } break;
-        case askDstReadonly: {
-            FcmdCopyCmprDel.this.evCurrentFile = ev1;
-            widgCopyNameDst.setText("read only: " + StringFunctions.z_StringJc(ev1.fileName));
-            widgSkipFile.setBackColor(GralColor.getColor("am"), 0);
-            widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
-        } break;
-        case askDstNotAbletoOverwr: {
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-          widgCopyNameDst.setText("can't overwrite: " + StringFunctions.z_StringJc(ev1.fileName));
-          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
-          widgOverwrFile.setBackColor(GralColor.getColor("am"), 0);
-        } break;
-        case askErrorDstCreate: {
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-          widgCopyNameDst.setText("can't create: " + StringFunctions.z_StringJc(ev1.fileName));
-          widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
-        } break;
-        case askErrorCopy: {
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-          widgCopyNameDst.setText("copy error: " + StringFunctions.z_StringJc(ev1.fileName));
-          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
-          widgOverwrFile.setBackColor(GralColor.getColor("am"), 0);
-        } break;
-        case error: {
-          FcmdCopyCmprDel.this.evCurrentFile = null;
-          widgCopyState.setText("error");
-          setTexts(Estate.error);
-          eventConsumed(ev, false);
-        }break;
-        case nok: {
-          FcmdCopyCmprDel.this.evCurrentFile = null;
-          widgCopyState.setText("nok");
-          setTexts(Estate.error);
-          eventConsumed(ev, false);
-        }break;
-        case done: {
-          FcmdCopyCmprDel.this.evCurrentFile = null;
-          widgCopyState.setText("ok: " + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
-          eventConsumed(ev, true);
-          setTexts(Estate.finit);
-        }break;
-        default:
-          FcmdCopyCmprDel.this.evCurrentFile = ev1;
-
-      }
-      //windConfirmCopy.setWindowVisible(false);
-      return 1;
-    }
-    @Override public String toString(){ return "FcmdCopy-success"; }
-
-    
-  };
+//  /**Instance of an event consumer which is used for all callback actions from the FileRemote machine.
+//   * The given event contains a command which depends on the action which is done by the file state machine or the file process.
+//   * Especially
+//   * <ul>
+//   * <li>{@link FileRemote.CallbackCmd#nrofFilesAndBytes}: shows the progress of the action. 
+//   * </ul>
+//   */
+//  EventConsumer evConsumerCallbackFromFileMachine = new EventConsumer(){
+//    @Override public int processEvent(EventObject ev)
+//    {
+//      FileRemote.CallbackEvent ev1 = (FileRemote.CallbackEvent)ev;
+//      FileRemote.CallbackCmd cmd = ev1.getCmd();
+//      String sCmd = cmd.name();
+//      System.out.println("FcmdCopy - callbackCopy;" + sCmd);
+//      switch(ev1.getCmd()){
+//        case start: {
+//          setTexts(Estate.busy);
+//        } break;
+//        case doneCheck:{ ///
+//          //if(listEvCheck.remove(ev)){  ///
+//            FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//            zFiles = ev1.nrofFiles;
+//            zBytes = ev1.nrofBytesAll;
+//            //int nrofPendingFiles = listEvCheck.size();
+//            //if(nrofPendingFiles == 0){
+//              //TODO check dst space
+//              widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
+//              //widgButtonOk.setText("copy");
+//              //widgButtonOk.setCmd("copy");
+//              //widgButtonSrc.setText("set src");
+//              //widgButtonSrc.setCmd("setSrc");
+//            //}
+//            
+//          //} else {
+//            //unexpected doneCheck:
+//          //}
+//          setTexts(Estate.checked);
+//        } break;
+//        case copyDir:{
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//          String sPath = StringFunctions.z_StringJc(ev1.fileName);
+//          widgCopyNameDst.setText(sPath);
+//        } break;
+//        case nrofFilesAndBytes:{
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//          int percent = ev1.promilleCopiedBytes / 10;
+//          widgProgressFile.setValue(percent);
+//          widgProgressAll.setValue(ev1.promilleCopiedFiles / 10);
+//          widgCopyNameDst.setText(StringFunctions.z_StringJc(ev1.fileName));
+//          widgCopyState.setText("... " + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
+//        }break;
+//        case askDstOverwr: {
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//          widgCopyNameDst.setText("exists: " + StringFunctions.z_StringJc(ev1.fileName));
+//          widgSkipFile.setBackColor(GralColor.getColor("am"), 0);
+//          widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
+//        } break;
+//        case askDstReadonly: {
+//            FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//            widgCopyNameDst.setText("read only: " + StringFunctions.z_StringJc(ev1.fileName));
+//            widgSkipFile.setBackColor(GralColor.getColor("am"), 0);
+//            widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
+//        } break;
+//        case askDstNotAbletoOverwr: {
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//          widgCopyNameDst.setText("can't overwrite: " + StringFunctions.z_StringJc(ev1.fileName));
+//          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+//          widgOverwrFile.setBackColor(GralColor.getColor("am"), 0);
+//        } break;
+//        case askErrorDstCreate: {
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//          widgCopyNameDst.setText("can't create: " + StringFunctions.z_StringJc(ev1.fileName));
+//          widgOverwrFile.setBackColor(GralColor.getColor("lrd"), 0);
+//        } break;
+//        case askErrorCopy: {
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//          widgCopyNameDst.setText("copy error: " + StringFunctions.z_StringJc(ev1.fileName));
+//          widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+//          widgOverwrFile.setBackColor(GralColor.getColor("am"), 0);
+//        } break;
+//        case error: {
+//          FcmdCopyCmprDel.this.evCurrentFile = null;
+//          widgCopyState.setText("error");
+//          setTexts(Estate.error);
+//          eventConsumed(ev, false);
+//        }break;
+//        case nok: {
+//          FcmdCopyCmprDel.this.evCurrentFile = null;
+//          widgCopyState.setText("nok");
+//          setTexts(Estate.error);
+//          eventConsumed(ev, false);
+//        }break;
+//        case done: {
+//          FcmdCopyCmprDel.this.evCurrentFile = null;
+//          widgCopyState.setText("ok: " + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
+//          eventConsumed(ev, true);
+//          setTexts(Estate.finit);
+//        }break;
+//        default:
+//          FcmdCopyCmprDel.this.evCurrentFile = ev1;
+//
+//      }
+//      //windConfirmCopy.setWindowVisible(false);
+//      return 1;
+//    }
+//    @Override public String toString(){ return "FcmdCopy-success"; }
+//
+//    
+//  };
 
   
  
@@ -1680,7 +1734,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * Therefore it can be occupied usual without waiting, at least with thread switch to finish execution of the event.
    * See {@link EventCmdPingPongType#occupyRecall(int, EventSource, EventConsumer, org.vishia.event.EventThread, boolean)}  
    */
-  FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent("FcmdCopyCmpDel", evConsumerCallbackFromFileMachine, null, evSrc); 
+//  FileRemote.CallbackEvent evCallback = new FileRemote.CallbackEvent("FcmdCopyCmpDel", evConsumerCallbackFromFileMachine, null, evSrc); 
   
 
   

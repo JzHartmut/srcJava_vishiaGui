@@ -1389,7 +1389,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else {
         //refresh it in an extra thread therefore show all lines with colorBackPending. 
         //Remove lines which remains the colorBackPending after refreshing.
-        dir.refreshPropertiesAndChildren(this.action.callbackChildren1, false, progress);
+        dir.refreshPropertiesAndChildren(this.action.callbackChildren1, false, this.progress);
       }
     }
     if(file !=null) {

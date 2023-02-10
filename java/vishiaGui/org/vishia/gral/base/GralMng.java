@@ -1473,7 +1473,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       ctOsEvents +=1;
       //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
     } while(bContinueDispatch);
-    if(this.debugPrint){ System.out.println("GralGraphicThread - dispatched os events, " + ctOsEvents); }
+    //if(true || this.debugPrint){ System.out.println("GralGraphicThread - dispatched os events, " + ctOsEvents); }
     this.checkTimes.calcTime();
     this.isWakedUpOnly = false;
     //System.out.println("dispatched");
