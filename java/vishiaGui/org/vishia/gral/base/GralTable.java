@@ -101,6 +101,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-02-11 {@link #processKeys(int)} experience. Now call {@link #keyActionDone} not as event,
+   *   instead immediately in the key handler. This is possible, because it is the graphic thread, of course!
+   *   It is better to save calculation time for enqueu/dequeu the timer and event.
+   *   The idea to show the graphic not on any key stroke to save time for fast repetition is not implemented here,
+   *   and it may be not necessary. It may be implementable with a time measurement and counter.  
    * <li>2023-01-06 Hartmut new: key combination sh + enter now for activating context menu. 
    *   Is it a good choice? In MS-Windows also sh-F10 activates the context menu (sometimes). 
    *   But it is general a good idea to activate it manually per key stroke. 
@@ -267,7 +272,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  protected final static String sVersion = "2023-01-06";
+  protected final static String sVersion = "2023-02-11";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -1016,14 +1021,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  private void fillVisibleArea(){
+  /**Fills the #linesForCell[] with the appropriate lines from the table.  
+   * 
+   */
+  protected void fillVisibleArea(){
     if(this.lineSelected ==null) {
       this.lineSelected = (TableLineData)getFirstLine();
     }
     TableLineData line = lineSelected;
     
     int ix = lineSelectedixCell;
-    while(ix >0 && line !=null){
+    while(ix >0 && line !=null){                           // filles linesForCell[0..ix-1] 
       line = prevLine(line);
       if(line !=null){
         linesForCell[--ix] = line;
@@ -1040,7 +1048,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  private void fillVisibleAreaBehind(TableLineData lineStart, int ixStart){
+  /**Fills the {@link #linesForCell} starting from the current line down.
+   * This is called in {@link #fillVisibleArea()} but also if a line is folded/unfolded.
+   * Then only the following lines are influenced.
+   * @param lineStart from this line in the whole {@link #rootline} container. 
+   * @param ixStart index in the graphical rows in the table.
+   */
+  protected void fillVisibleAreaBehind(TableLineData lineStart, int ixStart){
     int ix = ixStart;
     TableLineData line = lineStart;
     while(line !=null && ix < zLineVisible) {
@@ -1275,6 +1289,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @return true if the key is processed, false if the key is not processed here. Maybe processed after them.
    */
   protected boolean processKeys(int keyCode){
+    //TODO measure the calculation time load here with fast key repetition.
+    //this is a proper test for speed of graphic presentation.
+    //It writes many cells especially if shifts the table.
     if(keyCode == KeyCode.enter)
       Debugutil.stop();
     boolean done = true;
@@ -1315,7 +1332,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //the table has the focus, because the key action is done only if it is so.
         //set the new cell focused, in the paint routine.
         gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
+        keyActionDone.processEvent(null);
+        //keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
       case KeyCode.up: {
@@ -1334,7 +1352,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //the table has the focus, because the key action is done only if it is so.
         //set the new cell focused, in the paint routine.
         gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
+        keyActionDone.processEvent(null);
+        //   keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       case KeyCode.pgdn: {
         if(lineSelectedixCell < zLineVisible -3){
@@ -1355,7 +1374,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         //the table has the focus, because the key action is done only if it is so.
         //set the new cell focused, in the paint routine.
         gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
+        keyActionDone.processEvent(null);
+        //keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       default:
         if(keyCode == KeyCode.shift + KeyCode.enter) {     // The key combination sh+Enter is up to now (2023-01) used as right mouse:
@@ -1399,7 +1419,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           //the table has the focus, because the key action is done only if it is so.
           //set the new cell focused, in the paint routine.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
+          keyActionDone.processEvent(null);
+          //keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
         } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
           keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
           searchChars.appendCodePoint(keyCode);
@@ -1439,7 +1460,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         } else {
           line.setMarked(1, line.getUserData());
         }
-        keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
+        keyActionDone.processEvent(null);
+        //keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
         done = true;
       }
       if(!done /*&& lineSelected !=null*/){
@@ -1490,9 +1512,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected final GralGraphicEventTimeOrder keyActionDone = new GralGraphicEventTimeOrder("GralTableKeyDone", this.gralMng()) {
     @Override
     public int processEvent ( EventObject ev) {
-      actionOnLineSelected(KeyCode.userSelect, lineSelected);
       gi.bFocused = true;  //to focus while repainting
       _wdgImpl.redrawGthread();
+      actionOnLineSelected(KeyCode.userSelect, lineSelected);
       keyDone = true;
       return 0;
       //System.out.println("Key done");
@@ -1508,7 +1530,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    *  
    * @param line
    */
-  private void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
+  protected void actionOnLineSelected(int key, GralTableLine_ifc<?> line){
     gralMng.setLastClickedWidget(lineSelected);
     if(actionOnLineSelected !=null){
       actionOnLineSelected.exec(key, this, line);
@@ -1875,7 +1897,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       
       //todo if(outer.bPrepareVisibleArea){
         outer.fillVisibleArea();  //show the selected line at line 3 in graphic or before 0..2
-        outer.bPrepareVisibleArea = false;
+        outer.bPrepareVisibleArea = false;       // it is prepared
       //}
       
       //Now draw:

@@ -310,7 +310,7 @@ public class GralFileProperties extends GralWidgetBase {
     int windProps = GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable;
     GralWindow wind = new GralWindow(refPos, sPosName + "Window", sTitle, windProps);
     wind.pos().setSize(34,40, null);
-    wind.setVisible(true);
+    wind.setVisible(false);
     GralPanelContent panel = wind.mainPanel;
     String name = panel.name;
     //Note: the refPos describes the whole panel in the window. name is the namePanel without maybe position string

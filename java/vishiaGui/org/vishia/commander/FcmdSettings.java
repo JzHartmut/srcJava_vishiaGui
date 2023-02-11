@@ -17,6 +17,7 @@ public class FcmdSettings
 {
   /**Version, history and license
    * <ul>
+   * <li>2023-02-11 Hartmut now with new concept all Gral widgets created without implementation firstly. 
    * <li>2016-08-28 Hartmut chg: extra button now for the jzcmd.cfg, 
    *   extra button {@link #widgOkError} to open the infoBox, but open the infoBox automatically on error.
    *   The Button for open Infobox will get a button text "error" if an error in the config is found. 
@@ -50,7 +51,7 @@ public class FcmdSettings
    * 
    * 
    */
-  public static final String sVersion = "2016-08-28";
+  public static final String sVersion = "2023-02-11";
   
   protected final Fcmd main;
 
@@ -77,14 +78,8 @@ public class FcmdSettings
   
   public FcmdSettings(Fcmd main)
   { this.main = main;
-  }
-
-
-  
-  /**Builds the content of the file property window. The window is created static. It is shown
-   * whenever it is used.  */
-  void buildWindow()
-  { main.gui.gralMng.selectPanel("primaryWindow");
+ 
+    main.gui.gralMng.selectPanel("primaryWindow");
     int windProps = GralWindow.windConcurrently | GralWindow.windOnTop;
     GralWindow window =  main.gui.gralMng.addWindow("@10+29, 10+47 = windSettings", "Settings - The.file.Commander", windProps);
     //window.createImplWidget_Gthread();

@@ -577,6 +577,10 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   /**Creates the whole graphically representation with all given widgets on Gral level.
    * This operation creates the proper Factory with {@link GralFactory#getFactory},
    * then calls {@link GralFactory#createGraphic(GralMng, char)}.
+   * The graphic thread will be started, see {@link #runGraphicThread()},
+   * and the implementation graphic is instantiated in this graphic thread.
+   * This starts with {@link GralWindow#createImplWidget_Gthread()} for each given window.
+   * <br><br>
    * Only the {@link GralFactory} needs dependencies to the implementation graphic,
    * there only to the specific Factory. Whereby the specific factory can be called also via String:
    * {@link Class#forName(String)}. 

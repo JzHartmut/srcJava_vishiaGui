@@ -19,6 +19,8 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
 {
   /**Version, history and license.
    * <ul>
+   * <li>2023-02-11 Hartmut bugfix, bug on negative position values (from left/bottom) 
+   * <li>2013..22 some changes see git repository.
    * <li>2013-12-23 Hartmut new: Uses the new concept of widget implementation.
    * </ul>
    * 
@@ -48,7 +50,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
    * 
    */
   @SuppressWarnings("hiding")
-  public static final int version = 20120317;
+  public static final String version = "2023-02-11";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
@@ -84,7 +86,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     }
     this.labelSwt.setAlignment(mode);
     //swtMng.setPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
-    GralRectangle rectangle = swtMng.calcWidgetPosAndSizeSwt(this.widgg.pos(), this.labelSwt, 0, 0);
+    GralRectangle rectangle = swtMng.calcWidgetPosAndSizeSwt(this.widgg.pos(), panelSwt, 0, 0);
     this.labelSwt.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
     Color color = swtMng.getColorImpl(super.dyda().textColor);
     this.labelSwt.setForeground(color);

@@ -15,6 +15,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
+import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 
 /**This class represents a window of an application, either the primary window or any sub window.
@@ -380,6 +381,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    *
    */
   @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+//    if(name.equals("windSettings"))
+//      Debugutil.stop();
     if(super.createImplWidget_Gthread()) {
       GralPos pos = this.pos();
       if(pos.x.p1 ==0 && pos.x.p2 == 0 && pos.y.p1 == 0 && pos.y.p2 == 0){
