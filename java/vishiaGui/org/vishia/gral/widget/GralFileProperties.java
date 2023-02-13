@@ -436,6 +436,8 @@ public class GralFileProperties extends GralWidgetBase {
   }
   
   
+  
+  
   boolean doActionButtons ( GralWidget btn ) {
     int noMask = 0;
     boolean bAbort = false;
@@ -541,7 +543,7 @@ public class GralFileProperties extends GralWidgetBase {
               sFileDstUsed = sNameAbs.toString();
             }
             fileNew = FileRemote.get(sFileDstUsed);
-          } else {                                         // copy beside, only othe name
+          } else {                                         // copy beside, only other name
             fileNew = this.actFile.getParentFile().child(sFileDst);
           }
           this.actFile.copyTo(fileNew, this.evChg); //, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);

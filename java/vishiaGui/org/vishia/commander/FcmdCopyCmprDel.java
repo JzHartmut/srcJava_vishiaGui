@@ -155,6 +155,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   FileRemote fileDst, dirDst; //, dirDstCmpr;
 
+  String sFileMaskDst;
+  
   /**Name of the file for dst. */
   CharSequence sFileDstCopy;
   
@@ -263,7 +265,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.widgFromConditions = new GralTextField(refPos, "@+3.5-3.2, 1..-13++0.3=copyCond-" + name
         , "select src files: ?#+ [dirA|dirB]/**/*.ext (F1 for help) ", "t", GralTextField.Type.editable); 
     this.widgFromConditions.specifyActionChange(null, this.actionSelectMask, null);
-    this.widgButtonCheck = new GralButton(refPos, "@+0-3,-12..-1=check" + name, "check", null); //this.actionCheck );
+    this.widgButtonCheck = new GralButton(refPos, "@+0-3,-12..-1=check" + name, "check", this.actionCheck );
     
     //dst path, set dst
     if(this.cmdWind != Ecmd.delete) {
@@ -396,10 +398,12 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         }
       }
       sSrcMask = null;
+    } else if(sSrcMask.isEmpty()) {
+      sSrcMask = "**/*";
     }
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
-    srcFile.refreshAndMark(FileMark.selectForCopy, FileMark.selectForCopySomeInDir, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
+    srcFile.refreshAndMark(FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     widgCopyNameDst.setText(srcDir.getStateDevice());
     bFirstSelect = false;
   }
@@ -445,24 +449,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * See {@link FileRemote#copyChecked(String, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
    */
   final protected void execCopy(){
-    widgCopyState.setText("busy-copy");
-    widgButtonOk.setText("busy-copy");
-    widgButtonEsc.setText("abort");
-    String sDst = widgInputDst.getText();
-    String sDstDir, sDstMask;
-    int posWildcard = sDst.indexOf('*');
-    if(posWildcard >0) {
-      int posSep = sDst.lastIndexOf('/', posWildcard);
-      sDstDir = sDst.substring(0, posSep+1);
-      sDstMask = sDst.substring(posSep+1);
-    } else {
-      sDstDir = sDst;
-      sDstMask = null;
-    }
-    if(!FileSystem.isAbsolutePathOrDrive(sDstDir)) {
-      sDstDir = srcDir.getAbsolutePath() + "/" + sDstDir;
-    }
-    if(filesToCopy.size()>0) {
+    this.widgCopyState.setText("busy-copy");
+    this.widgButtonOk.setText("busy-copy");
+    this.widgButtonEsc.setText("abort");
+    String sDst = this.widgInputDst.getText();
+    String[] sDstFileMaskRet = new String[1];
+    this.dirDst = FileRemote.getDirFileDst(sDst, this.srcDir, sDstFileMaskRet);
+    this.sFileMaskDst = sDstFileMaskRet[0];
+    if(this.filesToCopy.size()>0) {
       for(FileRemote fileSrc: filesToCopy) {
       //======>>>>
         execCopy(fileSrc);
@@ -477,7 +471,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   final private void execCopy(FileRemote filedir) {
     if(filedir.isDirectory()) {
-      int selectMark = FileMark.selectForCopy | FileMark.selectForCopySomeInDir;
+      int selectMark = FileMark.select | FileMark.selectSomeInDir;
       filedir.copyDirTreeTo(this.dirDst, Integer.MAX_VALUE, null, selectMark, null, this.progress);
     } else {
       filedir.copyTo(this.fileDst, null);
@@ -521,26 +515,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * and refreshes the files therewith. See {@link FileRemote#refreshAndCompare(FileRemote, int, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
    */
   final protected void execCompare(){
-    String sDst = widgInputDst.getText();
-    int posSep = sDst.lastIndexOf('/');
-    int posSep2 = sDst.lastIndexOf('\\');
-    if(posSep2 >=0 && posSep2 > posSep){ posSep = posSep2; }
-    int posWildcard = sDst.indexOf('*');
-    String sDstDir;
-    if(posWildcard > posSep){
-      sDstDir = sDst.substring(0, posSep);
-    } else {
-      //no asterisk, either it is one file or it is the destination dir:
-      sDstDir = sDst;
-    }
-    FileRemote fileDst;
-    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
-      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
-    } else {
-      fileDst = srcDir.child(sDstDir);  //relative to source
-    }
-    if(fileDst.isDirectory()){ dirDst = fileDst; } 
-    else { dirDst = fileDst.getParentFile(); } 
+    setDirFileDst();
     boolean bOk = true;
     //check whether the event is able to occupy, use it to check.
 //    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
@@ -561,6 +536,31 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       setTexts(Estate.quest);
     }
     ///
+  }
+  
+  
+  
+  private void setDirFileDst ( ) {
+    String sDst = widgInputDst.getText();
+    int posSep = sDst.lastIndexOf('/');
+    int posSep2 = sDst.lastIndexOf('\\');
+    if(posSep2 >=0 && posSep2 > posSep){ posSep = posSep2; }
+    int posWildcard = sDst.indexOf('*');
+    String sDstDir;
+    if(posWildcard > posSep){
+      sDstDir = sDst.substring(0, posSep);
+    } else {
+      //no asterisk, either it is one file or it is the destination dir:
+      sDstDir = sDst;
+    }
+    FileRemote fileDst;
+    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
+      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
+    } else {
+      fileDst = srcDir.child(sDstDir);  //relative to source
+    }
+    if(fileDst.isDirectory()){ dirDst = fileDst; } 
+    else { dirDst = fileDst.getParentFile(); } 
   }
   
   
@@ -1058,7 +1058,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     * The OK-key is designated to "check". On button pressed the {@link #actionButtonCopy} is called,
     * with the "check" case.
     */
-   GralUserAction actionCheckThread = new GralUserAction("actionCheck")
+   GralUserAction actionCheck = new GralUserAction("actionCheck")
    {
      /**Opens the confirm-copy window and fills its fields to ask the user whether confirm.
       * @param dst The path which is selected as destination. It may be a directory or a file
@@ -1068,18 +1068,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
      { //String sSrc, sDstName, sDstDir;
        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){ 
          if(!widgButtonCheck.isDisabled()){
-         //if(state == Estate.start || state == Estate.checked) { //widgg.sCmd.equals("check")){    
-           //testonly: execMark();
-           
-           if(bRunTestProgressThread) {
-             bRunTestProgressThread = false;
-           } else {
-             bRunTestProgressThread = true;
-//             progress.clear();
-//             testProgressThread = new TestProgressThread();
-//             progress.timeOrder.activate(200);
-             
-           }
+           execMark();
          }
        }
        return true;
@@ -1087,6 +1076,19 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    };
    
 
+   
+   void startStopTestProgressThread ( ) {
+     if(bRunTestProgressThread) {
+       bRunTestProgressThread = false;
+     } else {
+       bRunTestProgressThread = true;
+       progress.clear();
+       testProgressThread = new TestProgressThread();
+       progress.timeOrder.activate(200);
+       
+     }
+   }
+   
   
    protected GralUserAction actionSetDst = new GralUserAction("actionSetDst") ///
    { @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
