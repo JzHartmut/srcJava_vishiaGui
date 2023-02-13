@@ -102,6 +102,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-02-12 There is a problem with focused cell and updating cell content. 
+   *   For that after KeyCode.up and KeyCode.dn the {@link #keyActionDone} should be called immediately in the graphic thread
+   *   to update the cell contents and afterwards with 50 ms delay the same because of the focus. 
+   *   This is not optimized yet. If the second call is not done, an automatic created focusLost and focusGained from Swt
+   *   sets the focus in the Text cell before, why it is unclarified. 
+   *   TODO maybe improve only set the focused cell in the delayed call, dont update the content. 
+   *   It may also be that updating forces the focus lost/gain behavior. Experience with order of that,
+   *   update at last. In the version now it works but needs a little bit too much calculation time. 
    * <li>2023-02-12 {@link #colorBackMarked2} etc. for selection lines for copy in Fcmd 
    *   respectively as common approach as second selection. 
    * <li>2023-02-11 {@link #processKeys(int)} experience. Now call {@link #keyActionDone} not as event,
@@ -299,6 +307,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * The {@link GralUserAction#exec(int, GralWidget_ifc, Object...)} will be called
    * with the line as Object. */
   GralUserAction actionOnRefreshChildren;
+  
+  
+  public long timeLastKeyUpDn;
+  
   
   /**Width of each column in GralUnits. */
   protected int[] columnWidthsGral;
@@ -1354,25 +1366,31 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         keyActionDone.processEvent(null);
         //keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
-      case KeyCode.mouseWheelUp:                         // cursor or mouse wheel to select lines
+      case KeyCode.mouseWheelUp:                           // cursor or mouse wheel to select lines
       case KeyCode.up: {
-        if(!searchContent(true)) {
-          if(lineSelectedixCell > 2){
-            lineSelectedixCell -=1;
-          } else {
-            int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
-            lineSelectedixCell -= 1 + shifted;
-            if(lineSelectedixCell <0){
-              lineSelectedixCell = 0;  //limit it on top.
+        if(keyCode != KeyCode.mouseWheelUp && (time - this.timeLastKeyUpDn) < 80) {
+          System.out.print("ö");
+          done = true;                                     // prevent too much reaction if the key repetition rate is high
+        } else {
+          this.timeLastKeyUpDn = time;
+          if(!searchContent(true)) {
+            if(lineSelectedixCell > 2){
+              lineSelectedixCell -=1;
+            } else {
+              int shifted = shiftVisibleArea(-1);  //shifted = -1 if all shifted
+              lineSelectedixCell -= 1 + shifted;
+              if(lineSelectedixCell <0){
+                lineSelectedixCell = 0;  //limit it on top.
+              }
             }
+            lineSelected = linesForCell[lineSelectedixCell];
           }
-          lineSelected = linesForCell[lineSelectedixCell];
+          //------------------------------------------------------------------- the table has the focus, because the key action is done only if it is so.
+          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; // set the new cell focused, in the paint routine.
+          keyActionDone.processEvent(null);                // if it is called immediately the last cell gets the focus return, not clarified
+          keyActionDone.timeOrder.activate(50);            // activate the redraw in 50 ms, only then the focus handling is correct, not clarified why.
+          done = true;
         }
-        //the table has the focus, because the key action is done only if it is so.
-        //set the new cell focused, in the paint routine.
-        gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-        keyActionDone.processEvent(null);
-        //   keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
       } break;
       case KeyCode.pgdn: {
         if(lineSelectedixCell < zLineVisible -3){
@@ -1409,37 +1427,43 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         }
         else if(keyCode == KeyCode.dn || keyCode == keyMarkDn || keyCode == KeyCode.mouseWheelDn
             ) {                                            // arrow down, mouse wheel down
-          if(keyCode == keyMarkDn && lineSelected !=null){
-            GralTableLine_ifc<?> line = lineSelected;    //mark the lines
-            if((line.getMark() & FileMark.select)!=0){
-              //it is selected yet
-              line.setNonMarked(FileMark.select, line.getUserData());
-            } else {
-              line.setMarked(FileMark.select, line.getUserData());
-            }
-          }
-          if(!searchContent(false)) {
-            if(lineSelectedixCell < zLineVisible -3){
-              lineSelectedixCell +=1;
-            } else {
-              int shifted = shiftVisibleArea(1);
-              lineSelectedixCell += 1 - shifted;
-              if(lineSelectedixCell >= zLineVisible){
-                lineSelectedixCell = zLineVisible -1;  //limit it on top.
+          if(keyCode != KeyCode.mouseWheelDn && (time - this.timeLastKeyUpDn) < 80) {
+            System.out.print("ö");
+            done = true;                                     // prevent too much reaction if the key repetition rate is high
+          } else {
+            this.timeLastKeyUpDn = time;
+            if(keyCode == keyMarkDn && lineSelected !=null){
+              GralTableLine_ifc<?> line = lineSelected;    //mark the lines
+              if((line.getMark() & FileMark.select)!=0){
+                //it is selected yet
+                line.setNonMarked(FileMark.select, line.getUserData());
+              } else {
+                line.setMarked(FileMark.select, line.getUserData());
               }
             }
-            while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
-                && lineSelectedixCell >0    
-                ){
-              lineSelectedixCell -=1;
+            if(!searchContent(false)) {
+              if(lineSelectedixCell < zLineVisible -3){
+                lineSelectedixCell +=1;
+              } else {
+                int shifted = shiftVisibleArea(1);
+                lineSelectedixCell += 1 - shifted;
+                if(lineSelectedixCell >= zLineVisible){
+                  lineSelectedixCell = zLineVisible -1;  //limit it on top.
+                }
+              }
+              while( (lineSelected = linesForCell[lineSelectedixCell]) ==null
+                  && lineSelectedixCell >0    
+                  ){
+                lineSelectedixCell -=1;
+              }
+              nLineFirst = -1;  //get new, undefined elsewhere.
             }
-            nLineFirst = -1;  //get new, undefined elsewhere.
+            //------------------------------------------------------------------- the table has the focus, because the key action is done only if it is so.
+            gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; // set the new cell focused, in the paint routine.
+            keyActionDone.processEvent(null);              // should be done immediately because some times content of cells are faulty.
+            keyActionDone.timeOrder.activate(50);          // activate the redraw in 100 ms to prevent too much redraw.
+            done = true;
           }
-          //the table has the focus, because the key action is done only if it is so.
-          //set the new cell focused, in the paint routine.
-          gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; 
-          keyActionDone.processEvent(null);
-          //keyActionDone.timeOrder.activate(100);             // activate the redraw in 100 ms to prevent too much redraw.
         } else if(KeyCode.isTextKey(keyCode) && !bColumnEditable[colSelectedixCellC]){
           keyCode &= ~KeyCode.shiftDigit;                //The keycode is valid without shift-designation.
           searchChars.appendCodePoint(keyCode);
@@ -1932,7 +1956,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
 //      outer.timeLastRedraw = System.currentTimeMillis();
       CharSequence stackInfo = ExcUtil.stackInfo(" call ", 20);
-      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name + stackInfo);
+      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name); // + stackInfo);
     }
 
     
@@ -2249,6 +2273,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
 
 
+    /**
+     * @param iCellLine
+     * @param cellData
+     * @param line
+     * @param linePresentationP
+     */
     protected abstract void drawCellContent(int iCellLine, CellData[] cellData, GralTable<?>.TableLineData line, LinePresentation linePresentationP);
 
     protected abstract CellData drawCellInvisible(int iCellLine, int iCellCol);

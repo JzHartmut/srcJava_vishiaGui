@@ -500,7 +500,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       }
     } catch(Exception exc){
       CharSequence sError = Assert.exceptionInfo("SwtCurveView.draw - exception", exc, 0, 20, true);
-      System.err.append(sError);
+      System.err.append(sError).append('\n');
     }
     //g.drawString(""+xShift+ ":"+ xViewLast + ":" + nrofDataShift.get(), 200, dyView-28);
     //g.drawString("xx", 200, dyView-16);

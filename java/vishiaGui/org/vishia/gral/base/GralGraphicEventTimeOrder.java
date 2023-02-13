@@ -108,7 +108,7 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
   /**Set the info from where the call comes (on calling this operation):
    */
   public void setStackInfo ( ) {
-    this.sInfo = org.vishia.util.ExcUtil.stackInfo(" src:", 4, 12).toString();
+    this.sInfo = org.vishia.util.ExcUtil.stackInfo(" src:", 4, 10).toString();
   }
 
   public String srcInfo ( ) { return this.sInfo; }

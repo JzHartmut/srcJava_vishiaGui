@@ -204,13 +204,13 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     super.wdgimpl = this.swtWidgHelper = new SwtWidgetHelper(swtTable, mng);
     //gralTable.implMethodWidget_.setWidgetImpl(this);
     //this.menuColumns = new SwtMenu[zColumn];
-    swtWidgHelper.widgetSwt.addKeyListener(myKeyListener);
+    swtTable.addKeyListener(myKeyListener);
     //table.addSelectionListener(selectionListener);
-    swtWidgHelper.widgetSwt.addControlListener(resizeListener);
-    swtWidgHelper.widgetSwt.addFocusListener(focusListenerTable);
+    swtTable.addControlListener(resizeListener);
+    swtTable.addFocusListener(focusListenerTable);
     
-    swtWidgHelper.widgetSwt.setFont(mng.propertiesGuiSwt.stdInputFont);
-    GralRectangle pixTable = swtWidgHelper.mng.setBounds_(widgg.pos(), swtWidgHelper.widgetSwt);
+    swtTable.setFont(mng.propertiesGuiSwt.stdInputFont);
+    GralRectangle pixTable = swtWidgHelper.mng.setBounds_(widgg.pos(), swtTable);
     SwtTable.this.resizeTable(pixTable);
     mng.gralMng.log.sendMsg(GralMng.LogMsg.newImplTable, sLog);
   }
@@ -451,9 +451,13 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   
   /**This routine implements all things to set the content of any table cell to show it.
    * @see org.vishia.gral.base.GralTable#drawCellContent(int, int, org.vishia.gral.base.GralTable.TableLineData)
+     * @param iCellLine index in the line (visible Text fields)
+     * @param cellData data for the Text[] of this line: color, etc. see {@link GralTable.CellData} 
+     * @param line the line in the container of the table. Note: it is a node structure
+     * @param linePresentationP colors of the line
    */
   @Override protected void drawCellContent(int iCellLine, GralTable.CellData[] cellLine, GralTable<?>.TableLineData line, GralTable.LinePresentation linePresentationP){
-    Text[] textlineSwt = cellsSwt[iCellLine];
+    Text[] textlineSwt = this.cellsSwt[iCellLine];         // The Text[] ioof the iCellLine
     int treeDepth = -1;
     if(line !=null && line.treeDepth() != cellLine[0].treeDepth){
       treeDepth =  cellLine[0].treeDepth = line.treeDepth();
@@ -663,7 +667,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      */
     @Override public void focusLost(FocusEvent ev){ 
       //System.out.println("Cell focus lost");
-      if(!bRedrawPending){
+      if(!bRedrawPending && System.currentTimeMillis() - (((GralTable)widgg).timeLastKeyUpDn) > 300){
         SwtTable.this.focusLostTable();         // do not call during redrawpending, supress unnecessary redraw action.
         //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
         GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
@@ -685,12 +689,14 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
     @Override public void focusGained(FocusEvent ev) { 
-      GralTable.CellData cell = (GralTable.CellData)((Text)ev.getSource()).getData();
-      SwtTable.this.ixLineFocus = cell.ixCellLine;
-      SwtTable.this.ixColumnFocus = cell.ixCellColumn;
-      SwtTable.this.focusGainedTable();
-      setFocused(widgg, true); 
-      cellInFocus = (Text)ev.getSource();
+      if(!bRedrawPending && System.currentTimeMillis() - (((GralTable)widgg).timeLastKeyUpDn) > 300){
+        GralTable.CellData cell = (GralTable.CellData)((Text)ev.getSource()).getData();
+        SwtTable.this.ixLineFocus = cell.ixCellLine;
+        SwtTable.this.ixColumnFocus = cell.ixCellColumn;
+        SwtTable.this.focusGainedTable();
+        setFocused(widgg, true); 
+        cellInFocus = (Text)ev.getSource();
+      }
       //System.out.println("SwtTableCell - focus gained;");
     }
   };
@@ -954,11 +960,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     }
     
     @Override public void focusLost(FocusEvent e){ 
-      //System.out.println("SwtTable - debug;table composite focus lost. ");
+      System.out.println("SwtTable - debug;table composite focus lost. ");
     }
     
-    @Override public void focusGained(FocusEvent ev)
-    { //System.out.println("SwtTable - debug;table composite focus gained. ");
+    @Override public void focusGained(FocusEvent ev) { 
+      System.out.println("SwtTable - debug;table composite focus gained. ");
     }
     
   };
