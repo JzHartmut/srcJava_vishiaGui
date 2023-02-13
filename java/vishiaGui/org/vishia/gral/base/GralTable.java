@@ -20,6 +20,7 @@ import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.Docu_UML_simpleNotation;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.IterableIterator;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
@@ -101,6 +102,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-02-12 {@link #colorBackMarked2} etc. for selection lines for copy in Fcmd 
+   *   respectively as common approach as second selection. 
    * <li>2023-02-11 {@link #processKeys(int)} experience. Now call {@link #keyActionDone} not as event,
    *   instead immediately in the key handler. This is possible, because it is the graphic thread, of course!
    *   It is better to save calculation time for enqueu/dequeu the timer and event.
@@ -272,7 +275,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  protected final static String sVersion = "2023-02-11";
+  protected final static String sVersion = "2023-02-12";
 
   
   protected int keyMarkUp = KeyCode.shift + KeyCode.up, keyMarkDn = KeyCode.shift + KeyCode.dn;
@@ -401,6 +404,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   /**The color of the current line. It is the selected line */
   protected GralColor colorBackSelect;
+
   /**The color of that lines which are marked. */
   protected GralColor colorBackMarked;
   /**The color of the current, the selected line if it is marked. */
@@ -409,6 +413,15 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   protected GralColor colorBackSomeMarked;
   /**The color of the current selected line if some children of it are marked. */
   protected GralColor colorBackSelectSomeMarked;
+  
+  /**The color of that lines which are marked. */
+  protected GralColor colorBackMarked2;
+  /**The color of the current, the selected line if it is marked. */
+  protected GralColor colorBackSelectMarked2;
+  /**The color of that lines which's some children are marked. */
+  protected GralColor colorBackSomeMarked2;
+  /**The color of the current selected line if some children of it are marked. */
+  protected GralColor colorBackSelectSomeMarked2;
   
   protected GralColor colorBackSelectNew;
   protected GralColor colorBackSelectNewMarked;
@@ -661,6 +674,12 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     
     this.colorBackSomeMarked = GralColor.getColor("pma");
     this.colorBackSelectSomeMarked = GralColor.getColor("lma");
+    
+    this.colorBackMarked2 = GralColor.getColor("lor");
+    this.colorBackSelectMarked2 = GralColor.getColor("or");
+    
+    this.colorBackSomeMarked2 = GralColor.getColor("por");
+    this.colorBackSelectSomeMarked2 = GralColor.getColor("por2");
     
     this.colorBackSelectNewMarked = GralColor.getColor("lpu");
     this.colorBackFillPending = GralColor.getColor("ma");
@@ -1911,8 +1930,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       if(++ix < outer.zLineVisibleMax){  //a half visible line
         drawCellContent(ix, cells[ix], null, linePresentation);
       }
-      outer.timeLastRedraw = System.currentTimeMillis();
-      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name + timeLastRedraw);
+//      outer.timeLastRedraw = System.currentTimeMillis();
+      CharSequence stackInfo = ExcUtil.stackInfo(" call ", 20);
+      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name + stackInfo);
     }
 
     
@@ -1935,25 +1955,35 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * @param line
      */
     private void setLineColors(TableLineData/*<?>*/ line){
-      boolean marked = line !=null && (line.getMark() & 1)!=0;
-      boolean childrenMarked = line !=null && (line.getMark() & 2)!=0;
+      boolean marked = line !=null && (line.getMark() & MarkMask_ifc.select)!=0;
+      boolean childrenMarked = line !=null && (line.getMark() &  MarkMask_ifc.selectParent)!=0;
+      boolean marked2 = line !=null && (line.getMark() & MarkMask_ifc.select2)!=0;
+      boolean childrenMarked2 = line !=null && (line.getMark() &  MarkMask_ifc.select2Parent)!=0;
       if(outer.fillinPending) {                            // a temporary situation 
         linePresentation.colorBack = outer.colorBackFillPending;
-      } else if(line !=null && line == outer.lineSelected){               // only one line
+      } else if(line !=null && line == outer.lineSelected){               // color for the current line (selected)
         if(marked){
           linePresentation.colorBack = line.colorBackSelectMarked !=null ? line.colorBackSelectMarked : outer.colorBackSelectMarked;
         } else if(childrenMarked){
           linePresentation.colorBack = line.colorBackSelectSomeMarked !=null ? line.colorBackSelectSomeMarked : outer.colorBackSelectSomeMarked;
+        } else if(marked2){
+          linePresentation.colorBack = line.colorBackSelectMarked2 !=null ? line.colorBackSelectMarked2 : outer.colorBackSelectMarked2;
+        } else if(childrenMarked2){
+          linePresentation.colorBack = line.colorBackSelectSomeMarked2 !=null ? line.colorBackSelectSomeMarked2 : outer.colorBackSelectSomeMarked2;
         } else {
           linePresentation.colorBack = line !=null && line.colorBackSelect !=null ? line.colorBackSelect : outer.colorBackSelect;
         }
       } else if(line !=null && line == outer.lineSelectedNew){
         linePresentation.colorBack = marked ? outer.colorBackSelectNewMarked : outer.colorBackSelectNew;
-      } else {
+      } else {                          //line is not selected
         if(marked){
           linePresentation.colorBack = line.colorBackMarked !=null ? line.colorBackMarked : outer.colorBackMarked;
         } else if(childrenMarked){
           linePresentation.colorBack = line.colorBackSomeMarked !=null ? line.colorBackSomeMarked : outer.colorBackSomeMarked;
+        } else if(marked2){
+          linePresentation.colorBack = line.colorBackMarked2 !=null ? line.colorBackMarked2 : outer.colorBackMarked2;
+        } else if(childrenMarked2){
+          linePresentation.colorBack = line.colorBackSomeMarked2 !=null ? line.colorBackSomeMarked2 : outer.colorBackSomeMarked2;
         } else if(!bFocused){
           linePresentation.colorBack = dyda.backColorNoFocus;
         } else {
@@ -2172,6 +2202,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         bFocused = true; 
         if(!bRedrawPending){
           gralMng.gralFocusListener.focusGainedGral(GralTable.this);
+//          TableLineData line = getCurrentLine();
+//          actionOnLineSelected(KeyCode.focusGained, line);
           //super.focusGained();
           //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
           redraw(50,100);       //to show all table cells with the focused background color.
@@ -2459,7 +2491,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     /**True if any of a cell text was changed by manual edit. */
     protected final boolean[] bChangedSet;
     
-    public GralColor colorForeground, colorBackground, colorBackSelect, colorBackSelectMarked, colorBackSelectSomeMarked, colorBackMarked, colorBackSomeMarked;
+    public GralColor colorForeground, colorBackground, colorBackSelect
+    , colorBackSelectMarked, colorBackSelectSomeMarked, colorBackMarked, colorBackSomeMarked
+    , colorBackSelectMarked2, colorBackSelectSomeMarked2, colorBackMarked2, colorBackSomeMarked2;
     
     //protected UserData userData;
     

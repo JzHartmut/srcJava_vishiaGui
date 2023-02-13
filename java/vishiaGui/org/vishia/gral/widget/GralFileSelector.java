@@ -2070,12 +2070,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_ClickFile, "actionFileTable %8X", keyCode);
     if(keyCode == KeyCode.alt + KeyCode.dn ) { 
       doActivateFavor();
+      return true;
     }
     else if(keyCode == KeyCode.F3) {
       FileRemote file = line.getUserData();
       this.gui.windView.view(file);
+      return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   
@@ -2179,9 +2182,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
     /**Action to show the file properties in the info line. This action is called anytime if a line
      * was changed in the file view table. */
-    private final GralUserAction actionOnFileSelection = new GralUserAction("actionOnFileSelection"){
+    final GralUserAction actionOnFileSelection = new GralUserAction("actionOnFileSelection"){
       @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params) {
-        if(actionCode == KeyCode.userSelect){
+        if(actionCode == KeyCode.userSelect) { //|| actionCode == KeyCode.focusGained){
           @SuppressWarnings("unchecked")
           GralTable<FileRemote>.TableLineData line = (GralTable<FileRemote>.TableLineData) params[0];
           if(line != null){

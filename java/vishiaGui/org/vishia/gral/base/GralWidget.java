@@ -180,6 +180,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   
   /**Version, history and license.
    * <ul>
+   * <li>2023-02-12: Any widget gets a context menu now which contains the name of the widget as info,
+   *   and which outputs the log with toString() as info. 
    * <li>2023-01-20: confusion with {@link #setVisible(boolean)} and setVisibleStateWidget() solved: 
    * <li>2022-12-11 new: {@link ActionChangeSelect#onAnyKey}: This action was missing especially in a {@link GralTable},
    *   because only the common action was used without designation. Is it satisfying? Better have the specific action for key pressing. 
@@ -353,7 +355,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final String sVersion = "2022-09-13";
+  public static final String sVersion = "2023-02-12";
 
   
   //private GralRectangle _wdgPosPixel = new GralRectangle(0, 0, 0, 0);
@@ -795,6 +797,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
     //this.bVisibleState = false;  //kkkk initially false for all widgets, it will be set true on set focus. For tabbed panels it should be false for the inactive panel. 
     this.itsCfgElement = null;
     assert(this.gralMng !=null);  //should be created firstly in the application, since 2015-01-18
+    this.contextMenu = new GralMenu(this);
+    this.contextMenu.addMenuItem(this.name, "info: " + name, showWidgetInfo);
     registerWidget();
 
   }
@@ -1932,6 +1936,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
         _wdgImpl.redrawGthread();
       } else {
         long time = System.currentTimeMillis();
+        redrawRequ.setStackInfo();
         redrawRequ.timeOrder.activateAt(time + Math.abs(delay), latest ==0 ? 0 : time + latest);
       }
     }
@@ -2240,6 +2245,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    */
   private final GralGraphicEventTimeOrder redrawRequ = new GralGraphicEventTimeOrder("GralWidget.redrawRequ", this.gralMng){
     public int processEvent ( EventObject ev) {
+      this.gralMng.log.sendMsg(GralMng.LogMsg.evRedraw, "redraw " + super.sInfo);
       if(_wdgImpl !=null) { _wdgImpl.redrawGthread(); }//Note: exception thrown in GralGraphicThread
       return 0;
     }
@@ -2277,6 +2283,19 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   }
 
 
+  GralUserAction showWidgetInfo = new GralUserAction("showWidgetInfo") {
+    @Override public boolean exec ( int actionCode, GralWidget_ifc widgd, Object... params ) {
+      GralWidget widg = GralWidget.this;
+      if(widg.gralMng.infoLog !=null) {
+        widg.gralMng.infoLog.addText("showWidgetInfo: " + widg.toString());
+      } else {
+        widg.gralMng.log.sendMsg(GralMng.LogMsg.infoWdg, "showWidgetInfo: " + widg.toString());
+      }
+      return true;
+    }
+  };
+  
+  
   //@Override
   public Object XXXgetWidgetImplementation()
   { if(_wdgImpl !=null) return _wdgImpl.getWidgetImplementation();

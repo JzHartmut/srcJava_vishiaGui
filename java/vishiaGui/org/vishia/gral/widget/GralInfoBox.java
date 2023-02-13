@@ -198,7 +198,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
 
 
   
-  @Override public Appendable append(CharSequence text) throws IOException{ return textBox.append(text); }
+  @Override public Appendable append(CharSequence text) { return this.textBox.append(text); }
 
   @Override
   public int getNrofLines()
@@ -215,6 +215,10 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
   { textBox.setText(text, caretPos);
   }
   
+  public void addText(CharSequence text) {
+    try{ this.textBox.append(text); }
+    catch(Exception exc) {};
+  }
   
   @Override public int setCursorPos(int pos){
     if(textBox !=null){

@@ -16,6 +16,7 @@ public class GralColor
   
   /**Version, history and license.
    * <ul>
+   * <li>2013-02-12 Hartmut new colors for "or2" 
    * <li>2012-10-11 Hartmut new concepts from new ColorChooser with usualNames, starting.
    * <li>2012-09-07 Hartmut  bugfix: toString: color with hexa value with leading 00 for example "0x00ff00".
    * <li>2012-06-09 Hartmut new: {@link #getColor(String)} now accepts a "0xhexa-Value" for a color name.
@@ -170,7 +171,8 @@ public class GralColor
       addColor("rpu", 0xff0040);  //red purple
       addColor("pu", 0x800080);  //purple html
       addColor("rd", 0xff2020);
-      addColor("or", 0xffa000);  //html: ffa500
+      addColor("or", 0xffa500);  //html: ffa500
+      addColor("or2", 0xff8000);  
       addColor("cc", 0xd2691e);  //chocolate html
       addColor("am", 0xffe000);
       addColor("sye", 0xc0c000); //saturated yellow
@@ -196,7 +198,8 @@ public class GralColor
       addColor("lbl", 0xa0a0ff);
       addColor("lye", 0xffff80);
       addColor("lam", 0xfff080);
-      addColor("lor", 0xffa060);
+      addColor("lor", 0xffd060);
+      addColor("lor2",0xffa050);
       addColor("lma", 0xff80ff);
       addColor("lmv", 0xe0e0ff);
       addColor("lcy", 0x00ffff);
@@ -209,7 +212,8 @@ public class GralColor
       addColor("pbl", 0xe0e0ff);
       addColor("pye", 0xffffc0);
       addColor("pam", 0xfff0c0);
-      addColor("por", 0xffc080);
+      addColor("por", 0xffe0a0);
+      addColor("por2",0xffc080);
       addColor("pmv", 0xfff0ff);
       addColor("pma", 0xffa0ff);
       addColor("pcy", 0xa0ffff);

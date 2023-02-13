@@ -998,7 +998,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   {
     if(infoBox == null) return;
     try{ infoBox.append(info); }
-    catch(IOException exc){}
+    catch(Exception exc){}
     if(show){
       infoBox.setFocus(); //setWindowVisible(true);
     }
@@ -2884,11 +2884,13 @@ public GralButton addCheckButton(
    */
   public static class LogMsg {
     public static final int ctorWdg = 1001;
+    public static final int infoWdg = 1002;
     public static final int newPanel = 1010;
     public static final int addTabPanel = 1012;
     
     public static final int newImplTable = 1051;
     
+    public static final int evRedraw = 1101;
     public static final int setVisible = 1130;
     public static final int setInvisible = 1131;
     public static final int setVisibleFromImpl = 1132;
