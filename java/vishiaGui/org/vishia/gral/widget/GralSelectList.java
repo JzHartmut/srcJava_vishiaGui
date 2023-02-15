@@ -45,6 +45,7 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
 {
   /**Version and history:
    * <ul>
+   * <li>2023-02-15 Hartmut new: second key set for entry/exit to left/right {@link #setLeftRightKeys(int, int, int, int)} 
    * <li>2022-12-11 Hartmut chg: because new concept of Gral setToPanel is no more called. 
    *   set the {@link #actionTable} now in the ctor which would be also proper in the past but now necessary.
    * <li>2018-10-28 Hartmut chg: {@link #createImplWidget_Gthread()} instead setToPanel(mng)
@@ -89,7 +90,10 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   /**The keys for left and right navigation. Default it is shift + left and right arrow key.
    * 
    */
-  protected int keyLeft = KeyCode.alt + KeyCode.left, keyRight = KeyCode.alt + KeyCode.right;
+  protected int keyLeft = KeyCode.alt + KeyCode.left, 
+          keyLeft2 = KeyCode.alt + KeyCode.left, 
+          keyRight = KeyCode.alt + KeyCode.right, 
+          keyRight2 = KeyCode.alt + KeyCode.right;
   
   
   
@@ -107,6 +111,18 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   }
 
   
+  /**The two left and right key codes for selection left and right can be changed.
+   * The key code is a number maybe in combination with alt, ctrl, shift see {@link KeyCode}.
+   * @param keyLeft Key code for outer selection
+   * @param keyRight KeyCode for deeper selection
+   * @param keyLeft2 second Key code for outer selection
+   * @param keyRight2 second KeyCode for deeper selection
+   */
+  public final void setLeftRightKeys(int keyLeft, int keyRight, int keyLeft2, int keyRight2){
+    this.keyLeft = keyLeft; this.keyRight = keyRight;
+    this.keyLeft2 = keyLeft2; this.keyRight2 = keyRight2;
+  }
+
   /**The left and right key codes for selection left and right can be changed.
    * The key code is a number maybe in combination with alt, ctrl, shift see {@link KeyCode}.
    * @param keyLeft Key code for outer selection
@@ -114,6 +130,7 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
    */
   public final void setLeftRightKeys(int keyLeft, int keyRight){
     this.keyLeft = keyLeft; this.keyRight = keyRight;
+    this.keyLeft2 = keyLeft; this.keyRight2 = keyRight;
   }
 
   //public SelectList()
@@ -239,11 +256,17 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
       //int keyCode = (Integer)params[1];
       boolean done = true;
       if(data !=null) {
-        if(keyCode == keyLeft){ actionLeft(data, line); }
-        else if(keyCode == keyRight){ actionRight(data, line); }
-        else if(keyCode == KeyCode.enter){ done = actionOk(data, line); }
-        else if(keyCode == KeyCode.mouse1Double){ done = actionOk(data, line); }
-        else { done = actionUserKey(keyCode, data, line); }
+        if(keyCode == GralSelectList.this.keyLeft || keyCode == GralSelectList.this.keyLeft2){ 
+          actionLeft(data, line); 
+        } else if(keyCode == GralSelectList.this.keyRight || keyCode == GralSelectList.this.keyRight2){ 
+          actionRight(data, line); 
+        } else if(keyCode == KeyCode.enter){ 
+          done = actionOk(data, line); 
+        } else if(keyCode == KeyCode.mouse1Double){ 
+          done = actionOk(data, line); 
+        } else { 
+          done = actionUserKey(keyCode, data, line); 
+        }
       } else {
         done = false;
       }

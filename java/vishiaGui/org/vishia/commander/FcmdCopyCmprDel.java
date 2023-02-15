@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
-import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
@@ -25,9 +24,8 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Debugutil;
-import org.vishia.util.FileSystem;
+import org.vishia.util.FileFunctions;
 import org.vishia.util.KeyCode;
-import org.vishia.util.SortedTreeWalkerCallback;
 import org.vishia.util.StringFormatter;
 import org.vishia.util.StringFunctions;
 
@@ -379,15 +377,15 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   final void execMark(){
     setTexts(Estate.busyCheck);
-    widgCopyState.setText("busy-check");
-    widgButtonOk.setText("busy-check");
-    widgButtonCheck.setState(GralButton.State.Disabled);
-    widgButtonEsc.setText("abort");
-    String sSrcMask= widgFromConditions.getText();
+    this.widgCopyState.setText("busy-check");
+    this.widgButtonOk.setText("busy-check");
+    this.widgButtonCheck.setState(GralButton.State.Disabled);
+    this.widgButtonEsc.setText("abort");
+    String sSrcMask= this.widgFromConditions.getText();
     //FileSystem: acts in other thread.
     //regards mark in first level ?
-    int depths = srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
-    long bMarkSelect = srcSomeFiles ? 0x200000000L + FileMark.select : 0;
+    int depths = this.srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
+    long bMarkSelect = this.srcSomeFiles ? 0x200000000L + FileMark.select : 0;
     if(sSrcMask.startsWith("?")) {
       for(int ix=1; ix < sSrcMask.length(); ++ix) {
         char cs = sSrcMask.charAt(ix);
@@ -403,9 +401,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
-    srcFile.refreshAndMark(FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
-    widgCopyNameDst.setText(srcDir.getStateDevice());
-    bFirstSelect = false;
+    this.progress.clear();
+    this.progress.timeOrder.activate(200);
+    this.srcFile.refreshAndMark(FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect, depths, this.callbackFromFilesCheck, this.progress);
+    this.widgCopyNameDst.setText(this.srcDir.getStateDevice());
+    this.bFirstSelect = false;
   }
   
   
@@ -431,7 +431,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       sDstMask = null;
     }
     FileRemote fileDst;
-    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
+    if(FileFunctions.isAbsolutePathOrDrive(sDstDir)) {
       fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source
@@ -554,7 +554,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       sDstDir = sDst;
     }
     FileRemote fileDst;
-    if(FileSystem.isAbsolutePathOrDrive(sDstDir)) {
+    if(FileFunctions.isAbsolutePathOrDrive(sDstDir)) {
       fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source

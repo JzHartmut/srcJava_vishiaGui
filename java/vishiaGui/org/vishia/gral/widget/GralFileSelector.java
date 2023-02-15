@@ -308,7 +308,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       super(refPos, posName, rows, columns);
       this.outer = outer;
       if(columns.length !=4) { throw new IllegalArgumentException("FileSelectList should have 4 columns");}
-      super.setLeftRightKeys(KeyCode.ctrl + KeyCode.pgup, KeyCode.ctrl + KeyCode.pgdn);
+      super.setLeftRightKeys( KeyCode.ctrl + KeyCode.pgup, KeyCode.ctrl + KeyCode.pgdn
+                            , KeyCode.ctrl + KeyCode.up, KeyCode.ctrl + KeyCode.dn);
     }
     
     
