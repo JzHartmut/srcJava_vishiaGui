@@ -402,8 +402,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     this.progress.clear();
-    this.progress.timeOrder.activate(200);
-    this.srcFile.refreshAndMark(FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect, depths, this.callbackFromFilesCheck, this.progress);
+    this.srcFile.refreshAndMark(FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect, depths
+        , this.callbackFromFilesCheck, this.progress);
     this.widgCopyNameDst.setText(this.srcDir.getStateDevice());
     this.bFirstSelect = false;
   }
@@ -469,6 +469,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   } 
   
   
+  /**calls {@link FileRemote#copyDirTreeTo(FileRemote, int, String, int, FileRemoteProgressEvent)}
+   * or {@link FileRemote#copyTo(FileRemote, org.vishia.fileRemote.FileRemote.CallbackEvent)}
+   * with the given filedir for the {@link #dirDst} or {@link #fileDst}.
+   * @param filedir
+   */
   final private void execCopy(FileRemote filedir) {
     if(filedir.isDirectory()) {
       int selectMark = FileMark.select | FileMark.selectSomeInDir;
@@ -529,7 +534,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 //      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state, 
       //it is a check of sendEvent and it should relinguish the event.
       //====>
-      srcFile.refreshAndCompare(dirDst, 0, sSrcMask, 0, null, this.progress); //evCallback); //evCallback able to use from callback.
+      srcFile.refreshAndCompare(dirDst, 0, sSrcMask, 0, this.progress); //evCallback); //evCallback able to use from callback.
       //setTexts(Estate.busy);
     } else {
       widgCopyState.setText("evCallback hangs");
@@ -756,12 +761,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     @Override public void run() {
       System.out.println(LogMessage.timeCurr("testProgressThread"));
       //progress.timeOrder.activate(200);
+      progress.timeOrder.activateCyclic();
       while(bRunTestProgressThread) {
         progress.nrFilesProcessed +=1;
         synchronized(this) { try{ wait(200);} catch(InterruptedException exc) {}}
       }
       System.out.println(LogMessage.timeCurr("stop testProgressThread"));
-      progress.bDone = true;
+      progress.done(EventConsumer.mEventConsumFinished, null);
     }
   };
   
@@ -780,11 +786,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       widgCopyDirDst.setText("?");
       widgCopyNameDst.setText("?");
     }
-    if(order.bDone) {
+    if(order.done()) {
       widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
       //setTexts(Estate.finit);
-    } else {
-      progress.timeOrder.activate(200);                    // re-activate showing in 200 ms steo.
     }
     
     
@@ -874,11 +878,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       @Override public int processEvent ( EventObject ev ) {
         FileRemoteProgressEvent progress = (FileRemoteProgressEvent)ev;
         showCurrentProcessedFileAndDir(progress); //this.currFile, this.nrFilesProcessed, this.bDone); 
-        return 0;
+        if(progress.done()) { return EventConsumer.mEventConsumFinished; }
+        else return 0;
       }
+
+      @Override public boolean awaitExecution ( long timeout ) { return false; }
       
     };
-    
     
     
 //    @SuppressWarnings("serial") 
@@ -898,7 +904,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   {
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){ 
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        progress.timeOrder.activate(200);
         if(srcFile !=null) { widgCopyState.setText(srcFile.getStateDevice()); }
         else { widgCopyState.setText("no source file"); }
       }
@@ -1289,7 +1294,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           } else if(cmd == Ecmd.search){
             execSearch();
           }
-          progress.timeOrder.activate(50);
         } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
           switch(cmd){
             case copy: execCopy(); break;

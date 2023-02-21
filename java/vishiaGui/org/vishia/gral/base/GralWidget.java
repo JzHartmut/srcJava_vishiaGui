@@ -287,7 +287,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * <li>2012-03-08 Hartmut chg: {@link #redrawRequ} firstly remove the request from queue before execution,
    *   a new request after that time will be added newly therefore, then execute it.
    * <li>2012-02-22 Hartmut new: catch on {@link #redrawGthread()} and continue the calling level
-   *   because elsewhere the redraw order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicEventTimeOrder)}-queue.
+   *   because elsewhere the redraw order isn't removed from the {@link org.vishia.gral.base.GralGraphicThread#addDispatchOrder(GralGraphicOrder)}-queue.
    * <li>2012-02-22 Hartmut new: implements {@link GralSetValue_ifc} now.
    * <li>2012-01-16 Hartmut new Concept {@link #redraw()}, can be invoked in any thread. With delay possible. 
    *   All inherit widgets have to be implement  {@link #redrawGthread()}.
@@ -2243,7 +2243,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * If its executeOrder() runs, it is dequeued from timer queue in the {@link GralGraphicThread} 
    * till the next request of {@link #redraw1(int, int)} or {@link #redraw()}.
    */
-  private final GralGraphicEventTimeOrder redrawRequ = new GralGraphicEventTimeOrder("GralWidget.redrawRequ", this.gralMng){
+  private final GralGraphicOrder redrawRequ = new GralGraphicOrder("GralWidget.redrawRequ", this.gralMng){
     public int processEvent ( EventObject ev) {
       this.gralMng.log.sendMsg(GralMng.LogMsg.evRedraw, "redraw " + super.sInfo);
       if(_wdgImpl !=null) { _wdgImpl.redrawGthread(); }//Note: exception thrown in GralGraphicThread

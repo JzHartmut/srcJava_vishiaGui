@@ -34,7 +34,7 @@
  * <li>{@link org.vishia.gral.swt.SwtFactory}: The Factory for SWT (Eclipse Graphic widget toolkit)
  * <li>{@link org.vishia.gral.base.GralMenu}: The menus both pull-down and right-mouse (context).
  * <li>{@link org.vishia.gral.base.GralWindow}: A window, the main or sub windows, dialog boxes.
- * <li>{@link org.vishia.gral.base.GralGraphicEventTimeOrder}: Order initialized from another thread. 
+ * <li>{@link org.vishia.gral.base.GralGraphicOrder}: Order initialized from another thread. 
  * <li>{@link org.vishia.gral.area9.GralArea9Window}: Window with 9 areas configurable for typical using
  * 
  * </ul>

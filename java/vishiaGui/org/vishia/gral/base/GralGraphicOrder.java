@@ -3,6 +3,7 @@ package org.vishia.gral.base;
 import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
+import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventThread_ifc;
 import org.vishia.event.TimeOrder;
 import org.vishia.event.EventWithDst;
@@ -20,11 +21,15 @@ import org.vishia.event.EventWithDst;
  *
  */
 @SuppressWarnings("serial") 
-public abstract class GralGraphicEventTimeOrder extends EventWithDst implements EventConsumer
+public abstract class GralGraphicOrder extends EventConsumerAwait
 {
   
   /**Version and history.
    * <ul>
+   * <li>2023-02-21 Hartmut chg renamed from GralGraphicEventTimeOrder
+   *   and changed of concept. This order refers now the event, it is not an event. 
+   *   This was also done because deviation from {@link EventConsumerAwait} for {@link #awaitExecution(long)}
+   *   es essential operation. All is adapted and runs. 
    * <li>2023-02-12 Hartmut new {@link #setStackInfo()} and {@link #sInfo} possible as information from the event producer
    *   to the event dst to inform from where and why comes the event proper usable to search and improve in software.
    * <li>2023-02-08 Hartmut now because the GralMng is also the {@link org.vishia.event.EventTimerThread}
@@ -79,6 +84,24 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
   final GralMng gralMng;
   
   String sInfo;
+  
+  
+  
+
+  
+  public static class GraphicEvent extends EventWithDst {
+    
+    final GralGraphicOrder graphicOrder;
+    
+    GraphicEvent ( String name, GralGraphicOrder to){
+      super(name, to.gralMng, to.gralMng.evSrc, to, to.gralMng);  // use the outer instance to as EventConsumer, calls the overridden operation processEvent(...)
+      this.graphicOrder = to;
+    }
+  }
+
+  final GraphicEvent ev;
+  
+  final TimeOrder timeOrder;
 
   /**Super constructor for all graphic time orders.
    * Usual a anonymous class is used for the instance: <pre>
@@ -91,17 +114,19 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
    * </pre>  
    * @param name The name is only used for showing in debugging.
    */
-  protected GralGraphicEventTimeOrder ( String name, GralMng gralMng) { 
+  protected GralGraphicOrder ( String name, GralMng gralMng) { 
     //super(name, gralMng);
-    super(name, gralMng, gralMng.evSrc, null, gralMng);
-    super.setDst(this);                                    // use this same instance also as EventConsumer, calls the overridden operation processEvent(...)
+    //super(name, gralMng, gralMng.evSrc, null, gralMng);
+    //super.setDst(this);                                    // use this same instance also as EventConsumer, calls the overridden operation processEvent(...)
+    this.gralMng = gralMng;
+    this.ev = new GraphicEvent(name, this);
+    this.timeOrder = this.ev.timeOrder;
     //this.timeOrder = new TimeEntry(name, gralMng, this);
     //EventThread_ifc execThread = null;                     // definitive null to use the timer thread to execute. 
     //                                                     // note: if use gralMng, the same as timer thread, the event will be enqueued first after expire.
     //occupy(gralMng.evSrc, this, execThread, true);         // occupy the time order which is also the event. 
     //super( new EnqueueInGraphicThread(gralMng), gralMng.gthread);
     //super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
-    this.gralMng = gralMng;
   }
   
 
@@ -112,5 +137,8 @@ public abstract class GralGraphicEventTimeOrder extends EventWithDst implements 
   }
 
   public String srcInfo ( ) { return this.sInfo; }
+
+  
+  
   
 }

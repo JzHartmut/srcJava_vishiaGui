@@ -119,7 +119,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   final boolean bPassword;
   
   /**Buffer for new text which is set or appended in another thread than the graphic thread.
-   * This buffer is empty if the graphic thread has processed the {@link GralGraphicEventTimeOrder}
+   * This buffer is empty if the graphic thread has processed the {@link GralGraphicOrder}
    * after calling {@link #append(CharSequence)} or {@link #setText(CharSequence)}.
    * It is filled only temporary. It is used only by a GralTextBox
    */

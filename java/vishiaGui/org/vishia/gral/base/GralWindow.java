@@ -29,10 +29,10 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
-   * <li>2016-09-23 Hartmut chg: {@link #create(String, char, LogMessage, GralGraphicEventTimeOrder)} now needs an obligate argument which can be null
+   * <li>2016-09-23 Hartmut chg: {@link #create(String, char, LogMessage, GralGraphicOrder)} now needs an obligate argument which can be null
    *   for the first callback routine for graphic initializing.  
    * <li>2016-09-18 Hartmut chg: renaming {@link #specifyActionOnCloseWindow(GralUserAction)} instead 'setActionOnSettingInvisible', more expressive name. 
-   * <li>2016-08-28 Hartmut new {@link #create(String, char, LogMessage, GralGraphicEventTimeOrder)} to create either the primary window inclusive the whole graphic machine,
+   * <li>2016-08-28 Hartmut new {@link #create(String, char, LogMessage, GralGraphicOrder)} to create either the primary window inclusive the whole graphic machine,
    *   or create any secondary window.
    * <li>2015-05-31 Hartmut The {@link GraphicImplAccess} is now derived from {@link GralPanelContent.ImplAccess}
    *   because this class is derived from that too. Parallel inheritance. 
@@ -465,7 +465,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * in the GUI-Thread if the GUI is created. 
    */
   @SuppressWarnings("serial") 
-  GralGraphicEventTimeOrder createImplWindow = new GralGraphicEventTimeOrder("GralWindow.createImplWindow", this.gralMng)
+  GralGraphicOrder createImplWindow = new GralGraphicOrder("GralWindow.createImplWindow", this.gralMng)
   {
     @Override public int processEvent ( EventObject ev) {
       GralMng mng = gralMng();

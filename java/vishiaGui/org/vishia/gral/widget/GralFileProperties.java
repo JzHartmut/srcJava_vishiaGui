@@ -555,6 +555,7 @@ public class GralFileProperties extends GralWidgetBase {
     else if(btn == this.widgRename){
       if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
         if(name !=null && !name.equals(this.actFile.getName())){
+          this.sNameNew = this.widgNameNew.getText();
           this.widgCopyFile.setText(this.buttonFilePropsCopying);
           this.widgName.setBackColor(this.colorGrayed, -1);
           this.actFile.chgProps(this.sNameNew, 0, 0, 0, this.evChg);
@@ -656,7 +657,9 @@ public class GralFileProperties extends GralWidgetBase {
       return 1;
     } 
   
-     @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
+    @Override public boolean awaitExecution ( long timeout ) { return false; }
+
+    @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
 
   };
 
@@ -695,6 +698,8 @@ public class GralFileProperties extends GralWidgetBase {
       return 1;
     } 
   
+    @Override public boolean awaitExecution ( long timeout ) { return false; }
+  
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
 
   };
@@ -719,6 +724,8 @@ public class GralFileProperties extends GralWidgetBase {
       return 1;
     } 
   
+    @Override public boolean awaitExecution ( long timeout ) { return false; }
+
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
 
   };

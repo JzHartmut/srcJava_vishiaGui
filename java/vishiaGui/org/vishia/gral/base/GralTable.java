@@ -92,7 +92,7 @@ import org.vishia.util.TreeNode_ifc;
  * <br><br>
  * <b>Adding an context menu</b>: <br>
  * The {@link #addContextMenuEntry(int, String, String, GralUserAction)} can be invoked for the table only in the graphic thread. 
- * Use any {@link GralGraphicEventTimeOrder} to do that, use a callback with this time order on the creation of the table. 
+ * Use any {@link GralGraphicOrder} to do that, use a callback with this time order on the creation of the table. 
  * 
  * @author Hartmut Schorrig
  *
@@ -1552,7 +1552,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * If a navigation key is released, the table navigation should be stopped immediately.
    * 
    */
-  protected final GralGraphicEventTimeOrder keyActionDone = new GralGraphicEventTimeOrder("GralTableKeyDone", this.gralMng()) {
+  protected final GralGraphicOrder keyActionDone = new GralGraphicOrder("GralTableKeyDone", this.gralMng()) {
     @Override
     public int processEvent ( EventObject ev) {
       gi.bFocused = true;  //to focus while repainting

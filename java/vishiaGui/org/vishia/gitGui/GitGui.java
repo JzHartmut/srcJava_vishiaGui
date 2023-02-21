@@ -13,7 +13,7 @@ import java.util.SortedMap;
 import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.JZtxtcmdFilepath;
 import org.vishia.gral.base.GralButton;
-import org.vishia.gral.base.GralGraphicEventTimeOrder;
+import org.vishia.gral.base.GralGraphicOrder;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTable;

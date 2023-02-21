@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.vishia.event.EventConsumer;
+import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
@@ -846,6 +849,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPosParent, posName, null);
     this.gui = new Gui(this, windFileSelector, rows, columns, bWithFavor, sExecBtn, fileViewer, wdgFileProperties);
+    this.progress = new FileRemoteProgressEvent("GralFileSelector", this.gralMng, this.evSrc, this.action.progress, 200); 
+
   }
   
   
@@ -2176,8 +2181,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
   
-  protected final FileRemoteProgressEvent progress = new FileRemoteProgressEvent("GralFileSelector", null, this.evSrc, null, 200);
-  
+  protected final FileRemoteProgressEvent progress;
   
   protected class Callbacks { 
 
@@ -2200,6 +2204,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     };
     
     
+    
+    final EventConsumer progress = new EventConsumerAwait() {
+
+      @Override public int processEvent ( EventObject ev ) {
+        // TODO Auto-generated method stub
+        return 0;
+      }
+      
+    };
     
     private final MarkMask_ifc actionOnMarkLine = new MarkMask_ifc(){
 
