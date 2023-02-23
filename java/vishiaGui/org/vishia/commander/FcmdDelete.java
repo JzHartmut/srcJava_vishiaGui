@@ -217,7 +217,7 @@ public class FcmdDelete
       return 1;
     }
 
-     @Override public boolean awaitExecution ( long timeout ) { return false; }
+     @Override public boolean awaitExecution ( long timeout, boolean cleanDone ) { return false; }
 
      @Override public String toString(){ return "FcmdDelete - success"; }
 

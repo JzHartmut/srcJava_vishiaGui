@@ -402,7 +402,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     this.progress.clear();
-    this.srcFile.refreshAndMark(FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect, depths
+    this.srcFile.refreshAndMark(depths, FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect
         , this.callbackFromFilesCheck, this.progress);
     this.widgCopyNameDst.setText(this.srcDir.getStateDevice());
     this.bFirstSelect = false;
@@ -477,7 +477,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   final private void execCopy(FileRemote filedir) {
     if(filedir.isDirectory()) {
       int selectMark = FileMark.select | FileMark.selectSomeInDir;
-      filedir.copyDirTreeTo(this.dirDst, Integer.MAX_VALUE, null, selectMark, null, this.progress);
+      int resetMark = FileMark.resetMark + selectMark;
+      filedir.copyDirTreeTo(this.dirDst, 0, resetMark, resetMark, null, selectMark, null, this.progress);
     } else {
       filedir.copyTo(this.fileDst, null);
     }
@@ -763,7 +764,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //progress.timeOrder.activate(200);
       progress.timeOrder.activateCyclic();
       while(bRunTestProgressThread) {
-        progress.nrFilesProcessed +=1;
+        progress.nrFilesVisited +=1;
         synchronized(this) { try{ wait(200);} catch(InterruptedException exc) {}}
       }
       System.out.println(LogMessage.timeCurr("stop testProgressThread"));
@@ -792,7 +793,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     
     
-    zFiles = order.nrFilesProcessed;
+    zFiles = order.nrofFilesSelected;
     zBytes = order.nrofBytesFileCopied;
     widgCopyState.setText("files:" + zFiles + ", size:" + zBytes);
     
@@ -882,7 +883,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         else return 0;
       }
 
-      @Override public boolean awaitExecution ( long timeout ) { return false; }
+      @Override public boolean awaitExecution ( long timeout, boolean cleanDone ) { return false; }
       
     };
     

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.EventObject;
 
 import org.vishia.event.EventConsumer;
+import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventSource;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralButton;
@@ -657,7 +658,7 @@ public class GralFileProperties extends GralWidgetBase {
       return 1;
     } 
   
-    @Override public boolean awaitExecution ( long timeout ) { return false; }
+    @Override public boolean awaitExecution ( long timeout, boolean cleanDone ) { return false; }
 
     @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
 
@@ -685,7 +686,7 @@ public class GralFileProperties extends GralWidgetBase {
   
   
   
-  final EventConsumer callbackCntLen = new EventConsumer()
+  final EventConsumer callbackCntLen = new EventConsumerAwait()
   { @Override public int processEvent(EventObject evP)
     { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done){
@@ -698,8 +699,6 @@ public class GralFileProperties extends GralWidgetBase {
       return 1;
     } 
   
-    @Override public boolean awaitExecution ( long timeout ) { return false; }
-  
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
 
   };
@@ -710,7 +709,7 @@ public class GralFileProperties extends GralWidgetBase {
   /**Callback this in the execution thread of the file system. 
    * 
    */
-  final EventConsumer callbackCopyMove = new EventConsumer() { 
+  final EventConsumer callbackCopyMove = new EventConsumerAwait() { 
     @Override public int processEvent ( EventObject evP) { 
       FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
       if(ev.getCmd() == FileRemote.CallbackCmd.done) {
@@ -724,7 +723,6 @@ public class GralFileProperties extends GralWidgetBase {
       return 1;
     } 
   
-    @Override public boolean awaitExecution ( long timeout ) { return false; }
 
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
 
