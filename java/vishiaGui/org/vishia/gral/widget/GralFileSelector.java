@@ -15,12 +15,16 @@ import java.util.TreeMap;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventSource;
+import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.fileRemote.FileRemoteProgressEvent;
+import org.vishia.fileRemote.FileRemote.CmdEvent;
+import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
+import org.vishia.fileRemote.XXXFileRemoteWalkerEvent;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralSwitchButton;
 import org.vishia.gral.base.GralMenu;
@@ -849,8 +853,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPosParent, posName, null);
     this.gui = new Gui(this, windFileSelector, rows, columns, bWithFavor, sExecBtn, fileViewer, wdgFileProperties);
-    this.progress = new FileRemoteProgressEvent("GralFileSelector", this.gralMng, this.evSrc, this.action.progress, 200); 
-
+    this.fillinEv = new EventWithDst<FileRemoteProgressEvData, Object>(name, this.evSrc, this.action.fillinCallback, null, new FileRemoteProgressEvData());
   }
   
   
@@ -1395,7 +1398,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else {
         //refresh it in an extra thread therefore show all lines with colorBackPending. 
         //Remove lines which remains the colorBackPending after refreshing.
-        dir.refreshPropertiesAndChildren(this.action.callbackChildren1, false, this.progress);
+        dir.refreshPropertiesAndChildren(false, this.fillinEv);  // refresh in another thread
       }
     }
     if(file !=null) {
@@ -2181,7 +2184,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
   
   
-  protected final FileRemoteProgressEvent progress;
+  /**Event as back event for fillin. */
+  protected final EventWithDst<FileRemoteProgressEvData,?> fillinEv;
+  
   
   protected class Callbacks { 
 
@@ -2205,12 +2210,26 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     
     
     
-    final EventConsumer progress = new EventConsumerAwait() {
+    /**Calback instance for the progress event of FileRemote on fillin.
+     * It fills the file GralTable using {@link GralFileSelector#showFile},
+     * on end {@link GralFileSelector#finishShowFileTable()}
+     * It is called in the thread of file walking (or in the receive thread of callback)
+     * to prevent lagging with event hanging. 
+     */
+    final FileRemoteProgress fillinCallback = new FileRemoteProgress(null) { //GralFileSelector.super.gralMng) {
 
-      @Override public int processEvent ( EventObject ev ) {
-        // TODO Auto-generated method stub
+      @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<CmdEvent, ?> evCmd ) {
+        if(progress.answer == FileRemote.Cmd.refreshFile) {
+          showFile(progress.currFile);  //invoked also for dirs because depth=1
+        }
+        if(progress.done()) {
+          finishShowFileTable();
+        }
+        progress.clear();
         return 0;
+        
       }
+
       
     };
     
@@ -2261,7 +2280,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     };
 
     
-  protected final FileRemoteWalkerCallback callbackChildren1 = new FileRemoteWalkerCallback()
+  protected final FileRemoteWalkerCallback XXXcallbackChildren1 = new FileRemoteWalkerCallback()
   {
 
     @Override public void start(FileRemote startDir){}

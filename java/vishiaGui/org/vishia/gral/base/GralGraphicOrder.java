@@ -89,17 +89,20 @@ public abstract class GralGraphicOrder extends EventConsumerAwait
   
 
   
-  public static class GraphicEvent extends EventWithDst {
-    
-    final GralGraphicOrder graphicOrder;
-    
-    GraphicEvent ( String name, GralGraphicOrder to){
-      super(name, to.gralMng, to.gralMng.evSrc, to, to.gralMng);  // use the outer instance to as EventConsumer, calls the overridden operation processEvent(...)
-      this.graphicOrder = to;
-    }
-  }
+//  public static class GraphicEvent extends EventWithDst {
+//    
+//    final GralGraphicOrder graphicOrder;
+//    
+//    GraphicEvent ( String name, GralGraphicOrder to){
+//      super(name, to.gralMng, to.gralMng.evSrc, to, to.gralMng);  // use the outer instance to as EventConsumer, calls the overridden operation processEvent(...)
+//      this.graphicOrder = to;
+//    }
+//  }
 
-  final GraphicEvent ev;
+  
+  final EventWithDst<GralGraphicOrder, ?> ev;
+  
+  //final GraphicEvent ev;
   
   final TimeOrder timeOrder;
 
@@ -115,21 +118,13 @@ public abstract class GralGraphicOrder extends EventConsumerAwait
    * @param name The name is only used for showing in debugging.
    */
   protected GralGraphicOrder ( String name, GralMng gralMng) { 
-    //super(name, gralMng);
-    //super(name, gralMng, gralMng.evSrc, null, gralMng);
-    //super.setDst(this);                                    // use this same instance also as EventConsumer, calls the overridden operation processEvent(...)
+    super(gralMng);                              // gralMng is the eventThread.
     this.gralMng = gralMng;
-    this.ev = new GraphicEvent(name, this);
-    this.timeOrder = this.ev.timeOrder;
-    //this.timeOrder = new TimeEntry(name, gralMng, this);
-    //EventThread_ifc execThread = null;                     // definitive null to use the timer thread to execute. 
-    //                                                     // note: if use gralMng, the same as timer thread, the event will be enqueued first after expire.
-    //occupy(gralMng.evSrc, this, execThread, true);         // occupy the time order which is also the event. 
-    //super( new EnqueueInGraphicThread(gralMng), gralMng.gthread);
-    //super(name, new EnqueueInGraphicThread(gralMng), gralMng.gthread);
+    this.ev = new EventWithDst<GralGraphicOrder, Object>(name, gralMng.evSrc, this, gralMng, this); //new GraphicEvent(name, this);
+    this.timeOrder = new TimeOrder(name, gralMng, this.ev); //this.ev.timeOrder;
   }
   
-
+  
   /**Set the info from where the call comes (on calling this operation):
    */
   public void setStackInfo ( ) {

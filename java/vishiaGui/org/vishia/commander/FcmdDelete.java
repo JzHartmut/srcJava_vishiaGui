@@ -5,11 +5,12 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vishia.event.EventCmdtype;
-import org.vishia.event.EventCmdtypeWithBackEvent;
-import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
+import org.vishia.event.EventThread_ifc;
+import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
@@ -49,7 +50,7 @@ public class FcmdDelete
    */
   String sFileDelete;
  
-  final List<EventCmdtypeWithBackEvent<?,?>> listEvDel = new LinkedList<EventCmdtypeWithBackEvent<?, ?>>();
+  //final List<EventCmdtypeWithBackEvent<?,?>> listEvDel = new LinkedList<EventCmdtypeWithBackEvent<?, ?>>();
 
   
   /**The file card where the directory content is shown where the file will be deleted.
@@ -167,13 +168,13 @@ public class FcmdDelete
                     if(!file.canWrite()){
                       //file.setWritable();
                     }
-                    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdDelete", evSrc, file
-                        , null, success, null,  evSrc);  //NOTE: store file as src to get its name for report in callback.
-                    listEvDel.add(callback);
+//                    FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdDelete", evSrc, file
+//                        , null, success, null,  evSrc);  //NOTE: store file as src to get its name for report in callback.
+//                    listEvDel.add(callback);
                     //
                     //The delete action:
                     if(file instanceof FileRemote){
-                      (file).delete(callback);
+//                      (file).delete(callback);
                     } else {
                       if(!file.delete()){
                         file.setWritable(true);
@@ -186,8 +187,8 @@ public class FcmdDelete
               }
             } else { //user has changed the path
               FileRemote dirRemote = currentDirWhereDelete;
-              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdDelete", evSrc, dirRemote, null, success, null, evSrc);  
-              dirRemote.delete(sPathDelete, true, callback);
+//              FileRemote.CallbackEvent callback = new FileRemote.CallbackEvent("FcmdDelete", evSrc, dirRemote, null, success, null, evSrc);  
+//              dirRemote.delete(sPathDelete, true, callback);
             }
           } else if(widgg.sCmd.equals("esc")){
             windConfirmDelete.setWindowVisible(false);
@@ -200,26 +201,28 @@ public class FcmdDelete
 
   
   
-  EventConsumer success = new EventConsumer(){
-    @Override public int processEvent(EventObject ev)
-    { FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
-      if(callback.successCode !=0){
-        main.log.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
-      }
-      listEvDel.remove(ev);
-      int nrofPendingFiles = listEvDel.size();
-      int percent = nrofPendingFiles * 100 / listFileDel.size();
-      widgProgress.setValue(percent);
-      if(nrofPendingFiles == 0){
-        windConfirmDelete.setWindowVisible(false);      
-      }
+  FileRemoteProgress success = new FileRemoteProgress(null){
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) {
+//      FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
+//      if(callback.successCode !=0){
+//        main.log.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
+//      }
+//      int percent = nrofPendingFiles * 100 / listFileDel.size();
+//      widgProgress.setValue(percent);
+//      if(nrofPendingFiles == 0){
+//        windConfirmDelete.setWindowVisible(false);      
+//      }
       fileCard.fillInCurrentDir();
       return 1;
     }
 
-     @Override public boolean awaitExecution ( long timeout, boolean cleanDone ) { return false; }
 
      @Override public String toString(){ return "FcmdDelete - success"; }
+
+    @Override public EventThread_ifc evThread () {
+      // TODO Auto-generated method stub
+      return null;
+    }
 
   };
   

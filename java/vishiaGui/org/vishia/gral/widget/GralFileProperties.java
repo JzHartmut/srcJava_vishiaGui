@@ -9,7 +9,11 @@ import java.util.EventObject;
 import org.vishia.event.EventConsumer;
 import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventSource;
+import org.vishia.event.EventThread_ifc;
+import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
@@ -161,14 +165,11 @@ public class GralFileProperties extends GralWidgetBase {
   GralFileSelector fileSelector;
   
   
-  /**
-   * 
-   */
-  final FileRemote.CallbackEvent evChg;
+  /**This is the back event for all actions with the [change] button*/
+  final EventWithDst<FileRemoteProgressEvData, ?> evBack;
   
-  final FileRemote.CallbackEvent evBack;
-  
-  final FileRemote.CallbackEvent evCntLen;
+  /**The [cnt length] has an own back event , can be work independent. */
+  final EventWithDst<FileRemoteProgressEvData, ?> evCntLen;
  
   
   
@@ -199,9 +200,8 @@ public class GralFileProperties extends GralWidgetBase {
     } else {
       this.bUnixSystem = System.getenv("WINDIR") == null;
     }
-    this.evBack = new FileRemote.CallbackEvent("GralFileProperties-evBack", this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
-    this.evChg = new FileRemote.CallbackEvent("GralFileProperties-evChg", this.evSrc, null, null, null, null, this.evSrc);
-    this.evCntLen = new FileRemote.CallbackEvent("GralFileProperties-evCntLen", this.evSrc, null, null, this.callbackCntLen, null, this.evSrc);
+    this.evBack = new EventWithDst<FileRemoteProgressEvData, FileRemote.CmdEvent>("evBack-Props", new FileRemoteProgressEvData()); //new FileRemote.CallbackEvent("GralFileProperties-evBack", this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
+    this.evCntLen = new EventWithDst<FileRemoteProgressEvData, FileRemote.CmdEvent>("evBack-ctLen", this.evSrc, this.callbackCntLen, this.gralMng, new FileRemoteProgressEvData()); //new FileRemote.CallbackEvent("GralFileProperties-evChg", this.evSrc, null, null, null, null, this.evSrc);
     this.widgLink = new GralTextField(refPos, "@3.5-3.2++, 1..-1=link-" + this.name, "symbolic link", "t");
     this.widgDir = new GralTextField(refPos, "dir-" + this.name, "directory path", "t");
     this.widgName = new GralTextField(refPos, "@+,1..-9=name-" + this.name, "filename", "t", GralTextField.Type.editable);
@@ -346,7 +346,7 @@ public class GralFileProperties extends GralWidgetBase {
       this.isVisible = this.windFileProps.isVisible();
     }
     if(this.isVisible) { 
-      if(this.evChg.isOccupied()){
+      if(this.evBack.isOccupied()){
         this.widgChgFile.setText("abort");
         this.widgChgFile.setCmd(sCmdAbort);
       } else {
@@ -443,7 +443,7 @@ public class GralFileProperties extends GralWidgetBase {
     int noMask = 0;
     boolean bAbort = false;
     if(btn.sCmd !=null && btn.sCmd.equals(sCmdAbort)){
-      if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
+      if(this.evBack.occupy(this.evSrc, this.callbackChgProps, null, true)){
         this.widgChgFile.setText(this.buttonFilePropsChg);
         btn.sCmd = sCmdChg;
       } else {
@@ -506,26 +506,26 @@ public class GralFileProperties extends GralWidgetBase {
         case On:        flags |=  FileRemote.mHidden; break;
       }
       if(btn.sCmd.equals(sCmdChg)){
-        if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
+        if(this.evBack.occupy(this.evSrc, this.callbackChgProps, null, true)){
           //cmds with callback
           this.widgChgFile.setText(this.buttonFilePropsChanging);
           int mask = (flags ^ this.nFlagsOriginal);
-          this.actFile.chgProps(this.sNameNew, mask, flags, date, this.evChg);
+          this.actFile.chgProps(false, this.sNameNew, mask, flags, date, this.evBack);
           //TODO main.refreshFilePanel(actFile.getParentFile());  //refresh the panel if the directory is shown there
         } else { bAbort = true; }
         //
       } else if(btn.sCmd.equals(sCmdChgRecurs)){
-        if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
+        if(this.evBack.occupy(this.evSrc, this.callbackChgProps, null, true)){
           //cmds with callback
           this.widgChgRecurs.setText(this.buttonFilePropsChanging);
           int mask = ~(flags ^ this.nFlagsOriginal);
-          this.actFile.chgPropsRecursive(mask, flags, date, this.evChg);
+          this.actFile.chgPropsRecursive(mask, flags, date, this.evBack);
         } else { bAbort = true; }
         //
       }
     }
     else if(btn == this.widgCopyFile){
-      if(this.evChg.occupy(this.evSrc, this.callbackCopyMove, null, true)){
+      if(this.evBack.occupy(this.evSrc, this.callbackCopyMove, null, true)){
         this.widgBtnCallback = this.widgCopyFile;
         this.sWidgCallbackTextOk = "copy done";
         this.sWidgCallbackTextNok = "error copy";
@@ -547,36 +547,36 @@ public class GralFileProperties extends GralWidgetBase {
           } else {                                         // copy beside, only other name
             fileNew = this.actFile.getParentFile().child(sFileDst);
           }
-          this.actFile.copyTo(fileNew, this.evChg); //, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
+          this.actFile.copyTo(fileNew, this.evBack); //, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
         } else {
           this.widgCopyFile.setText("copy - name?");
         }
       } else { bAbort = true; }
     }
     else if(btn == this.widgRename){
-      if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
+      if(this.evBack.occupy(this.evSrc, this.callbackChgProps, null, true)){
         if(name !=null && !name.equals(this.actFile.getName())){
           this.sNameNew = this.widgNameNew.getText();
           this.widgCopyFile.setText(this.buttonFilePropsCopying);
           this.widgName.setBackColor(this.colorGrayed, -1);
-          this.actFile.chgProps(this.sNameNew, 0, 0, 0, this.evChg);
+          this.actFile.chgProps(false, this.sNameNew, 0, 0, 0, this.evBack);
         } else {
           this.widgCopyFile.setText("rename ?");
         }
       } else { bAbort = true; }
     }
     else if(btn == this.widgDelFile){
-      if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
+      if(this.evBack.occupy(this.evSrc, this.callbackChgProps, null, true)){
         this.widgName.setBackColor(this.colorGrayed, -1);
-        this.actFile.delete(this.evChg);
+        this.actFile.delete(this.evBack);
       } else { bAbort = true; }
     }
     else if(btn == this.widgCreateDirFile){
-      if(this.evChg.occupy(this.evSrc, this.callbackChgProps, null, true)){
+      if(this.evBack.occupy(this.evSrc, this.callbackChgProps, null, true)){
         if(name !=null && !name.equals(this.actFile.getName())){
           this.widgCopyFile.setText(this.buttonFilePropsCopying);
           FileRemote fileNew = this.actFile.getParentFile().child(name);
-          this.actFile.copyTo(fileNew, this.evChg, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
+          this.actFile.copyTo(fileNew, this.evBack, FileRemote.modeCopyReadOnlyOverwrite | FileRemote.modeCopyCreateYes | FileRemote.modeCopyExistAll);
         } else {
           this.widgCopyFile.setText("copy - name?");
         }
@@ -624,11 +624,11 @@ public class GralFileProperties extends GralWidgetBase {
   
 
 
-  EventConsumer callbackChgProps = new EventConsumer() { 
-    @Override public int processEvent(EventObject evP) { 
-      FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;  // type adaption
-      if(ev.getCmd() == FileRemote.CallbackCmd.done){
-        FileRemote newFile = ev.getFileSrc();
+  FileRemoteProgress callbackChgProps = new FileRemoteProgress(super.gralMng) { 
+    
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
+      if(progress.answer == FileRemote.Cmd.done){
+        FileRemote newFile = progress.currFile;
         if(newFile == GralFileProperties.this.actFile && newFile.exists()) {   // file itself is not changed (not renamed, not deleted)
         //if(GralFileProperties.this.actFile.exists()) {
           showFileInfos(GralFileProperties.this.actFile, GralFileProperties.this.fileSelector);
@@ -651,16 +651,18 @@ public class GralFileProperties extends GralWidgetBase {
       } else {
         GralFileProperties.this.widgChgFile.setText(GralFileProperties.this.buttonFilePropsRetry);
       }
-      ev.relinquish();
       if(GralFileProperties.this.actionRefresh !=null) {
         GralFileProperties.this.actionRefresh.exec(KeyCode.shiftAlt, GralFileProperties.this.windFileProps);
       }
-      return 1;
+      return EventConsumer.mEventConsumed;
     } 
   
-    @Override public boolean awaitExecution ( long timeout, boolean cleanDone ) { return false; }
 
     @Override public String toString(){ return "FcmdFileProps-callbackChgProps"; }
+
+    @Override public EventThread_ifc evThread () {
+      return GralFileProperties.this.gralMng;
+    }
 
   };
 
@@ -685,18 +687,18 @@ public class GralFileProperties extends GralWidgetBase {
   
   
   
+  final FileRemoteProgress callbackCntLen = new FileRemoteProgress(super.gralMng) { 
+    
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
+
   
-  final EventConsumer callbackCntLen = new EventConsumerAwait()
-  { @Override public int processEvent(EventObject evP)
-    { FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
-      if(ev.getCmd() == FileRemote.CallbackCmd.done){
-        String sLen = "" + ev.nrofBytesAll;
+      if(progress.answer == FileRemote.Cmd.done){
+        String sLen = "" + progress.nrofBytesAll;
         GralFileProperties.this.widgLength.setText(sLen);
       } else {
         GralFileProperties.this.widgLength.setText("error count bytes");
       }
-      ev.relinquish();
-      return 1;
+      return EventConsumer.mEventConsumed;
     } 
   
     @Override public String toString(){ return "FcmdFileProps - callback cnt length"; }
@@ -709,18 +711,17 @@ public class GralFileProperties extends GralWidgetBase {
   /**Callback this in the execution thread of the file system. 
    * 
    */
-  final EventConsumer callbackCopyMove = new EventConsumerAwait() { 
-    @Override public int processEvent ( EventObject evP) { 
-      FileRemote.CallbackEvent ev = (FileRemote.CallbackEvent)evP;
-      if(ev.getCmd() == FileRemote.CallbackCmd.done) {
+  final FileRemoteProgress callbackCopyMove = new FileRemoteProgress(super.gralMng) { 
+    
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
+      if(progress.answer == FileRemote.Cmd.done) {
         GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorUnchanged, -1);
         GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextOk);
       } else {
         GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorWrong, -1);
         GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextNok);
       }
-      ev.relinquish();
-      return 1;
+      return EventConsumer.mEventConsumed;
     } 
   
 

@@ -80,7 +80,7 @@ public class FcmdStatus
    */
   void openDialog()
   {
-    if(main.copyCmd.listEvCopy.size() >0){
+    if(false) { //main.copyCmd.listEvCopy.size() >0){
       widgCopy.setBackColor(GralColor.getColor("rd"), 0);
     } else {
       widgCopy.setBackColor(GralColor.getColor("wh"), 0);
