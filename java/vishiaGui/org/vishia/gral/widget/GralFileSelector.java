@@ -1261,8 +1261,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.gui.widgSelectList.wdgdTable.clearTable();
     this.idata.idxLines.clear();
     for(File file1: files ){
-      FileCluster fc = this.idata.currentDir.itsCluster;
-      FileRemote file = fc.getFile(FileFunctions.normalizePath(file1.getAbsolutePath()), null);
+      //FileCluster fc = this.idata.currentDir.itsCluster;
+      FileRemote file = FileRemote.fromFile(file1);
       //String name = file.getName();
       String path = file.getCanonicalPath();
       GralTableLine_ifc<FileRemote> tline = this.gui.widgSelectList.wdgdTable.insertLine(path, 0, null, file);
@@ -1957,7 +1957,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       if(fileStart !=null) {
         fillIn(fileStart, false);
       } else {
-        FileRemote fStart = favor.fileCluster.getDir(favor.sCurrDir);
+        FileRemote fStart = FileRemote.getDir(favor.sCurrDir);
         fillIn(fStart, false);       //bDoNotRefresh = false, refresh it in another thread
       }
         //File favorfile = new File(favor.sCurrFile);
@@ -2005,7 +2005,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     this.idata.sFileToSelect = sPath.substring(posFile+1);       // name given after last /name or \name may be ""
     if(posFile == 2 && sPath.charAt(1) == ':') { posFile = 3; };
     sPath = sPath.substring(0, posFile);
-    FileRemote dir = GralFileSelector.this.idata.originDir.itsCluster.getDir(sPath);
+    FileRemote dir = GralFileSelector.this.idata.originDir.getDir(sPath);
     {
       //file.refreshProperties(null);
 //      if(true || dir.isDirectory()){
@@ -2173,7 +2173,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      */
     public FileRemote getOriginDir(){
       if(this.dir == null){ //build it only one time, but only if it is necessary.
-        this.dir = this.fileCluster.getFile(this.path, null);  //new FileRemote(path);
+        this.dir = FileRemote.getDir(this.path);  //new FileRemote(path);
       }
       return this.dir;
     }

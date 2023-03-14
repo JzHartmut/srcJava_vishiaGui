@@ -436,7 +436,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     FileRemote fileDst;
     if(FileFunctions.isAbsolutePathOrDrive(sDstDir)) {
-      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
+      fileDst = FileRemote.getDir(sDstDir); //main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source
     }
@@ -565,7 +565,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
     FileRemote fileDst;
     if(FileFunctions.isAbsolutePathOrDrive(sDstDir)) {
-      fileDst = main.fileCluster.getDir(sDstDir);  //maybe a file or directory
+      fileDst = FileRemote.getDir(sDstDir); //main.fileCluster.getDir(sDstDir);  //maybe a file or directory
     } else {
       fileDst = srcDir.child(sDstDir);  //relative to source
     }

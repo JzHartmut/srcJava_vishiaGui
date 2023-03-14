@@ -87,9 +87,8 @@ public class InspcCurveViewApp
       fLog = new FileOutputStream("T:/InspcCurveViewApp.log");
       log = new LogMessageStream(System.out, fLog, null, false, null);     // Note: Creating a window outside is necessary because:
       //GralWindow wind = gralFactory.createWindow(log, "Curve View", 'B', 100, 50, 800, 600);
-      FileCluster fileCluster = FileRemote.clusterOfApplication;
-      FileRemote fileCfg = fileCluster.getFile(this.argData.dirCfg.getAbsolutePath(), this.argData.fileCfg);
-      FileRemote fileData = fileCluster.getFile(this.argData.dirData.getAbsolutePath(), this.argData.fileData);
+      FileRemote fileCfg = FileRemote.getFile(this.argData.dirCfg.getAbsolutePath(), this.argData.fileCfg);
+      FileRemote fileData = FileRemote.getFile(this.argData.dirData.getAbsolutePath(), this.argData.fileData);
       // =================================================== // Create an empty Window
       // ========== The InspcCurveView is a Sub Window on any Window-Application
       // Or it is created as main Window if it is the first one.
