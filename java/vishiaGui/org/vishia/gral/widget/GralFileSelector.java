@@ -16,6 +16,7 @@ import org.vishia.event.EventConsumer;
 import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventSource;
 import org.vishia.event.EventWithDst;
+import org.vishia.event.Payload;
 import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
@@ -853,7 +854,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
     super(refPosParent, posName, null);
     this.gui = new Gui(this, windFileSelector, rows, columns, bWithFavor, sExecBtn, fileViewer, wdgFileProperties);
-    this.fillinEv = new EventWithDst<FileRemoteProgressEvData, Object>(name, this.evSrc, this.action.fillinCallback, null, new FileRemoteProgressEvData());
+    this.fillinEv = new EventWithDst<FileRemoteProgressEvData, Payload>(name, this.evSrc, this.action.fillinCallback, null, new FileRemoteProgressEvData());
   }
   
   
@@ -2216,10 +2217,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      * It is called in the thread of file walking (or in the receive thread of callback)
      * to prevent lagging with event hanging. 
      */
-    final FileRemoteProgress fillinCallback = new FileRemoteProgress(null) { //GralFileSelector.super.gralMng) {
+    final FileRemoteProgress fillinCallback = new FileRemoteProgress("fillinCallback", null) { //GralFileSelector.super.gralMng) {
 
       @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<CmdEvent, ?> evCmd ) {
-        if(progress.answer == FileRemote.Cmd.refreshFile) {
+        if(progress.answer == FileRemoteProgressEvData.ProgressCmd.refreshFile) {
           showFile(progress.currFile);  //invoked also for dirs because depth=1
         }
         if(progress.done()) {

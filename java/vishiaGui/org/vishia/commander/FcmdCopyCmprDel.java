@@ -8,6 +8,7 @@ import org.vishia.event.EventConsumer;
 import org.vishia.event.EventSource;
 import org.vishia.event.EventThread_ifc;
 import org.vishia.event.EventWithDst;
+import org.vishia.event.Payload;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteProgress;
@@ -324,7 +325,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".pause.");
     }  
     this.widgButtonOk = new GralButton(refPos, "@-4+3, -13+-1=copyOk" + name, "ok", this.actionButtonOk);
-    this.progressEv = new EventWithDst<FileRemoteProgressEvData, Object>(name, this.evSrc, this.action.progressAction, null, new FileRemoteProgressEvData());
+    this.progressEv = new EventWithDst<FileRemoteProgressEvData, Payload>(name, this.evSrc, this.action.progressAction, null, new FileRemoteProgressEvData());
     //this.evWalker = new FileRemoteWalkerEvent(name, null, null, this.action.progressEv, 200);
     
   }
@@ -379,7 +380,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * and refreshes the files therewith. The #this.progress is used as callback.
    * See {@link FileRemote#refreshAndMark(int, boolean, String, int, int, FileRemoteWalkerCallback)}.
    */
-  final void execMark(){
+  final void execCheck(){
     setTexts(Estate.busyCheck);
     this.widgCopyState.setText("busy-check");
     this.widgButtonOk.setText("busy-check");
@@ -874,11 +875,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected class Actions
   {
     
-    protected final FileRemoteProgress progressAction = new FileRemoteProgress(null) {
+    protected final FileRemoteProgress progressAction = new FileRemoteProgress("progressAction", null) {
 
       @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) {
         showCurrentProcessedFileAndDir(progress); //this.currFile, this.nrFilesProcessed, this.bDone); 
-        if(progress.done()) { return EventConsumer.mEventConsumFinished; }
+        if(progress.done()) { 
+          setTexts(Estate.checked);
+          return EventConsumer.mEventConsumFinished; 
+        }
         else return 0;
       }
 
@@ -1074,7 +1078,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
      { //String sSrc, sDstName, sDstDir;
        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){ 
          if(!widgButtonCheck.isDisabled()){
-           execMark();
+           execCheck();
          }
        }
        return true;
@@ -1284,11 +1288,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         if(state == Estate.start) { //widgg.sCmd.equals("check")){    
           action.progressAction.clear();
           if(cmd == Ecmd.delete){
-            execMark();
+            execCheck();
           } else if(cmd == Ecmd.copy || bFineSelect){
-            execMark();
+            execCheck();
           } else if(cmd == Ecmd.move){
-            execMark();
+            execCheck();
           } else if(cmd == Ecmd.compare){
             execCompare();
           } else if(cmd == Ecmd.search){
@@ -1352,7 +1356,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         if(FcmdCopyCmprDel.this.progressEv.data().quest() == FileRemote.CallbackCmd.askDstOverwr
              || FcmdCopyCmprDel.this.progressEv.data().quest() == FileRemote.CallbackCmd.askDstReadonly) {
           FcmdCopyCmprDel.this.progressEv.data().modeCopyOper = modeCopy();
-          FcmdCopyCmprDel.this.progressEv.data().setAnswer(FileRemote.Cmd.overwr ); 
+          FcmdCopyCmprDel.this.progressEv.data().setAnswer(FileRemoteProgressEvData.ProgressCmd.nok); //.overwr ); 
           widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
           widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
         } else {
@@ -1382,7 +1386,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 //        }
 //        else if(this.progress !=null) {
           FcmdCopyCmprDel.this.progressEv.data().modeCopyOper = modeCopy();
-          FcmdCopyCmprDel.this.progressEv.data().setAnswer(FileRemote.Cmd.abortCopyFile ); //;
+          FcmdCopyCmprDel.this.progressEv.data().setAnswer(FileRemoteProgressEvData.ProgressCmd.nok); //.abortCopyFile ); //;
          
 //        }
         widgCopyNameDst.setText("");
@@ -1407,7 +1411,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 //          //evCurrentFile.copySkipDir(modeCopyOper);
 //        }
         FcmdCopyCmprDel.this.progressEv.data().modeCopyOper = modeCopy();
-        FcmdCopyCmprDel.this.progressEv.data().setAnswer(FileRemote.Cmd.abortCopyDir ); //;
+        FcmdCopyCmprDel.this.progressEv.data().setAnswer(FileRemoteProgressEvData.ProgressCmd.nok); //abortCopyDir ); //;
         widgSkipFile.setBackColor(GralColor.getColor("wh"), 0);
         widgOverwrFile.setBackColor(GralColor.getColor("wh"), 0);
       }

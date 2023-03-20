@@ -7,6 +7,7 @@ import org.vishia.event.EventConsumerAwait;
 import org.vishia.event.EventThread_ifc;
 import org.vishia.event.TimeOrder;
 import org.vishia.event.EventWithDst;
+import org.vishia.event.Payload;
 
 
 /**This is the base class for user classes, which contains code, that should be executed in the graphic thread.
@@ -21,7 +22,7 @@ import org.vishia.event.EventWithDst;
  *
  */
 @SuppressWarnings("serial") 
-public abstract class GralGraphicOrder extends EventConsumerAwait
+public abstract class GralGraphicOrder extends EventConsumerAwait implements Payload
 {
   
   /**Version and history.
@@ -120,7 +121,7 @@ public abstract class GralGraphicOrder extends EventConsumerAwait
   protected GralGraphicOrder ( String name, GralMng gralMng) { 
     super(gralMng);                              // gralMng is the eventThread.
     this.gralMng = gralMng;
-    this.ev = new EventWithDst<GralGraphicOrder, Object>(name, gralMng.evSrc, this, gralMng, this); //new GraphicEvent(name, this);
+    this.ev = new EventWithDst<GralGraphicOrder, Payload>(name, gralMng.evSrc, this, gralMng, this); //new GraphicEvent(name, this);
     this.timeOrder = new TimeOrder(name, gralMng, this.ev); //this.ev.timeOrder;
   }
   
@@ -134,6 +135,22 @@ public abstract class GralGraphicOrder extends EventConsumerAwait
   public String srcInfo ( ) { return this.sInfo; }
 
   
-  
+  @Override public void clean () {
+    // TODO Auto-generated method stub
+    
+  }
+
+
+  @Override public byte[] serialize () {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+
+  @Override public boolean deserialize ( byte[] data ) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
   
 }
