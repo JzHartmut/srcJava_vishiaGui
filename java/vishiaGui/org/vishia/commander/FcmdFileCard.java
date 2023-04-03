@@ -516,35 +516,37 @@ public class FcmdFileCard extends GralFileSelector
    */
   protected void setActFilePanel_setColorCurrLine(){
     //main.lastFavorCard = wdgFavorCard;
-    this.main.currentFileCard = this;
-    this.mainPanel.actFileCard = FcmdFileCard.this;
-    this.main.setLastSelectedPanel(mainPanel);
-    //System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.wdgFavorCard.sActSelectedFavorPath);
-    //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
-    int ixMainPanel = -1;
-    for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
-      if(ixMainPanel >=2) {
-        break;
+    if(this.main.currentFileCard !=this) {       // do nothing if this is the current file card, especially re-focused the window in debugging situation.
+      this.main.currentFileCard = this;
+      this.mainPanel.actFileCard = FcmdFileCard.this;
+      this.main.setLastSelectedPanel(mainPanel);
+      //System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.wdgFavorCard.sActSelectedFavorPath);
+      //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
+      int ixMainPanel = -1;
+      for(FcmdLeftMidRightPanel panel: main.lastFilePanels){
+        if(ixMainPanel >=2) {
+          break;
+        }
+        if(panel.actFileCard !=null){                        // mark the current file card with green, last yellow
+          panel.actFileCard.gui.widgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
+          panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
+        } else {
+          panel.orderMainPanel = 0; //not used.
+        }
       }
-      if(panel.actFileCard !=null){                        // mark the current file card with green, last yellow
-        panel.actFileCard.gui.widgSelectList.wdgdTable.setColorBackSelectedLine(this.colorSelectFocused123[++ixMainPanel]);
-        panel.orderMainPanel = ixMainPanel +1;   //order in list 1, 2, 3
-      } else {
-        panel.orderMainPanel = 0; //not used.
-      }
+      org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.gui.widgSelectList.wdgdTable.getCurrentLine();
+      FileRemote fileCurr = line.getData();
+      String fName = line.getCellText(1);
+      FcmdLeftMidRightPanel p1 = this.main.lastFilePanels.size() <=0 ? null: this.main.lastFilePanels.get(0);
+      FcmdLeftMidRightPanel p2 = this.main.lastFilePanels.size() <=1 ? null: this.main.lastFilePanels.get(1);
+      FcmdLeftMidRightPanel p3 = this.main.lastFilePanels.size() <=2 ? null: this.main.lastFilePanels.get(2);
+      char c1 = p1 == null? '.' : p1.cc;
+      char c2 = p2 == null? '.' : p2.cc;
+      char c3 = p3 == null? '.' : p3.cc;
+      String sOrderFilePanels = "" + c1 + c2 + c3;
+      //this.gralMng().log.sendMsg(Fcmd.LogMsg.fmcdFileCard_setCurrFilePanel, "setCurrFilePanel : %s", sOrderFilePanels );
+      actionOnFileSelection(fileCurr, fName);
     }
-    org.vishia.gral.base.GralTable<FileRemote>.TableLineData line  = FcmdFileCard.super.gui.widgSelectList.wdgdTable.getCurrentLine();
-    FileRemote fileCurr = line.getData();
-    String fName = line.getCellText(1);
-    FcmdLeftMidRightPanel p1 = this.main.lastFilePanels.size() <=0 ? null: this.main.lastFilePanels.get(0);
-    FcmdLeftMidRightPanel p2 = this.main.lastFilePanels.size() <=1 ? null: this.main.lastFilePanels.get(1);
-    FcmdLeftMidRightPanel p3 = this.main.lastFilePanels.size() <=2 ? null: this.main.lastFilePanels.get(2);
-    char c1 = p1 == null? '.' : p1.cc;
-    char c2 = p2 == null? '.' : p2.cc;
-    char c3 = p3 == null? '.' : p3.cc;
-    String sOrderFilePanels = "" + c1 + c2 + c3;
-    //this.gralMng().log.sendMsg(Fcmd.LogMsg.fmcdFileCard_setCurrFilePanel, "setCurrFilePanel : %s", sOrderFilePanels );
-    actionOnFileSelection(fileCurr, fName);
   }
   
   

@@ -105,7 +105,7 @@ public class FcmdStatusLine
       FileRemote filer = file;
       FileRemote filep = file.getParentFile();
       int parentId = filep !=null ? filep.ident(): 0;
-      info.append(" #").append(filer.ident()).append('/').append(parentId).append(" flags=0x")
+      info.append(" #").append(parentId).append('/').append(filer.ident()).append(" flags=0x")
       .append(Integer.toHexString(filer.getFlags()));
       if(file.mark() !=null){
         int mark = file.mark().getMark();

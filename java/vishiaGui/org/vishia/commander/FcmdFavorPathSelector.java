@@ -750,7 +750,7 @@ class FcmdFavorPathSelector
       if(lastFiles[0] !=null){
         FileCluster fc = lastFiles[0].itsCluster;
         String sStartDir = lastFiles[0].getCanonicalPath();
-        ListIterator<FileRemote> it = fc.listSubdirs(sStartDir);
+        Iterator<FileRemote> it = fc.listSubdirs(sStartDir);
         while(it.hasNext()){
           FileRemote dir1 = it.next();
           if(!dir1.getCanonicalPath().startsWith(sStartDir)) { break; }
@@ -774,7 +774,7 @@ class FcmdFavorPathSelector
       if(lastFiles[0] !=null){
         FileCluster fc = lastFiles[0].itsCluster;
         String sStartDir = lastFiles[0].getCanonicalPath();
-        ListIterator<FileRemote> it = fc.listSubdirs(sStartDir);
+        Iterator<FileRemote> it = fc.listSubdirs(sStartDir);
         while(it.hasNext()){
           FileRemote dir1 = it.next();
           if(!dir1.getCanonicalPath().startsWith(sStartDir)) { break; }

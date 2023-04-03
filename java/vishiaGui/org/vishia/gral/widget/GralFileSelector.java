@@ -2220,13 +2220,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     final FileRemoteProgress fillinCallback = new FileRemoteProgress("fillinCallback", null) { //GralFileSelector.super.gralMng) {
 
       @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<CmdEvent, ?> evCmd ) {
-        if(progress.answer == FileRemoteProgressEvData.ProgressCmd.refreshFile) {
+        if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.refreshFile) {
           showFile(progress.currFile);  //invoked also for dirs because depth=1
         }
         if(progress.done()) {
           finishShowFileTable();
         }
-        progress.clear();
+        progress.clean();
         return 0;
         
       }

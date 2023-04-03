@@ -1387,7 +1387,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
           }
           //------------------------------------------------------------------- the table has the focus, because the key action is done only if it is so.
           gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; // set the new cell focused, in the paint routine.
-          keyActionDone.processEvent(null);                // if it is called immediately the last cell gets the focus return, not clarified
+          //keyActionDone.processEvent(null);                // if it is called immediately the last cell gets the focus return, not clarified
           keyActionDone.timeOrder.activate(50);            // activate the redraw in 50 ms, only then the focus handling is correct, not clarified why.
           done = true;
         }
@@ -1460,7 +1460,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
             }
             //------------------------------------------------------------------- the table has the focus, because the key action is done only if it is so.
             gi.cells[lineSelectedixCell][colSelectedixCellC].bSetFocus = true; // set the new cell focused, in the paint routine.
-            keyActionDone.processEvent(null);              // should be done immediately because some times content of cells are faulty.
+            //keyActionDone.processEvent(null);              // should be done immediately because some times content of cells are faulty.
             keyActionDone.timeOrder.activate(50);          // activate the redraw in 100 ms to prevent too much redraw.
             done = true;
           }
@@ -1956,7 +1956,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       }
 //      outer.timeLastRedraw = System.currentTimeMillis();
       CharSequence stackInfo = ExcUtil.stackInfo(" call ", 20);
-      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name); // + stackInfo);
+//      this.outer.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "GralTable.updateGraphicCellContent(): " + GralTable.this.name); // + stackInfo);
     }
 
     

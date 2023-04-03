@@ -631,7 +631,7 @@ public class GralFileProperties extends GralWidgetBase {
   FileRemoteProgress callbackChgProps = new FileRemoteProgress("callbackChgProps", super.gralMng) { 
     
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
-      if(progress.answer == FileRemoteProgressEvData.ProgressCmd.done){
+      if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
         FileRemote newFile = progress.currFile;
         if(newFile == GralFileProperties.this.actFile && newFile.exists()) {   // file itself is not changed (not renamed, not deleted)
         //if(GralFileProperties.this.actFile.exists()) {
@@ -696,7 +696,7 @@ public class GralFileProperties extends GralWidgetBase {
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
 
   
-      if(progress.answer == FileRemoteProgressEvData.ProgressCmd.done){
+      if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
         String sLen = "" + progress.nrofBytesAll;
         GralFileProperties.this.widgLength.setText(sLen);
       } else {
@@ -718,7 +718,7 @@ public class GralFileProperties extends GralWidgetBase {
   final FileRemoteProgress callbackCopyMove = new FileRemoteProgress("callbackCopyMove", super.gralMng) { 
     
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
-      if(progress.answer == FileRemoteProgressEvData.ProgressCmd.done) {
+      if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done) {
         GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorUnchanged, -1);
         GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextOk);
       } else {

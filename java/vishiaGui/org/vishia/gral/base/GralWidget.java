@@ -1645,9 +1645,9 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
     boolean bLastVisible = this.bVisibleState;
     String nameParent = _wdgPos.parent == null ? "main window" : _wdgPos.parent.getName();
     if(visible) {
-      this.gralMng.log.sendMsg(GralMng.LogMsg.setVisible , "GralWidget set visible: %s@%s (%s)", this.name, nameParent, toString());
+//      this.gralMng.log.sendMsg(GralMng.LogMsg.setVisible , "GralWidget set visible: %s@%s (%s)", this.name, nameParent, toString());
     } else {
-      this.gralMng.log.sendMsg(GralMng.LogMsg.setInvisible , "GralWidget set invisible: %s@%s (%s)", this.name, nameParent, toString());
+//      this.gralMng.log.sendMsg(GralMng.LogMsg.setInvisible , "GralWidget set invisible: %s@%s (%s)", this.name, nameParent, toString());
     }
     if(this.name.equals("tabFavorsAll1")) {
       Debugutil.stop(); }
@@ -1850,25 +1850,13 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   @Override public void setFocus ( int delay, int latest){
     GralWidgetBase_ifc child = this;
     GralWidgetBase_ifc parent;
-    this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "GralWidget.setFocus: " + delay +" §" + this.name);
-//    while( !(child instanceof GralScreen) ) {
-//      parent = child.pos().parent;
-//      parent.setVisible(true);
-//      parent.setFocusedWidget(child);
-//      child = parent;
-//    }
+//    this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "GralWidget.setFocus: " + delay +" §" + this.name);
     do {
       child.setVisible(true);                              // maybe GralWidget is not visible
       parent = child.pos().parent;                         
       parent.setFocusedWidget(child);                      // sets the child as focused widget in parent
       child = parent;
     } while( !(parent instanceof GralScreen) );            // the last parent is GralScreen, hence also the window is visible
-//    while( (child = parent.getFocusedWidget()) !=null) {
-//      parent = child;
-//    }
-//    while( !(child instanceof GralWidget)) {
-//      child = child.getFocusedWidget();
-//    }
     GralWidget wdgToFocus = this; //(GralWidget)parent;
     wdgToFocus.dyda.setChanged(ImplAccess.chgFocus | ImplAccess.chgVisible);
     wdgToFocus.redraw(delay, latest);                     // do the following action in the graphic thread.
@@ -2133,7 +2121,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
      * @param visible
      */
     protected void setVisibleState(boolean visible){
-      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.setVisibleFromImpl, "set visible from Impl = " + (visible? "true" : "false") + this.widgg.toString());
+//      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.setVisibleFromImpl, "set visible from Impl = " + (visible? "true" : "false") + this.widgg.toString());
       widgg.bVisibleState = visible;
     }
 
@@ -2245,7 +2233,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    */
   private final GralGraphicOrder redrawRequ = new GralGraphicOrder("GralWidget.redrawRequ", this.gralMng){
     public int processEvent ( EventObject ev) {
-      this.gralMng.log.sendMsg(GralMng.LogMsg.evRedraw, "redraw " + super.sInfo);
+//      this.gralMng.log.sendMsg(GralMng.LogMsg.evRedraw, "redraw " + super.sInfo);
       if(_wdgImpl !=null) { _wdgImpl.redrawGthread(); }//Note: exception thrown in GralGraphicThread
       return 0;
     }
