@@ -372,11 +372,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
             srcSomeFiles = false;
             sFilesSrc = null;  //only one file, 
             //widgShowSrc.setText(fileSrc.getAbsolutePath());
-            if(srcFile.isDirectory()) {
-              sFileDstCopy = "*";
-            } else {
+//            if(srcFile.isDirectory()) {
+//              sFileDstCopy = "*";
+//            } else {
               sFileDstCopy = srcFile.getName();  //name of source file as default for destination.
-            }
+//            }
           } else {
             //more as one file:
             sFileDstCopy = "*";
@@ -606,6 +606,21 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       int resetMark = FileMark.resetMark + selectMark;
       filedir.copyDirTreeTo(false, this.dirDst, 0, resetMark, resetMark, null, selectMark, null, this.progressEv);
     } else {
+      //TODO maybe evaluate 
+      final String sName;
+      int posMask;
+      if(this.sFileMaskDst ==null || this.sFileMaskDst.equals("*")) {
+        sName = this.srcFile.getName();
+      } else if( (posMask = this.sFileMaskDst.indexOf("*."))>=0) {
+        String sNameSrc = this.srcFile.getName();
+        int posExt = sNameSrc.lastIndexOf('.');
+        if(posExt >0) { sNameSrc = sNameSrc.substring(0, posExt); }
+        sName = this.sFileMaskDst.substring(0, posMask) + sNameSrc + this.sFileMaskDst.substring(posMask+1);
+      } else {
+        sName = this.sFileMaskDst;
+      }
+      this.fileDst = this.dirDst.child(sName);
+
       filedir.copyTo(this.fileDst, null);
     }
   }

@@ -695,7 +695,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         this.widgFavorTable = new GralTable<FavorPath>(refPos, "@2..0,0..0=favorTable-" + thisf.name, 50, new int[] {10, -20});
         this.widgFavorTable.specifyActionChange(null, thisf.action.actionFavorTable, null);
         this.widgFavorTable.setColumnProportional((new int[] { 3, 10}));
-        this.widgFavorTable.setColumnEditable(0, true);
+        this.widgFavorTable.setColumnEditable(0, false);
         this.widgFavorTable.setColumnEditable(1, true);
         GralMenu menuFavor = this.widgFavorTable.getContextMenu();
         menuFavor.addMenuItem("save", thisf.action.actionSaveFavors);

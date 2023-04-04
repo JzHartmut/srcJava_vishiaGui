@@ -463,14 +463,14 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       treeDepth =  cellLine[0].treeDepth = line.treeDepth();
     }
     if(line !=null){
-      for(int col=0; col < cells[0].length; ++col){
+      for(int col=0; col < this.cells[0].length; ++col){
         Text cellSwt = textlineSwt[col]; 
         GralTable.CellData cellData = cellLine[col]; //(GralTable.CellData)cellSwt.getData();
         if(treeDepth >=0 && col < super.nrofColumnTreeShift){
-          int xleft = xpixelCell[col] + treeDepth * xPixelUnit; 
-          int xRight = xpixelCell[col+1] + (col < (super.nrofColumnTreeShift-1) ?  treeDepth * xPixelUnit : 0);
-          int yTop = cellData.ixCellLine * linePixel;
-          cellSwt.setBounds(xleft, yTop, xRight - xleft, linePixel);
+          int xleft = this.xpixelCell[col] + treeDepth * this.xPixelUnit; 
+          int xRight = this.xpixelCell[col+1] + (col < (super.nrofColumnTreeShift-1) ?  treeDepth * this.xPixelUnit : 0);
+          int yTop = cellData.ixCellLine * this.linePixel;
+          cellSwt.setBounds(xleft, yTop, xRight - xleft, this.linePixel);
         }
         //
         if(line.wasCelltextSet(col) || bChangedLinesForCell()) {
@@ -480,8 +480,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           cellSwt.setText(text);
         }
         if(cellData.bSetFocus){
-          cellSwt.setFocus();
+          boolean bFocusOk = cellSwt.setFocus();
           cellData.bSetFocus = false;
+          //this.widgg.gralMng.log().sendMsg(GralMng.LogMsg.setFocus, "set Focus %d %d %s", iCellLine, col, bFocusOk ? "ok" : "no");
         }
         GralColor colorBackCell = linePresentationP.cellsColorBack !=null && linePresentationP.cellsColorBack[col] !=null 
             ? linePresentationP.cellsColorBack[col] : linePresentationP.colorBack;  
