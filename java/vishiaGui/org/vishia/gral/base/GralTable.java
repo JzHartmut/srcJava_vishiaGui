@@ -102,6 +102,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-04-04: bugfixing while test.
    * <li>2023-04-04: Now {@link #processKeys(int)} number of key strokes generally reduced to 100 ms min.
    *   {@link #bitLinesForCellChanged}: not active, but try to reduce effort for redraw. Has less effect, is not ready. 
    * <li>2023-02-12 There is a problem with focused cell and updating cell content. 
@@ -345,7 +346,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    * Whether they are associated to a graphic widget or not is able to evaluate with this array.
    * The cellLines[0] is the TableLineData of the first visible line in any case etc.
    */
-  protected TableLineData[] linesForCell;
+  protected TableLineData[] linesForCell, linesForCellPrev;
   long bitLinesForCellChanged;
   
   boolean bChangedLinesForCell;
@@ -491,6 +492,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @SuppressWarnings("unchecked")
     TableLineData[] linesForCell1 = (TableLineData[])Array.newInstance( TableLineData.class, zLineMax );
     this.linesForCell = linesForCell1; //Hint: linesForCell = new GralTable<UserData>.TableLineData[50]; does not work because TableLineData is generic.
+    TableLineData[] linesForCell2 = (TableLineData[])Array.newInstance( TableLineData.class, zLineMax );
+    this.linesForCellPrev = linesForCell2;
     this.zLineVisibleMax = this.linesForCell.length;
     setColors();
   }
@@ -876,6 +879,10 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
+  /**Insert a new line before the current line, or as first line if the table is empty.
+   * Note that the lines in the table are organized in a tree structure. 
+   * The line is inserted in the node where the current line is found.
+   */
   @Override public TableLineData insertLine(String lineKey, int row, String[] lineTexts, UserData userData) {
     if(row ==0){
       //insert on top
@@ -996,6 +1003,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     this.zLineCurr = 0;
     this.nLineFirst = -1;
     this.lineSelected = null;
+    this.lineSelectedixCell = this.lineSelectedixCellLast = 0;
     actionOnLineSelected(KeyCode.removed, this.lineSelected);
     this.searchChars.setLength(0);
     for(int ix = 0; ix < this.linesForCell.length; ++ix){
@@ -1054,7 +1062,9 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   /**Fills the #linesForCell[] with the appropriate lines from the table.  
-   * 
+   * It uses #lineSelectixCell as preferred for the current line,
+   * but this is only an estimation. 
+   * The algorithm searches the real position of the line in the table backward.
    */
   protected void fillVisibleArea(){
     if(this.lineSelected ==null) {
@@ -1062,19 +1072,30 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     TableLineData line = this.lineSelected;
     int ix = this.lineSelectedixCell;
-    this.bitLinesForCellChanged = (1<<ix) | (1<<this.lineSelectedixCellLast);
-    while(ix >0 && line !=null){                           // filles linesForCell[0..ix-1] 
+    this.bitLinesForCellChanged = (1<<this.lineSelectedixCellLast);
+    int ixPrev = 0;
+    this.linesForCellPrev[ixPrev] = line;
+    while(--ix >=0 && line !=null){                           // filles linesForCell[0..ix-1] 
       line = prevLine(line);
-      if(this.linesForCell[--ix] != line && line !=null){
-        this.linesForCell[ix] = line;
-        this.bitLinesForCellChanged |= 1<<ix;
+      if(line !=null) {
+        this.linesForCellPrev[++ixPrev] = line;
       }
     }
-    int nLinesBefore = this.lineSelectedixCell - ix;  //==lineStart if all lines are present.
-    if(ix > 0){
-      System.arraycopy(this.linesForCell, ix, this.linesForCell, 0, nLinesBefore);
-      this.lineSelectedixCell = nLinesBefore;
+    ix = 0;
+    int nLinesBefore = ixPrev;
+    while(ixPrev >=0) {
+      if(this.linesForCell[ix] != this.linesForCellPrev[ixPrev]) {
+        this.linesForCell[ix] = this.linesForCellPrev[ixPrev];
+        this.bitLinesForCellChanged |= 1<<ix;
+      }
+      ix +=1; ixPrev -=1;
     }
+                       
+//    int nLinesBefore = this.lineSelectedixCell - ix;  //==lineStart if all lines are present.
+//    if(ix > 0){
+//      System.arraycopy(this.linesForCell, ix, this.linesForCell, 0, nLinesBefore);
+//      this.lineSelectedixCell = nLinesBefore;
+//    }
     this.bChangedLinesForCell = true;
     fillVisibleAreaBehind(this.lineSelected, nLinesBefore);
   }
@@ -1339,7 +1360,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     long timeDiff = time - this.lastKeyTime;
     boolean bSameKey = this.lastKeyCode == keyCode;
     this.lastKeyCode = keyCode;
-    if(bSameKey && timeDiff < 100) {
+    if(bSameKey && timeDiff < 50) {
       //System.out.print(" " + timeDiff);
       return false;                              // ignore to high frequently key pressing
     }

@@ -1315,6 +1315,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    *   Elsewhere that line is marked which's file is found in #idxSelectFileInDir due to the fileIn directory. 
    * @param bDonotRefrehs false then invoke an extra thread to walk through the file system, 
    *   see @{@link FileRemote#refreshPropertiesAndChildren(FileRemoteWalkerCallback)} and {@link #callbackChildren1}.
+   *   On any file {@link #showFile(FileRemote)} is called in the file thread which fills the table lines. 
+   *   On done event {@link #finishShowFileTable()} is called in the file thread.
    *   If true then it is presumed that the FileRemote children are refreshed in the last time already.
    *   The fill the table newly with given content in this thread.
    */
@@ -1399,6 +1401,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       } else {
         //refresh it in an extra thread therefore show all lines with colorBackPending. 
         //Remove lines which remains the colorBackPending after refreshing.
+        // on any file showFile will be called in the file thread.
+        // on done the finishShowFileTable will be called, see next next operation.
+        // there redraw(...) is called, which works in this graphic thread.
         dir.refreshPropertiesAndChildren(false, this.fillinEv);  // refresh in another thread
       }
     }
@@ -1477,12 +1482,12 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     }
     if(tline !=null){
       FileRemote fileFound = tline.getUserData();
-      if(fileFound != this.idata.currentFile) {
-        GralTableLine_ifc<FileRemote> nextline = tline.nextSibling();                       // go to the next line if the file if the found line 
-        if(nextline !=null) {
+      if(fileFound != this.idata.currentFile) {  // is another one, because file is deleted, renamed etc.
+        GralTableLine_ifc<FileRemote> nextline = tline.nextSibling();
+        if(nextline !=null) {                    // go to the next line if the file if the found line
           tline = nextline;
         }
-      }                                                    // is another one, because file is deleted, renamed etc.
+      }                                          // presume that it is the last three line. Corrected in redraw
       this.gui.widgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
       if(tline !=null)
       this.idata.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.

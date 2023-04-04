@@ -1303,21 +1303,22 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected GralUserAction actionButtonOk = new GralUserAction("actionButtonCopy")
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(state == Estate.start) { //widgg.sCmd.equals("check")){    
-          action.progressAction.clear();
-          if(cmd == Ecmd.delete){
-            execCheck();
-          } else if(cmd == Ecmd.copy || bFineSelect){
-            execCheck();
-          } else if(cmd == Ecmd.move){
-            execCheck();
-          } else if(cmd == Ecmd.compare){
-            execCompare();
-          } else if(cmd == Ecmd.search){
-            execSearch();
-          }
-        } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
-          switch(cmd){
+//        if(state == Estate.start) { //widgg.sCmd.equals("check")){    
+//          action.progressAction.clear();
+//          if(cmd == Ecmd.delete){
+//            execCheck();
+//          } else if(cmd == Ecmd.copy || bFineSelect){
+//            execCheck();
+//          } else if(cmd == Ecmd.move){
+//            execCheck();
+//          } else if(cmd == Ecmd.compare){
+//            execCompare();
+//          } else if(cmd == Ecmd.search){
+//            execSearch();
+//          }
+//        } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
+          if(state != Estate.finit) {  
+            switch(cmd){
             case copy: execCopy(); break;
             case move: execMove(); break; 
             case delete: execDel(); break;
