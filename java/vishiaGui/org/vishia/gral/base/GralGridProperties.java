@@ -11,10 +11,10 @@ public final class GralGridProperties
 {
   /**Version, history and license.
    * <ul>
-   * <li>2015-10-24 Hartmut chg: Size C is now 10 pixel per grid unit, size D is the older size C. 
+   * <li>2015-10-24 Hartmut chg: Size C is now 10 pixel per grid unit, size D is the older size C.
    * <li>2015-10-11 Hartmut chg: The text font should be lesser because g, q, y are not proper able to read.
-   *   TODO think about finer steps between A..C, but don't change existing sizes because some graphics are tuned with them. 
-   * <li>2010-00-00 Hartmut created. The idea of a grid layout with different sizes as basic.     
+   *   TODO think about finer steps between A..C, but don't change existing sizes because some graphics are tuned with them.
+   * <li>2010-00-00 Hartmut created. The idea of a grid layout with different sizes as basic.
    * </ul>
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
@@ -35,21 +35,21 @@ public final class GralGridProperties
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
    * If you are indent to use this sources without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
+   * a second license subscribing a special contract with the author.
+   *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
+   *
+   *
    */
   public final static int version = 0x20120303;
 
-  
-  /**This are the font sizes for some heights of fields in the given sizes of presentation. 
+
+  /**This are the font sizes for some heights of fields in the given sizes of presentation.
    * First index is the height of field, second is the size of presentation.
    */
   protected final static int[][] stdTextFontSize =
   {//6   7   8   9  10  12  15  18   pixel per grid unit
-   //A   B   C   D   E   F   G   H 
+   //A   B   C   D   E   F   G   H
     {3,  3,  4,  5,  5,  7,  8, 10}  ////1, 1.1, 1.2
   , {3,  4,  4,  6,  7,  8, 10, 12}  // 1.3 1.4,
   , {4,  4,  6,  8,  8, 10, 12, 15}  //1.5 1.6
@@ -61,15 +61,15 @@ public final class GralGridProperties
   , {12,14, 16, 18, 20, 24, 30, 36}  //3.5..3.9
   , {15,18, 20, 22, 24, 30, 36, 44}  //>=4.0
   };
-  
+
   /** Number of pixel for fractional part and for the grid size.
    * The array is organized in a 2-dimensional array <code>[frac][size]</code>.
-   * The <code>[frac][10]</code> contains the number of pixel for 1 grid unit. 
+   * The <code>[frac][10]</code> contains the number of pixel for 1 grid unit.
    * <ul>
    * <li>The first column contains 0 for frac = 0.
    * <li>The last column: <code>pixelFrac[size] [10]</code> contains the pixel size of the grid.
    * <li>The fractional part is given in even numbers (1, 3, 5, 7, 9) to divide in part of 1/6:
-   *     1 = 1/6, 3 = 1/3, 5 = 1/2, 7 = 2/3, 9 = 5/6. It is decimal 0.166, 0.333, 0.5, 0.666, 0.833. 
+   *     1 = 1/6, 3 = 1/3, 5 = 1/2, 7 = 2/3, 9 = 5/6. It is decimal 0.166, 0.333, 0.5, 0.666, 0.833.
    * <li>The fractional part is given in odd numbers (2, 4, 6, 8) to divide in part of 1/5 or decimal 2/10:
    *     2 = 1/5 = 0.2, 4 = 2/5 = 0.4, 6 = 3/5 = 0.6, 8 = 4/5 = 0.8.
    * </ul>
@@ -81,8 +81,8 @@ public final class GralGridProperties
    * <tr><td>TextField                 </td><td>2   </td><td>16   </td></tr>
    * <tr><td>Large InputField          </td><td>4   </td><td>32   </td></tr>
    * </table>
-   * Number of Grid Units for full display sizes. An application which needs about 40 lines of text or text fields 
-   * needs 80 grid unit in vertical, it is about 80x120. It runs in a small window with 640 x 480 pixel on size A only. 
+   * Number of Grid Units for full display sizes. An application which needs about 40 lines of text or text fields
+   * needs 80 grid unit in vertical, it is about 80x120. It runs in a small window with 640 x 480 pixel on size A only.
    * In full display mode on a standard display it can use the size C or D.
    * <table>
    * <tr><th>size        </td><td>A        </td><td>B      </td><td>C      </td><td>D      </td><td>E      </td><td>F      </td></td><td>G     </td></tr>
@@ -100,7 +100,7 @@ public final class GralGridProperties
    * <tr><td>InputField                 </td><td>4   </td><td>34   </td></tr>
    * </table>
    */
-  protected final static int[][] pixelFrac = 
+  protected final static int[][] pixelFrac =
  //    1/6   1/3   1/2   2/3   5/6   Divisions of 2, 3 and 6
  //       1/5   2/5   3/5   4/5      Divisions of 5
  //     1  2  3  4  5  6  7  8  9   0   the number given
@@ -113,9 +113,9 @@ public final class GralGridProperties
   , {0, 2, 3, 5, 6, 7, 9,10,12,13, 15 }  //pixel size G
   , {0, 3, 4, 6, 8, 9,10,12,14,15, 18 }  //pixel size H
   };
-  
+
   //protected final static int[][] yPixelFrac = xPixelFrac;
-  	  
+
   protected int xPixelUnit;
 
   //Map<Integer, GralColor> colors = new TreeMap<Integer, GralColor>();
@@ -129,13 +129,13 @@ public final class GralGridProperties
    * <tr><td>  0  </td><td>  1  </td><td>  2  </td><td>  3  </td><td>  4  </td><td>  5  </td><td>  6  </td><td>  7  </td><td>  8  </td><td>  9  </td><td></tr>
    * </table>
    * This table will be filled depending of the Grid size, see {@link #stdTextFontSize}.
-   * 
+   *
    */
   public final GralFont[] textFont = new GralFont[10];
-  
 
-  public final GralFont[] fontMonospacedSansSerif = new GralFont[10];  
-  
+
+  public final GralFont[] fontMonospacedSansSerif = new GralFont[10];
+
   /**The size of this propety set.*/
   protected int size;
 
@@ -143,14 +143,14 @@ public final class GralGridProperties
 	{
 
 	}
-  
-	
+
+
 	public void setSizeGui(char sizeC) {
 	  int size = (sizeC - 'A');
     if(size <0 || size >= pixelFrac.length) throw new IllegalArgumentException("parameter size should be A.." + (char)('A' + pixelFrac.length));
-    this.size = size; 
+    this.size = size;
     this.xPixelUnit = pixelFrac[size][10];                 // pixel per grid unit, last entry in pixelFrac
-    colorBackground_ = color(0xeeeeee);
+    this.colorBackground_ = color(0xeeeeee);
     this.textFont[0] = new GralFont("Arial", stdTextFontSize[0][size], 'n');
     this.textFont[1] = new GralFont("Arial", stdTextFontSize[1][size], 'n');
     this.textFont[2] = new GralFont("Arial", stdTextFontSize[2][size], 'n');
@@ -173,48 +173,48 @@ public final class GralGridProperties
     this.fontMonospacedSansSerif[8] = new GralFont(sMonospaced, stdTextFontSize[8][size], 'n');
     this.fontMonospacedSansSerif[9] = new GralFont(sMonospaced, stdTextFontSize[9][size], 'n');
 	}
-	
-	public int size() { return size; }
-	
+
+	public int size() { return this.size; }
+
 	public int getColorValue(String sColorName)
-	{ //Integer colorValue = 
+	{ //Integer colorValue =
 	  GralColor color = GralColor.getColor(sColorName);
 	  if(color == null) return 0x606060;
 	  else return color.getColorValue();
 	}
-	
-  
+
+
   public GralFont getTextFont(float size)
   {
-    if(size <=1.25f) return textFont[0];  //1, 1.1, 1.2
-    if(size <=1.45f) return textFont[1];  // 1 1/3, 
-    if(size <=1.65f) return textFont[2];  //1.5
-    if(size <=1.95f) return textFont[3];  //1 2/3
-    if(size <=2.25f) return textFont[4];  //2
-    if(size <=2.45f) return textFont[5];   //2 1/3
-    if(size <=2.95f) return textFont[6];   //2.5, 2 2/3
-    if(size <=3.45f) return textFont[7];   //3
-    if(size <=3.95f) return textFont[8];   //3.5
-    return textFont[9];                   //>=4
-    
+    if(size <=1.25f) return this.textFont[0];  //1, 1.1, 1.2
+    if(size <=1.45f) return this.textFont[1];  // 1 1/3,
+    if(size <=1.65f) return this.textFont[2];  //1.5
+    if(size <=1.95f) return this.textFont[3];  //1 2/3
+    if(size <=2.25f) return this.textFont[4];  //2
+    if(size <=2.45f) return this.textFont[5];   //2 1/3
+    if(size <=2.95f) return this.textFont[6];   //2.5, 2 2/3
+    if(size <=3.45f) return this.textFont[7];   //3
+    if(size <=3.95f) return this.textFont[8];   //3.5
+    return this.textFont[9];                   //>=4
+
   }
-  
+
   /**The type:
    * <ul>
    * <li>m: monospaced small
    * </ul>
    * The style: not supported yet. TODO i, b for italic, bold,...
-   * 
+   *
    * @param fontHeight height of the text line in GralPos. 2.0f is standard.
-   * @param type 
-   * @param style 
+   * @param type
+   * @param style
    * @return
    */
   public GralFont getTextFont(float fontHeight, char type, char style)
   {
     int ifontSize;
     if(fontHeight <=1.25f) ifontSize = 0;  //1, 1.1, 1.2
-    else if(fontHeight <=1.45f) ifontSize = 1;  //1.3..1.4 
+    else if(fontHeight <=1.45f) ifontSize = 1;  //1.3..1.4
     else if(fontHeight <=1.65f) ifontSize = 2;  //1.5..1.6
     else if(fontHeight <=1.95f) ifontSize = 3;  //1.7..1.9
     else if(fontHeight <=2.25f) ifontSize = 4;  //2.0..2.2
@@ -225,15 +225,15 @@ public final class GralGridProperties
     else ifontSize = 9;                   //>=4
     final GralFont font;
     switch(type){
-      case 'm': font = fontMonospacedSansSerif[ifontSize]; break;
-      default: font = textFont[ifontSize];
+      case 'm': font = this.fontMonospacedSansSerif[ifontSize]; break;
+      default: font = this.textFont[ifontSize];
     }
     return font;
   }
-  
-  
 
-	
+
+
+
   /**Returns a color with given numeric color value.
    * The color instance is taken from a pool if the color is used already.
    * Elsewhere it is created newly and put into the pool.
@@ -249,38 +249,38 @@ public final class GralGridProperties
     }
     return color;
   }
-  
 
-	
-	
-  public int yPixelFrac(int frac){ return pixelFrac[size][frac]; }
-  
-  
-  /**Gets the number of pixel for one unit of x-direction. It is approximately the half width of the letter 'm' 
+
+
+
+  public int yPixelFrac(int frac){ return pixelFrac[this.size][frac]; }
+
+
+  /**Gets the number of pixel for one unit of x-direction. It is approximately the half width of the letter 'm'
    * for the standard input field font. To support visibility of a dedicated number of chars, you should use
-   * 2 * nrofChars units for a text field. In opposite, the Constructor for the javax.swing.TextField(int) 
+   * 2 * nrofChars units for a text field. In opposite, the Constructor for the javax.swing.TextField(int)
    * sets the size of the text-field to the given number of 'm'-width. Here you should use factor 2.
-   *  
+   *
    * NOTE: A possibility to derive the xPixelUnit() from the font wasn't found. The cohesion between the font-widht for 'm'
    * and the returned number of pixels is tested manually. It may be different if another font is used.
    * @return Number of pixel for 1 unit in x-direction.
    */
-  public int xPixelUnit(){ return pixelFrac[size][10]; }
-  
-  public int yPixelUnit(){ return pixelFrac[size][10]; }
+  public int xPixelUnit(){ return pixelFrac[this.size][10]; }
 
-  public int xPixelFrac(int frac){ return pixelFrac[size][frac]; }
+  public int yPixelUnit(){ return pixelFrac[this.size][10]; }
+
+  public int xPixelFrac(int frac){ return pixelFrac[this.size][frac]; }
 
 
   /**
    *
    */
   public static abstract class ImplAccess {
-    
+
     protected final static int[] smallPromptFontSize = stdTextFontSize[0];
     protected final static int[] stdInputFontSize =    stdTextFontSize[4];
     protected final static int[] stdButtonFontSize =   stdTextFontSize[7];
-    
+
   }
-  
+
 }

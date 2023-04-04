@@ -23,7 +23,7 @@ java org.vishia.gral.base.GralPos.testScanSize();
 */
 
 
-/**This class describes a position in a gral panel. 
+/**This class describes a position in a gral panel.
    * <br><br>
    * <b>Concept of positioning</b>:<br>
    * The position are never given as pixel positions. They are user-oriented positions. The calculation
@@ -34,27 +34,27 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * A normal text with a font in the standard proper read-able size is presented by 2 units of the Gral-position
    * in vertical direction (line) and approximately 1 unit per character in horizontal direction.
    * Of course the horizontal character size depends on the font properties.
-   * A text can be presented in a smaller or larger font.  
+   * A text can be presented in a smaller or larger font.
    * The text height depends on the height given in the position of the text. A very small font is presented by 1 vertical gral-unit.
    * Such a text can be used as short title for text input fields (prompt) or adequate.
    * <br>
-   * A button is able to proper present with 3 or 2 vertical gral units. A small check box may be presented 
+   * A button is able to proper present with 3 or 2 vertical gral units. A small check box may be presented
    * with 1 x 1 gral unit.
    * <br><br>
-   * A gral unit should be have the same distance in vertical as in horizontal direction. It depends on the 
-   * graphical implementation. One gral unit may have approximately 6 to 30 pixel, 
-   * depending on the requested size of appearance in comparison with the given display pixel size. 
+   * A gral unit should be have the same distance in vertical as in horizontal direction. It depends on the
+   * graphical implementation. One gral unit may have approximately 6 to 30 pixel,
+   * depending on the requested size of appearance in comparison with the given display pixel size.
    * Any graphic can be shown in several sizes of appearance, given with a start parameter of the application
    * (see {@link org.vishia.gral.area9.GuiCallingArgs#sSize}) respectively the parameter size of {@link GralGridProperties#GralGridProperties(char size)}.
    * <br><br>
    * <b>Fine positions</b>:<br>
-   * Either the positions are given as float value. Then the intger part (left from dot) is the grid position itself, 
+   * Either the positions are given as float value. Then the intger part (left from dot) is the grid position itself,
    * as grid unit, described above.
-   * One digit after dot as fractional part is the fine position or fine grid unit, described following. 
+   * One digit after dot as fractional part is the fine position or fine grid unit, described following.
    * <br>If positions are given as integer values, the value is  grid unit * 10 + fine grid unit.
    * The fine grid unit is in range 0..9.
    * <br><br>
-   * The fine grid units divides one Gral grid position into 5 or into 6 fine positions. 
+   * The fine grid units divides one Gral grid position into 5 or into 6 fine positions.
    * The odd numbers divide into 6 positions. In this kind a Gral grid position is able to divide by 2, 3 and 6:
    * <ul>
    * <li>1: 1/6 = 0.1333
@@ -63,7 +63,7 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * <li>7: 2/3 = 0.6667
    * <li>9: 5/6 = 0.8667
    * </ul>
-   * The even numbers divide into 5 positions: 
+   * The even numbers divide into 5 positions:
    * <ul>
    * <li>2: 1/5 = 0.2
    * <li>4: 2/5 = 0.4
@@ -73,41 +73,41 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * The fine positioning enables a fine positioning of widgets in respect to the fundamental positions.
    * <br><br>
    * <b>Bit designations for the stored numeric values of the position in this class</b>:<br>
-   * Though the position arguments to set a position may be given relative to other ones 
+   * Though the position arguments to set a position may be given relative to other ones
    * as {@link #samesize}, {@link #size}, {@link #same}, {@link #next} and {@link #refer}, the position values are stored
    * as absolute positions anyway. That are the elements {@link #x}, and {@link #y} with its values in
    * {@link Coordinate}.
-   * The {@link Coordinate#p1} is the lesser value, left and top, 
+   * The {@link Coordinate#p1} is the lesser value, left and top,
    * and {@link Coordinate#p2},the end position is the greater value, right or bottom.
    * <br>
    * If the values are (10 * grid units + fine unit) if they are not designated as {@link #ratio} or {@link #useNatSize}.
-   * A negative value, counts from the given spread in the {@link #parent} from bottom or right side. 
+   * A negative value, counts from the given spread in the {@link #parent} from bottom or right side.
    * <br>
    * The {@link Coordinate#p1} is used for left or top and {@link Coordinate#p2} is used for right and bottom.
    * The pixel values (calculated with {@link #calcWidgetPosAndSize(GralGridProperties, int, int, int, int)})
-   * uses the known height and width from the parent if the implementation graphic is active. It depends from resizing actions. 
+   * uses the known height and width from the parent if the implementation graphic is active. It depends from resizing actions.
    * If then the left or top pixel value is greater then the right or bottom pixel value because left or top is given as positive value
-   * and the other is given negative (from bottom or right) and the size is too less, it is calculated in this kind, 
-   * and the widget may be invisible or an position error may occur. This is a result of a bad given positioning.   
+   * and the other is given negative (from bottom or right) and the size is too less, it is calculated in this kind,
+   * and the widget may be invisible or an position error may occur. This is a result of a bad given positioning.
    * <br>
    * This form of storing is better to calculate the pixel position while building the graphic and it is better
-   * to calculate related position too.    
+   * to calculate related position too.
    * <br>
-   * Generally the stored numeric value is integer in range 0x8001 .. 0x7fff for the position itself. 
+   * Generally the stored numeric value is integer in range 0x8001 .. 0x7fff for the position itself.
    *   This means a grid range of 6400 which is proper for display sized of more as 30000 pixel.
-   * <br>For specific calculations some mask bits can be added:     
+   * <br>For specific calculations some mask bits can be added:
    * <ul>
-   * <li>An additional value {@link #useNatSize} means, the position is given as pixel units. 
+   * <li>An additional value {@link #useNatSize} means, the position is given as pixel units.
    *   This is only usable for images which should not be scaled.
    * <li>An additional value {@link #ratio} means, the position value in range 0..1000 is related to the spread of the parent
-   *   as ratio. This feature is still TODO. It is important for resize. 
+   *   as ratio. This feature is still TODO. It is important for resize.
    * </ul>
    * <br><br>
    * <b>Positions as numeric arguments</b>:
    * The designations {@link #ratio} and {@value #useNatSize} can be immediately used too for setting the positions.
    * Additional some more designations are possible, which calculates the position to store from other given stored positions:
    * <ul>
-   * <li>Without designation the numeric value is the absolute values of grid units + fine grid units 
+   * <li>Without designation the numeric value is the absolute values of grid units + fine grid units
    *   regarded to the spread of the {@link #parent} panel or comprehensive widget.
    *   Whereas negative numbers counts from bottom or right side. The 0 for end position is the bottom or right of the #parent.
    *   <br>The numeric values must be in range -1600.0 till 1600.0 as float or adequate -16000 ... 16000 (more exact 0xc001..0x3fff).
@@ -115,30 +115,30 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * <li>The value {@link #same} (without additional value!) means, using the same position value as the reference position
    *   (given as 'refPos' in the setPosition...(...) operations. If the refPos is null, it means don't change this value.
    * <li>The value {@link #next} (without additional value!) for the left and top position means,
-   *   calculate this positions from the refPos with the given direction and border in {@link Coordinate#pb}. 
-   *   If the direction in {@link Coordinate#dirNext} is 'l' or 'r' for the x position or 'u' or 'd' for the y position, 
+   *   calculate this positions from the refPos with the given direction and border in {@link Coordinate#pb}.
+   *   If the direction in {@link Coordinate#dirNext} is 'l' or 'r' for the x position or 'u' or 'd' for the y position,
    *   then this position is incremented.
-   *   The other position is not incremented, because the same value for dirNext is stored there. 
-   *   Hence 'd' increments the {@link #y}. {@link Coordinate#p1} but not the {@link #x}.   
-   * <li>An additional value {@link #refer} (0x80000) means, the position is related to the given refPos, 
+   *   The other position is not incremented, because the same value for dirNext is stored there.
+   *   Hence 'd' increments the {@link #y}. {@link Coordinate#p1} but not the {@link #x}.
+   * <li>An additional value {@link #refer} (0x80000) means, the position is related to the given refPos,
    *   or the yet given own position if refPos = null. Of course the additional calculated position should not exceed
    *   the range of 0x8000 ... 0x7fff respectively should be inside the viewable spread. It means the additional value
-   *   is usual in a small range + or - 1..100.0f or 1..1000 for integer presentation. 
+   *   is usual in a small range + or - 1..100.0f or 1..1000 for integer presentation.
    * <li>An additional value {@link #size} for the right and bottom coordinate means, the value is added to the value of left or top.
-   *   It is given as size. Whereby a negative size means, the position as first argument is the bottom or right position, 
-   *   the top or left position is calculated with the size. 
+   *   It is given as size. Whereby a negative size means, the position as first argument is the bottom or right position,
+   *   the top or left position is calculated with the size.
    *   For example calling <code>setPosition(null, 10.0f, -3.5f + GralPos.size, 20, 12 + GralPos.size) </code> means,
-   *   the absolute postion is 6.5..10 in y direction and 20..32 in x direction.          
+   *   the absolute postion is 6.5..10 in y direction and 20..32 in x direction.
    * <li>The value {@link #samesize} (without additional value!) means, the end values are calculated using the size of the refPos
-   *   or the given size before of the own positions if refPos = null. 
+   *   or the given size before of the own positions if refPos = null.
    *   For example For example calling <code>setPosition(null, 4 + GralPos.refer, GralPos.samesize, 20, 12 + GralPos.size) </code> means,
    *   that on given position in y 6.5..10 the new position is 10.5..14.
-   * <li>The additional value {@link #areaNr} is only usable for the {@link GralArea9Panel} as selection for the sub panel.   
+   * <li>The additional value {@link #areaNr} is only usable for the {@link GralArea9Panel} as selection for the sub panel.
    * </ul>
-   * 
-   * Fine positions are given always from left or top of the fundamental positions. 
+   *
+   * Fine positions are given always from left or top of the fundamental positions.
    * For example a value -1.3 means, the widget is placed 1 unit from right, and then 1/3 inside this unit.
-   * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined. 
+   * This is 2/3 unit from right. A value for example -0.3 is not admissible, because -0 is not defined.
     * <br><br>
    * <b>Position writing style in a gral script:</b><br>
    * The appearance of a graphic can be given with a script using {@link org.vishia.gral.cfg.GralCfgZbnf}.
@@ -147,13 +147,13 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * It should be simple. The syntax of a position in the gral script is given in the variable {@link #syntaxZbnf}.
    * The method {@link #setPosition(CharSequence, GralPos)} uses that syntax.
    * <ul>
-   * <li>@myPanel, 5..7, 8..18: This is a full given absolute position. The element should be placed from line 5 to line 7 
-   *   and from column 8 to 18. The vertical position 7 is the bottom line, the column 18 is the right column exclusive. 
+   * <li>@myPanel, 5..7, 8..18: This is a full given absolute position. The element should be placed from line 5 to line 7
+   *   and from column 8 to 18. The vertical position 7 is the bottom line, the column 18 is the right column exclusive.
    *   The horizontal size is 10, the vertical size is 2.
    * <li>@myPanel, 5..7, 8..-1: This is a full given absolute position. The end column is given with a negative value.
    *   It means that the end column is related to the right border of the panel.
-   * <li>@myPanel, 5+2, 8+10: This is a full given position using the size. The element should be placed from line 5 
-   *   to line 7 and from column 8 to 18. The range is given as size. 
+   * <li>@myPanel, 5+2, 8+10: This is a full given position using the size. The element should be placed from line 5
+   *   to line 7 and from column 8 to 18. The range is given as size.
    * <li>@7-2, 18-10: The panel isn't given, so the panel of the last position, in the script in order of text,
    *   is used. The positions are exactly the same, from 5 to 7 and from 10 to 18. But because the size is given
    *   as negative value, the position value is the bottom line and the right column. A user may place elements
@@ -162,7 +162,7 @@ java org.vishia.gral.base.GralPos.testScanSize();
    *   is positioning right side after the current in distance of 1 unit (distance feature TODO).
    * <li>@-3,+4: The position isn't given yet. It means, the position of the last element is used. Because
    *   the size is negative, the bottom position of the last element is used. Because the last position is
-   *   designated with '++' for column, the column value of position is the right value and the current element 
+   *   designated with '++' for column, the column value of position is the right value and the current element
    *   is placed right hand from the last one. This is an example of a button right from a text. The button is
    *   some times greater (3 units) in relation to the text (2 units), but they have the same button line.
    * <li>@,+5: Here the line isn't specified. It is taken from the last position: bottom line 7
@@ -172,14 +172,14 @@ java org.vishia.gral.base.GralPos.testScanSize();
    * <li>@,+2+10: The '+' on the first value determines a relative position related to the last one. In this example
    *   the new column is 24 to 34. There is 2 units space.
    * <li>@ +-2-2,+0+20: A negative relative position related to the last absolute given position
-   *   should be written firstly with the '+' to prevent confusion with the '-' designation for counting from bottom or right side. 
-   *   In this example it is line 7 and column 10. The new position is calculated with that values to line 9. 
+   *   should be written firstly with the '+' to prevent confusion with the '-' designation for counting from bottom or right side.
+   *   In this example it is line 7 and column 10. The new position is calculated with that values to line 9.
    *   The column 10 is the same column related to the last given absolute.
-   *   This kind of specification allows determining some positions in lines and columns, 
+   *   This kind of specification allows determining some positions in lines and columns,
    *   whereby the absolute position is given only one time. (feature TODO)
-   * <li>@ %50-2,%10..%90: The positions are calculated from the size of the panel in percent. (feature TODO)  
+   * <li>@ %50-2,%10..%90: The positions are calculated from the size of the panel in percent. (feature TODO)
    * </ul>
-   * 
+   *
  * @author Hartmut Schorrig
  *
  */
@@ -188,30 +188,30 @@ public class GralPos extends ObjectVishia implements Cloneable
   /**Version, history and license.
    * <ul>
    * <li>2023-01-30 chg: {@link #set10Position(int, int, int, int, char, int, GralPos)} now instead setFinePositon(...),
-   *   this is a explicitly different name to the old concept with two values for grid and fine grid position. 
-   *   Designation of some operations as deprecated, comment some stuff.   
+   *   this is a explicitly different name to the old concept with two values for grid and fine grid position.
+   *   Designation of some operations as deprecated, comment some stuff.
    * <li>2023-01-03 chg: Now the origin parameter is removed. It is non sensible and never used for positions.
-   *   Only for a text label it is sensible.  
-   * <li>2022-12-30 meaningful refactoring. Now the positions are stored with fine grid units in only one number. 
-   *   This makes it more simple for relative calculation. 
+   *   Only for a text label it is sensible.
+   * <li>2022-12-30 meaningful refactoring. Now the positions are stored with fine grid units in only one number.
+   *   This makes it more simple for relative calculation.
    *   The interpretation of the fractional part follows the direction of the integer value (of course).
-   *   On the old solution the fractional part was oriented sometimes always to right and button, but that was confusing. 
-   *   Now it is even. See also test cases in test_vishiaGral/org/vishia/gral/test/basics/Test_GralPos.java    
+   *   On the old solution the fractional part was oriented sometimes always to right and button, but that was confusing.
+   *   Now it is even. See also test cases in test_vishiaGral/org/vishia/gral/test/basics/Test_GralPos.java
    * <li>2022-12-20 Hartmut new {@link #screenPos(int, int, int, int)} to get a pos relative to given widget but for another window.
    * <li>2022-12-20 Hartmut chg {@link #parent} can now be also a comprehensive widget, using {@link GralWidgetBase_ifc}.
    * <li>2022-12-17 Hartmut new {@link #setAsFrame()}
    * <li>2022-11-20 showing Area9 positions, now ABC ar colomns not rows.
-   * <li>2022-11-20 Using {@link ObjectVishia} for improved {@link ObjectVishia#toString(Appendable, String...)} 
-   * <li>2022-11-12 accepts also a GralWindow instead a GralPanel to replace the {@link GralWindow#mainPanel}  
-   * <li>2022-11-11 accepts positions A1C3 for Area9 
-   * <li>2022-10-27 new {@link #calcWidgetPosAndSize(GralGridProperties)} without more arguments. 
-   *   If necessary this operation gets sizes from the parent pos. But it needs more time. 
+   * <li>2022-11-20 Using {@link ObjectVishia} for improved {@link ObjectVishia#toString(Appendable, String...)}
+   * <li>2022-11-12 accepts also a GralWindow instead a GralPanel to replace the {@link GralWindow#mainPanel}
+   * <li>2022-11-11 accepts positions A1C3 for Area9
+   * <li>2022-10-27 new {@link #calcWidgetPosAndSize(GralGridProperties)} without more arguments.
+   *   If necessary this operation gets sizes from the parent pos. But it needs more time.
    * <li>2022-08 refactored. Now also for textual configured Widgets the {@link #setPosition(CharSequence, GralPos)} is used.
    *   It means, should support all features. It is refactored and yet in test. Some bugfixes including, and more features.
-   * <li>2013-05-24 Hartmut bugfix fine position can be greater 20 if positions are add and sizes are add too. 
+   * <li>2013-05-24 Hartmut bugfix fine position can be greater 20 if positions are add and sizes are add too.
    * <li>2011-10-01 Hartmut corr: Calculation of next position or refer + value if the size was negative and sameSize is selected.
    *                Then the new input value should calculate from the bottom or left value because the size is negative furthermore.
-   * <li>2011-10-01 Hartmut bugfix: if(qf >= 10)... instead >10 
+   * <li>2011-10-01 Hartmut bugfix: if(qf >= 10)... instead >10
    * <li>2011-09-23 Hartmut chg: The methods {@link #setPosition(GralPos, float, float, float, float, int, char)} etc
    *     are moved from the GralGridMngBase to this. It are methods of this class functionally. The GralGridMngBase wrappes it
    *     because that methods should be able to call there.
@@ -220,12 +220,12 @@ public class GralPos extends ObjectVishia implements Cloneable
    *     to the previous position or to a frame.
    * <li>2011-08-31 Hartmut new: method {@link #toString()} to see values of instance in debug
    * <li>2011-08-14 Hartmut new: creation of this class. Beforehand this values are stored inside the GralGridMngBase as main position.
-   *     But a position in this kind is necessary in other contexts too, and the position values should be pooled in one class.                       
+   *     But a position in this kind is necessary in other contexts too, and the position values should be pooled in one class.
    * </ul>
    * <ul>
    * <li>2011-06-00 Hartmut created
    * </ul>
-   * 
+   *
    * <b>Copyright/Copyleft</b>:<br>
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -245,71 +245,71 @@ public class GralPos extends ObjectVishia implements Cloneable
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
    * If you intent to use this source without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
+   * a second license subscribing a special contract with the author.
+   *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   public static final int version = 20221231;
 
-  
-  /**This mask 0x8... applied at any coordinate parameter of any setPosition- method means, that the value is 
+
+  /**This mask 0x8... applied at any coordinate parameter of any setPosition- method means, that the value is
    * referred to the position of the previous or given position. The referred value may be given as positive or negative number.
-   * Adding this constant a value in range 0x70000...0x80000 to 0x8ffff results for positions -32767...32767 
+   * Adding this constant a value in range 0x70000...0x80000 to 0x8ffff results for positions -32767...32767
    * or 0x8001..0x7fff (which is ~3200 grid units, used usual -100..100)
    */
   public final static int refer = 0x80000;
-  
-  /**This value applied at any coordinate parameter of any setPosition- method means, that the value is 
+
+  /**This value applied at any coordinate parameter of any setPosition- method means, that the value is
    * the same as the previous or given position.
    */
   public final static int same = 0xdfffc;
-  
+
   /**Use the next value for the coordinate in relation to the last one for the given direction
    * but the same value for the other coordinate. It is the typical value for both coordinates
-   * if a quasi-float layout is desired. 
-   * This value can be applied to x, xEnd, y, yEnd or to the float given arguments of any setPosition- method. 
-   * It uses xEnd for x and yEnd for y with the adequate fractional parts. 
-   * The new value for xEnd or yEnd is calculated using the size if this value is applied to them. 
+   * if a quasi-float layout is desired.
+   * This value can be applied to x, xEnd, y, yEnd or to the float given arguments of any setPosition- method.
+   * It uses xEnd for x and yEnd for y with the adequate fractional parts.
+   * The new value for xEnd or yEnd is calculated using the size if this value is applied to them.
    */
   public final static int next = 0xdfffe;
-  
-  /**Use the next value for the coordinate in relation to the last one. 
-   * This value can be applied to x, xEnd, y, yEnd or to the float given arguments of any setPosition- method. 
-   * It uses xEnd for x and yEnd for y with the adequate fractional parts. 
-   * The new value for xEnd or yEnd is calculated using the size if this value is applied to them. 
+
+  /**Use the next value for the coordinate in relation to the last one.
+   * This value can be applied to x, xEnd, y, yEnd or to the float given arguments of any setPosition- method.
+   * It uses xEnd for x and yEnd for y with the adequate fractional parts.
+   * The new value for xEnd or yEnd is calculated using the size if this value is applied to them.
    */
   public final static int nextBlock = 0xdfffd;
-  
+
   /**0xdffff Marker for invalid, to check*/
   public final static int invalidPos = 0xdffff;
-  
+
   /**This value 0x0c000 at xEnd or yEnd means, that the native size of a widget should be used.
    * It is especially to draw images with its native size.
-   * This is a bit mask. The nature size is stored in the bits 12..0, that is maximal 8191 pixel 
+   * This is a bit mask. The nature size is stored in the bits 12..0, that is maximal 8191 pixel
    */
   public final static int useNatSize = 0xc0000;
-  
-  
+
+
   /**This mask 0xa... at all coordinates means, that the value is given as ratio from the size.
    * The bit {@link useNatSize} have to be 0. The ratio is stored as a value from 0 to 999
    * in the bits 9..0. The other bits should be 0.
    */
   public final static int ratio = 0xa0000;
-  
-  
+
+
   /**This adding value at xEnd or yEnd or the float presentations of the calling argument of any
    * setPosition- method means, that the value is the size, not the position.
-   * A size can be positive or negative. 
+   * A size can be positive or negative.
    */
   public final static int size = 0x40000;  //Note: Bit is contained in useNatSize, (pos = useNatSize | size) == useNatSize
-  
-  
+
+
   /**Use the same size.
-   * 
+   *
    */
   public final static int samesize = 0xdfffb;
-  
-  
+
+
   /**Values 0ex001..0xe003 as number of a {@link GralArea9Panel} A..C for columns, 1..3 for rows */
   public final static int areaNr = 0xe0000;
 
@@ -318,35 +318,35 @@ public class GralPos extends ObjectVishia implements Cloneable
    * The range of any value is from 0x0 to 0x0fff for positive values and from 0x1fff downto 0x1000
    * for negative values. The value == 0 is designated with 0x0 after mask. */
   private final static int mValueRange_ = 0x7fff, mValueNegative = 0x8000;
-  
-  /**Bits in an integer position value for the type. 
+
+  /**Bits in an integer position value for the type.
    * If the type should be tested, the mTypwAdd_ should be added before masking. That is because
    * the negative values for a specific type are disposed type - value */
   private final static int mType_ = 0xe0000, kTypAdd_ = 0x10000;
-  
+
   /**Bit masks for the special types {@link #next}, {@link #nextBlock}, {@link #useNatSize}. */
-  private final static int  mSpecialType = 0xff000, kSpecialType=0xdf000; 
-  
+  private final static int  mSpecialType = 0xff000, kSpecialType=0xdf000;
+
   /**Mask to check ratio. This bits should be mask and the ratio value should compare with them. */
   private final static int XXXmCheckRatio_ = 0xf0000;
-  
+
   /**Mask for value of natural size. The maximum size is 16383 pixel. */
   private final static int XXXmNatSize_ = 0xf0001;
-  
+
   /**Mask bits to designate related position, related end position and size.
-   * 
+   *
    */
   //private final static int mBitRel = 0x1, mBitSize = 0x2, mBitRelEnd = 0x4, mBitSizeNeg = 8;
-  
-  /**Position and mask of bits to designate kind of parameter. See {@link #parameterDesignation} */ 
-  //private final static int kBitParamDesignator_x = 0, kBitParamDesignator_y = 8, mParamDesignator = 0xff; 
-  
-  
+
+  /**Position and mask of bits to designate kind of parameter. See {@link #parameterDesignation} */
+  //private final static int kBitParamDesignator_x = 0, kBitParamDesignator_y = 8, mParamDesignator = 0xff;
+
+
   /**Syntax of a position. It is
    * <pre>
   position::= @ [<$?panel> ,]
        [<?yPosRelative> &+] [<#?yPos>[\\.<#?yPosFrac>]]
-     [ [+] <#-?ySizeDown>[\\.<#?ySizeFrac>]| +* <?yOwnSize> |] 
+     [ [+] <#-?ySizeDown>[\\.<#?ySizeFrac>]| +* <?yOwnSize> |]
    [ , [<?xPosRelative> &+] [<#?xPos>[\\.<#?xPosFrac>]]
      [ [+] <#-?xWidth>[\\.<#?xSizeFrac>]| +* <?xOwnSize> |] [ <?xIncr> ++]
    ].
@@ -362,63 +362,63 @@ public class GralPos extends ObjectVishia implements Cloneable
   + "   [ [+] <#-?xWidth>[\\.<#?xSizeFrac>]| +* <?xOwnSize> |] [ <?xIncr> ++]"
   + " ] :";
   */
-  
-  
-  
-  /**The Property for the input parameter to use same, next etc. 
+
+
+
+  /**The Property for the input parameter to use same, next etc.
    * This value is used to generate an adequate config file from given input values.
    * The coordinates don't carry the information about that input values.
    */
   //public int parameterDesignation;
-  
+
   /**Position of any widget.
-   * Generally: There are coordinates in a grid, not in pixel. 
+   * Generally: There are coordinates in a grid, not in pixel.
    * Positive value is from top or left, negative value is from right or bottom.
    * {@link GralGridPos#useNatSize} on xEnd, yEnd means, that the natural size of the object should be used.
-   * 
+   *
    */
   //public int x, xEnd, y, yEnd;
 
-  
-  
+
+
   /**Fractional part of position.
    * Generally: It is a number from 0 to 9 as part of 1 grid unit.
    */
   //public int xFrac, xEndFrac, yFrac, yEndFrac;
-  
+
   /**The border to the next element. */
   //public int xyBorder, xyBorderFrac;
-  
+
   /**Origin of widget, use l, m, r for xOrigin and t, m, b for yOrigin. */
   //public char xOrigin, yOrigin;
-  
+
   /**direction of the next element. Use r, d, l, u. */
   //public char dirNext;
-  
+
   /**Relation of x and y left and top to any separation line. 0 - relation to left and top border. */
   //public int xSepLine, ySepLine;
-  
+
   public GralWidgetBase_ifc parent;
 
 
   /**The values for x and y positions. Note: should be private! Don't use in application furthermore. */
   public final Coordinate x = new Coordinate(), y = new Coordinate();
-  
+
   public boolean dbg = false;
-  
+
   /**Creates an position with all values 0 related to the whole screen.
    * The position can be changed after them with {@link #setPosition(float, float)} etc.
    */
   public GralPos(GralMng gralMng){
     this.parent = gralMng.getPanel("screen");              // the whole screen as pseudo panel is always available.
   }                                                        // Note: a parent is necessary to get the gralMng() for panel selection.
-  
-  
-  /**Set a initial GralPos with the given widget as parent. 
+
+
+  /**Set a initial GralPos with the given widget as parent.
    * The parent can be especially a {@link GralPanelContent} but also a {@link GralWidgetBase} - derived class
    * which is a comprehensive widget (contains a few widgets).
-   * The initial position describes the whole area of the parent. 
-   * This initial position can be used as reference position (refPos). 
+   * The initial position describes the whole area of the parent.
+   * This initial position can be used as reference position (refPos).
    * <br>
    * It is also possible recommended to mark the position with {@link #setAsFrame()} for the child widgets.
    * @param panel The given parent, a panel or comprehensive widget.
@@ -426,32 +426,32 @@ public class GralPos extends ObjectVishia implements Cloneable
   public GralPos(GralWidgetBase_ifc parent) {
     this.parent = parent;
   }
-  
+
   /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
-   * It is copied inside the GralMng for any widget. The position can be changed after them with {@link #setPosition(float, float)} etc. 
+   * It is copied inside the GralMng for any widget. The position can be changed after them with {@link #setPosition(float, float)} etc.
    * @param src the src position to copy all values.
    */
   public GralPos(GralPos src){ set(src); }
-  
+
   public GralPos(GralMng mng, String pos) throws ParseException {
     this(mng);
     this.setPosition(pos, this);
   }
-  
+
   public GralPos(GralWidget_ifc panel, String pos) throws ParseException {
     this(panel);
     this.setPosition(pos, this);
   }
-  
+
   /**The border to the next element. */
   //public int xyBorder, xyBorderFrac;
 
   /**Origin of widget, use l, m, r for xOrigin and t, m, b for yOrigin. */
   //public char xOrigin, yOrigin;
-  
+
   /**direction of the next element. Use r, d, l, u. */
   //public char dirNext;
-  
+
   /**Sets all values of this with the values of pos (copy values)
    * @param pos The src pos
    */
@@ -463,12 +463,12 @@ public class GralPos extends ObjectVishia implements Cloneable
     this.x.n2 = pos.x.n2; this.y.n2 = pos.y.n2;
     this.parent = pos.parent;
   }
-  
-  
+
+
   /**Sets a panel, maybe the {@link GralMng#screen} as parent for the widget, where this GralPos is used.
    * Note: If this is done after the position is determined by relative coordinates, the coordinates are already calculated
    * using the parent before, if a refPos was not given.
-   * 
+   *
    * @param parent panel for the widget where the GralPos is used.
    * @return
    */
@@ -476,30 +476,30 @@ public class GralPos extends ObjectVishia implements Cloneable
     this.parent = parent;
     return this;
   }
-  
+
   /**Sets the position to the given full panel.
    * @param panel
    */
   public void setFullPanel(GralPanelContent panel) {
-    this.x.p1 = 0; this.x.p2 = 0; 
+    this.x.p1 = 0; this.x.p2 = 0;
     this.y.p1 = 0; this.y.p2 = 0;
-//    this.x.p1Frac = 0; this.x.p2Frac = 0; 
+//    this.x.p1Frac = 0; this.x.p2Frac = 0;
 //    this.y.p1Frac = 0; this.y.p2Frac = 0;
     this.x.dirNext = 'R'; this.y.dirNext = 'D';
     this.parent = panel;
     this.x.n1 = -1; this.y.n1 = -1;
     this.x.n2 = -1; this.y.n2 = -1;
   }
-  
-  
+
+
   public void setPosition(float line, float column)
   {
     setPosition(this, line, samesize, column, samesize, '.', 0);
   }
-  
-  
-  
-  
+
+
+
+
   /**Sets a position in full grid coordinates and the size in full grid values.
    * @param line
    * @param column
@@ -512,8 +512,8 @@ public class GralPos extends ObjectVishia implements Cloneable
   { setFinePosition(line, 0, height + GralPos.size, 0, column, width + GralPos.size, 0, 1, direction, 0, 0, posFrame);
   }
 
-  
-  
+
+
   /**Set a new position in the same panel as given maybe relative to the own position.
    * @param sPos See {@link #setPosition(CharSequence, GralPos)}
    * @throws ParseException
@@ -523,26 +523,26 @@ public class GralPos extends ObjectVishia implements Cloneable
     return this;
   }
 
-  
+
   /**Sets the position with the given string representation.
  <pre>
- position::= [@] [<$?panel> ,] 
+ position::= [@] [<$?panel> ,]
                 [<?yPosRelative> &+]
-                [<#?yPos>[\.<#?yPosFrac>]] 
-                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|] 
-                [ <?yIncr> ++] 
+                [<#?yPos>[\.<#?yPosFrac>]]
+                [ [+] <#-?ySizeDown>[\.<#?ySizeFrac>]| +* <?yOwnSize> |] ##| - <#?ySizeUp>|]
+                [ <?yIncr> ++]
                 [ ,
-                  [<?xPosRelative> &+] 
-                  [<#?xPos>[\.<#?xPosFrac>]] 
+                  [<?xPosRelative> &+]
+                  [<#?xPos>[\.<#?xPosFrac>]]
                   [ [+] <#-?xWidth>[\.<#?xSizeFrac>]| +* <?xOwnSize> |]
                   [ <?xIncr> ++]
                 ] :
- ] 
+ ]
 </pre>
    * @param sPos The syntax of the string see description of this class, starting with "@panel, ..." etc.
-   *   for example "@windowA, 3..5, 16+20" for absolute line 3 and 4 (exclusive 5) and from absolute column 16, size-x=20. 
+   *   for example "@windowA, 3..5, 16+20" for absolute line 3 and 4 (exclusive 5) and from absolute column 16, size-x=20.
    *   The position can be given without panel designation or relative, then the posParent argument is necessary.
-   * @param refPos necessary to build the absolute position from relative given sPos, 
+   * @param refPos necessary to build the absolute position from relative given sPos,
    *   maybe null then this is used itself as reference.
    * @throws ParseException on errors of sPos or missing posParent if necessary.
    */
@@ -557,7 +557,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       //all other values of line and col remain 0. It is default.
       col.p1 = next;
       col.p2 = samesize;
-      posParent1 = refPos; 
+      posParent1 = refPos;
     } else {
       //position given as text
       StringPartScan spPos = new StringPartScan(sPos);
@@ -566,14 +566,14 @@ public class GralPos extends ObjectVishia implements Cloneable
         spPos.scan("@").scanStart();  //skip over a first @
         if(spPos.scanIdentifier().scan(",").scanOk()) {  //ckeck if a panel is given:
           String sPanel = spPos.getLastScannedString().toString();
-          GralMng mng = this.parent.gralMng();              // use the gralMng given in the parent panel. 
+          GralMng mng = this.parent.gralMng();              // use the gralMng given in the parent panel.
           GralWidget_ifc panel = mng.getPanel(sPanel);      // search the already created existing panel.
           if(panel == null) {
             panel = mng.getWindow(sPanel);
-          }  
+          }
           if(panel == null) {
             spPos.close();
-            throw new ParseException("GralPos.setPosition - unknown panel, " + sPanel, 0); 
+            throw new ParseException("GralPos.setPosition - unknown panel, " + sPanel, 0);
           }
           if(refPos !=null && panel == refPos.parent) {
             posParent1 = refPos;
@@ -624,7 +624,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       direction = col.dirNext == '+' ? 'R' : 'L';
       border = col.pb;
 //      borderFrac = col.pbf;
-    } 
+    }
     else if(refPos !=null) {
       if(refPos.y.dirNext != 0) {
         border = refPos.y.pb;
@@ -644,9 +644,9 @@ public class GralPos extends ObjectVishia implements Cloneable
 
     set10Position(line.p1, line.p2, col.p1, col.p2, direction, border, posParent1);
   }
-  
-  
-  
+
+
+
   /**Scans one coordinate.
    * <pre>
    * [[<?refer>+|<?percent>%]<#?p1>[.<#p2Frac>] [..|<?size>]] <#?p2>[.<#p2Frac>]
@@ -679,7 +679,7 @@ public class GralPos extends ObjectVishia implements Cloneable
     sign = spPos.seekNoWhitespace().getCurrentChar();
     if(spPos.scanInteger().scanOk()) {  //------------------- first value maybe negative scanned  10 or -10
       co.p1 = 10*(int)spPos.getLastScannedIntegerNumber();  //higher bits determines rel_p1, lower bits are scanned number
-//      if(sign == '-') {                                    // negative number on first position 
+//      if(sign == '-') {                                    // negative number on first position
 //        co.p1 -=1;                                         // 0 => -1, -1 => -2
 //      }
       if(spPos.scan(".").scanInteger().scanOk()) {
@@ -727,22 +727,22 @@ public class GralPos extends ObjectVishia implements Cloneable
     }
     assert(co.p1 != invalidPos && co.p2 != invalidPos  );
   }
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
   /**Sets the position with given grid coordinates in float.
-   * The first 
+   * The first
    * @param refPos The frame or last pos for relative positions.
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
-   *   it is the bottom line for the position. 
-   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
+   *   it is the bottom line for the position.
+   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size}
    *   with a negative value, the framePos {@link GralPos#y.p2} is used. If it is designated
    *   with {@link #same} but with any offset, the {@link GralPos#y} is used as refer position, it is the top line position.
    *   Elsewhere it is the top position.
-   * 
+   *
    * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
    * @param column
    * @param columnEndOrSize
@@ -759,20 +759,20 @@ public class GralPos extends ObjectVishia implements Cloneable
     int x = (int)(10 * (column-type)) + type;
     type = ((int)columnEndOrSize & (mSpecialType)) == kSpecialType ? (int)columnEndOrSize: ((int)columnEndOrSize + kTypAdd_) & mType_;
     int xe = (int)(10 * (columnEndOrSize - type)) + type;
-    
+
     set10Position(y, ye, x, xe, direction, (int)(10 * border), refPos);
   }
-  
+
 
   /**Sets the position
    * @param framePos The frame or last pos for relative positions.
    * @param line The line. If the parameter lineEndOrSize is designated with {@link #size} with a negative value,
-   *   it is the bottom line for the position. 
-   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size} 
+   *   it is the bottom line for the position.
+   *   If it is designated with {@link #same} without offset and the lineEndOrSize is designated with {@link #size}
    *   with a negative value, the framePos {@link GralPos#y.p2} is used. If it is designated
    *   with {@link #same} but with any offset, the {@link GralPos#y} is used as refer position, it is the top line position.
    *   Elsewhere it is the top position.
-   * 
+   *
    * @param lineEndOrSize Maybe designated with {@link #size} or {@link #samesize}
    * @param column
    * @param columnEndOrSize
@@ -781,24 +781,24 @@ public class GralPos extends ObjectVishia implements Cloneable
   public void setPosition ( GralPos framePos, float line, float lineEndOrSize, float column, float columnEndOrSize ) {
     setPosition(framePos, line, lineEndOrSize, column, columnEndOrSize, 's', -1);
   }
-  
-  
-  
+
+
+
   /**Returns true if this position is from right or bottom, so that a resize of the parent needs new positions for this widget.
    */
-  public boolean toResize(){ return x.p1 < 0 || x.p2 <= 0 || y.p1< 0 || y.p2 <=0 || x.n1 >=0 || x.n2 >=0 || y.n1 >=0 || y.n2 >=0; }
-  
+  public boolean toResize(){ return this.x.p1 < 0 || this.x.p2 <= 0 || this.y.p1< 0 || this.y.p2 <=0 || this.x.n1 >=0 || this.x.n2 >=0 || this.y.n1 >=0 || this.y.n2 >=0; }
 
 
-  
-  
-  
-  /**Sets a fine position only with integer values, 
+
+
+
+
+  /**Sets a fine position only with integer values,
    * instead float as in {@link #setPosition(GralPos, float, float, float, float, int, char, float)}
    * This operation is not recommended, should use the float version.
-   * It is the old form till 2022, where the grid positions and fine positions were stored in two different variables. 
+   * It is the old form till 2022, where the grid positions and fine positions were stored in two different variables.
    * The nwer variant {@link #set10Position(int, int, int, int, char, int, GralPos)} use only one value for grid and fine position
-   * but with factor 10. 
+   * but with factor 10.
    * @deprecated use {@link #set10Position(int, int, int, int, char, int, GralPos)} for immediately replacement with 10*line + yPosf etc.
    *   or use {@link #setPosition(GralPos, float, float, float, float, char, float)}
    */
@@ -817,27 +817,27 @@ public class GralPos extends ObjectVishia implements Cloneable
     int xe = (10 * (columnEndOrSize - type)) + type;
     set10Position(y + yPosf, ye + yef, x + xPosf, xe + xef, direction, 10*border + borderFrac, refPos);
   }
-  
+
   /**Sets the position for the next widget to add in the container.
    * This is the core function to calculate positions. It is called from all other ones.
    * It calls {@link Coordinate#set(int, int, String, Coordinate)} for both coordinates.
    * <ul>
    * <li>All positions are grid fine units. It means 10* grid unit + fine unit. The fine unit is 0..9.
    * <li>The position counts from 0 ... from top or left in the spread of the given {@link #parent} widget
-   *   or it counts from negative till ... 0 from bottom or right. For the end positions: 0 is bottom or right. 
+   *   or it counts from negative till ... 0 from bottom or right. For the end positions: 0 is bottom or right.
    * <li>The positions yPos, xPos can be given with {@link #same}, {@link #next}.
    *   It is related to the refPos or this.
-   * <li>The positions ye, xe can be given with {@link #samesize}, 
+   * <li>The positions ye, xe can be given with {@link #samesize},
    *   then the end position is calculated from the start position and the size of the parent (or the given size)
    * <li>The values of all positions can be completed (| or +) with {@link #refer}, {@link #ratio}, {@link #useNatSize},
-   * <li>The values of the end positons ye, xe can be completed (| or +) with {@link #size}  
-   * <li>The end positions can be completed (or or +) with  {@link #size},    
-   * </ul> 
+   * <li>The values of the end positons ye, xe can be completed (| or +) with {@link #size}
+   * <li>The end positions can be completed (or or +) with  {@link #size},
+   * </ul>
    * <i>Note: The fine unit continues the position in the same direction as the grid unit. This is since 2022-12,
    *   in the past (2009..2022) the fine position counts always from top and left, also on negative grid positions.
    *   That is a detail, the now found solution is more understandable.
-   *   Also changed in 2022-12: before, there were two integer numbers for grid and fine potition. 
-   *   Now as described, the integer position is 10 * the grid position + fine positon from 0..9</i> 
+   *   Also changed in 2022-12: before, there were two integer numbers for grid and fine potition.
+   *   Now as described, the integer position is 10 * the grid position + fine positon from 0..9</i>
    * @param yPos start position of the spread (top)
    * @param xPos start position of the spread (left)
    * @param ye: end position of the spread (bottom) or the size with + {@link #size}
@@ -867,10 +867,10 @@ public class GralPos extends ObjectVishia implements Cloneable
     final GralPos refUse = refPos == null ? this : refPos;
     //
     if(this.parent ==null) { this.parent = refPos.parent; }
-    
+
     this.y.set(yPos, ye, "uUdD", refUse.y);    // core of positioning for line and column
     this.x.set(xPos, xe, "lLrR", refUse.x);    // resolves the relative positions to refUse
-    
+
     if("rlRL".indexOf(direction)>=0 ){
       this.x.dirNext = Character.toLowerCase(direction);
       this.y.dirNext = '.';
@@ -889,55 +889,55 @@ public class GralPos extends ObjectVishia implements Cloneable
     }
     assert(".\0lrf".indexOf(this.x.dirNext) >=0);
     assert(".\0udf".indexOf(this.y.dirNext) >=0);
-  
-    
+
+
   }
-  
-  
-  
-  
-  
-  /**Sets the position, direction as frame, but the size as given. 
+
+
+
+
+
+  /**Sets the position, direction as frame, but the size as given.
    * @param height grid units + .fine units
    * @param width
    * @param frame if null, it does not change the own values.
    */
-  public void setSize(float height, float width, GralPos frame) { 
+  public void setSize(float height, float width, GralPos frame) {
     int y2 = (int)(height*10.0f + 0.05f);
     int x2 = (int)(width*10.0f + 0.05f);
     set10Position(GralPos.same, y2 + GralPos.size, GralPos.same, x2 + GralPos.size, '.', 0, frame);
   }
-  
-  
-  
 
-  /**Mark the position as frame position for some other derived positions. 
-   * If this is done, the position itself won't be changed as reference by positioning in the GralWidget posName string. 
-   * Instead firstly a clone is done and the clone is changed for only the widget. 
-   * This position remain unchanged. 
+
+
+
+  /**Mark the position as frame position for some other derived positions.
+   * If this is done, the position itself won't be changed as reference by positioning in the GralWidget posName string.
+   * Instead firstly a clone is done and the clone is changed for only the widget.
+   * This position remain unchanged.
    * Hint: To refer to the last widget's position you can also use the {@link GralWidget#pos()} value.
    * <br>
-   * From this position {@link GralPos#next} cannot be used. 
+   * From this position {@link GralPos#next} cannot be used.
    * <br>
    * Example for usage: <pre>
    * GralPos framePos = super.pos().setAsFrame();                   // from a comprehensive widget.
    * this.mySubWdg1 = new TextField(framePos, "@2+2, 10..-10=text"); //position is related to framePos
    * <br>
    * If for that example the framePos contains "@10..20, 6..-20" inside a panel,
-   * the resulting position for the text widget is "@12+2, 16..-30" related to the panel. 
+   * the resulting position for the text widget is "@12+2, 16..-30" related to the panel.
    * <br>
    * This property is regarded especially in {@link #setFinePosition(int, int, int, int, int, int, int, int, int, char, int, int, GralPos)}
    * and also in all positioning operations.
-   * 
-   * @return this 
+   *
+   * @return this
    */
   public GralPos setAsFrame() {
-    this.x.dirNext = this.y.dirNext = 'f';           // it are frame coord. Note do not use 'F', will be converted to 'f' 
+    this.x.dirNext = this.y.dirNext = 'f';           // it are frame coord. Note do not use 'F', will be converted to 'f'
     return this;
   }
-  
-  
-  
+
+
+
   /**Returns the position on the screen relative to the given pos
    * Note: the from positions should be only >0 TODO
    * @param line
@@ -947,14 +947,14 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @return
    */
   public GralPos screenPos(int line, int col, int dy, int dx) {
-    
+
     GralPos pos = clone();
     pos.x.p1 =line;
     pos.y.p1 =col;
     GralWidgetBase_ifc parent = this.parent;
     while(parent !=null) {
       pos.parent = parent;
-      GralPos ppos = parent.pos(); 
+      GralPos ppos = parent.pos();
       if(ppos !=null) {
         pos.x.p1 += ppos.x.p1;
         pos.y.p1 += ppos.y.p1;
@@ -969,27 +969,27 @@ public class GralPos extends ObjectVishia implements Cloneable
     pos.y.n1 = pos.y.n2 = -1;
     return pos;
   }
-  
-  
+
+
   /**This operation should be called before usage the position.
    * If the dirNext is in upper case, {@link #setNextPosition()} is called.
-   * This is the state where no setPosition was called after last usage. 
+   * This is the state where no setPosition was called after last usage.
    * The Position#dirNext of the x coord is set to upper case after them
    * to mark it for the next call of {@link #checkSetNext()}.
    */
   public void checkSetNext ( ) {
     if("LR".indexOf(this.x.dirNext) >=0 || "UD".indexOf(this.y.dirNext) >=0  ) {
       setPosition(this, next, samesize, next, samesize, '.', 0 );
-    } 
+    }
   }
-  
-  
+
+
   /**Marks the position as used.
-   * The {@link Coordinate#dirNext} is set to upper case. 
-   * This operation should be called (is called in {@link GralWidgetBase#GralWidgetBase(GralPos, String, GralMng)}) 
-   * if the position is used as reference by any widget. 
+   * The {@link Coordinate#dirNext} is set to upper case.
+   * This operation should be called (is called in {@link GralWidgetBase#GralWidgetBase(GralPos, String, GralMng)})
+   * if the position is used as reference by any widget.
    * If it is used for a next widget without given position string,
-   * then the called {@link #checkSetNext()} calculates the next position in the given direction.  
+   * then the called {@link #checkSetNext()} calculates the next position in the given direction.
    */
   public void setUsed() {
     switch(this.x.dirNext) {                 // check and set to upper case
@@ -1008,70 +1008,70 @@ public class GralPos extends ObjectVishia implements Cloneable
     case '\0': break;
     default: throw new IllegalArgumentException("faulty dirnext" + toString());
     }
-    
+
   }
-  
-  
+
+
   public void assertCorrectness() {
     if(this.x.n2 == areaNr || this.y.n2 == areaNr) {
       assert(  this.x.p1 <=3 && this.x.p2 <=3 && this.x.p1 < this.x.p2
             && this.y.p1 <=3 && this.y.p2 <=3 && this.y.p1 < this.y.p2);
     }
   }
-  
-  
+
+
   public float xGrid() {
-    return x.p1 / 10.0f;
+    return this.x.p1 / 10.0f;
   }
-  
-  
+
+
   /**Returns the height in grid position + fine position as one digit after dot.
    * @return for example 5.3 5 grid units + 3 fine units.
    */
   public float height()
   { float height;
-    if(y.p1 * y.p2 >= 0){
-      height = (y.p2 - y.p1)/10.0f;
+    if(this.y.p1 * this.y.p2 >= 0){
+      height = (this.y.p2 - this.y.p1)/10.0f;
     }
-    else{ 
+    else{
       height = 2.0F;  //not able to determine, use default.
     }
     //height += (y.p2Frac - y.p1Frac) * 0.1F;
     return height;
   }
-  
-  
+
+
   /**Returns the width in grid position + fine position as one digit after dot.
    * @return for example 5.3 5 grid units + 3 fine units.
    */
   public float width()
   { float width;
-    if(y.p1 > 0 && x.p2 > 0){ width = (x.p2 - y.p1)/10.0f; }
-    else if(x.p1 < 0 && x.p2 < 0){ width = (x.p2 - x.p1)/10.0f; }
+    if(this.y.p1 > 0 && this.x.p2 > 0){ width = (this.x.p2 - this.y.p1)/10.0f; }
+    else if(this.x.p1 < 0 && this.x.p2 < 0){ width = (this.x.p2 - this.x.p1)/10.0f; }
     else { width = 0.0F; } //not able to determine, use default.
     return width;
   }
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
   /**Creates a new position instance with the same values. */
   @Override public GralPos clone(){
-    //Hint: Object.clone() can't be used because it clones the references of x and y and not its values. 
+    //Hint: Object.clone() can't be used because it clones the references of x and y and not its values.
     GralPos newObj = new GralPos(this.parent);
-    newObj.x.set(x);
-    newObj.y.set(y);
-    newObj.parent = parent;
-    //try{ newObj = (GralGridPos)super.clone(); 
+    newObj.x.set(this.x);
+    newObj.y.set(this.y);
+    newObj.parent = this.parent;
+    //try{ newObj = (GralGridPos)super.clone();
     //} catch(CloneNotSupportedException exc){ assert(false); }
-    return newObj; 
+    return newObj;
   }
-  
-  
-  
-  
+
+
+
+
   /**Sets the given position with the given posString.
    * @param posString "@parent,line, col:" syntax see description on class level.
    * @return new calculated position equal to this.
@@ -1079,39 +1079,39 @@ public class GralPos extends ObjectVishia implements Cloneable
    *   during building the Gui. This instance is furthermore used as currently calculated,
    *   the widget aggregates a
    * @throws ParseException
-   * @deprecated use {@link #setPosition(CharSequence)} 
+   * @deprecated use {@link #setPosition(CharSequence)}
    */
   @Deprecated public GralPos calcNextPos(String posString) throws ParseException {
     if(posString.equals("!")) {  //new window, initialize the position without parent because it is top.
-      parent = null;
+      this.parent = null;
       setFinePosition(0,0,0,0,0,0,0,0,'d', 0,0, null);
     } else {
       setPosition(posString, this);
       //TODO change pos:
     }
-    return this; 
+    return this;
   }
-  
-  
-  
-  
-  
 
-  
-  
+
+
+
+
+
+
+
   /**Calculates the position and size of a widget from this given Pos.
-   * This operation is only intend to use internally. 
+   * This operation is only intend to use internally.
    * Call {@link GralMng#calcWidgetPosAndSize(GralPos, int, int, int, int)},
    * The GralMng instance knows the propertiesGui
-   * 
+   *
    * @param propertiesGui The properties for presentation.
-   * @param widthParentPixel width of the container. This value will be used if the position is given 
+   * @param widthParentPixel width of the container. This value will be used if the position is given
    *   from right with negative numbers.
-   * @param heightParentPixel height of the container. This value will be used if the position is given 
+   * @param heightParentPixel height of the container. This value will be used if the position is given
    *   from bottom with negative numbers.
-   * @param widthWidgetNat natural width of the component which will be positioning. 
+   * @param widthWidgetNat natural width of the component which will be positioning.
    *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the xe-value
-   * @param heightWidgetNat natural height of the component which will be positioning. 
+   * @param heightWidgetNat natural height of the component which will be positioning.
    *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the ye-value
    * @return A rectangle for setBounds. It is exclusively the right and bottom pixel. dx and dy are calc -1
    */
@@ -1141,7 +1141,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       x2 = (int)((float)area9.xpFrameArea[this.x.p2] / area9.xpFrameArea[3] * widthParentPixel);
       y1 = (int)((float)area9.ypFrameArea[this.y.p1] / area9.ypFrameArea[3] * heightParentPixel);
       y2 = (int)((float)area9.ypFrameArea[this.y.p2] / area9.ypFrameArea[3] * heightParentPixel);
-      
+
     } else {
       int x1g = this.x.p1 / 10;                            // -5 results in 0
       int x1i = this.x.p1 - x1g*10;                        // -5 results in -5
@@ -1153,8 +1153,8 @@ public class GralPos extends ObjectVishia implements Cloneable
       if(this.x.p1 <0) {                                   // x1 = -nn is from right side
         x1 += widthParentPixel;
       }
-      int y1g = this.y.p1 / 10; 
-      int y1i = this.y.p1 - y1g*10; 
+      int y1g = this.y.p1 / 10;
+      int y1i = this.y.p1 - y1g*10;
       if(y1i <0) { y1i +=10; y1g -=1; }
       assert(y1i >=0 && y1i <10);
 //      y1 = this.y.p1 >=0 ?      y1g * yPixelUnit + propertiesGui.yPixelFrac(y1i)
@@ -1164,9 +1164,9 @@ public class GralPos extends ObjectVishia implements Cloneable
         y1 += heightParentPixel;
       }
       if(this.x.p2 == GralPos.useNatSize){
-        x2 = x1 + widthWidgetNat; 
+        x2 = x1 + widthWidgetNat;
       } else {
-        int x2g = this.x.p2 / 10; 
+        int x2g = this.x.p2 / 10;
         int x2i = this.x.p2 - x2g*10;
         if(x2i <0) { x2i +=10; x2g -=1; }
         assert(x2i >=0 && x2i <10);
@@ -1178,10 +1178,10 @@ public class GralPos extends ObjectVishia implements Cloneable
 //           : widthParentPixel - (-x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i));
       }
       if(this.y.p2 == GralPos.useNatSize){
-        y2 = y1 + heightWidgetNat; 
+        y2 = y1 + heightWidgetNat;
       } else {
-        int y2g = this.y.p2 / 10; 
-        //int y2i = this.y.p2 >=0 ? this.y.p2 - y2g*10 : this.y.p2 - y2g * 10 +10; 
+        int y2g = this.y.p2 / 10;
+        //int y2i = this.y.p2 >=0 ? this.y.p2 - y2g*10 : this.y.p2 - y2g * 10 +10;
         int y2i = this.y.p2 - y2g*10;
         if(y2i <0) { y2i +=10; y2g -=1; }
         assert(y2i >=0 && y2i <10);
@@ -1189,7 +1189,7 @@ public class GralPos extends ObjectVishia implements Cloneable
         if(this.y.p2 <=0) {                                // y2 = -nn .. 0 is from bottom
           y2 += heightParentPixel;
         }
-//        
+//
 //        y2 = this.y.p2 >0 ?       y2g * xPixelUnit + propertiesGui.xPixelFrac(y2i)
 //        : widthParentPixel - (-y2g * xPixelUnit + propertiesGui.xPixelFrac(y2i));
       }
@@ -1199,26 +1199,26 @@ public class GralPos extends ObjectVishia implements Cloneable
   }
 
 
-//  /**Calculates the pixel from a given position. 
+//  /**Calculates the pixel from a given position.
 //   * If the given position contains negative values (from left and bottom),
 //   * then the parent's position is gotten recursively till the size is known.
-//   * Because of this recursive call this operation is slower than a programmed calculation  
-//   * of the panels size and get it via arguments of 
+//   * Because of this recursive call this operation is slower than a programmed calculation
+//   * of the panels size and get it via arguments of
 //   * {@link #calcWidgetPosAndSize(GralGridProperties, int, int, int, int)}.
 //   * But the operation is more simple to use.
-//   * 
+//   *
 //   * @param propertiesGui The properties for scaling.
 //   * @return rectangle with pixel position relative to the parent's pixel position,
 //   *   as it is necessary in the implementation graphic.
-//   * <br>  
+//   * <br>
 //   * Note: To get the pixel in a implementation's data struct (for example org.eclipse.swt.graphics.Rectangle),
 //   *   the implementation specific {@link GralMng.ImplAccess} should offer such one,
-//   *   which uses this operation.  
+//   *   which uses this operation.
 //   */
 //  public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui ) {
 //    return calcWidgetPosAndSize(propertiesGui, 0);
 //  }
-//  
+//
 //  /**Recursively call for {@link #calcWidgetPosAndSize(GralGridProperties)}
 //   * @param propertiesGui
 //   * @param recursion
@@ -1271,12 +1271,12 @@ public class GralPos extends ObjectVishia implements Cloneable
   }
 
 
-  
-  
-  /**Returns the position in a syntax which is able to parse 
+
+
+  /**Returns the position in a syntax which is able to parse
    * Useful to write back to a configuration file.
    */
-  public String posString ( ) { 
+  public String posString ( ) {
     StringBuilder b = new StringBuilder(16);
     try {
       b.append('@');
@@ -1293,15 +1293,15 @@ public class GralPos extends ObjectVishia implements Cloneable
     } catch(IOException exc) { throw new RuntimeException("unecpected", exc); }
     return b.toString();
   }
-  
-  
-  
+
+
+
   /**Append position to given Appendable, for toString of using widgets.
    * @param b append here
    * @return b for concatenate.
    * @throws IOException can be force RuntimeException if a StringBuilder is given as Appendable
    */
-  @Override public Appendable toString(Appendable b, String ... appendPanel) { 
+  @Override public Appendable toString(Appendable b, String ... appendPanel) {
     try {
       b.append('@');
       if(appendPanel !=null && this.parent != null) {
@@ -1324,7 +1324,7 @@ public class GralPos extends ObjectVishia implements Cloneable
     }
     return b;
   }
-  
+
   /**Use especially for debug.
    * @see java.lang.Object#toString()
    */
@@ -1333,52 +1333,52 @@ public class GralPos extends ObjectVishia implements Cloneable
     catch(RuntimeException exc) { return "?"; } // does never occur.
   }
 
-  
-  
+
+
   void stop(){}
 
-  
+
   /**Class holds values for either x or y. Both values are calculated with adequate algorithms,
    * so that algorithm is written only one time but called 2 times for x and for y.
-   * 
+   *
    *
    */
   public static class Coordinate
   {
-    /**The start position for the spread. 
+    /**The start position for the spread.
      * The value is 10* grid position + fine position
-     * If there are positive numbers, they count from left to right respectively top to bottom. 
-     * If the value is negative, the absolute is the distance from right respectively bottom. 
+     * If there are positive numbers, they count from left to right respectively top to bottom.
+     * If the value is negative, the absolute is the distance from right respectively bottom.
      */
     public int p1;
-    
-    /**The end position for the spread. 
+
+    /**The end position for the spread.
      * The value is 10* grid position + fine position
-     * If there are positive numbers, they count from left to right respectively top to bottom. 
-     * If the value is negative or 0, the absolute is the distance from right respectively bottom. 
+     * If there are positive numbers, they count from left to right respectively top to bottom.
+     * If the value is negative or 0, the absolute is the distance from right respectively bottom.
      */
     public int p2;
-    
-    /**Start Position as proportionately to the size of the parent (panel). 
-     * If -1 then not used. 0..999, 1000 is the position from left to right or top to bottom border of the parent. 
+
+    /**Start Position as proportionately to the size of the parent (panel).
+     * If -1 then not used. 0..999, 1000 is the position from left to right or top to bottom border of the parent.
      */
     int n1 = -1;
-    
+
     /** as proportionately to the size of the parent (panel). */
     int n2 = -1;
-    
+
     /**Additional border value for {@link GralPos#next}. */
     public int pb;
-    
+
     /**Attributes of this coordinate. */
     //public int attr;
-    
+
     /**direction of the next element. Use r, d, l, u for right, down, left, up.
-     * If this characters are in upper case R D L U, then the position is not set newly since usage. 
+     * If this characters are in upper case R D L U, then the position is not set newly since usage.
      * It means it should be set forward in the proper direction by next usage. */
     public char dirNext;
 
-    
+
 
     /**Sets the new position for this coordinate.
      * Special functions:
@@ -1402,13 +1402,13 @@ public class GralPos extends ObjectVishia implements Cloneable
       int q1 = invalidPos, q1f =0, q2 = invalidPos, q2f =0;
 
       //check input parameter ze of size and negative size
-      
+
       //The type of input parameter.
       final boolean zNeg;
       //zType is either 0x20000, 0x40000, 0x60000, 0x80000, 0xa0000, 0xc0000. 0xdfxxx, 0xe0000 for one of the type designations
       final int zType;
       if((z & mSpecialType) == kSpecialType) {             // 0xdfxxx for the specialType.
-        zType = z; 
+        zType = z;
         zNeg = false;
       } else {
         zType = (z + kTypAdd_) & mType_;                   // Adding kTypeAdd_ brings forex 7000..8fff to 8000..9fff, mType_ results is 0x8000
@@ -1418,7 +1418,7 @@ public class GralPos extends ObjectVishia implements Cloneable
       final boolean zeNeg;
       final int zeType;
       if((ze & mSpecialType) == kSpecialType) {             // 0xdfxxx for the specialType.
-        zeType = ze; 
+        zeType = ze;
         zeNeg = false;
       } else {
         zeType = (ze + kTypAdd_) & mType_;                   // Adding kTypeAdd_ brings forex 7000..8fff to 8000..9fff, mType_ results is 0x8000
@@ -1428,11 +1428,11 @@ public class GralPos extends ObjectVishia implements Cloneable
       final int testCase;                                  // testcase for debug
       final int testType = (zType<<16) + zeType;           // combination of both coord start ...end
       if(refCoord !=this){
-        pb = refCoord.pb;
+        this.pb = refCoord.pb;
       }
       boolean bSetEnd = false;                             // true then z determines qe
       switch(zType) {
-      case 0: 
+      case 0:
         if(refCoord.dirNext == 'f') {                      // related to given as framePos
           if(z >=0) {                                       // 10.. (positive value)
             q1 = refCoord.p1 + z;                          // it is related to the left coord of framePos
@@ -1442,7 +1442,7 @@ public class GralPos extends ObjectVishia implements Cloneable
         } else {
           q1 = z;                                          // no specific designation: absloute pos
         }
-        this.n1 = this.n2 = -1;     
+        this.n1 = this.n2 = -1;
         break;
       case refer:  //same                                  // relative to the reference position
         //+12..10                 refer to q1
@@ -1454,14 +1454,14 @@ public class GralPos extends ObjectVishia implements Cloneable
         if(  zeNeg                        //+2-2                    refer to p2 as base line for new pos
           && !zNeg )  {                   //+-2-2                   refer to q1 because q1 will be the baseline for left/up side
 //          || zeType ==0) {                  //+2..10                  refer to p2
-          q1 = refCoord.p2 + (z - refer); 
+          q1 = refCoord.p2 + (z - refer);
         } else {
-          q1 = refCoord.p1 + (z - refer); 
+          q1 = refCoord.p1 + (z - refer);
         }
         this.n1 = refCoord.n1;
         break;
       case same:                                           // same as the reference position
-        q1 = refCoord.p1; 
+        q1 = refCoord.p1;
         this.n1 = refCoord.n1;
         break;
       case next: {
@@ -1474,8 +1474,8 @@ public class GralPos extends ObjectVishia implements Cloneable
           q1 = refCoord.p2 + refCoord.pb;;  //add the border to second (right, bottom) to get the next first pos
           break;
         default:                                           // left same position for this coord (the other may be changed)
-          q1 = refCoord.p1;;             // don't change this coordinate. It may be the other one.              
-        }//switch direction     
+          q1 = refCoord.p1;;             // don't change this coordinate. It may be the other one.
+        }//switch direction
         this.n1 = refCoord.n1;
       } break;
       case areaNr:
@@ -1484,11 +1484,11 @@ public class GralPos extends ObjectVishia implements Cloneable
         this.n1 = -1; this.n2 = areaNr;     // mark as area value
         break;
       default:
-        throw new IllegalArgumentException("GralPos coord set, start value faulty case: 0x" + Integer.toHexString(zType));  
+        throw new IllegalArgumentException("GralPos coord set, start value faulty case: 0x" + Integer.toHexString(zType));
       } //switch for z coord
       //
       switch(zeType) {
-      case 0: 
+      case 0:
         if(refCoord.dirNext == 'f') {                      // related to given framePos
           if(ze >0) {                                      // ..20 (positive value
             q2 = refCoord.p1 + ze;                         // it is related to the left coord of framePos
@@ -1501,12 +1501,12 @@ public class GralPos extends ObjectVishia implements Cloneable
         break;
       case size:
         int ze2 = (ze - size);                             // relative end position to start pos
-        if(ze2 <0) { 
+        if(ze2 <0) {
           if(refCoord.dirNext == 'f') {                      // related to given as framePos
             q2 = refCoord.p2;
             q1 = q2 + ze2;                                 // ze2 is <0. q1 < q2
           } else {
-            q2 = q1;                                       // "10-2": negative size: q2 is the end point, 
+            q2 = q1;                                       // "10-2": negative size: q2 is the end point,
             q1 = q1 + ze2;
           }
         } else {                                           // ze2 >=0 as size
@@ -1514,10 +1514,10 @@ public class GralPos extends ObjectVishia implements Cloneable
         }
         break;
       case refer:                                           //"" not textual
-        q2 = refCoord.p2 + (ze - refer); 
+        q2 = refCoord.p2 + (ze - refer);
         break;
       case same:                                           //"" not textual
-        q2 = refCoord.p2; 
+        q2 = refCoord.p2;
         break;
       case samesize:
         q2 = q1 + (refCoord.p2 - refCoord.p1);                 // use size of parent to calculate q2 from q1
@@ -1526,28 +1526,28 @@ public class GralPos extends ObjectVishia implements Cloneable
         q2 = ze - areaNr;
         if(q2 <0 || q2 >3) { throw new IllegalArgumentException("area should be A1..C3"); }
         break;
-      default:                                              
-        throw new IllegalArgumentException("GralPos coord set, end value case missing: 0x" + Integer.toHexString(zeType));  
+      default:
+        throw new IllegalArgumentException("GralPos coord set, end value case missing: 0x" + Integer.toHexString(zeType));
       }
-      assert(q1 != invalidPos && q2 != invalidPos);      
-      
+      assert(q1 != invalidPos && q2 != invalidPos);
+
 //      switch(testType){
 //        //
 //        case 0: {                                          // both are absolute coord
 //          testCase = 1;
-//          q = z; qFrac = zFrac;                        
-//          qe = ze; qeFrac = zeFrac;                        
+//          q = z; qFrac = zFrac;
+//          qe = ze; qeFrac = zeFrac;
 //        } break;
 //        //
 //        case 0 + refer: {                                  //start absolute, end relative to parent end
-//          testCase = 2;                                      
+//          testCase = 2;
 //          q = z; qFrac = zFrac;                            // it is a special case, not textual possible
 //          qe = parent.p2 + (ze - refer); qeFrac = parent.p2Frac + zeFrac;
 //        } break;
 //        //
 //        case 0 + size: {                                   //set start, size to end, typical case
 //          testCase = 3;
-//          if(zeNeg){ 
+//          if(zeNeg){
 //            qe = z; qeFrac = zFrac;                        // if negative size, start is bottom or right point
 //            q = qe + (ze - size); qFrac = qeFrac + zeFrac; //              and q calculate by size
 //          } else {
@@ -1560,11 +1560,11 @@ public class GralPos extends ObjectVishia implements Cloneable
 //          testCase = 4;
 //          if( (attr & mBitSizeNeg) !=0){     //was the last size negative? the qe is base
 //            qe = z; qeFrac = zFrac;                     //qe = z
-//            q = qe - (parent.p2 - parent.p1) + (ze - samesize);  //q = qe - lastsize + sizediff 
+//            q = qe - (parent.p2 - parent.p1) + (ze - samesize);  //q = qe - lastsize + sizediff
 //            qFrac = qeFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
 //          } else {
-//            q = z; qFrac = zFrac;                       //q = z 
-//            qe = q + (parent.p2 - parent.p1) + (ze - samesize);  //qe = q + lastsize + sizediff 
+//            q = z; qFrac = zFrac;                       //q = z
+//            qe = q + (parent.p2 - parent.p1) + (ze - samesize);  //qe = q + lastsize + sizediff
 //            qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
 //          }
 //        } break;
@@ -1577,7 +1577,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 //        //
 //        case (refer<<16) + 0: {                            // start is relative to parent, end is given.
 //          testCase = 5;
-//          q = parent.p1 + (z - refer); qFrac = parent.p1Frac + zFrac;      //q = p + refer 
+//          q = parent.p1 + (z - refer); qFrac = parent.p1Frac + zFrac;      //q = p + refer
 //          qe = ze; qeFrac = zeFrac;                     //qe = ze
 //        } break;
 //        //
@@ -1589,8 +1589,8 @@ public class GralPos extends ObjectVishia implements Cloneable
 //        //
 //        case (refer<<16) + size: {                         // start relative to parent, end is start + size
 //          testCase = 6;
-//          if(zeNeg){ 
-//            qe = parent.p2 + (z - refer); qeFrac = parent.p2Frac + zFrac; //qe = parent.pe + refer, z is the bottom/right pos 
+//          if(zeNeg){
+//            qe = parent.p2 + (z - refer); qeFrac = parent.p2Frac + zFrac; //qe = parent.pe + refer, z is the bottom/right pos
 //            q = qe + (ze - size); qFrac = qeFrac + zeFrac;     //q = qe - size
 //          } else {
 //            q = parent.p1 + z - refer; qFrac = parent.p1Frac + zFrac;        //q = parent.p + refer
@@ -1600,12 +1600,12 @@ public class GralPos extends ObjectVishia implements Cloneable
 //        //
 //        case (refer<<16) + samesize: {
 //          testCase = 7;
-//          if( (attr & mBitSizeNeg) !=0){       
+//          if( (attr & mBitSizeNeg) !=0){
 //            q = z - (parent.p2 - parent.p1) + ze - samesize; qFrac = zFrac - (parent.p2Frac - parent.p1Frac);
-//            qe = parent.p2 + z - refer; qeFrac = zeFrac; 
+//            qe = parent.p2 + z - refer; qeFrac = zeFrac;
 //          } else {
 //            q = parent.p1 + (z - refer); qFrac = parent.p1Frac + zFrac;      //q = parent.p + refer
-//            qe = q + (parent.p2 - parent.p1) + (ze - samesize);    //qe = q + lastsize + sizediff 
+//            qe = q + (parent.p2 - parent.p1) + (ze - samesize);    //qe = q + lastsize + sizediff
 //            qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
 //          }
 //        } break;
@@ -1613,7 +1613,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 //        case (next<<16) + refer: {
 //          testCase = 8;
 //          q = parent.p2 + parent.pb; qFrac = parent.p2Frac + parent.pbf;              //q = parent.pe + parent.pb  the next right/down
-//          qe = q + (parent.p2 - parent.p1) + (ze - refer); qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;     //qe = q + (parent.pe - parent.p) + refer  
+//          qe = q + (parent.p2 - parent.p1) + (ze - refer); qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;     //qe = q + (parent.pe - parent.p) + refer
 //        } break;
 //        //
 //        case (next<<16) + size: {
@@ -1621,17 +1621,17 @@ public class GralPos extends ObjectVishia implements Cloneable
 //          //switch(dirNext){
 //          switch(parent.dirNext){
 //              case 'r': case 'd': {
-//              if( (attr & mBitSizeNeg) !=0){ 
-//                qe = parent.p2 + parent.pb; qeFrac = parent.p2Frac + parent.pbf; 
+//              if( (attr & mBitSizeNeg) !=0){
+//                qe = parent.p2 + parent.pb; qeFrac = parent.p2Frac + parent.pbf;
 //                q = qe - (parent.p2 - parent.p1) + (ze - size); qFrac = qeFrac - (parent.p2Frac - parent.p1Frac) + zeFrac;
 //              } else {                               //same as next, refer
 //                q = parent.p2 + parent.pb; qFrac = parent.p2Frac + parent.pbf;         //q = parent.pe + parent.pb the next right/down
-//                qe = q + ze - size; qeFrac = qFrac + zeFrac; 
+//                qe = q + ze - size; qeFrac = qFrac + zeFrac;
 //              }
 //            } break;
 //            //
 //            default: {
-//              q = parent.p1; qFrac = parent.p1Frac; qe = parent.p2; qeFrac = parent.p2Frac;  //don't change this coordinate. It may be the other one.              
+//              q = parent.p1; qFrac = parent.p1Frac; qe = parent.p2; qeFrac = parent.p2Frac;  //don't change this coordinate. It may be the other one.
 //            }
 //          }
 //        } break;
@@ -1640,27 +1640,27 @@ public class GralPos extends ObjectVishia implements Cloneable
 //          testCase = 9;
 //          switch(parent.dirNext){
 //            case 'r': case 'd': {
-//              if( (attr & mBitSizeNeg) !=0){ 
-//                qe = parent.p2 + (parent.p2 - parent.p1) + parent.pb; qeFrac = parent.p2Frac + (parent.p2Frac - parent.p1Frac) + parent.pbf; 
+//              if( (attr & mBitSizeNeg) !=0){
+//                qe = parent.p2 + (parent.p2 - parent.p1) + parent.pb; qeFrac = parent.p2Frac + (parent.p2Frac - parent.p1Frac) + parent.pbf;
 //                q = qe - (parent.p2 - parent.p1) + (ze - samesize); qFrac = qeFrac - (parent.p2Frac - parent.p1Frac) + zeFrac;
 //              } else {                               //same as next, refer
 //                q = parent.p2 + parent.pb; qFrac = parent.p2Frac + parent.pbf;         //q = parent.pe + parent.pb the next right/down
-//                qe = q + (parent.p2 - parent.p1) + ze - samesize; qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac; 
+//                qe = q + (parent.p2 - parent.p1) + ze - samesize; qeFrac = qFrac + (parent.p2Frac - parent.p1Frac) + zeFrac;
 //              }
 //            } break;
 //            //
 //            default: {
-//              q = parent.p1; qFrac = parent.p1Frac; qe = parent.p2; qeFrac = parent.p2Frac;  //don't change this coordinate. It may be the other one.              
+//              q = parent.p1; qFrac = parent.p1Frac; qe = parent.p2; qeFrac = parent.p2Frac;  //don't change this coordinate. It may be the other one.
 //            }
 //          }
 //        } break;
-//        default: 
+//        default:
 //          assert(false);
 //          testCase = 12;
-//          q = z; qFrac = zFrac; 
+//          q = z; qFrac = zFrac;
 //          qe = ze; qeFrac = zeFrac;
 //      }
-      
+
       if(!(q1 <= q2 || q2 <=0)){
         throw new IllegalArgumentException("start > end " + q1 + " > " + q2);
       }
@@ -1675,7 +1675,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 //      } else if(q1f < 0){
 //        this.p1 = q1 - 1; this.p1Frac = q1f +10;
 //      } else {
-//        this.p1 = q1; this.p1Frac = q1f;   
+//        this.p1 = q1; this.p1Frac = q1f;
 //      }
 //      if(q2f >= 20){
 //        this.p2 = q2 +2; this.p2Frac = q2f -20;
@@ -1684,7 +1684,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 //      } else if(q2f < 0){
 //        this.p2 = q2 - 1; this.p2Frac = q2f +10;
 //      } else {
-//        this.p2 = q2; this.p2Frac = q2f;   
+//        this.p2 = q2; this.p2Frac = q2f;
 //      }
 //      if(!(p1Frac >=0 && p1Frac <=9 && p2Frac >=0 && p2Frac <=9 )){
 //        throw new IllegalArgumentException("Fractional position failure: " + p1Frac + ", " + p2Frac);
@@ -1698,44 +1698,44 @@ public class GralPos extends ObjectVishia implements Cloneable
      */
     void set(Coordinate src){
       this.p1 = src.p1; this.p2 = src.p2;
-      this.pb = src.pb;  
+      this.pb = src.pb;
       this.n1 = src.n1; this.n2 = src.n2;
       this.dirNext = Character.toLowerCase(src.dirNext);
     }
-    
-    
+
+
     ///
-    /**Calculate from size to pixel. 
-     * 
+    /**Calculate from size to pixel.
+     *
      */
 //    void calc(int[] dst, int dparent, int dnat, int xPixelUnit, int[] xPixelFrac){
 //      int x1, x2;  //begin, end
 //      int min, max;
-//      
+//
 //      //maximum of width
 //      x1 = xPixelUnit * p1 + xPixelFrac[p1Frac]  //negative if from right
 //      + (p1 < 0 ? dparent : 0);  //from right
 //      if(p2 == GralPos.useNatSize){
-//        x2 = x1 + dnat; 
+//        x2 = x1 + dnat;
 //      } else {
 //       x2 = xPixelUnit * p2 + xPixelFrac[p2Frac]  //negative if from right
 //          + (p2 < 0 || p2 == 0 && p2Frac == 0 ? dparent : 0);  //from right
 //      }
-//     
-//      
+//
+//
 //      if(n1 >=0 && ((1000 * (x2 - x1))/dparent) > (n2 - n1) ){
 //        //The percent size is less then the maximum size, use it.
-//        x1 = n1 * dparent; 
+//        x1 = n1 * dparent;
 //        x2 = n2 * dparent;
 //        max = xPixelUnit * p2;
 //        min = xPixelUnit * p1;
 //      }
 //    }
-//    
-//    
+//
+//
     @Override public String toString() {
       StringBuilder ret = new StringBuilder(20);
-      try{ 
+      try{
         appendPos(ret, this.p1);
         ret.append("..");
         appendPos(ret, this.p2);
@@ -1744,6 +1744,6 @@ public class GralPos extends ObjectVishia implements Cloneable
 //      return this.p1/10 + ".." + this.p2/10;
     }
   }
-  
-  
+
+
 }

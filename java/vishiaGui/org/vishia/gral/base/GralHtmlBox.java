@@ -1,10 +1,10 @@
 package org.vishia.gral.base;
 
 
-public class GralHtmlBox extends GralWidget 
+public class GralHtmlBox extends GralWidget
 {
   /**Version, history and licence
-   * 
+   *
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -24,47 +24,47 @@ public class GralHtmlBox extends GralWidget
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
    * If you are indent to use this sources without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
+   * a second license subscribing a special contract with the author.
+   *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
+   *
+   *
    */
   public final static int version = 0x20120303;
 
-  
+
   public GralHtmlBox(GralPos currPos, String name)
   { super(currPos, name, 'h');
   }
 
   String url;
-  
-  public void setUrl(String url){ 
-    this.url = url; 
+
+  public void setUrl(String url){
+    this.url = url;
     if(super._wdgImpl !=null) {
-      ((ImplAccess)_wdgImpl).setUrl(url); 
+      ((ImplAccess)this._wdgImpl).setUrl(url);
     }
   }
 
-  public void activate(){ 
-    ((ImplAccess)_wdgImpl).setUrl(url); 
-    ((ImplAccess)_wdgImpl).activate(); 
+  public void activate(){
+    ((ImplAccess)this._wdgImpl).setUrl(this.url);
+    ((ImplAccess)this._wdgImpl).activate();
   }
-  
-  
+
+
   public abstract static class ImplAccess extends GralWidget.ImplAccess
   {
-    
+
     protected ImplAccess(GralHtmlBox gralBox){
       super(gralBox);
     }
-    
+
     protected abstract void setUrl(String url);
 
     protected abstract void activate();
-    
-    
+
+
   }
-  
-  
+
+
 }

@@ -1,3 +1,4 @@
+
 package org.vishia.gral.base;
 
 import java.io.IOException;
@@ -15,16 +16,16 @@ import org.vishia.gral.ifc.GralTextBox_ifc;
 
 public class GralTextBox extends GralTextField implements Appendable, GralTextBox_ifc
 {
-  
+
   /**Version and history
    * <ul>
-   * <li>2022-01-31 Hartmut chg: {@link #append(CharSequence)} without IOException. 
-   *   It is possible in Java though the interface defines an IOException. Here not necessary and more simple for application. 
+   * <li>2022-01-31 Hartmut chg: {@link #append(CharSequence)} without IOException.
+   *   It is possible in Java though the interface defines an IOException. Here not necessary and more simple for application.
    * <li>2022-01-31 Hartmut chg: Some stuff is commented now, because it is all in GralTextField,
-   *   because SwtTextFieldWrapper contains all necessities. Not an extra implementation class. 
+   *   because SwtTextFieldWrapper contains all necessities. Not an extra implementation class.
    * <li>2014-08-16 Hartmut chg: Now Implementation uses the same class, as GralTextField, inheritance was done before.
    *   It is very more simple. Same only additional features for GralTextBox and GralTextField
-   * <li>2014-08-16 Hartmut chg: GrapTextBox not abstract, using GraphicImplAccess like new concept of all GralWidgets. 
+   * <li>2014-08-16 Hartmut chg: GrapTextBox not abstract, using GraphicImplAccess like new concept of all GralWidgets.
    * <li>2012-01-06 Hartmut chg: The {@link #append(CharSequence)} etc. methods are implemented
    *   in this super class instead in the graphic layer implementation classes. Therefore
    *   the methods {@link #appendTextInGThread(CharSequence)} and {@link #setTextInGThread(CharSequence)}
@@ -50,20 +51,20 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
    * If you are indent to use this sources without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
+   * a second license subscribing a special contract with the author.
+   *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
-   * 
-   * 
+   *
+   *
    */
   @SuppressWarnings("hiding")
   public final static String sVersion = "2022-01-28";
-  
-  
-  
+
+
+
 //  Map<Integer, Integer> posLines;
-  
-  
+
+
   public GralTextBox(GralPos posCurr, String name, Type... property)
   { super(posCurr, name, property);
     super.newText = new StringBuffer();
@@ -73,13 +74,13 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 //    this(null, name, property);
 //  }
 
-  
+
   /**Sets the text to the widget, invoked only in the graphic thread.
    * This method have to be implemented in the Graphic implementation layer.
    * @param text The text which should be shown in the widget.
    */
   //protected abstract void setTextInGThread(CharSequence text);
-  
+
   /**Appends the text to the current text in the widget, invoked only in the graphic thread.
    * This method have to be implemented in the Graphic implementation layer.
    * @param text The text which should be appended and shown in the widget.
@@ -91,13 +92,13 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
    * of the widget immediately. But if the thread is any other one, the text will be stored
    * in a StringBuilder and the graphic thread will be waked up with the {@link #appendTextViewTrail}
    * dispatch listener.
-   * 
+   *
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
   @Override public final Appendable append(CharSequence arg0)
-  { synchronized(newText) {
-      newText.append(arg0);
-      dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
+  { synchronized(this.newText) {
+      this.newText.append(arg0);
+      this.dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
       redraw();
     }
     return this;
@@ -105,13 +106,13 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 
   /**Append a single char, able to call threadsafe in any thread.
    * @see #append(CharSequence)
-   * 
+   *
    * @see java.lang.Appendable#append(java.lang.CharSequence)
    */
   @Override public final Appendable append(char arg0)
-  { synchronized(newText) {
-    newText.append(arg0);
-    dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
+  { synchronized(this.newText) {
+    this.newText.append(arg0);
+    this.dyda.setChanged(GraphicImplAccess.chgAddText | GraphicImplAccess.chgViewTrail);
     redraw();
   }
   return this;
@@ -119,7 +120,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 
   /**Append a sub char sequence, able to call threadsafe in any thread.
    * @see #append(CharSequence)
-   * 
+   *
    * @see java.lang.Appendable#append(java.lang.CharSequence, int, int)
    */
   @Override public final Appendable append(CharSequence arg0, int arg1, int arg2)
@@ -129,7 +130,7 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
   }
 
 
-  
+
 //  @Override public void setTextStyle(GralColor color, GralFont font)
 //  {
 //    dyda.textFont = font;
@@ -139,23 +140,23 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 //      repaint();
 //    }
 //  }
-  
 
-  
+
+
   @Override public void setEditable(boolean editable){
-    dyda.setChanged(editable ? GraphicImplAccess.chgEditable : GraphicImplAccess.chgNonEditable);
-    if(_wdgImpl !=null){
+    this.dyda.setChanged(editable ? GraphicImplAccess.chgEditable : GraphicImplAccess.chgNonEditable);
+    if(this._wdgImpl !=null){
       redraw();
     }
   }
 
 
-  
+
   @Override public int getNrofLines(){ return 0; }  //TODO
 
-  
+
 //  @Override public int getCursorPos() { return super.caretPos = ((GraphicImplAccess)_wdgImpl).getCurrentCaretPos(); }
-//  
+//
 //  public LineColumn getCursorLineColumn() {
 //    super.caretPos = ((GralTextBox.GraphicImplAccess)_wdgImpl).getCurrentCaretPos();
 //    int lineNr = ((GralTextBox.GraphicImplAccess)_wdgImpl).getCurrentCaretLinePos();
@@ -166,48 +167,48 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 
   @Override public void viewTrail()
   {
-    dyda.setChanged(GraphicImplAccess.chgViewTrail);
-    if(_wdgImpl !=null){
+    this.dyda.setChanged(GraphicImplAccess.chgViewTrail);
+    if(this._wdgImpl !=null){
       redraw();
     }
-    
+
   }
 
-  
-  public static class XXXLineColumn { 
-    final int line, col;  
+
+  public static class XXXLineColumn {
+    final int line, col;
 
     public XXXLineColumn(int line, int column) {
       this.line = line;
       this.col = column;
     }
   }
-  
-  
-  
+
+
+
 //  public abstract class GraphicImplAccess extends GralTextField.GraphicImplAccess  //GralWidget.ImplAccess
 //  implements GralWidgImpl_ifc
 //  {
 //    public static final int chgCursor = 0x200, chgEditable = 0x400, chgNonEditable = 0x800
 //        , chgViewTrail = 0x1000, chgAddText = 0x2000;
 //
-//    
+//
 //    protected GraphicImplAccess(GralWidget widgg)
 //    {
 //      super(widgg);
 //    }
-//    
+//
 //    protected String getAndClearNewText(){ String ret; synchronized(newText){ ret = newText.toString(); newText.setLength(0); } return ret; }
-//    
+//
 //    protected int caretPos(){ return GralTextBox.this.caretPos; }
-//    
+//
 //    protected void caretPos(int newPos){ GralTextBox.this.caretPos = newPos; }
-//    
+//
 //    protected GralTextFieldUser_ifc user(){ return GralTextBox.this.user; }
 //
 //    protected abstract int getCurrentCaretPos();
 //    protected abstract int getCurrentCaretLinePos();
-//    
+//
 //  }
 
 }

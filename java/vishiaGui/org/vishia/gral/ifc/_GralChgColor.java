@@ -14,12 +14,12 @@ public class _GralChgColor
     color.colorGuimpl = null; //create a new one.
   }
 
-  
+
   public static void addColorUsualNames(GralColor color, String usualNames) {
     color.usualNames = usualNames;
   }
 
-  
+
   public static void setColorUsualNames(GralColor color, String usualNames) {
     if(false && usualNames !=null && color.usualNames !=null && color.usualNames.length() >0){
       color.usualNames += ", " + usualNames;

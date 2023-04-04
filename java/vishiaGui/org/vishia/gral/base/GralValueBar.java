@@ -2,7 +2,7 @@ package org.vishia.gral.base;
 
 import org.vishia.gral.ifc.GralSetValue_ifc;
 
-/**This is a common base class for a ValueBar-widget. 
+/**This is a common base class for a ValueBar-widget.
  * It is designed as a container for the widget. The widget itself is derived from the graphical base class,
  * for example from org.eclipse.swt.widgets.Canvas if the SWT-graphic is used,
  * or from java.awt.canvas if Swing is used.
@@ -11,13 +11,13 @@ import org.vishia.gral.ifc.GralSetValue_ifc;
  */
 public class GralValueBar extends GralWidget implements GralSetValue_ifc
 {
-  
+
   /**Version, history and license.
    * <ul>
    * <li>2014-02-11 Hartmut new: new Widget concept
    * <li>2010-06-00 Hartmut created
    * </ul>
-   * 
+   *
    * <b>Copyright/Copyleft</b>:<br>
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -37,8 +37,8 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
    * If you intent to use this source without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
+   * a second license subscribing a special contract with the author.
+   *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   public static final int version = 20140211;
@@ -46,11 +46,11 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	protected float minRange = 0.0F, maxRange = 100.0F;
 
 	protected float[] fLevels;
-	
+
 	protected String[] sColorLevels;
-	
-	
-	
+
+
+
 	public GralValueBar(GralPos currPos, String name)
 	{ super(currPos, name, 'U');
 	}
@@ -60,8 +60,8 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 	@Override
 	public void setMinMax(float minValue, float maxValue)
 	{
-		minRange = minValue;
-	  maxRange = maxValue;	
+		this.minRange = minValue;
+	  this.maxRange = maxValue;
 	}
 
 	/**Associates values to level and color.
@@ -75,56 +75,56 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
    * for example <pre>
    * String param = "-100,red,0,green,100,orange,200";
    * String[] sParam = param.tokenize(",");
-   * 
+   *
 	 * @param sParam Even number of Strings.
-	 *        
+	 *
 	 */
 	public void setBorderAndColors(String[] sParam)
 	{
 		int zParam = sParam.length;
 		//the first and the last value are the border:
-		minRange = Float.parseFloat(sParam[0]);
-		maxRange = Float.parseFloat(sParam[zParam-1]);
-		fLevels = new float[zParam/2];
-		sColorLevels = new String[zParam/2];
+		this.minRange = Float.parseFloat(sParam[0]);
+		this.maxRange = Float.parseFloat(sParam[zParam-1]);
+		this.fLevels = new float[zParam/2];
+		this.sColorLevels = new String[zParam/2];
 		int ixBorder = 0;
 		for(int ix = 1; ix < zParam; ix +=2){
-	    sColorLevels[ixBorder] = sParam[ix];
-	    fLevels[ixBorder] = Float.parseFloat(sParam[ix+1]);
+	    this.sColorLevels[ixBorder] = sParam[ix];
+	    this.fLevels[ixBorder] = Float.parseFloat(sParam[ix+1]);
 	    ixBorder +=1;
 		}
-		if(_wdgImpl !=null){
-		  ((GraphicImplAccess)_wdgImpl).setBorderAndColorsImpl(sColorLevels);
+		if(this._wdgImpl !=null){
+		  ((GraphicImplAccess)this._wdgImpl).setBorderAndColorsImpl(this.sColorLevels);
 		}
 	}
-	
-	
-	/**Sets the bar and its color. A refresh of graphic is only done if the value change forces 
+
+
+	/**Sets the bar and its color. A refresh of graphic is only done if the value change forces
 	 * a change of pixel positions of the value bar. Less changes of value does not force refresh.
 	 * @see org.vishia.gral.base.GralWidget#setValue(float)
 	 */
 	@Override public void setValue(float value)
 	{
-		if(_wdgImpl !=null){
-		  if(((GraphicImplAccess)_wdgImpl).setValue(value)) {
+		if(this._wdgImpl !=null){
+		  if(((GraphicImplAccess)this._wdgImpl).setValue(value)) {
         this.redraw();
 		  }
 		}
 	}
-  
+
 
 	public static class ColorValues
 	{
 		float[] border;
 		int[] color;
 	}
-	
-	
+
+
   public abstract class GraphicImplAccess extends GralWidget.ImplAccess
   implements GralWidgImplAccess_ifc
   {
-    
-    
+
+
     /**Values of the level borders */
     protected int[] pixLevel;
 
@@ -132,18 +132,18 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
 
     /**The values in Pixel between the colored bar is shown. */
     protected int pix0line, pixvalue = 50;
-    
+
     protected int ixColor;
-    
+
     protected GraphicImplAccess(GralMng mng)
     {
       super(GralValueBar.this, mng);
       if(GralValueBar.this.sColorLevels !=null){
-        setBorderAndColorsImpl(GralValueBar.this.sColorLevels); 
+        setBorderAndColorsImpl(GralValueBar.this.sColorLevels);
       }
     }
-    
-    
+
+
     /**Sets the pixel values
      * @param valueP
      * @return true if a pixel value is changed. Only then refresh is necessary.
@@ -152,9 +152,9 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
     {
       final boolean chg;
       int value1, value2;
-      int pixMax = horizontal ? pixBounds.dx : pixBounds.dy;
-      value1 = (int)(pixMax * ((0.0F - minRange)/ (maxRange - minRange)));  //the 0-value
-      value2 = (int)(pixMax * ((valueP - minRange) / (maxRange - minRange)));
+      int pixMax = this.horizontal ? this.pixBounds.dx : this.pixBounds.dy;
+      value1 = (int)(pixMax * ((0.0F - GralValueBar.this.minRange)/ (GralValueBar.this.maxRange - GralValueBar.this.minRange)));  //the 0-value
+      value2 = (int)(pixMax * ((valueP - GralValueBar.this.minRange) / (GralValueBar.this.maxRange - GralValueBar.this.minRange)));
       if(value1 < 0){ value1 = 0;}
       if(value1 > pixMax){ value1 = pixMax; }
       if(value2 < 0){ value2 = 0;}
@@ -163,11 +163,11 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
       if(chg) {
         this.pix0line = value1;
         this.pixvalue = value2;
-        float level1 = minRange;
-        //check in which range the value is assigned, set ixColor 
-        if(fLevels !=null)
-        for(ixColor = 0; ixColor < fLevels.length -1; ++ixColor){
-          float level2 = fLevels[ixColor];
+        float level1 = GralValueBar.this.minRange;
+        //check in which range the value is assigned, set ixColor
+        if(GralValueBar.this.fLevels !=null)
+        for(this.ixColor = 0; this.ixColor < GralValueBar.this.fLevels.length -1; ++this.ixColor){
+          float level2 = GralValueBar.this.fLevels[this.ixColor];
           if(  level1 < level2 && level1 <= valueP && valueP < level2
             || level1 > level2 && level2 <= valueP && valueP < level1
             )
@@ -178,17 +178,17 @@ public class GralValueBar extends GralWidget implements GralSetValue_ifc
       return chg;
     }
 
-    
+
     abstract public void setBorderAndColorsImpl(String[] sColorLevels);
-    
-    protected boolean horizontal(){ return horizontal; }
-    
-    protected int ixColor(){ return ixColor; }
-    
-    protected int pix0line(){ return pix0line; }
-    
-    protected int pixvalue(){ return pixvalue; }
-    
+
+    protected boolean horizontal(){ return this.horizontal; }
+
+    protected int ixColor(){ return this.ixColor; }
+
+    protected int pix0line(){ return this.pix0line; }
+
+    protected int pixvalue(){ return this.pixvalue; }
+
   }
 
 

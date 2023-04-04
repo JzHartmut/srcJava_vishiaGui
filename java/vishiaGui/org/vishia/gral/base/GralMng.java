@@ -67,20 +67,20 @@ import org.vishia.util.MinMaxTime;
 import org.vishia.util.ReplaceAlias_ifc;
 import org.vishia.util.TimedValues;
 
-/**This is the Manager for the graphic. 
+/**This is the Manager for the graphic.
  * It contains the independent parts of graphic organization.
- * This class <code>GralMng</code> is a common approach to work with graphical interface simply. 
+ * This class <code>GralMng</code> is a common approach to work with graphical interface simply.
  * The inner class {@link ImplAccess} is implemented by the several graphic-system-supporting classes.
  * <ul>
  * <li>{@link org.vishia.gral.swt.SwtMng}
  * <li>{@link org.vishia.gral.awt.AwtMng}
  * </ul>
  * <br><br>
- * 
+ *
  * @author Hartmut Schorrig
  *
  */
-@SuppressWarnings("synthetic-access") 
+@SuppressWarnings("synthetic-access")
 public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralMng_ifc
 {
   /**Version, history and license.
@@ -91,14 +91,14 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    *   in the same thread, without dequeue and enqueue in the graphic thread. Lesser number of thread switches.
    *   <br>But because the graphic thread wait operation in SWT cannot wake up in a given time, it needs a timer thread
    *   only used for wake up. This is the {@link #awakeThread}.
-   * <li>2022-11-14 Hartmut new {@link LogMsg} with some constants for organization of log messages 
-   *   with the {@link LogMessage#sendMsg(int, CharSequence, Object...)} approach. 
+   * <li>2022-11-14 Hartmut new {@link LogMsg} with some constants for organization of log messages
+   *   with the {@link LogMessage#sendMsg(int, CharSequence, Object...)} approach.
    *   The real logged messages can be filtered with this numbers.
    * <li>2022-11-14 Hartmut new now {@link #reportGralContent(Appendable)} for all existing windows defined here.
-   * <li>2022-11-14 Hartmut new now {@link #initScript(CharSequence)} wrapped here for more simple user programming. 
+   * <li>2022-11-14 Hartmut new now {@link #initScript(CharSequence)} wrapped here for more simple user programming.
    * <li>2022-11-14 Hartmut rename now {@link #refPos()} instead currPos().
    * <li>2022-10-27 Hartmut chg now the singleton concept is obsolete. Some more refactoring.
-   * <li>2022-10-27 Hartmut new {@link #createGraphic(String, char, LogMessage)} is now localized here (where else!). 
+   * <li>2022-10-27 Hartmut new {@link #createGraphic(String, char, LogMessage)} is now localized here (where else!).
    * <li>2020-02-01 Hartmut new {@link #actionClose} sets the property to close a main Window.
    * <li>2016-11-04 Hartmut chg: {@link #notifyFocus(GralWidget)}: Only widgets with datapath. It is only for the inspector etc. TODO: Is there a list necessary? Store only the last widget in focus!
    * <li>2016-09-02 Hartmut new: {@link #setPosPanel(GralPanelContent)} now invoked especially from ctor of {@link GralPanelContent}
@@ -107,36 +107,36 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    *   then the panel should have a position string too to assigned them. Or the widgets are created with creation of the implementation graphic,
    *   then a panel should be created in the same kind, and invoke {@link #setPosPanel(GralPanelContent)} in the ctor of its implementation.
    *   The contract is unchanged: A created panel determines that all following widgets are created on that panel.
-   * <li>2016-09-02 Hartmut chg: {@link #registerPanel(GralPanelContent)} is only be called in the ctor of {@link GralPanelContent} 
-   *   because any panel is based on GralPanelContent. 
-   *   The definition of the panel in the {@link #pos()} used for the next widgets are done now in the extra routine {@link #setPosPanel(GralPanelContent)}. 
+   * <li>2016-09-02 Hartmut chg: {@link #registerPanel(GralPanelContent)} is only be called in the ctor of {@link GralPanelContent}
+   *   because any panel is based on GralPanelContent.
+   *   The definition of the panel in the {@link #pos()} used for the next widgets are done now in the extra routine {@link #setPosPanel(GralPanelContent)}.
    * <li>2016-09-01 Hartmut chg: instead implements {@link ReplaceAlias_ifc} now contains {@link #getReplacerAlias()}.
-   *   It is an extra class for a ReplacerAlias given independent of the graphic. 
-   * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name. 
+   *   It is an extra class for a ReplacerAlias given independent of the graphic.
+   * <li>2016-07-20 Hartmut chg: instead setToPanel now {@link #createImplWidget_Gthread()}. It is a better name.
    * <li>2015-10-29 Hartmut chg: Problem on {@link #pos()} with a second thread: The MainWindow- {@link GralPos#panel} was registered in another thread
    *   and therefore unknown in the new {@link #pos()} for that thread. Solution: If the thread-specific GralPos will be created,
-   *   it should copy the data from the {@link #posCurrent} which is valid any case for valid initial data.   
+   *   it should copy the data from the {@link #posCurrent} which is valid any case for valid initial data.
    * <li>2015-10-26 Hartmut new: The help and info box is an integral part of the GralMng and therefore available for any small application without additional effort.
-   *   Only the {@link #createHtmlInfoBoxes(MainCmd)} should be invoked in the graphic thread while initializing the application. 
+   *   Only the {@link #createHtmlInfoBoxes(MainCmd)} should be invoked in the graphic thread while initializing the application.
    * <li>2015-07-13 Hartmut chg: {@link GralMngFocusListener#focusLostGral(GralWidget)} now invokes the {@link GralWidget#actionFocused} too.
-   *   The action should distinguish between focus gained and focus lost in its action routine. That should be added to the code. Done for all vishia sources.  
-   * <li>2015-07-13 Hartmut new: {@link #registerUserAction(String, GralUserAction)} now knows possibility of usage the own name with "<name>" 
-   * <li>2015-07-13 Hartmut chg: Positioning: The new concept gets a position in the constructor of {@link GralWidget} via 
-   *   {@link #getPosCheckNext()}. That routine sets the current position in this class to {@link PosThreadSafe#posUsed} 
-   *   for further using to increment. That is correct. 
+   *   The action should distinguish between focus gained and focus lost in its action routine. That should be added to the code. Done for all vishia sources.
+   * <li>2015-07-13 Hartmut new: {@link #registerUserAction(String, GralUserAction)} now knows possibility of usage the own name with "<name>"
+   * <li>2015-07-13 Hartmut chg: Positioning: The new concept gets a position in the constructor of {@link GralWidget} via
+   *   {@link #getPosCheckNext()}. That routine sets the current position in this class to {@link PosThreadSafe#posUsed}
+   *   for further using to increment. That is correct.
    *   The problem before was faulty old-concept usage of org.vishia.gral.swt.SwtMng#XXXsetPosAndSizeSwt
    *   which invokes {@link #setNextPosition()} which increments the position too, therefore twice. The usage of that routine
-   *   is prevented for Swt implementation, TODO for awt yet now. 
+   *   is prevented for Swt implementation, TODO for awt yet now.
    * <li>2015-05-31 Hartmut chg: {@link GralMngFocusListener}: invokes repaint() because of maybe changed outfit on focus gained
-   * <li>2015-05-02 Hartmut chg: {@link #registerWidget(GralWidget)} is obsolete now, it is empty yet. 
+   * <li>2015-05-02 Hartmut chg: {@link #registerWidget(GralWidget)} is obsolete now, it is empty yet.
    *   Instead {@link #registerWidget(String, GralWidget)} by given name and {@link #removeWidget(String)} by name.
-   *   See description of registering on {@link GralWidget#setToPanel(GralMngBuild_ifc)}. 
+   *   See description of registering on {@link GralWidget#setToPanel(GralMngBuild_ifc)}.
    * <li>2015-04-27 Hartmut new {@link #selectPanel(GralPanelContent)} not only with String given
    * <li>2015-01-18 Hartmut chg: Now the implementation for any Grahic (SwtMng) and the GralMng are two separated instances.
    *   The SwtMng extends the {@link GralMng.ImplAccess} which accesses all private data of the GralMng.
-   * <li>2013-12-21 Hartmut new: {@link #createImplWidget_Gthread(GralWidget)} for all set to panel actions. That method handles all widget types. 
+   * <li>2013-12-21 Hartmut new: {@link #createImplWidget_Gthread(GralWidget)} for all set to panel actions. That method handles all widget types.
    * <li>2013-03-20 Hartmut adap: {@link #actionFileSelect} with setText(...), now the file select field was filled.
-   * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because 
+   * <li>2012-08-20 Hartmut new: {@link #getWidgetsPermanentlyUpdating()} created but not used yet because
    *   {@link #refreshCurvesFromVariable(VariableContainer_ifc)} has the necessary functionality.
    * <li>2012-06-30 Hartmut new: Composition {@link #widgetHelper} The widget helper is implemented in the graphic system
    *   for example as {@link org.vishia.gral.swt.SwtWidgetHelper} to do some widget specific things.
@@ -151,45 +151,45 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * <li>2011-12-26 Hartmut new {@link #setApplicationAdapter(GralMngApplAdapter_ifc)} to support context sensitive help by focusGained of widgets.
    * <li>2011-11-18 Hartmut new {@link #getLastClickedWidget()} to get the last clicked widget in any user routine.
    *   The information about the widget can be used to capture widgets for any script.
-   * <li>2011-11-17 Hartmut new addText(String) as simple variant.  
-   * <li>2011-11-14 Hartmut bugfix: copy values of GralTabbedPanel.pos to this.pos instead set the reference from GralWidgetMng to GralTabbedPanel.pos 
+   * <li>2011-11-17 Hartmut new addText(String) as simple variant.
+   * <li>2011-11-14 Hartmut bugfix: copy values of GralTabbedPanel.pos to this.pos instead set the reference from GralWidgetMng to GralTabbedPanel.pos
    *   The bug effect was removed panel in GralTabbedPanel.pos because it was the same instance as GralWidgetMng.
    * <li>2011-10-01 Hartmut chg: move {@link #registerPanel(GralPanelContent)} from the SWT implementation to this.
-   * <li>2011-10-01 Hartmut new: method {@link #getPanel(String)} to get a registered panel by name.    
+   * <li>2011-10-01 Hartmut new: method {@link #getPanel(String)} to get a registered panel by name.
    * <li>2011-09-30 Hartmut new: {@link #actionDesignEditField}. It is the action which is called from menu now.
    * <li>2011-09-29 Hartmut chg: {@link #calcWidgetPosAndSize(GralPos, int, int, int, int)}: calculates dy and dx one pixel less.
    * <li>2011-09-23 Hartmut chg: All implementation routines for positioning are moved to the class {@link GralPos}. This class contains only wrappers now.
    * <li>2011-09-18 Hartmut chg: Inner static class GuiChangeReq now stored in an own class {@link GralWidgetChangeRequ}.
-   * <li>2011-09-18 Hartmut new: : {@link GralPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, GralPos)} calculates from right or bottom with negative values.                            
-   * <li>2011-09-10 Hartmut chg: Renaming this class, old name was GuiMngBase.                             
-   * <li>2011-09-10 Hartmut chg: Some routines form SWT implementation moved to this base class. It doesn't depends on the underlying graphic base.                            
+   * <li>2011-09-18 Hartmut new: : {@link GralPos#setFinePosition(int, int, int, int, int, int, int, int, int, char, GralPos)} calculates from right or bottom with negative values.
+   * <li>2011-09-10 Hartmut chg: Renaming this class, old name was GuiMngBase.
+   * <li>2011-09-10 Hartmut chg: Some routines form SWT implementation moved to this base class. It doesn't depends on the underlying graphic base.
    * <li>2011-08-13 Hartmut chg: New routines for store and calculate the position to regard large widgets.
    * </ul>
    * Old History from GralGraphicThread
    * <ul>
-   * <li>2022-09-04 in {@link #runGraphicThread()} set the thread ID before (!) the implementation is started. 
+   * <li>2022-09-04 in {@link #runGraphicThread()} set the thread ID before (!) the implementation is started.
    * <li>2020-02-01 in {@link #runGraphicThread()}: The {@link GralWindow_ifc#windHasMenu} is not forced, it is set compatible
-   *   in {@link GralArea9MainCmd#parseArgumentsAndInitGraphic(String, String, char, String)}. 
-   *   <br>Usage of {@link GralWindow#GralWindow(String, String, String, int)} 
-   *   should add {@link GralWindow_ifc#windResizeable} etc. additionally. 
-   * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows. 
+   *   in {@link GralArea9MainCmd#parseArgumentsAndInitGraphic(String, String, char, String)}.
+   *   <br>Usage of {@link GralWindow#GralWindow(String, String, String, int)}
+   *   should add {@link GralWindow_ifc#windResizeable} etc. additionally.
+   * <li>2016-07-16 Hartmut chg: The main window will be created with same methods like all other windows.
    * <li>2015-01-17 Hartmut chg: Now it is an own instance able to create before the graphic is established.
-   *   The graphical implementation extends the {@link ImplAccess}. 
+   *   The graphical implementation extends the {@link ImplAccess}.
    * <li>2012-04-20 Hartmut bugfix: If a {@link GralGraphicOrder} throws an exception,
    *   it was started again because it was in the queue yet. The proplem occurs on build graphic. It
    *   was repeated till all graphic handles are consumed. Now the {@link #queueGraphicOrders} entries
    *   are deleted first, then executed. TODO use this class only for SWT, use the adequate given mechanism
-   *   for AWT: java.awt.EventQueue.invokeAndWait(Runnable). use Runnable instead GralDispatchCallbackWorker. 
+   *   for AWT: java.awt.EventQueue.invokeAndWait(Runnable). use Runnable instead GralDispatchCallbackWorker.
    * <li>2012-03-15 Hartmut chg: Message on exception.
-   * <li>2011-11-08 Hartmut new: Delayed orders to dispatch in the graphic thread: 
-   *   Some actions need some calculation time. 
-   *   If they are called in a fast repetition cycle, a follow up effect may occur. 
-   *   Therefore actions should be registered with a delayed start of execution, the start time 
+   * <li>2011-11-08 Hartmut new: Delayed orders to dispatch in the graphic thread:
+   *   Some actions need some calculation time.
+   *   If they are called in a fast repetition cycle, a follow up effect may occur.
+   *   Therefore actions should be registered with a delayed start of execution, the start time
    *   should be able to putting off till all repetitions (for example key repetition) are done.
    * <li>2011-11-00 Hartmut created: as own class from Swt widget manager.
    * </ul>
 
-   * 
+   *
    * <b>Copyright/Copyleft</b>:
    * For this source the LGPL Lesser General Public License,
    * published by the Free Software Foundation is valid.
@@ -209,12 +209,12 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    *    You mustn't delete this Copyright/Copyleft inscription in this source file.
    * </ol>
    * If you are intent to use this sources without publishing its usage, you can get
-   * a second license subscribing a special contract with the author. 
-   * 
+   * a second license subscribing a special contract with the author.
+   *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   public final static String sVersion = "2022-10-27";
-  
+
 	/**This class is used for a selection field for file names and paths. */
   public static class FileSelectInfo
   {
@@ -225,8 +225,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     public String sTitle;
     public final GralFileDialog_ifc dialogFile;
     public final GralWidget dstWidgd;
-    
-    
+
+
     public FileSelectInfo(String sTitle, List<String> listRecentFiles, String startDirMask, GralWidget dstWidgd)
     { this.listRecentFiles = listRecentFiles;
       this.dstWidgd = dstWidgd;
@@ -252,7 +252,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
         if(sMask1.indexOf('*') >=0){ //contains an asterix
           sLocalDir1 = posSlash >=0 ? sLocalDir1.substring(0, posSlash) : "";
         } else {
-          sMask1 = null;  //no mask, sLocalDir is a directory.  
+          sMask1 = null;  //no mask, sLocalDir is a directory.
         }
       }
       this.sMask = sMask1;
@@ -260,71 +260,71 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       this.dialogFile = null; //singleton.createFileDialog();      // TODO this is a problem if created not in the graphic thread.
       //this.dialogFile.open(sTitle, mode);
     }
-    
+
   }
-  
-  
-  
+
+
+
   /*package private*/ static final class PosThreadSafe
   {
-    /**Position of the next widget to add. If some widgets are added one after another, 
+    /**Position of the next widget to add. If some widgets are added one after another,
      * it is similar like a flow-layout.
      * But the position can be set.
      * The values inside the position are positive in any case, so that the calculation of size is simple.
      */
     public final GralPos pos; //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
-    
-    /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
+
+    /**False if the position is given newly. True if it is used. Then the next add-widget invocation
      * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
     protected boolean posUsed;
-    
+
     final long threadId;
-    
+
     PosThreadSafe(GralMng gralMng) {
-      threadId = Thread.currentThread().getId();
-      pos = new GralPos(gralMng);
+      this.threadId = Thread.currentThread().getId();
+      this.pos = new GralPos(gralMng);
     }
-    
+
     PosThreadSafe(GralPos exists) {
-      threadId = Thread.currentThread().getId();
-      pos = new GralPos(exists);
+      this.threadId = Thread.currentThread().getId();
+      this.pos = new GralPos(exists);
     }
-    
-    @Override public String toString(){ return "thread=" + threadId + ": " + pos.toString(); }
-   
+
+    @Override public String toString(){ return "thread=" + this.threadId + ": " + this.pos.toString(); }
+
   }
-  
-  
+
+
   /**The current position as helper if it is the same thread.
    * Initialized firstly empty.
    */
   private PosThreadSafe posCurrent;
 
   private final Map<Long, PosThreadSafe> posThreadSafe;
-  
-  
+
+
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
-  //GuiDialogZbnfControlled dialogZbnfConfigurator;   
+  //GuiDialogZbnfControlled dialogZbnfConfigurator;
   GralCfgBuilder cfgBuilder;
-  
+
   GralCfgWriter cfgWriter;
-  
-  /**The designer is an aggregated part of the PanelManager, but only created if necessary. 
+
+  /**The designer is an aggregated part of the PanelManager, but only created if necessary.
    * TODO check whether it should be disposed to {@link #gralDevice} .*/
   protected GralCfgDesigner designer;
-  
+
   private GralCfgData cfgData;
-  
+
   public boolean bDesignMode = false;
-  
+
   /**Some actions may be processed by a user implementation. */
   //private final GuiPlugUser_ifc user;
-  
+
   protected boolean bDesignerIsInitialized = false;
-  
+
   //final GralMng parent;
-  
+
   /**Properties of the Gui appearance. */
   public GralGridProperties.ImplAccess propertiesGui;
 
@@ -341,13 +341,13 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   //private final IndexMultiTable showFieldsM;
 
   //public final GralWidgetHelper widgetHelper;
-  
+
   /**Map of all panels. A panel may be a dialog box etc. */
   protected final Map<String, GralPanel_ifc> idxPanels = new TreeMap<String,GralPanel_ifc>();
 
   /**Representation of the 'whole screen' as parent for a window. */
   public final GralPanel_ifc screen;
-  
+
   /**Map of all windows. One of them is the primary one */
   protected final Map<String, GralWindow> idxWindows = new TreeMap<String,GralWindow>();
 
@@ -355,168 +355,168 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   private GralWindow windPrimary;
 
   private final List<GralWidget> widgetsInFocus = new LinkedList<GralWidget>();
- 
+
   /**Three windows as sub window for html help, info and logging created if the primary window is created. */
   public GralInfoBox infoHelp, infoBox, infoLog;
-  
+
   private String sHelpBase;
 
 
-  
-  /**List of all panels which may be visible yet. 
+
+  /**List of all panels which may be visible yet.
    * The list can be iterated. Therefore it is lock-free multi-threading accessible.
    */
   protected final ConcurrentLinkedQueue<GralVisibleWidgets_ifc> listVisiblePanels = new ConcurrentLinkedQueue<GralVisibleWidgets_ifc>();
-  
-  
+
+
   Queue<GralWidget> listWidgetsPermanentUpdating = new LinkedList<GralWidget>();
-  
-  
+
+
   /**It is possible to write any message via this class to a logging system.
    * All internal methods of gral writes exceptions to that logging system instead abort the execution of the application.
    * This is an association, can be null, should not be null while working.
    * See {@link #GralMng(LogMessage)} and #setLog
    */
   public LogMessage log;
-  
-  
+
+
   protected GralMngApplAdapter_ifc applAdapter;
-  
+
 	/**Composition of some curve view widgets, which should be filled indepentent of there visibility. */
   @Deprecated public final List<GralCurveView_ifc> curveContainer = new LinkedList<GralCurveView_ifc>();
-	
-  /**Position of the next widget to add. If some widgets are added one after another, 
+
+  /**Position of the next widget to add. If some widgets are added one after another,
    * it is similar like a flow-layout.
    * But the position can be set.
    * The values inside the position are positive in any case, so that the calculation of size is simple.
    */
 //  protected final GralPos XXXpos = new GralPos(this); //xPos, xPosFrac =0, xPosEnd, xPosEndFrac, yPos, yPosEnd, yPosFrac, yPosEndFrac =0;
-  
-  /**False if the position is given newly. True if it is used. Then the next add-widget invocation 
+
+  /**False if the position is given newly. True if it is used. Then the next add-widget invocation
    * calculates the next position in direction see {@link GralPos#setNextPosition()}. */
 //  protected boolean XXXposUsed;
-  
 
-  
-  
+
+
+
   /**Saved last use position. After calling {@link #setPosAndSize_(Control, int, int, int, int)}
    * the xPos and yPos are setted to the next planned position.
    * But, if a new position regarded to the last given one is selected, the previous one is need.
    */
   //protected int xPosPrev, xPosPrevFrac, yPosPrev, yPosPrevFrac;
-  
+
   /**width and height for the next element. If a value */
   //protected int xSize, xSizeFrac, ySize, ySizeFrac;
-  
-  /**'l' - left 'r'-right, 't' top 'b' bottom. */ 
+
+  /**'l' - left 'r'-right, 't' top 'b' bottom. */
   //protected char xOrigin = 'l', yOrigin = 'b';
-  
+
   //protected char pos.dirNext = 'r';
-  
-  /**The width of the last placed element. 
+
+  /**The width of the last placed element.
    * It is used to determine a next xPos in horizontal direction. */
   //int xWidth;
-  
+
   /**True if the next element should be placed below the last. */
   protected boolean bBelow, bRigth;
-  
-  
+
+
   /**
-   * 
+   *
    */
   protected GralUserAction userMainKeyAction;
-  
+
   InspcReplAlias replacerAlias = new InspcReplAlias();
-  
+
   //public final GralWidgetHelper widgetHelper;
-  
+
 	/**Any kind of TabPanel for this PanelManager TODO make protected
    */
-  
+
   //public GralPanel_ifc currPanel;
-  
+
   protected String sCurrPanel;
-  
-  /**Last focused widget or last selected line in a table. 
+
+  /**Last focused widget or last selected line in a table.
    * This info can be used to get the last widget on a context menu etc. on another widget.
    * See {@link #getLastClickedWidget()}
    */
   private GralWidget_ifc lastClickedWidget;
-  
+
   //private String lastClickedDatapath;
-  
+
   //private String lastClickedVariable;
-  
-  /**Index of all user actions, which are able to use in Button etc. 
+
+  /**Index of all user actions, which are able to use in Button etc.
    * The user action "showWidgetInfos" defined here is added initially.
-   * Some more user-actions can be add calling {@link #registerUserAction(String, GralUserAction)}. 
+   * Some more user-actions can be add calling {@link #registerUserAction(String, GralUserAction)}.
    * */
   protected final Map<String, GralUserAction> userActions = new TreeMap<String, GralUserAction>();
   //private final Map<String, ButtonUserAction> userActions = new TreeMap<String, ButtonUserAction>();
-  
+
   /**Index of all Tables, which are representable. */
   //private final Map<String, Table> userTableAccesses = new TreeMap<String, Table>();
-  
+
   /**Map of replacements of paths to data. Filled from ZBNF: DataReplace::= <$?key> = <$-/\.?string> */
   private final Map<String, String> dataReplace = new TreeMap<String,String>();
 
-  
+
   /**The thread id of the managing thread for graphic actions. */
   protected long graphicThreadId;
 
-  
+
   boolean debugPrint = false;
-  
+
   protected boolean isWakedUpOnly;
-  
+
   /**True if the startup of the main window is done and the main window is visible. */
-  protected boolean bStarted = false; 
+  protected boolean bStarted = false;
 
   /** set to true to exit the graphic thread and dispose the implementation graphic */
   protected boolean bShouldExitImplGraphic = false;
-  
+
   protected boolean bIsExitImplGraphic = false;
-  
+
   /**Set to true to finish the main. Set from the graphic thread. */
   protected boolean bExitMain = false;
-  
+
   /**Set to true to finish the main. Maybe on dispose the implementation graphic. */
   protected boolean bShouldExitMain = false;
-  
+
   /**Instance to measure execution times.
-   * 
+   *
    */
   protected MinMaxTime checkTimes = new MinMaxTime();
-  
-  
-  /**Queue of orders to execute in the graphic thread before dispatching system events. 
+
+
+  /**Queue of orders to execute in the graphic thread before dispatching system events.
    * Any instance will be invoked in the dispatch-loop.
-   * See {@link #addTimeEntry(Runnable)}. 
-   * An order can be stayed in this queue for ever. It is invoked any time after the graphic thread 
+   * See {@link #addTimeEntry(Runnable)}.
+   * An order can be stayed in this queue for ever. It is invoked any time after the graphic thread
    * is woken up and before the dispatching of graphic-system-event will be started.
    * An order may be run only one time, than it should delete itself from this queue in its run-method.
    * */
   private final ConcurrentLinkedQueue<GralGraphicOrder> queueOrdersToExecute = new ConcurrentLinkedQueue<GralGraphicOrder>();
 
-  
+
   private final Thread awakeThread;
-  
+
   /**True then the dispatcher sleeps, does not work.
    * Only then the {@link #awakeThread} should awake the dispatcher. */
   private boolean bDispatcherSleeps;
-  
+
   public EventSource evSrc = new EventSource("gralMng") {
-    
+
   };
-  
-  
+
+
   /**The graphic specific implementation part of the GralMng
-   * This implementation should care about the correct implementation widgets. 
+   * This implementation should care about the correct implementation widgets.
    */
   public ImplAccess _mngImpl;
-  
+
   private static GralMng XXXsingleton;
-	
+
   /*
   public GralMng(GralGraphicThread device, LogMessage log)
   { this.gralDevice = device;
@@ -524,22 +524,22 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       this.log = log;
   //its a user action able to use in scripts.
       userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-  GralMng.singleton = this; 
+  GralMng.singleton = this;
   }
   */
 
-  /**Creates the GralMng with a given logging output, 
-   * 
+  /**Creates the GralMng with a given logging output,
+   *
    * @param log maybe null firstly, then use {@link #setLog(LogMessage)}
    */
-  public GralMng(LogMessage log) { 
+  public GralMng(LogMessage log) {
     super("gralMng");                            // EventTimerThread name is "gralMng"
     this.log = log;
-    this.awakeThread = new Thread(this.runAwakeThread, "awakeGraphicDispatcher");  
-    this.gralProps = new GralGridProperties();  
+    this.awakeThread = new Thread(this.runAwakeThread, "awakeGraphicDispatcher");
+    this.gralProps = new GralGridProperties();
     //its a user action able to use in scripts.
-    userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
-    //if(GralMng.singleton ==null) { GralMng.singleton = this; } 
+    this.userActions.put("showWidgetInfos", this.actionShowWidgetInfos);
+    //if(GralMng.singleton ==null) { GralMng.singleton = this; }
     this.screen = new GralScreen(this);       // this is only a fictive panel without meaning, only to have anyway a parent for GralPos
     this.idxPanels.put("screen", this.screen);
     this.posThreadSafe = new TreeMap<Long, PosThreadSafe>();
@@ -547,13 +547,13 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     this.posThreadSafe.put(this.posCurrent.threadId, this.posCurrent);
   }
 
-  
+
   public GralMng() {
     this(new LogMessageStream(System.out));
   }
-  
-  
-  
+
+
+
   /**Initialize the graphic with a script. See {@link GralCfgZbnf#configureWithZbnf(CharSequence, GralCfgData)}.
    * This operation is only wrapped.
    * @param script String given, also possible in a StringBuilder prepared.
@@ -562,18 +562,18 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   public void initScript(CharSequence script) throws ParseException {
     GralCfgZbnf.configWithZbnf(script, null, this);         // does all, reads the config file, parses, creates Graphic Elements
   }
-  
-  
+
+
   /**Initialize the graphic with a script. See {@link GralCfgZbnf#configureWithZbnf(File, GralCfgData)}.
    * This operation is only wrapped.
    * @param script given in file
-   * @throws Exception 
+   * @throws Exception
    */
   public void initScript(File script) throws Exception {
     GralCfgZbnf.configWithZbnf(script, null, this);         // does all, reads the config file, parses, creates Graphic Elements
   }
-  
-  
+
+
   /**Creates the whole graphically representation with all given widgets on Gral level.
    * This operation creates the proper Factory with {@link GralFactory#getFactory},
    * then calls {@link GralFactory#createGraphic(GralMng, char)}.
@@ -583,12 +583,12 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * <br><br>
    * Only the {@link GralFactory} needs dependencies to the implementation graphic,
    * there only to the specific Factory. Whereby the specific factory can be called also via String:
-   * {@link Class#forName(String)}. 
-   * This class remains independent of any implementation. 
+   * {@link Class#forName(String)}.
+   * This class remains independent of any implementation.
    * @param implementor "SWT" or "AWT" or (TODO) the class path of the implementor's factory class.
    * @param sizeShow 'A' .. 'G' for the size
    * @param log null if a log is already given for the GralMng,
-   *   else the log from yet. A given log will be removed. 
+   *   else the log from yet. A given log will be removed.
    */
   public void createGraphic(String implementor, char sizeShow, LogMessage log) {
     if(log != null) { this.log = log; }
@@ -604,8 +604,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     }
     this.windPrimary.redraw();
   }
-  
-  
+
+
   /**Creates the singleton instance of the GralMng. If this routine is invoked more as one time, the first invocation
    * is the correct one. The more-time-invocation is supported because an application may not invoke this routine.
    * Therefore it is invoked later additional.
@@ -616,33 +616,33 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    */
   public static boolean XXXcreate(LogMessage log){
 //    if(singleton !=null) return false;
-//    else { 
+//    else {
 //      singleton = new GralMng(log);
 //      return true;
 //    }
     return false;
   }
-  
 
-  /**Returns the singleton of the GralMng. Creates it if it is not instantiated yet. 
+
+  /**Returns the singleton of the GralMng. Creates it if it is not instantiated yet.
    * On creation all logging output will be redirect to System.out.
    * To use another logging output, create the GralMng using {@link GralMng#GralMng(LogMessage)}
    * on start of application, before this routine is firstly called. */
-//  public static GralMng get(){ 
+//  public static GralMng get(){
 //    if(singleton == null) { //not initialized yet, early invocation:
 //      singleton = new GralMng(new MainCmdLoggingStream(System.out));
 //    }
-//    return singleton; 
+//    return singleton;
 //  }
-  
-  
+
+
   /**Changes or sets the log output. See {@link #log()}.
    * @param log
    */
   public void setLog(LogMessage log) { this.log = log; }
-  
+
   //public final GralWidgetHelper widgetHelper;
-  
+
   /**Creates an nee Panel Manager in a new Window.
    * @param graphicBaseSystem
    * @return
@@ -652,16 +652,16 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   { Class<GralMng> mngClass;
   	GralMng mng = null;
   	String sGraphicBaseSystem = "org.vishia.mainGuiSwt.GuiPanelMngSwt";
-  	try{ 
+  	try{
   		mngClass = (Class<GralMng>) Class.forName(sGraphicBaseSystem);
   	} catch(ClassNotFoundException exc){ mngClass = null; }
-  	
+
   	if(mngClass == null) throw new IllegalArgumentException("Graphic base system not found: " + sGraphicBaseSystem);
-  	try{ 
+  	try{
   		Constructor<GralMng> ctor = mngClass.getConstructor();
   		mng = ctor.newInstance();
   		//mng = mngClass.newInstance();
-  	
+
   	} catch(IllegalAccessException exc){ throw new IllegalArgumentException("Graphic base system access error: " + sGraphicBaseSystem);
   	} catch(InstantiationException exc){ throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
   	} catch (SecurityException exc) { throw new IllegalArgumentException("Graphic base system not able to instanciate: " + sGraphicBaseSystem);
@@ -672,42 +672,42 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   	return mng;
   }
 
-  PosThreadSafe pos() 
+  PosThreadSafe pos()
   { long threadId1 = Thread.currentThread().getId();
-    PosThreadSafe ret = posCurrent;   //thread safe: atomic access, use ret.
+    PosThreadSafe ret = this.posCurrent;   //thread safe: atomic access, use ret.
     if(ret.threadId != threadId1) {   //only access to map if necessary.
       Long threadId = new Long(threadId1);
-      ret = posThreadSafe.get(threadId);
+      ret = this.posThreadSafe.get(threadId);
       if(ret == null){
-        ret = new PosThreadSafe(posCurrent.pos); //copy values from the last one 
-        posThreadSafe.put(threadId, ret);
+        ret = new PosThreadSafe(this.posCurrent.pos); //copy values from the last one
+        this.posThreadSafe.put(threadId, ret);
       }
     }
-    posCurrent = ret;                 //store for next access, it may be faster.
+    this.posCurrent = ret;                 //store for next access, it may be faster.
     return ret;
   }
 
-  /**Sets the position in a Thread safe kind. 
+  /**Sets the position in a Thread safe kind.
    * @param pos maybe gotten from {@link #getPositionInPanel()} any slightly varied
    */
   public void setPos(GralPos pos) {
     pos().pos.set(pos);
   }
 
-  
+
   /**Returns the current position of this thread to work with it.
    * @return Will be changed on ctors of GralWidget.
-   *   The GralWidget does not store a reference to this, it stores a clone. 
+   *   The GralWidget does not store a reference to this, it stores a clone.
    */
   public GralPos refPos ( ) { return this.pos().pos; }
-  
-  
+
+
   /**Sets the position with a given String, see {@link GralPos#setPosition(CharSequence, GralPos)}
    * whereby the parent is the current position value.
    * @param sPosition
    * @throws ParseException
    */
-  public GralPos setPos ( String sPosition) 
+  public GralPos setPos ( String sPosition)
   throws ParseException
   { PosThreadSafe pos = pos();
     pos.pos.setPosition(sPosition, null);
@@ -755,7 +755,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     pos.posUsed = false;
   }
 
-  /**Sets the size of the position and remark it as unused. 
+  /**Sets the size of the position and remark it as unused.
    * @param height
    * @param width
    */
@@ -781,22 +781,22 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
   public void registerShowField(GralWidget widg){
     //link the widget with is information together.
-    if(widgetsInFocus.size()==0 && widg.getDataPath() !=null) {
+    if(this.widgetsInFocus.size()==0 && widg.getDataPath() !=null) {
       //it has not a datapath initally. Never come here.
-      widgetsInFocus.add(widg);   //add first widget.
+      this.widgetsInFocus.add(widg);   //add first widget.
     }
     if(widg.name !=null){
-      idxShowFields.put(widg.name, widg);
+      this.idxShowFields.put(widg.name, widg);
     }
-  
+
   }
 
   @Override public GralPos getPositionInPanel(){ return pos().pos.clone(); }
 
-  public GralPos getPosCheckNext(){ 
+  public GralPos getPosCheckNext(){
     PosThreadSafe pos = pos();
     pos.pos.checkSetNext();
-    return pos.pos.clone(); 
+    return pos.pos.clone();
   }
 
   /**Used for deprecated style, without independent GralWidget. TODO remove.
@@ -805,16 +805,16 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   public GralPos getPosOldPositioning(){ return getPosCheckNext(); }
 
   //private String lastClickedDatapath;
-  
+
   //private String lastClickedVariable;
-  
+
   @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
 
 
   public void setProperties(GralGridProperties.ImplAccess props) {
     this.propertiesGui = props;
   }
-  
+
   /**register a window only called in the {@link GralWindow#GralWindow(GralPos, String, String, int, GralMng)}.
    * @since 2022-09 renamed from setFirstlyThePrimaryWindow(), and also register all windows.
    * @param window
@@ -822,69 +822,69 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    */
   public void registerWindow(GralWindow window){
     if(this.windPrimary ==null) {
-      this.windPrimary = window; 
-      idxPanels.put("primaryWindow", window.mainPanel);
+      this.windPrimary = window;
+      this.idxPanels.put("primaryWindow", window.mainPanel);
     }
     this.idxWindows.put(window.name, window);
   };
-  
-  
+
+
 //  public static void createMainWindow(GralFactory factory, GralWindow window, char sizeShow, int left, int top, int xSize, int ySize) {
 //    factory.createWindow(window, sizeShow, left, top, xSize, ySize);
 //  }
-//  
-  
-  
+//
+
+
   /**This routine should be called in the initializing routine in the graphic thread one time.
    * @param mainCmd If given the help from mainCmd will be written into the Help box.
    */
   public void createHtmlInfoBoxes(MainCmd mainCmd)
   {
     setPosition(10, 0, 10, 0, 'd', 0);
-    infoBox = createTextInfoBox("infoBox", "Info");
+    this.infoBox = createTextInfoBox("infoBox", "Info");
     //
     selectPanel("primaryWindow");
     setPosition(0,40,10,0,'.', 0);
-    infoHelp = GralInfoBox.createHtmlInfoBox(this, refPos(), "Help", "Help", true);
+    this.infoHelp = GralInfoBox.createHtmlInfoBox(this, refPos(), "Help", "Help", true);
     if(mainCmd !=null) {
       try{
         for(String line: mainCmd.listHelpInfo){
-          infoHelp.append(line).append("\n");
+          this.infoHelp.append(line).append("\n");
         }
       } catch(Exception exc){ writeLog(0, exc); }
     }
   }
-  
-  
-  
+
+
+
   /**Not that this routine must not invoked before the {@link GralFactory#createWindow(GralWindow, char, int, int, int, int)}
    * was not called.
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#createImplWidget_Gthread(org.vishia.gral.base.GralWidget)
    */
-  @Override public void createImplWidget_Gthread(GralWidget widgg){ 
+  @Override public void createImplWidget_Gthread(GralWidget widgg){
     try {
       if(false && widgg instanceof GralWindow){
         GralWindow wind1 = (GralWindow)widgg;
         this._mngImpl.createSubWindow(wind1);
   //      for(Map.Entry<String, GralPanelContent> e: wind1.panels.entrySet()) {
   //        GralPanelContent tab = e.getValue();
-  //        
+  //
   //      }
         //registerPanel(wind1);
         //set the current position of the manager to this window, initalize it.
         //PosThreadSafe pos = pos();
         //pos.pos.panel = wind1; //it is selected.
         //pos.pos.setPosition(null, 0,0,0,0,0,'r');  //per default the whole window as position and size.
-  
-      } else {  
-        _mngImpl.createImplWidget_Gthread(widgg); 
+
+      } else {
+        this._mngImpl.createImplWidget_Gthread(widgg);
       }
     } catch(Exception exc) {
       System.err.println(CheckVs.exceptionInfo("unexpected", exc, 0, 10));
     }
   }
-  
-  
+
+
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#setMainKeyAction(org.vishia.gral.ifc.GralUserAction)
    */
@@ -893,24 +893,24 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     this.userMainKeyAction = userMainKeyAction;
     return last;
   }
-  
-  
-  
-  /**package private*/ GralUserAction userMainKeyAction(){ return userMainKeyAction; }
-  
-  
-  @Override public GralGridProperties propertiesGui(){ return gralProps; }
-  
-  @Override public LogMessage log(){ return log; }
 
 
-  
+
+  /**package private*/ GralUserAction userMainKeyAction(){ return this.userMainKeyAction; }
+
+
+  @Override public GralGridProperties propertiesGui(){ return this.gralProps; }
+
+  @Override public LogMessage log(){ return this.log; }
+
+
+
   /**Returns null if the widget value can only be gotten platform-depending.
    * The platform widget manager should override this method too and invoke super.getValueFromWidget()
    * to call this method. If it returns a value, then it is ok.
    * A user invocation calls the overridden platform depending method automatically.
    * <br>
-   * See {@link org.vishia.gral.swt.SwtMng}.   
+   * See {@link org.vishia.gral.swt.SwtMng}.
    */
   @Override public String getValueFromWidget(GralWidget widgd)
   { String sValue = null;
@@ -927,139 +927,139 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   }
 
   public void setApplicationAdapter(GralMngApplAdapter_ifc adapter){ this.applAdapter = adapter; }
-  
 
-  public GralMngApplAdapter_ifc getApplicationAdapter(){ return applAdapter; } 
-  
-  
-  @Override public ReplaceAlias_ifc getReplacerAlias(){ return replacerAlias; }
-  
-  
 
-  public void setHelpBase(String path){ 
+  public GralMngApplAdapter_ifc getApplicationAdapter(){ return this.applAdapter; }
+
+
+  @Override public ReplaceAlias_ifc getReplacerAlias(){ return this.replacerAlias; }
+
+
+
+  public void setHelpBase(String path){
     char cEnd = path.charAt(path.length()-1);
     if("/\\".indexOf(cEnd) >=0) {
-      sHelpBase = path;
+      this.sHelpBase = path;
     } else {
-      sHelpBase = path + "/";
+      this.sHelpBase = path + "/";
     }
   }
-  
-  
-  
-  /**Sets the URL for the current help situation. 
+
+
+
+  /**Sets the URL for the current help situation.
    * Note: before calling the following may/should be set: <pre>
    * this.gralMng.createHtmlInfoBoxes(null);
    *  this.gralMng.setHelpBase(this.sHelpDir);
    * </pre>
    * Only then the url is effective.
-   * @param urlSuffix it is usual a suffix to given helpBase. 
+   * @param urlSuffix it is usual a suffix to given helpBase.
    *   Only if it is absolute than take it without helpbase.
    */
-  public void setHelpUrl(String urlSuffix){ 
+  public void setHelpUrl(String urlSuffix){
     String sUrl;
     if(urlSuffix.startsWith(":")){
       sUrl = this.sHelpBase + urlSuffix.substring(1);
-    } else if(FileFunctions.isAbsolutePath(urlSuffix)) { 
+    } else if(FileFunctions.isAbsolutePath(urlSuffix)) {
       sUrl = urlSuffix;  //absolute path
     } else if (this.sHelpBase !=null) { //a directory should end with "/", possible also /path/to/file.html
       sUrl = this.sHelpBase + urlSuffix;      //url may be "file.html#label" or "#label"
     } else {
       sUrl = urlSuffix;  //taken as is absolute or relative
     }
-    if(this.infoHelp !=null) this.infoHelp.setUrl(sUrl); 
+    if(this.infoHelp !=null) this.infoHelp.setUrl(sUrl);
   }
-  
 
-  
+
+
   public void setHtmlHelp(String url){
-    setHelpUrl(url); 
+    setHelpUrl(url);
     /*
     if(applAdapter !=null){
       applAdapter.setHelpUrl(url);
     }
     */
   }
-  
-  public void showInfo(CharSequence text) {
-    if(infoBox == null) return;
-    if(text !=null){ infoBox.setText(text); }
-    infoBox.setFocus();
-  }
-  
-  public void setInfo(CharSequence text) {
-    if(infoBox == null) return;
-    infoBox.setText(text);
-  }
-  
 
-  
+  public void showInfo(CharSequence text) {
+    if(this.infoBox == null) return;
+    if(text !=null){ this.infoBox.setText(text); }
+    this.infoBox.setFocus();
+  }
+
+  public void setInfo(CharSequence text) {
+    if(this.infoBox == null) return;
+    this.infoBox.setText(text);
+  }
+
+
+
   public void addInfo(CharSequence info, boolean show)
   {
-    if(infoBox == null) return;
-    try{ infoBox.append(info); }
+    if(this.infoBox == null) return;
+    try{ this.infoBox.append(info); }
     catch(Exception exc){}
     if(show){
-      infoBox.setFocus(); //setWindowVisible(true);
+      this.infoBox.setFocus(); //setWindowVisible(true);
     }
   }
 
-  
-  
-  /**selects a registered panel for the next add-operations. 
+
+
+  /**selects a registered panel for the next add-operations.
    */
-  @Override public GralPanel_ifc selectPanel(String sName){ 
+  @Override public GralPanel_ifc selectPanel(String sName){
     PosThreadSafe pos = pos();
     GralPanel_ifc panel = this.idxPanels.get(sName);
     pos.pos.parent = panel;                                // the current pos in GralMng is marked with the panel as parent
-    sCurrPanel = sName;
+    this.sCurrPanel = sName;
 //    if(pos.pos.parent == null && XXXcurrTabPanel !=null) {
 //      //use the position of the current tab panel for the WidgetMng. Its panel is the parent.
-//      pos.pos.set(XXXcurrTabPanel.pos());  
+//      pos.pos.set(XXXcurrTabPanel.pos());
 //      pos.pos.parent = XXXcurrTabPanel.addGridPanel(sName, /*"&" + */sName,1,1,10,10);
 //      idxPanels.put(sName, panel);  //TODO unnecessay, see addGridPanel
-      log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
+      this.log.sendMsg(0, "GuiPanelMng:selectPanel: unknown panel name %s", sName);
       //Note: because the pos.panel is null, not placement will be done.
 //    }
     setPosition(0,0,0,0,'d',0);  //set the position to default, full panel because the panel was selected newly.
     return panel;
   }
-  
-  
+
+
   /**Selects the given panel as current panel to build some content. */
   @Override public void selectPanel(GralPanel_ifc panel) {
     pos().pos.parent = panel;
-    sCurrPanel = panel == null ? null: panel.getName();
+    this.sCurrPanel = panel == null ? null: panel.getName();
     setPosition(0,0,0,0,'d',0);  //set the position to default, full panel because the panel was selected newly.
   }
-  
+
   /**Selects the primary window as current panel to build some content. */
-  @Override public void selectPrimaryWindow() { selectPanel(windPrimary.mainPanel); } 
-  
+  @Override public void selectPrimaryWindow() { selectPanel(this.windPrimary.mainPanel); }
+
   @Override public boolean currThreadIsGraphic(){
     return Thread.currentThread().getId() == getThreadIdGui();
   }
 
 
-  
+
   @Override public GralWidget getWidget(String name)
-  { return idxNameWidgets.get(name);
+  { return this.idxNameWidgets.get(name);
   }
-  
-  
-  
+
+
+
   public Iterable<GralWidget> getWidgetIter() {
-    return idxNameWidgets.values();
+    return this.idxNameWidgets.values();
   }
-  
-  
+
+
   @Override public void buildCfg(GralCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
     this.cfgData = data;
     File currentDir = FileSystem.getDir(fileCfg);
-    this.cfgBuilder = new GralCfgBuilder(cfgData, this, currentDir);
-    cfgBuilder.buildGui(log, 0);
-    this.designer = new GralCfgDesigner(cfgBuilder, this, log);  
+    this.cfgBuilder = new GralCfgBuilder(this.cfgData, this, currentDir);
+    this.cfgBuilder.buildGui(this.log, 0);
+    this.designer = new GralCfgDesigner(this.cfgBuilder, this, this.log);
     this.bDesignMode = true;
   }
 
@@ -1067,52 +1067,52 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * @param mode
    */
   @Override public void setDesignMode(boolean mode){ this.bDesignMode = mode; }
-  
+
   /**Saves the given configuration.
    * @param dest
    * @return
    */
   @Override public String saveCfg(Writer dest)
-  { cfgWriter = new GralCfgWriter(log);
-    String sError = cfgWriter.saveCfg(dest, cfgData);
+  { this.cfgWriter = new GralCfgWriter(this.log);
+    String sError = this.cfgWriter.saveCfg(dest, this.cfgData);
     return sError;
   }
-  
 
-  
-  
-	/**This method is called whenever the left mouse is pressed on a widget, whiches 
+
+
+
+	/**This method is called whenever the left mouse is pressed on a widget, whiches
 	 * @param lastClickedWidgetInfo
 	 */
 	public void setLastClickedWidget(GralWidget_ifc lastClickedWidgetInfo)
 	{
 		this.lastClickedWidget = lastClickedWidgetInfo;
 	}
-	
-	
+
+
   /**Returns that widget which was clicked by mouse at last. This method is usefully for debugging
    * and for special functionality. A widget which {@link GralWidget#setDataPath(String)} is initialized
    * with "widgetInfo" is not captured for this operation. It means, if any user action method uses
    * this method to get the last clicked widget, that widget itself have to be marked with
-   * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
+   * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.
    * @return The last clicked widget
    */
-  public GralWidget_ifc getLastClickedWidget(){ return lastClickedWidget; }
-  
-  
+  public GralWidget_ifc getLastClickedWidget(){ return this.lastClickedWidget; }
+
+
   /**Returns that widget which was clicked by mouse at last. This method is usefully for debugging
    * and for special functionality. A widget which {@link GralWidget#setDataPath(String)} is initialized
    * with "widgetInfo" is not captured for this operation. It means, if any user action method uses
    * this method to get the last clicked widget, that widget itself have to be marked with
-   * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.  
+   * <b>setDataPath("widgetInfo");</b> to prevent getting its own widget info.
    * @return The last clicked widget
    */
   //public String getLastClickedDatapath(){ return lastClickedWidget; }
-  
-  
+
+
   /**Registers all user actions, which are able to use in Button etc.
    * The name is related with the <code>userAction=</code> designation in the configuration String.
-   * @param name if it contains "<name>" then that is replace by the {@link GralUserAction#name}. 
+   * @param name if it contains "<name>" then that is replace by the {@link GralUserAction#name}.
    *   You can give "<name>" only to set the action's name.
    * @param action
    */
@@ -1125,46 +1125,46 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     } else {
       name1 = name;
     }
-    userActions.put(name1, action);
+    this.userActions.put(name1, action);
   }
-  
+
   @Override public GralUserAction getRegisteredUserAction(String name)
   {
-    return userActions.get(name);
+    return this.userActions.get(name);
   }
-  
-  
+
+
   void registerWidget(String name, GralWidget widgd) {
-    idxNameWidgets.put(name, widgd);
+    this.idxNameWidgets.put(name, widgd);
   }
-  
+
   void removeWidget(String name) {
-    idxNameWidgets.remove(name);
+    this.idxNameWidgets.remove(name);
   }
-  
+
   @Override public void registerWidget(GralWidget widgd)
   {
     if(widgd.name != null){
-      idxNameWidgets.put(widgd.name, widgd);
+      this.idxNameWidgets.put(widgd.name, widgd);
     }
   }
-  
-  
+
+
   public void deregisterWidgetName(GralWidget widg)
   {
     if(widg.name != null){
-      idxNameWidgets.remove(widg.name);
+      this.idxNameWidgets.remove(widg.name);
     }
-    
+
   }
-  
+
   /**Registers a panel to place the widgets.
    * <br>
    * For positioning of Widgets in the panel:
    * The panel should be associated with a current position which is used to hold the current value for increment.
    * For that {@link GralPos#setPosition(CharSequence, GralPos)} should be used.
    * <br>
-   * Old positioning, deprecated: After registration, this panel is the current one, stored in {@link #pos()} for this thread. 
+   * Old positioning, deprecated: After registration, this panel is the current one, stored in {@link #pos()} for this thread.
    * The panel can be selected with its name calling the {@link #selectPanel(String)} -routine
    * @param key Name of the panel.
    * @param panel The panel.
@@ -1177,26 +1177,26 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     }
     this.idxPanels.put(panel.getName(), panel);
   }
-  
-  
+
+
   @Deprecated public void setPosPanel(GralPanel_ifc panel) {
     GralMng.PosThreadSafe pos = pos();
     pos.pos.parent = panel;
     //initialize the position because its a new panel. The initial position is the whole panel.
     pos.pos.setFinePosition(0,0,0,0,0,0,0,0,'d',0,0, pos.pos);
-    sCurrPanel = panel.getName();
+    this.sCurrPanel = panel.getName();
   }
-  
-  
-  /*package private*/ 
+
+
+  /*package private*/
   void deregisterPanel(GralPanel_ifc panel) {
-    if(sCurrPanel.equals(panel.getName())) {
+    if(this.sCurrPanel.equals(panel.getName())) {
 //      sCurrPanel = windPrimary.name;
     }
-    idxPanels.remove(panel.getName());
+    this.idxPanels.remove(panel.getName());
   }
-  
-  
+
+
   void deregisterWindow(GralWindow wind) {
     this.idxWindows.remove(wind.getName());
     if(this.windPrimary == wind) {
@@ -1210,22 +1210,22 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 //      sCurrPanel = windPrimary.name;
     }
   }
-  
-  
+
+
   /**Returns a Set of all fields, which are created to show.
    * @return the set, never null, possible an empty set.
    */
   public Set<Map.Entry<String, GralWidget>> getShowFields()
   {
-    Set<Map.Entry<String, GralWidget>> set =idxShowFields.entrySet();
+    Set<Map.Entry<String, GralWidget>> set =this.idxShowFields.entrySet();
     return set; //(Set<Entry<String, WidgetDescriptor>>)set;
   }
 
-  
+
   public Map<String, String> getAllValues()
   {
       Map<String, String> values = new TreeMap<String, String>();
-  for(GralWidget input: idxNameWidgets.values()){
+  for(GralWidget input: this.idxNameWidgets.values()){
       String sValue = getValueFromWidget(input);
     values.put(input.name, sValue);
   }
@@ -1234,7 +1234,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
   @Override public String getValue(String sName)
   { final String sValue;
-      GralWidget widgetDescr = idxNameWidgets.get(sName);
+      GralWidget widgetDescr = this.idxNameWidgets.get(sName);
       if(widgetDescr !=null){
           sValue = getValueFromWidget(widgetDescr);
       } else {
@@ -1242,9 +1242,9 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       }
       return sValue;
   }
-  
 
-  
+
+
   /**It is a special routine for tabbedPanel.
    * The reason: If a new tab should add in {@link GralTabbedPanel#addGridPanel(String, String, int, int, int, int)}
    * then the mng is set to the tabbed panel.
@@ -1253,25 +1253,25 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   /*package private*/public void setTabbedPanel(GralPanel_ifc tabbedPanel){
     pos().pos.parent = tabbedPanel;
   }
-  
-  
+
+
   public GralWidget_ifc getWindow(String name){
     return this.idxWindows.get(name);
   }
-  
-  
-  
+
+
+
   public GralPanel_ifc getPanel(String name){
     return this.idxPanels.get(name);
   }
-  
-  
 
-  public GralWindow getPrimaryWindow(){ return windPrimary; }
-  
-  
+
+
+  public GralWindow getPrimaryWindow(){ return this.windPrimary; }
+
+
   public GralPanelContent getCurrentPanel(){ return (GralPanelContent)pos().pos.parent; }
-  
+
   public GralPanelActivated_ifc actionPanelActivate = new GralPanelActivated_ifc()
   { @Override public void panelActivatedGui(List<GralWidget> widgetsP)
     {  //changeWidgets(widgetsP);
@@ -1282,7 +1282,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 //   * @param ev
 //   */
 //  public void storeEvent(EventObject ev){
-//    if(ev instanceof GralGraphicTimeOrder) { 
+//    if(ev instanceof GralGraphicTimeOrder) {
 //      queueOrdersToExecute.add((GralGraphicTimeOrder)ev);
 //      //System.out.println("storeEventPaint, wakeup");
 //      this._mngImpl.wakeup();
@@ -1292,8 +1292,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 //  }
 
 
-  
-  /**Necessary operation to wakeup the graphic thread. It sleeps in OS-management. 
+
+  /**Necessary operation to wakeup the graphic thread. It sleeps in OS-management.
    * This operation is called just if a new event is enqueued, on {@link EventTimerThread#storeEvent(EventObject)}.
    * See {@link EventTimerThread#wakeup_()}
    */
@@ -1301,98 +1301,98 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     this._mngImpl.wakeup();
   }
 
-  
+
   public EventTimerThread orderList(){ return this; }
-  
-  
+
+
   /**Adds the order to execute in the graphic dispatching thread.
    * It is the same like order.{@link GralGraphicOrder#activate()}.
    * @param order
    */
-  public void addDispatchOrder(GralGraphicOrder order){ 
+  public void addDispatchOrder(GralGraphicOrder order){
     super.storeEvent(order.ev);                               // stores the order as event in the own queue, also if called in the own graphic thread.
     //commented: order.sendEvent();                        // this is longer, does the same
     //old order.activate();
-    //old orderList.addTimeOrder(order); 
+    //old orderList.addTimeOrder(order);
   }
 
   //public void removeDispatchListener(GralDispatchCallbackWorker listener){ orderList.removeTimeOrder(listener); }
 
-  
 
-  
+
+
 //  public void addEvent(EventObject event) {
 //    assert(event instanceof GralGraphicEventTimeOrder);  //should be
 //    queueOrdersToExecute.add((GralGraphicEventTimeOrder)event);
 //    this._mngImpl.wakeup();
 //  }
-  
-  
-  public long getThreadIdGui(){ return graphicThreadId; }
-  
+
+
+  public long getThreadIdGui(){ return this.graphicThreadId; }
+
   /**This method should wake up the execution of the graphic thread because some actions are registered.. */
   public void wakeup(){ this._mngImpl.wakeup(); }
 
 
   public void waitForStart(){
     synchronized(this) {
-      while(!bStarted) {
+      while(!this.bStarted) {
         try{ wait(1000);
         } catch(InterruptedException exc){}
       }
     }
   }
-  
+
   public boolean isStarted(){ return this.bStarted; }
-  
+
   /**Returns true so long the application should run (indpendent of implementation graphic)
    * @return false then exit the implementation
    */
   public boolean isRunning(){ return !this.bExitMain; }
-  
+
   public boolean isImplementationGraphicTerminated(){ return this.bIsExitImplGraphic; }
 
   /**Terminates the run loop of the graphic thread*/
   public void closeImplGraphic ( ){ this.bShouldExitImplGraphic = true; }
 
-  
+
   public void closeApplication ( ) { this.bShouldExitImplGraphic = true; this.bShouldExitMain = true; }
 
-  
+
   /**Creates and starts the thread. If this routine is called from the user, the thread runs
    * till the close() method was called. If this method is not invoked from the user,
    * the thread is created and started automatically if {@link #storeEvent(EventCmdtype)} was called.
    * In that case the thread stops its execution if the event queue is empty and about 5 seconds
    * are gone.  */
-  @Override protected void createThread_ ( ){ 
+  @Override protected void createThread_ ( ){
     super.threadTimer = null;              //this thread is not used.
     //super.threadTimer = new Thread(this.runGraphicThread, this.threadName);
-  }  
+  }
 
-  
-  
-  
+
+
+
   /**The run method of the graphic thread. This method is started in the constructor of the derived class
-   * of this, which implements the graphic system adapter. 
+   * of this, which implements the graphic system adapter.
    * <ul>
    * <li>{@link #initGraphic()} will be called firstly. It is overridden by the graphic system implementing class
    *   and does some things necessary for the graphic system implementing level.
-   * <li>The routine runs so long as {@link #bShouldExitImplGraphic} is not set to false. bExit may be set to false 
-   *   in a window close listener of the graphic system level. It means, it is set to false especially 
+   * <li>The routine runs so long as {@link #bShouldExitImplGraphic} is not set to false. bExit may be set to false
+   *   in a window close listener of the graphic system level. It means, it is set to false especially
    *   if the windows will be closed from the operation system. If the window is closed because the application
    *   is terminated by any application command the window will be closed, and the close listerer sets bReady
-   *   to false then. 
+   *   to false then.
    * <li>In the loop the {@link #queueGraphicOrders} will be executed.
-   * <li>For SWT graphic this is the dispatch loop of graphic events. They are executed 
+   * <li>For SWT graphic this is the dispatch loop of graphic events. They are executed
    *   in the abstract defined here {@link #dispatchOsEvents()} method.
    * <li>This thread should be wait if not things are to do. The wait will be executed in the here abstract defined
-   *   method {@link #graphicThreadSleep()}.    
-   * </ul>  
+   *   method {@link #graphicThreadSleep()}.
+   * </ul>
    * @see java.lang.Runnable#run()
    */
   //tag::runGraphicThread-start[]
   protected void runGraphicThread() {
-    long guiThreadId1 = Thread.currentThread().getId();    // should set firstly because in createImplWidget_Gthread it is necesarry. 
+    long guiThreadId1 = Thread.currentThread().getId();    // should set firstly because in createImplWidget_Gthread it is necesarry.
     this.graphicThreadId = guiThreadId1;
     this._mngImpl.initGraphic();                           // inits the basics of the Graphic only, not the GralWidgets.
     //add important properties for the main window, the user should not thing about:
@@ -1401,18 +1401,18 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       //it it should not be minimized, then close, never set Invisible, because it is not possible to set visible again.
       this.windPrimary.windProps |= GralWindow.windRemoveOnClose;
     }
-    //======================================================= On start create the implementation of all yet known GralWindow 
+    //======================================================= On start create the implementation of all yet known GralWindow
     for(Map.Entry<String,GralWindow> ewind: this.idxWindows.entrySet()) {
       GralWindow wind = ewind.getValue();
       //boolean bVisible = wind == this.windPrimary;
-      //      
-      //======>>>> 
+      //
+      //======>>>>
       wind.createImplWidget_Gthread();           // creates all widgets of the window.
-      //wind.setWindowVisible( bVisible ); 
+      //wind.setWindowVisible( bVisible );
     }
     //end::runGraphicThread-start[]
 
-    
+
     this._mngImpl.finishInit();
     if(this.log !=null) {
       try{ this._mngImpl.reportContent(this.log);
@@ -1433,7 +1433,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     while (!this.bShouldExitImplGraphic) {                 // run so long the graphic should run
       this.bDispatcherSleeps = false;
       stepGraphicThread();
-      if(!this.bShouldExitImplGraphic){ 
+      if(!this.bShouldExitImplGraphic){
         //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
         this.bDispatcherSleeps = true;
         this._mngImpl.graphicThreadSleep();
@@ -1458,16 +1458,16 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
   }
 
-  
+
   /**The step routine of the graphic thread
-   * 
+   *
    */
   private int stepGraphicThread()
   {
     boolean bContinueDispatch;
     int ctOsEvents = 0;
     do { //================================================== first manage all os-events
-      try{ 
+      try{
         bContinueDispatch = this._mngImpl.dispatchOsEvents();  // do it due the implementation graphic
       }
       catch(Throwable exc){
@@ -1496,7 +1496,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       super.stepThread();
 //      while( (order = queueOrdersToExecute.poll()) !=null) {
 //        order.stateOfEvent = 'r';
-//        try{ 
+//        try{
 //          order.doExecute();  //calls EventIimeOrderBase.doExecute() with enqueue
 //        } catch(Throwable exc){
 //          CharSequence excText = Assert.exceptionInfo("GralGraphicThread - unexpected Exception; ", exc, 0, 99);
@@ -1506,11 +1506,11 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 //        bSleep = false;
 //        ctOrders +=1;
 //      }
-      if(debugPrint){ System.out.println("GralGraphicThread - dispatched graphic orders, " + ctOrders); }
+      if(this.debugPrint){ System.out.println("GralGraphicThread - dispatched graphic orders, " + ctOrders); }
       //===================================================== manage all os-events again, may be because of events.
       ctOsEvents = 0;
-      do { 
-        try{ 
+      do {
+        try{
           bContinueDispatch = this._mngImpl.dispatchOsEvents();  // do it due the implementation graphic
         }
         catch(Throwable exc){
@@ -1521,16 +1521,16 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
         ctOsEvents +=1;
         //isWakedUpOnly = false;  //after 1 event, it may be wakeUp, set if false.
       } while(bContinueDispatch);
-    } 
+    }
     return 0;
   }
-  
 
-  
+
+
   /**This thread has only the task to wake up the graphic thread.
    * <br>It uses the super#timeCheckNew to determine how many ms to wakeup.
-   * <br>If the graphic thread is active in the moment, it waits 10 ms, then check again. 
-   * <br>If any time order has elapsed or will be elapsed in the next 2 ms, 
+   * <br>If the graphic thread is active in the moment, it waits 10 ms, then check again.
+   * <br>If any time order has elapsed or will be elapsed in the next 2 ms,
    * then wake up the graphic thread calling {@link ImplAccess#wakeup()}
    */
   protected void runAwakeThread ( ) {
@@ -1560,42 +1560,42 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     }
   }
 
-  
+
   public void closeMainWindow() {
     this.windPrimary.windProps |= GralWindow_ifc.windRemoveOnClose; //if not set till now.
   }
-  
 
-  
-  
+
+
+
   protected void checkAdmissibility(boolean value){
     if(!value){
       throw new IllegalArgumentException("failure");
     }
   }
-  
-  
+
+
   private GralWidget findWidget(String name){
-    GralWidget widg = idxNameWidgets.get(name);
+    GralWidget widg = this.idxNameWidgets.get(name);
     if(widg == null){
-      log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
+      this.log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
     }
     return widg;
   }
-  
-  
+
+
   /**Sets the background color of any widget. The widget may be for example:
    * <ul>
-   * <li>a Table: Then a new line will be colored. 
+   * <li>a Table: Then a new line will be colored.
    * <li>a Tree: Then a new leaf is colored.
    * <li>a Text-edit-widget: Then the field background color is set.
    * </ul>
-   * The color is written into a queue, which is red in another thread. 
+   * The color is written into a queue, which is red in another thread.
    * It may be possible too, that the GUI is realized in another module, maybe remote.
    * It means, that a few milliseconds should be planned before the change appears.
-   * If the thread doesn't run or the remote receiver isn't present, 
+   * If the thread doesn't run or the remote receiver isn't present,
    * than the queue may be overflowed or the request may be lost.
-   *    
+   *
    * @param name The name of the widget, which was given by the add...()-Operation
    * @param ident A identifying number. It meaning depends on the kind of widget.
    *        0 means, insert on top.  Integer.MAXVALUE means, insert after the last element (append).
@@ -1608,9 +1608,9 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     if( (widg = findWidget(name)) !=null){
       widg.setBackColor(GralColor.getColor(color), ix);
     }
-  } 
-  
-  
+  }
+
+
   @Override public void setText(String name, CharSequence text){
     GralWidget widg;
     if( (widg = findWidget(name)) !=null){
@@ -1618,17 +1618,17 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     }
   }
 
-  
-  
+
+
   @Override public void setValue(String widget, Object visibleInfo, Object userData){
     GralWidget widg;
     if( (widg = findWidget(widget)) !=null){
       widg.setValue(0,0, visibleInfo, userData);
     }
-    
+
   }
-  
-  
+
+
   /**Add a standard window remove on close, resizeable.
    * If it is the first call, this is the main window.
    * @param posName Position at the screen or related to another window
@@ -1638,14 +1638,14 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   public GralWindow addWindow(String posName, String sTitle) {
     return addWindow(posName, sTitle, GralWindow.windRemoveOnClose | GralWindow.windResizeable);
   }
-    
+
   public GralWindow addWindow(String posName, String sTitle, int props) {
     GralWindow wdgg = new GralWindow(this.refPos(), posName
         , sTitle, props, this);
     return wdgg;
   }
- 
-  
+
+
   /**Add a panel to any other panel or window.
    * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
    * @return GralPanelContent to set some more.
@@ -1654,8 +1654,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, this);
     return wdgg;
   }
-  
-  
+
+
   /**Add a panel to any other panel or window which contains only other panels as tab
    * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
    * @return GralPanelContent to set some more.
@@ -1665,8 +1665,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     wdgg.setToTabbedPanel();
     return wdgg;
   }
-  
-  
+
+
   /**Add a panel as tab pabel. The parent should be a tabbed panel.
    * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
    * @param tabName The string shown on the tab.
@@ -1676,8 +1676,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, nameTab, this);
     return wdgg;
   }
-  
-  
+
+
   /**Add a panel with 9 areas to any other panel or window.
    * @param posName "@panel,... = name" determines to which panel, elsewhere to the last added panel.
    * @return GralArea9Panel to set some more.
@@ -1686,11 +1686,11 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     GralArea9Panel wdgg = new GralArea9Panel(this.refPos(),posName, this);
     return wdgg;
   }
-  
-  
+
+
   /**Adds a text to a named widget.
    * @deprecated, use the widget itself to add or call {@link #getWidget(String)} to search it.
-   *   It is over-engineered to offer all operations also in the GralMng. 
+   *   It is over-engineered to offer all operations also in the GralMng.
    */
   @Deprecated @Override public void addText(String name, CharSequence text){
     GralWidget widg;
@@ -1705,10 +1705,10 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     }
   }
 
-  
+
   /**Adds a text to a named widget.
    * @deprecated, use the widget itself to add or call {@link #getWidget(String)} to search it.
-   *   It is over-engineered to offer all operations also in the GralMng. 
+   *   It is over-engineered to offer all operations also in the GralMng.
    */
   @Override public GralWidget addText(String sText, int origin, GralColor textColor, GralColor backColor)
   {
@@ -1718,35 +1718,35 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     return widgg;
   }
 
-  
+
   /** Adds a text field for showing or editing a text value.
-   * 
+   *
    * @param sName The registering name
    * @param width Number of grid units for length
-   * @param editable true than edit-able, false to show content 
+   * @param editable true than edit-able, false to show content
    * @param prompt If not null, than a description label is shown
    * @param promptStylePosition Position and size of description label:
    *   upper case letter: normal font, lower case letter: small font
-   *   'l' left, 't' top (above field) 
+   *   'l' left, 't' top (above field)
    * @return
    */
   public GralTextField addTextField(String name, String prompt, String promptStylePosition, GralTextField.Type ... property){
     if(name !=null && name.charAt(0) == '$'){
-      name = sCurrPanel + name.substring(1);
+      name = this.sCurrPanel + name.substring(1);
     }
     GralTextField widgg = new GralTextField(this.refPos(), name, property);
     widgg.setPrompt(prompt, promptStylePosition);
     //widgg.setEditable(editable);
     // createImplWidget_Gthread(widgg);
-    //SwtTextFieldWrapper.createTextField(widgg, this);   
+    //SwtTextFieldWrapper.createTextField(widgg, this);
     return widgg;
   }
 
-  
+
   @Override public GralTextField addTextField(String name, boolean editable, String prompt, String promptStylePosition){
     return addTextField(name, prompt, promptStylePosition, GralTextField.Type.editable);
   }
-    
+
   public GralTextField addTextField(String name) {
     return addTextField(name, false, null, null);
   }
@@ -1755,27 +1755,27 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     return addTextField(name, editable, null, null);
   }
 
-  
+
   public GralTextField addTextField(String name, GralTextField.Type property) {
     return addTextField(name, null, null, property);
   }
 
-  
+
 /** Adds a text box for showing or editing a text in multi lines.
- * 
+ *
  * @param sName The registering name
  * @param width Number of grid units for length
- * @param editable true than edit-able, false to show content 
+ * @param editable true than edit-able, false to show content
  * @param prompt If not null, than a description label is shown
  * @param promptStylePosition Position and size of description label:
  *   upper case letter: normal font, lower case letter: small font
- *   'l' left, 't' top (above field) 
+ *   'l' left, 't' top (above field)
  * @return
  */
 @Override public GralTextBox addTextBox(String name, boolean editable, String prompt, char promptStylePosition)
-{ 
+{
   if(name !=null && name.charAt(0) == '$'){
-    name = sCurrPanel + name.substring(1);
+    name = this.sCurrPanel + name.substring(1);
   }
   GralTextBox widgg = new GralTextBox(this.refPos(), name);
   char[] prompt1 = new char[1];
@@ -1783,7 +1783,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   widgg.setPrompt(prompt, new String(prompt1));
   widgg.setEditable(editable);
   // createImplWidget_Gthread(widgg);
-  //SwtTextFieldWrapper.createTextField(widgg, this);   
+  //SwtTextFieldWrapper.createTextField(widgg, this);
   return widgg;
 
 }
@@ -1801,7 +1801,7 @@ public GralTextBox addTextBox(String posName) {
 //, String sShowMethod
 , String sDataPath
 )
-{ 
+{
   GralValueBar wdgg = new GralValueBar(refPos(), sName);
   wdgg.setDataPath(sDataPath);
   // wdgg.setToPanel(this);
@@ -1815,14 +1815,14 @@ public GralTextBox addTextBox(String posName) {
   , String sButtonText
   )
 { return addButton(sName, action, null, null, sButtonText);
-}  
+}
 
 
 
 
 public GralButton addButton ( String sName , String sButtonText , GralUserAction action ) {
   return addButton(sName, action, null, null, sButtonText);
-}  
+}
 
 
 
@@ -1840,7 +1840,7 @@ public GralButton addButton ( String sName , String sButtonText , GralUserAction
   setNextPositionUnused();  //since 130523 it should be the valid one.
   float ySize = pos().pos.height();
   int xSize = (int)pos().pos.width();
-  
+
   char size = ySize > 3? 'B' : 'A';
   if(sName == null){ sName = sButtonText; }
   GralButton widgButton = new GralButton(refPos(), sName);
@@ -1871,7 +1871,7 @@ public GralButton addButton ( String sName , String sButtonText , GralUserAction
   //, String sCmd, String sUserAction, String sName)
 )
 {
-  
+
   if(sName == null){ sName = sButtonText; }
   GralButton widgButton = new GralButton(refPos(), sName);
   int ySize = (int)widgButton.pos().height();
@@ -1900,11 +1900,11 @@ public GralButton addButton ( String sName , String sButtonText , GralUserAction
   //, String sCmd, String sUserAction, String sName)
 )
 {
-  
+
   GralButton widgButton = new GralButton(refPos(), sName);
   int ySize = (int)widgButton.pos().height();
   int xSize = (int)widgButton.pos().width();
-  
+
   char size = ySize > 3? 'B' : 'A';
   widgButton.setSwitchMode(colorOff, colorOn);
   widgButton.setSwitchMode(sButtonTextOff, sButtonTextOn);
@@ -1958,32 +1958,32 @@ public GralButton addCheckButton(
 
 
   /**@deprecated, use the widget itself to add or call {@link #getWidget(String)} to search it.
-   *   It is over-engineered to offer all operations also in the GralMng. 
+   *   It is over-engineered to offer all operations also in the GralMng.
    */
   @Deprecated @Override public void setBackColor(GralWidget widg, int ix, int color)
   { widg.setBackColor(GralColor.getColor(color), ix);
-  } 
-  
-  
+  }
+
+
   @Deprecated @Override public void setLineColor(GralWidget widg, int ix, int color)
   { widg.setLineColor(GralColor.getColor(color), ix);
-  } 
-  
-  
+  }
+
+
   @Deprecated @Override public void setTextColor(GralWidget widg, int ix, int color)
   { widg.setTextColor(GralColor.getColor(color));
-  } 
-  
-  
-  
+  }
+
+
+
   /**Adds a line.
-   * <br><br>To adding a line is only possible if the current panel is of type 
-   * {@link XXXSwtCanvasStorePanel}. This class stores the line coordinates and conditions 
+   * <br><br>To adding a line is only possible if the current panel is of type
+   * {@link XXXSwtCanvasStorePanel}. This class stores the line coordinates and conditions
    * and draws it as background if drawing is invoked.
-   * 
+   *
    * @param colorValue The value for color, 0xffffff is white, 0xff0000 is red.
    * @param xa start of line relative to current position in grid units.
-   *          The start is relative to the given position! Not absolute in window! 
+   *          The start is relative to the given position! Not absolute in window!
    * @param ya start of line relative to current position in grid units.
    * @param xe end of line relative to current position in grid units.
    * @param ye end of line relative to current position in grid units.
@@ -1992,8 +1992,8 @@ public GralButton addCheckButton(
     //if(pos().pos.panel.getPanelImpl() instanceof SwtCanvasStorePanel){
     if(((GralPanelContent)pos().pos.parent).canvas() !=null){
       GralColor color = GralColor.getColor(colorValue);
-      int xgrid = gralProps.xPixelUnit();
-      int ygrid = gralProps.yPixelUnit();
+      int xgrid = this.gralProps.xPixelUnit();
+      int ygrid = this.gralProps.yPixelUnit();
       int x1 = (int)((pos().pos.x.p1 + xa) * xgrid);
       int y1 = (int)((pos().pos.y.p1 - ya) * ygrid);
       int x2 = (int)((pos().pos.x.p1 + xe) * xgrid);
@@ -2004,28 +2004,28 @@ public GralButton addCheckButton(
       ((GralPanelContent)pos().pos.parent).canvas().drawLine(color, x1, y1, x2, y2);
       //furtherSetPosition((int)(xe + 0.99F), (int)(ye + 0.99F));
     } else {
-      log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
+      this.log.sendMsg(0, "GuiPanelMng:addLine: panel is not a CanvasStorePanel");
     }
   }
-  
-  
+
+
   @Deprecated @Override public void addLine(GralColor color, List<GralPoint> points){
     GralPanelContent panel = (GralPanelContent)pos().pos.parent;
     if(panel.canvas() !=null){
       panel.canvas().drawLine(pos().pos, color, points);
     } else {
-      log.sendMsg(0, "GralMng.addLine - panel is not a CanvasStorePanel;");
+      this.log.sendMsg(0, "GralMng.addLine - panel is not a CanvasStorePanel;");
     }
   }
-  
 
-  
+
+
   @Deprecated @Override public void setLed(GralWidget widg, int colorBorder, int colorInner)
   {
     ((GralLed)widg).setColor(GralColor.getColor(colorBorder), GralColor.getColor(colorInner));
   }
-  
-  
+
+
   /**Reports all existing Widgets on Gral level, sorted to {@link GralWindow}.
    * It calls internally {@link GralWindow#reportAllContent(Appendable)} for each window.
    * <br>
@@ -2033,18 +2033,18 @@ public GralButton addCheckButton(
    * @param out any output, maybe especially {@link System#out} or {@link LogMessage}
    */
   public void reportGralContent(Appendable out) {
-    try { out.append("==== GralMng.reportGralContent():\n");} 
+    try { out.append("==== GralMng.reportGralContent():\n");}
     catch (Exception exc) { System.err.println("Error GralMng.reportGralContent() Appendable= "+ out); }
-    for(Map.Entry<String, GralWindow> ewindow : idxWindows.entrySet()) {
+    for(Map.Entry<String, GralWindow> ewindow : this.idxWindows.entrySet()) {
       GralWindow window = ewindow.getValue();
       window.reportAllContent(out);
     }
   }
-  
+
 
   @Override public ConcurrentLinkedQueue<GralVisibleWidgets_ifc> getVisiblePanels()
   {
-    return listVisiblePanels;
+    return this.listVisiblePanels;
   }
 
   @Override public GralVisibleWidgets_ifc getWidgetsPermanentlyUpdating(){
@@ -2052,29 +2052,29 @@ public GralButton addCheckButton(
     return null;
   }
 
-  
-  
+
+
   @Deprecated @Override public void setFocus(GralWidget widgd)
   {
     widgd.setFocus();
   }
-  
+
   @Deprecated @Override public void notifyFocus(GralWidget widgd)
   {
-    if(widgd.getDataPath() !=null) {  
+    if(widgd.getDataPath() !=null) {
       //regard only widgets with datapath, all other are not used.
       //Therewith preserve the last focused widget which has a datapath.
-      synchronized(widgetsInFocus){
-        widgetsInFocus.remove(widgd);  //remove it anywhere inside
-        widgetsInFocus.add(0, widgd);     //add at start.
+      synchronized(this.widgetsInFocus){
+        this.widgetsInFocus.remove(widgd);  //remove it anywhere inside
+        this.widgetsInFocus.add(0, widgd);     //add at start.
       }
     }
   }
-  
-  @Override public GralWidget getWidgetInFocus(){ return widgetsInFocus.size() >0 ? widgetsInFocus.get(0) : null; }
-  
-  @Override public List<GralWidget> getWidgetsInFocus(){ return widgetsInFocus; }
-  
+
+  @Override public GralWidget getWidgetInFocus(){ return this.widgetsInFocus.size() >0 ? this.widgetsInFocus.get(0) : null; }
+
+  @Override public List<GralWidget> getWidgetsInFocus(){ return this.widgetsInFocus; }
+
   @Override public int getColorValue(String sColorName){ return GralColor.getColor(sColorName).getColorValue(); }
 
   @Override public GralColor getColor(String sColorName){ return GralColor.getColor(sColorName); }
@@ -2088,43 +2088,43 @@ public GralButton addCheckButton(
 			String sCmd
 		, GralWidget infos, Object... params
 		)
-		{ 
-			if(lastClickedWidget !=null){
-				log.sendMsg(Report.info, "widget %s, datapath=%s"
+		{
+			if(GralMng.this.lastClickedWidget !=null){
+				GralMng.this.log.sendMsg(Report.info, "widget %s, datapath=%s"
 					, GralMng.this.lastClickedWidget.getName()
 					, GralMng.this.lastClickedWidget.getDataPath());
 	      return true;
 			} else {
-				log.sendMsg(0, "widgetInfo - no widget selected");
+				GralMng.this.log.sendMsg(0, "widgetInfo - no widget selected");
 			}
       return false;
 		}
-		
-	};
-	
-	
-	
-	
-  
-  
-  
-  
 
-	
-	
-	
-  
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
   /**Calculates the pixel position and size with a given GralPos for the given size of display appearance.
    * @param pos Given position
-   * @param widthParentPixel width of the container. This value will be used if the position is given 
+   * @param widthParentPixel width of the container. This value will be used if the position is given
    *   from right with negative numbers.
-   * @param heightParentPixel height of the container. This value will be used if the position is given 
+   * @param heightParentPixel height of the container. This value will be used if the position is given
    *   from bottom with negative numbers.
-   * @param widthWidgetNat natural width of the component which will be positioning. 
+   * @param widthWidgetNat natural width of the component which will be positioning.
    *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the xe-value
-   * @param heightWidgetNat natural height of the component which will be positioning. 
+   * @param heightWidgetNat natural height of the component which will be positioning.
    *   This value is used only if the pos parameter contains {@link GralPos#useNatSize} for the ye-value
-   * @return The position and size relative in the container. 
+   * @return The position and size relative in the container.
    * @deprecated, use {@link #calcWidgetPosAndSizeSwt(GralPos, int, int)} because the parent is known in pos.
    */
   public GralRectangle calcWidgetPosAndSize(GralPos pos,
@@ -2133,13 +2133,13 @@ public GralButton addCheckButton(
   ){ return pos.calcWidgetPosAndSize(this.gralProps, widthParentPixel, heightParentPixel
                                     , widthWidgetNat, heightWidgetNat);
   }
-  
-  
-  
 
-  
-  
-  
+
+
+
+
+
+
   /* (non-Javadoc)
    * @see org.vishia.gral.ifc.GralMngBuild_ifc#addFileSelectField(java.lang.String, java.util.List, java.lang.String, java.lang.String, java.lang.String)
    */
@@ -2150,29 +2150,29 @@ public GralButton addCheckButton(
     GralPos posAll = getPositionInPanel(); //saved whole position.
     //reduce the length of the text field:
     setPosition(GralPos.same, GralPos.same, GralPos.same, GralPos.same -2.0F, 'r', 0);
-    
+
     //xSize -= ySize;
     GralTextField widgd = addTextField(name, true, prompt, promptStylePosition );
     setSize(posAll.height(), 2.0F);
     //xPos += xSize;
     //xSize = ySize;
-    GralWidget widgdSelect = addButton(name + "<", actionFileSelect,  "<");
+    GralWidget widgdSelect = addButton(name + "<", this.actionFileSelect,  "<");
     FileSelectInfo fileSelectInfo = new FileSelectInfo(name, listRecentFiles, startDirMask, widgd);
-    widgdSelect.setContentInfo(fileSelectInfo); 
+    widgdSelect.setContentInfo(fileSelectInfo);
     //xSize = xSize1;
     pos().pos.set(posAll);  //the saved position.
     return widgd;
   }
 
-  
-  
+
+
   public GralUserAction actionFileSelect = new GralUserAction("actionFileSelect")
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     { assert(false);
       return userActionGui(null, infos);
     }
-  
-    @Override public boolean userActionGui(int actionCode, GralWidget widgg, Object... params) 
+
+    @Override public boolean userActionGui(int actionCode, GralWidget widgg, Object... params)
     {
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){  //supress both mouse up and down reaction
         FileSelectInfo fileSelectInfo = (FileSelectInfo)widgg.getContentInfo();
@@ -2181,11 +2181,11 @@ public GralButton addCheckButton(
         } else {
           fileSelectInfo.dialogFile.show(fileSelectInfo.sRootDir, fileSelectInfo.sLocalDir
             , fileSelectInfo.sMask, fileSelectInfo.sTitle);
-          String fileSelect = fileSelectInfo.dialogFile.getSelection(); 
+          String fileSelect = fileSelectInfo.dialogFile.getSelection();
           if(fileSelect !=null){
             fileSelectInfo.dstWidgd.setText(fileSelect);
             //fileSelectInfo.dstWidgd.setValue(cmdSet, 0, fileSelect);
-            GralWidget_ifc.ActionChange action = fileSelectInfo.dstWidgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter); 
+            GralWidget_ifc.ActionChange action = fileSelectInfo.dstWidgd.getActionChange(GralWidget_ifc.ActionChangeWhen.onEnter);
             if(action !=null){
               Object[] args = action.args();
               if(args == null){ action.action().exec(KeyCode.menuEntered, fileSelectInfo.dstWidgd, fileSelect); }
@@ -2194,48 +2194,48 @@ public GralButton addCheckButton(
           }
         }
       }
-      return true;      
-    }; 
-    
+      return true;
+    };
+
   };
-  
-  
+
+
 
   /**Action to edit the properties of one widget in the graphic. */
   public GralUserAction actionDesignEditField = new GralUserAction("actionDesignEditField")
-  { 
+  {
     @Override public boolean userActionGui(int key, GralWidget infos, Object... params)
     {
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        designer.editFieldProperties(widgd, null);
+        GralMng.this.designer.editFieldProperties(widgd, null);
       }
       return true;
     }
-    
+
     @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
-        designer.editFieldProperties(widgd, null);
+        GralMng.this.designer.editFieldProperties(widgd, null);
       }
       return true;
     }
   };
 
 
-  
+
 
   /**Action to edit the properties of one widget in the graphic. */
   public GralUserAction actionReadPanelCfg = new GralUserAction("actionReadPanelCfg")
   { @Override public boolean userActionGui(String sIntension, GralWidget infos, Object... params)
     {
-      //GralPanel_ifc currPanel = 
+      //GralPanel_ifc currPanel =
       GralWidget widgd = getWidgetInFocus();
       if(widgd !=null){
         GralWidgetBase_ifc panel = widgd.pos().parent;
         String namePanel = panel.getName();
-        cfgBuilder.buildGui(log, 0);
+        GralMng.this.cfgBuilder.buildGui(GralMng.this.log, 0);
         //designer.editFieldProperties(widgd, null);
       }
       return true;
@@ -2243,57 +2243,57 @@ public GralButton addCheckButton(
   };
 
 
-  
 
-  
-  
+
+
+
   /**It will be called only at the GUI-implementation level. TODO protected and delegation.
    * @param widgd
    * @param xy
    */
   public void pressedLeftMouseDownForDesign(GralWidget widgd, GralRectangle xy)
-  { designer.pressedLeftMouseDownForDesign(widgd, xy);
+  { this.designer.pressedLeftMouseDownForDesign(widgd, xy);
   }
-  
-  
+
+
   /**It will be called only at the GUI-implementation level. TODO protected and delegation.
    * @param widgd
    * @param xy
    */
   public void releaseLeftMouseForDesign(GralWidget widgd, GralRectangle xy, boolean bCopy)
-  { designer.releaseLeftMouseForDesign(widgd, xy, bCopy);
+  { this.designer.releaseLeftMouseForDesign(widgd, xy, bCopy);
   }
-  
+
   public void markWidgetForDesign(GralWidget widgg){
-    designer.markWidgetForDesign(widgg);
+    this.designer.markWidgetForDesign(widgg);
   }
-  
+
   /**It will be called only at the GUI-implementation level. TODO protected and delegation.
    * @param widgd
    * @param xy
    */
   public void XXXpressedRightMouseDownForDesign(GralWidget widgd, GralRectangle xy)
-  { designer.editFieldProperties(widgd, xy);
+  { this.designer.editFieldProperties(widgd, xy);
   }
-  
-  
-  
+
+
+
   public void initCfgDesigner(){
-    designer.setToPanel();
+    this.designer.setToPanel();
   }
-  
+
   @Override public GralInfoBox createTextInfoBox(String name, String title)
   {
     return GralInfoBox.createTextInfoBox(this, name, title);
   }
 
-  
+
   @Override public GralInfoBox createHtmlInfoBox(String posName, String title, boolean onTop)
   {
     return GralInfoBox.createHtmlInfoBox(this, this.refPos(), posName, title, onTop);
   }
 
-  
+
   /**Adds a text to the current panel at given position with standard colors, left origin.
    * The size of text is calculated using the height of positioning values.
    * see also {@link #addText(String, int, GralColor, GralColor)},
@@ -2304,19 +2304,19 @@ public GralButton addCheckButton(
   { //return addText(text, 0, GralColor.getColor("bk"), GralColor.getColor("wh"));
     return addText(text, 0, GralColor.getColor("bk"), null);
   }
-  
-  
-  
-  
-  
+
+
+
+
+
   @Override public void repaint()
   {
     assert(false);
     //gralDevice.redraw();
   }
-  
-  
-  
+
+
+
   @Override public void repaintCurrentPanel()
   {
     GralWidgetBase_ifc panel = pos().pos.parent;
@@ -2324,90 +2324,90 @@ public GralButton addCheckButton(
       ((GralPanelContent)panel).redraw();
     }
   }
-  
-  
 
-  
-  
+
+
+
+
   @Override public void refreshCurvesFromVariable(VariableContainer_ifc container){
-    for(GralCurveView_ifc curve : curveContainer){
+    for(GralCurveView_ifc curve : this.curveContainer){
       if(curve.isActiv()){
         curve.refreshFromVariable(container);
       }
     }
   }
-  
+
   @Override public boolean remove(GralWidget widget)
   { widget.remove();  //remove instance by Garbage collector.
     return true;
-    
+
   }
 
-  
+
 
   @Override public void writeLog(int msgId, Exception exc)
   {
     String sMsg = exc.toString();
     StackTraceElement[] stackTrace = exc.getStackTrace();
     String sWhere = stackTrace[0].getFileName() + ":" + stackTrace[0].getLineNumber();
-    log.sendMsg(msgId, sMsg + " @" + sWhere);
+    this.log.sendMsg(msgId, sMsg + " @" + sWhere);
   }
-  
-  
+
+
   private Runnable runGraphicThread = new Runnable() {
     @Override public void run () {
       GralMng.this.runGraphicThread();
     }
   };
-  
-  
+
+
   private Runnable runAwakeThread = new Runnable() {
     @Override public void run () {
       GralMng.this.runAwakeThread();
     }
   };
-  
-  
+
+
   public final GralUserAction actionHelp = new  GralUserAction("actionHelp")
-  { 
+  {
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
-    { infoHelp.activate();
-      infoHelp.setFocus(); //setWindowVisible(true);
-      return true; 
+    { GralMng.this.infoHelp.activate();
+      GralMng.this.infoHelp.setFocus(); //setWindowVisible(true);
+      return true;
   } };
 
 
 
-  
+
   /**This is one action to close the whole application. Especially close via menu,
-   * not closing with mouse via the [X] right on title bar. 
+   * not closing with mouse via the [X] right on title bar.
    * Note that a window may be created using {@link GralWindow_ifc#windMinimizeOnClose}.
    * Then close is possible only and especially here.
    */
   public final GralUserAction actionClose = new  GralUserAction("actionClose")
-  { 
+  {
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params)
     { //GralMng.this.closeMainWindow();
       GralMng.this.closeApplication();
-      return true; 
+      return true;
   } };
 
 
 
-  
-  
+
+
   /**This standard Gral focus listener is the base class for the common implementation layer focus listener.
    * The both methods {@link #focusGainedGral(GralWidget)} and {@link #focusLostGral(GralWidget)} will be invoked
    * with that GralWidget, which is referred by the implementation layer widgets data.
    * <br><br>
-   * The GralMng implementation classes should offer a focus listener for common usage, see 
-   * {@link org.vishia.gral.swt.SwtMng.SwtMngFocusListener} and its instance {@link org.vishia.gral.swt.SwtMng.focusListener}. 
-   * That reference and class is protected and therewith package visible because only swt implementations needs it. 
+   * The GralMng implementation classes should offer a focus listener for common usage, see
+   * {@link org.vishia.gral.swt.SwtMng.SwtMngFocusListener} and its instance {@link org.vishia.gral.swt.SwtMng.focusListener}.
+   * That reference and class is protected and therewith package visible because only swt implementations needs it.
    * An implementation widget class can use this instance of SwtMng.focusListener immediately for standard behavior.
    * The standard behavior is realized in this class, see {@link GralMngFocusListener#focusGainedGral(GralWidget)}.
    * <br><br>
    * For enhanced functionality of a focus listener the implementation layer SwtFocusListener class can be enhanced.
-   * That is realized for example in {@link org.vishia.gral.swt.SwtTextFieldWrapper}. That's focus listener should 
+   * That is realized for example in {@link org.vishia.gral.swt.SwtTextFieldWrapper}. That's focus listener should
    * update the text in the widget with the gral text store {@link GralWidget.DynamicData#displayedText}
    * on focus gained, and overtake a changed content on focus lost. Adequate it is on all edit-able widgets.
    * The SwtTextFieldWrapper.TextFieldFocusListener.focusGained(...) and focusLost(...) methods executes the special
@@ -2415,7 +2415,7 @@ public GralButton addCheckButton(
    */
   public class GralMngFocusListener
   {
-    
+
     /**Standard action on focus lost:
      * @param widgg
      */
@@ -2441,28 +2441,28 @@ public GralButton addCheckButton(
       widgg.redraw();  //maybe changed outfit on focus gained.
       widgg.gralMng.log.sendMsg(GralMng.LogMsg.evFocused, "ev-focusGained: " + widgg.getName() + ":" + widgg.pos());
       String htmlHelp = widgg.getHtmlHelp();
-      if(htmlHelp !=null && htmlHelp.startsWith(":FcmdNew.html")) { 
+      if(htmlHelp !=null && htmlHelp.startsWith(":FcmdNew.html")) {
         Debugutil.stop(); }
-      if(htmlHelp !=null && applAdapter !=null){
-        applAdapter.setHelpUrl(htmlHelp);
+      if(htmlHelp !=null && GralMng.this.applAdapter !=null){
+        GralMng.this.applAdapter.setHelpUrl(htmlHelp);
       }
-      if(widgg.cfg.actionFocused !=null){ 
-        widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg); 
+      if(widgg.cfg.actionFocused !=null){
+        widgg.cfg.actionFocused.exec(KeyCode.focusGained, widgg);
       }
-      if(widgg.cfg.actionChangeSelect !=null && widgg.cfg.actionChangeSelect.onFocusGained !=null){ 
-        widgg.cfg.actionChangeSelect.onFocusGained.action().exec(KeyCode.focusGained, widgg); 
+      if(widgg.cfg.actionChangeSelect !=null && widgg.cfg.actionChangeSelect.onFocusGained !=null){
+        widgg.cfg.actionChangeSelect.onFocusGained.action().exec(KeyCode.focusGained, widgg);
       }
     }
   }
-  
-  
+
+
   /**This instance can be used if any other focus listener is necessary for any implementation widget.
    * The standard behavior for GralWidget is supported using this aggregate.
    * In Opposite a full ready to use focus listener based on this class in the implementation layer,
    * see {@link org.vishia.gral.swt.SwtMng.SwtMngFocusListener}.
    */
   public GralMngFocusListener gralFocusListener = new GralMngFocusListener();
-  
+
   /**This inner class is public only because the implementation uses it. It is not public for applications.
    *
    *
@@ -2470,67 +2470,67 @@ public GralButton addCheckButton(
   public class InternalPublic{
     public GralKeyListener gralKeyListener = new GralKeyListener(GralMng.this);
   }
-  
+
   /**Implementation specific fields.
-   * 
+   *
    */
   public final InternalPublic _implListener = new InternalPublic();
-  
-  
+
+
   /**This class is used only for the implementation level of the graphic. It is not intent to use
    * by any application. It is public because the implementation level should accesses it.
    * It is the super class for several Graphic-Adapters (AWT/Swing, SWT etc.).
-   * 
-   * 
+   *
+   *
    */
   public static abstract class ImplAccess {
     public GralMng gralMng;
-    
+
     protected char sizeCharProperties;
 
     /**The thread which runs all graphical activities. */
     protected final Thread threadGuiDispatch;
 
-   
+
     public ImplAccess(GralMng mng){
       this.gralMng = mng;
       mng._mngImpl = this;
-      this.sizeCharProperties = sizeCharProperties;
-      threadGuiDispatch = new Thread(gralMng.runGraphicThread, "graphic");
+      this.sizeCharProperties = this.sizeCharProperties;
+      this.threadGuiDispatch = new Thread(this.gralMng.runGraphicThread, "graphic");
       mng.threadTimer = this.threadGuiDispatch;   //this thread is also used for the timer.
    }
-    
-    protected GralPos pos(){ return gralMng.pos().pos; }
-    
-    protected Map<String, GralWindow> idxWindows ( ) { return gralMng.idxWindows; }
 
-    protected GralPanel_ifc getPanel ( String name ) { return gralMng.idxPanels.get(name); }
+    protected GralPos pos(){ return this.gralMng.pos().pos; }
 
-    protected String sCurrPanel(){ return gralMng.sCurrPanel; }
-    
-    public void listVisiblePanels_add(GralVisibleWidgets_ifc panel){ gralMng.listVisiblePanels.add(panel); }
-    
-    /**Forbidden. The current panel depends on the widget. 
+    protected Map<String, GralWindow> idxWindows ( ) { return this.gralMng.idxWindows; }
+
+    protected GralPanel_ifc getPanel ( String name ) { return this.gralMng.idxPanels.get(name); }
+
+    protected String sCurrPanel(){ return this.gralMng.sCurrPanel; }
+
+    public void listVisiblePanels_add(GralVisibleWidgets_ifc panel){ this.gralMng.listVisiblePanels.add(panel); }
+
+    /**Forbidden. The current panel depends on the widget.
      * Use {@link org.vishia.gral.swt.SwtMng#getWidgetsPanel(GralWidget)}.
      * @return
      */
     @Deprecated public abstract Object getCurrentPanel();
-    
-    protected GralWidget indexNameWidgets(String name){ return gralMng.idxNameWidgets.get(name); }
-    
-    protected GralUserAction userMainKeyAction(){ return gralMng.userMainKeyAction; }
-    
-    
+
+    protected GralWidget indexNameWidgets(String name){ return this.gralMng.idxNameWidgets.get(name); }
+
+    protected GralUserAction userMainKeyAction(){ return this.gralMng.userMainKeyAction; }
+
+
     /**This operation creates the proper implementation widgets due to the underlying Graphic system.
      * It is implemented by the specific GralMngXyz, see {@link org.vishia.gral.swt.SwtMng}.
      * @param widgg The given instantiated GralWidget but without implementation instacne yet.
      */
     public abstract void createImplWidget_Gthread(GralWidget widgg);
-    
-    
+
+
     /**Creates the context menu for the given widget for right-mouse pressing.
      * This method is invoked only in {@link GralWidget#getContextMenu()} whereby an existing
-     * context menu is stored in the {@link GralWidget#contextMenu} association. 
+     * context menu is stored in the {@link GralWidget#contextMenu} association.
      * The widget have to be set to panel already, an implementation widget have to be existing.
      * It means {@link GralWidget#getWidgetImplementation()} should be return that instance
      * where the menu is to be added.
@@ -2538,15 +2538,15 @@ public GralButton addCheckButton(
      * @param widg The widget
      */
     protected abstract GralMenu createContextMenu(GralWidget widgg);
-    
-    
+
+
     /**Creates a box inside the current panel to hold some widgets.
-     * 
+     *
      * @return
      * @since 2010-05-01
      */
     //protected abstract GralPanelContent createCompositeBox(String name);
-   
+
     /**Creates an independent grid panel which is managed by this.
      * The panel can be associated to any graphic frame.
      * @param namePanel
@@ -2559,53 +2559,53 @@ public GralButton addCheckButton(
      */
     //protected abstract GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG, int xS, int yS);
 
-    
+
     public abstract boolean remove(GralPanel_ifc compositeBox);
-    
+
     /**Creates the menu bar for the given window.
      * This method is invoked only in {@link GralWindow#getMenuBar()} whereby an existing
-     * menu bar is stored in the {@link GralWindow#menuBarGral} association. 
+     * menu bar is stored in the {@link GralWindow#menuBarGral} association.
      * @param windg The window
      */
     protected abstract GralMenu createMenuBar(GralWindow windg);
-    
-    
+
+
     @Deprecated public abstract GralWindow createWindow(String name, String title, int windProps);
-    
-    
+
+
     @Deprecated protected abstract void createSubWindow(GralWindow windowGral) throws IOException;
-    
+
 //    @Deprecated public abstract GralTabbedPanel addTabbedPanel(String namePanel, GralPanelActivated_ifc user, int property);
-    
+
     @Deprecated public abstract GralWidget addText(String sText, char size, int color);
-    
-    
+
+
     public abstract GralHtmlBox addHtmlBox(String name);
-    
+
     public abstract Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd);
-    
+
     public abstract GralWidget addSlider(
         String sName
         , GralUserAction action
         , String sShowMethod
         , String sDataPath
         );
-    
-    
+
+
     public abstract GralCurveView addCurveViewY(String sName, int nrofXvalues, GralCurveView.CommonCurve common);
-    
-    
+
+
     public abstract GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease);
 
     public abstract void addFocusAction(GralWidget widgetInfo, GralUserAction action, String sCmdEnter, String sCmdRelease);
-    
-    
+
+
     @Deprecated public abstract GralTable addTable(String sName, int height, int[] columnWidths);
-    
+
     public abstract GralFileDialog_ifc createFileDialog();
-    
+
     protected abstract GralMenu XXXaddPopupMenu(String sName);
-    
+
 
     /**Calculates the bounds of a widget with a given pos independent of this {@link #pos}.
      * This method is a part of the implementing GralMng because the GralPos is not implemented for
@@ -2613,7 +2613,7 @@ public GralButton addCheckButton(
      * This method is not intent to use from an application, only for implementing methods of Gral.
      * Therefore it isn't a member of the {@link GralWindowMng_ifc} and {@link GralMngBuild_ifc}
      * It is possible to tune the bounds after calculation, for example to enhance the width if a text
-     * is larger then the intended position. 
+     * is larger then the intended position.
      * @param pos The position.
      * @param widthwidgetNat The natural size of the component.
      * @param heigthWidgetNat The natural size of the component.
@@ -2622,7 +2622,7 @@ public GralButton addCheckButton(
     public abstract GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat);
 
     @Deprecated public abstract String getValueFromWidget(GralWidget widgd);
-    
+
     /**Gets the color of the graphic implementation (swt.Color, swing.TODO)
      * Either the implementation color instance is stored already in the GralColor,
      * or it will be created, stored in GralColor and returned here.
@@ -2630,33 +2630,33 @@ public GralButton addCheckButton(
      * @return Instance of the implementation color.
      */
     public abstract Object getColorImpl(GralColor color);
-    
+
     /**Forces the redrawing for all set samples. It should be called after { @link #setSampleCurveViewY(String, float[])}.
      * @param sName The name of the widget.
      */
     protected abstract void redrawWidget(String sName);
-    
-    
-    
-    /**Forces the resizing of the given widged. 
+
+
+
+    /**Forces the resizing of the given widged.
      * @param widgd the widget
      */
     protected abstract void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent);
-    
-    
+
+
     /**Adds a sampling value set.
      * @param sName The registered name
      * @param values The values.
      */
     protected abstract void setSampleCurveViewY(String sName, float[] values);
-    
+
     /**Shows the context menu of any widget independent of the internal right-mouse invocation.
      * @param widg The widget.
      * @return true if the widget have a context menu.
      */
     protected abstract boolean showContextMenuGthread(GralWidget widg);
-    
-    
+
+
     /**Reports all existing Widgets on implementation level.
      * This operation is implemented in the specific implementation managers.
      * <br>
@@ -2666,41 +2666,41 @@ public GralButton addCheckButton(
     public abstract void reportContent(Appendable out) throws IOException;
 
     public abstract void finishInit();
-    
-    
+
+
     protected void startThread() {
-      threadGuiDispatch.start();
-      gralMng.waitForStart();
+      this.threadGuiDispatch.start();
+      this.gralMng.waitForStart();
    }
 
-    
-   
+
+
     /**This method should be implemented by the graphical implementation layer. It should build the graphic main window
      * and returned when finished. This routine is called as the first routine in the Graphic thread's
      * method {@link #runGraphicThread()}. See {@link org.vishia.gral.swt.SwtGraphicThread}. */
     protected abstract void initGraphic ( );
-    
-    
+
+
     protected abstract void closeImplGraphic ( );
-    
+
     /**Calls the dispatch routine of the implementation graphic.
      * @return true if dispatching should be continued.
      */
     protected abstract boolean dispatchOsEvents();
-    
-    
+
+
     /**Forces the graphic thread to sleep and wait for any events. Either this routine returns
      * if {@link #wakeup()} is called or this routine returns if the operation system wakes up the graphic thread. */
     protected abstract void graphicThreadSleep();
-    
-    /**This method should be implemented by the graphical base. It should be waked up the execution 
+
+    /**This method should be implemented by the graphical base. It should be waked up the execution
      * of the graphic thread because some actions are registered.. */
     public abstract void wakeup();
-    
+
     //protected char sizeCharProperties(){ return gralGraphicThread.sizeCharProperties; }
 
 
-    
+
     /**Sets a given and registered window visible at the given position and size or set it invisible.
      * <br>
      * A window can be created by invoking {@link org.vishia.gral.ifc.GralMngBuild_ifc#createWindow(String, boolean)}
@@ -2709,7 +2709,7 @@ public GralButton addCheckButton(
      * <br>
      * The position is given relative to that panel,
      * which is stored in {@link GralPos#panel}. To get a position instance,
-     * you can set a position invoking 
+     * you can set a position invoking
      * <ul>
      * <li>{@link org.vishia.gral.ifc.GralMngBuild_ifc#selectPanel(String)}
      * <li>{@link org.vishia.gral.ifc.GralMngBuild_ifc#setPosition(float, float, float, float, int, char)}
@@ -2717,38 +2717,38 @@ public GralButton addCheckButton(
      * </ul>
      * That can be done in the build phase of the graphic. The position can be stored. It is possible to adjust
      * the position relative to the unchanged panel by changing the values of {@link GralPos#x} etc.
-     * It is possible too to change the Panel which relates to the position. Then the grid managing instance 
+     * It is possible too to change the Panel which relates to the position. Then the grid managing instance
      * have to be known via the {@link org.vishia.gral.ifc.GralMngBuild_ifc} to select a panel.
      * The panels may be moved or resized. With the knowledge of the relative position of the window in respect to a panel
      * of the parent window, the window can be placed onto a proper position of the whole display.
-     *   
+     *
      * @param window the instance of the window wrapper.
-     * @param atPos If null then hide the window. If not null then show the window. 
-     *        The position and size of the window is given related to any panel of any other window. 
-     *         
+     * @param atPos If null then hide the window. If not null then show the window.
+     *        The position and size of the window is given related to any panel of any other window.
+     *
      * @return true if it is visible.
      * @deprecated
      */
     @Deprecated
     protected abstract boolean XXXsetWindowsVisible(GralWindow_ifc window, GralPos atPos);
-    
+
   }
-  
-  
-  
+
+
+
 
   void stop(){}
 
-  
-  protected GralMenu createContextMenu(GralWidget widg){ 
+
+  protected GralMenu createContextMenu(GralWidget widg){
     return widg.getContextMenu();
   }
-  
-  protected GralMenu createMenuBar(GralWindow windg){ 
+
+  protected GralMenu createMenuBar(GralWindow windg){
     return windg.getMenuBar();
   }
 
-  
+
 
   @Override public GralWidget addSlider(String sName, GralUserAction action, String sShowMethod,
       String sDataPath)
@@ -2769,7 +2769,7 @@ public GralButton addCheckButton(
   {
     GralLabel label = new GralLabel(pos().pos, sText, sText, 0);
     label.setTextColor(GralColor.getColor(color));
-    return label;    
+    return label;
   }
 
   @Override public Object addImage(String sName, InputStream imageStream, int height, int width, String sCmd)
@@ -2817,14 +2817,14 @@ public GralButton addCheckButton(
   @Override public boolean remove(GralPanel_ifc compositeBox)
   {
     if(this._mngImpl !=null) {
-      return _mngImpl.remove(compositeBox);
+      return this._mngImpl.remove(compositeBox);
     } else {
       return false;
     }
   }
 
-  
-  
+
+
 
 
 
@@ -2835,7 +2835,7 @@ public GralButton addCheckButton(
    */
   @Override public GralWindow createWindow(String posName, String title, int windProps)
   { GralPos pos = pos().pos;  //without clone.
-    //String sPos = pos.posString(); 
+    //String sPos = pos.posString();
     GralWindow windowGral = new GralWindow(pos, posName, title, windProps, this);
 //    try {
 //      this._mngImpl.createSubWindow(windowGral);
@@ -2854,7 +2854,7 @@ public GralButton addCheckButton(
   @Override public void redrawWidget(String sName)
   {
     if(this._mngImpl !=null) {
-      _mngImpl.redrawWidget(sName);
+      this._mngImpl.redrawWidget(sName);
     }
   }
 
@@ -2862,7 +2862,7 @@ public GralButton addCheckButton(
   {
     // TODO Auto-generated method stub
     if(this._mngImpl !=null) {
-      _mngImpl.resizeWidget(widgd, xSizeParent, ySizeParent);
+      this._mngImpl.resizeWidget(widgd, xSizeParent, ySizeParent);
     }
   }
 
@@ -2876,12 +2876,12 @@ public GralButton addCheckButton(
   {
     //_mngImpl.setSampleCurveViewY(sName, values);
   }
-	
 
-  
-  /**This class defines only static numbers for messages. 
+
+
+  /**This class defines only static numbers for messages.
    * The numbers should be a little bit sorted,
-   * so that dispatching of messages can be done. 
+   * so that dispatching of messages can be done.
    *
    */
   public static class LogMsg {
@@ -2889,15 +2889,15 @@ public GralButton addCheckButton(
     public static final int infoWdg = 1002;
     public static final int newPanel = 1010;
     public static final int addTabPanel = 1012;
-    
+
     public static final int newImplTable = 1051;
-    
+
     public static final int evRedraw = 1101;
     public static final int setVisible = 1130;
     public static final int setInvisible = 1131;
     public static final int setVisibleFromImpl = 1132;
     public static final int setFocus = 1133;
-    
+
     public static final int gralTable_updateCells = 1201;
     public static final int gralFileSelector_fillin = 1211;
     public static final int gralFileSelector_fillinFinished = 1212;
@@ -2905,8 +2905,8 @@ public GralButton addCheckButton(
     public static final int gralFileSelector_updateFavor = 1214;
     public static final int gralFileSelector_setPath = 1215;
     public static final int gralFileSelector_ClickFile = 1216;
-    
+
     public static final int evFocused = 1501;
   }
-	
+
 }
