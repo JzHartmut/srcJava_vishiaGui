@@ -102,6 +102,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-04-06: {@link #mouseDown(int, CellData)} left mouse now selects the line on down. 
+   *   The version, selection on mouse-up, only mark with mouse down is reserved only for the right mouse for the context menu.
+   *   For that it is important: Functionality: right mouse down shows a selection without change, right mouse up then opens the context menu.
+   *   The last one is not programmed here, it is feature of the SWT framework (if a context menu was associated to the {@link org.eclipse.swt.widgets.Control}).
+   * <li>2023-04-06: {@link #fillVisibleArea()} a little bit progress on using {@link #bitLinesForCellChanged} but uncomplete. (It should save calculation time).
    * <li>2023-04-04: bugfixing while test.
    * <li>2023-04-04: Now {@link #processKeys(int)} number of key strokes generally reduced to 100 ms min.
    *   {@link #bitLinesForCellChanged}: not active, but try to reduce effort for redraw. Has less effect, is not ready.
@@ -749,8 +754,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
 
-  @Override
-  public void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn) {
+  @Override public void setCurrentLine(GralTableLine_ifc<UserData> line, int ixline, int ixcolumn) {
     int ixline1 = ixline >= 0 ? ixline: this.zLineVisible + ixline;  //negative: -1 is the last line.
     if(ixline1 < 0) { ixline1 = 0;}
     if(ixline1 >= this.zLineVisible) { ixline1 = this.zLineVisible-1; }
@@ -1062,9 +1066,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
 
   /**Fills the #linesForCell[] with the appropriate lines from the table.
-   * It uses #lineSelectixCell as preferred for the current line,
+   * It uses #lineSelectixCell as preferred line number for the current line,
    * but this is only an estimation.
+   * Especially on a unknown line it can be only estimated that this should be for example the 3th 
+   * or the 3th from last line, if the number of lines from start or till end are unknown.
+   * 
    * The algorithm searches the real position of the line in the table backward.
+   * It sets {@link #lineSelectedixCell} with the line number where the {@link #lineSelected} is presented. 
    */
   protected void fillVisibleArea(){
     if(this.lineSelected ==null) {
@@ -1083,6 +1091,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     }
     ix = 0;
     int nLinesBefore = ixPrev;
+    this.lineSelectedixCell = ixPrev;          // this is the line in table where the this.lineSelected is really presented.
+    this.bitLinesForCellChanged |= (1<<this.lineSelectedixCell);  // the color will be changed.
     while(ixPrev >=0) {
       if(this.linesForCell[ix] != this.linesForCellPrev[ixPrev]) {
         this.linesForCell[ix] = this.linesForCellPrev[ixPrev];
@@ -1120,7 +1130,11 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       ix +=1;
     }
     while(ix < this.zLineVisible){
-      this.linesForCell[ix++] = null;
+      if(this.linesForCell[ix] != null) {
+        this.bitLinesForCellChanged |= 1<<ix;
+        this.linesForCell[ix] = null;
+      }
+      ix +=1;
     }
     this.bChangedLinesForCell = true;
 
@@ -1220,16 +1234,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
    */
   protected void mouseDown(int key, CellData cell){
     this.lineSelectedNew = this.linesForCell[cell.ixCellLine];
-    redraw(0,0);  //immediately, it is in the graphic thread.
-  }
-
-
-  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseUpGral(int, CellData)}
-   * @param key
-   * @param cell
-   */
-  protected void mouseUp(int key, CellData cell){
-    if(key == KeyCode.mouse1Up){
+    if(key == KeyCode.mouse1Down) {
       this.lineSelected = this.lineSelectedNew;
       this.nLineFirst = -1;  //get new
       this.lineSelectedNew = null;
@@ -1237,8 +1242,29 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       this.lineSelectedixCell = cell.ixCellLine;  //used for key handling.
       this.colSelectedixCellC = cell.ixCellColumn;
       actionOnLineSelected(KeyCode.userSelect, this.lineSelected);
-      redraw();
+      redraw(0,0);
+    } else {  //----------------------------------- right mouse down, mark the new selected line, for right mouse menu.
+      redraw(0,0);  //immediately, it is in the graphic thread.
     }
+  }
+
+
+  /**Invoked in the graphic thread from mouse listener in {@link GraphicImplAccess#mouseUpGral(int, CellData)}
+   * @param key
+   * @param cell
+   */
+  protected void mouseUp(int key, CellData cell) {
+    // The context menu is started outside of this operation.
+//    if(key == KeyCode.mouse1Up){
+//      this.lineSelected = this.lineSelectedNew;
+//      this.nLineFirst = -1;  //get new
+//      this.lineSelectedNew = null;
+//      this.lineSelectedixCellLast = this.lineSelectedixCell;
+//      this.lineSelectedixCell = cell.ixCellLine;  //used for key handling.
+//      this.colSelectedixCellC = cell.ixCellColumn;
+//      actionOnLineSelected(KeyCode.userSelect, this.lineSelected);
+//      redraw();
+//    }
   }
 
 
@@ -1976,6 +2002,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //Now draw:
       //
       int ix = -1;
+      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
       while(++ix < this.outer.zLineVisible) {
         if(true || (this.outer.bitLinesForCellChanged & (1<<ix)) !=0) {  // non relevant CPU load impact
           line = this.outer.linesForCell[ix];                            // marking with bitLinesForCellChanged is not sufficient yet.

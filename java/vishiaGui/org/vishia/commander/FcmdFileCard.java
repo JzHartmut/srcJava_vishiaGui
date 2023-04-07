@@ -516,7 +516,7 @@ public class FcmdFileCard extends GralFileSelector
    */
   protected void setActFilePanel_setColorCurrLine(){
     //main.lastFavorCard = wdgFavorCard;
-    if(this.main.currentFileCard !=this) {       // do nothing if this is the current file card, especially re-focused the window in debugging situation.
+    //if(this.main.currentFileCard !=this) {       // do nothing if this is the current file card, especially re-focused the window in debugging situation.
       this.main.currentFileCard = this;
       this.mainPanel.actFileCard = FcmdFileCard.this;
       this.main.setLastSelectedPanel(mainPanel);
@@ -546,7 +546,7 @@ public class FcmdFileCard extends GralFileSelector
       String sOrderFilePanels = "" + c1 + c2 + c3;
       //this.gralMng().log.sendMsg(Fcmd.LogMsg.fmcdFileCard_setCurrFilePanel, "setCurrFilePanel : %s", sOrderFilePanels );
       actionOnFileSelection(fileCurr, fName);
-    }
+    //}
   }
   
   
@@ -562,7 +562,7 @@ public class FcmdFileCard extends GralFileSelector
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
       // do it only if it is the current focused panel.    // prevent next operation for the second panel to sync!
       if(actionCode == KeyCode.activated) {
-        FcmdFileCard.this.main.setLastSelectedPanel(FcmdFileCard.this.mainPanel);
+        //FcmdFileCard.this.main.setLastSelectedPanel(FcmdFileCard.this.mainPanel);
       }
       if(FcmdFileCard.this.main.lastFilePanels.size()>=1 && FcmdFileCard.this.main.lastFilePanels.get(0) == FcmdFileCard.this.mainPanel) {
         setActFilePanel_setColorCurrLine();                // action on this card: It is the first one

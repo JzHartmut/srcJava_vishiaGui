@@ -289,7 +289,7 @@ public class GralFileProperties extends GralWidgetBase {
       this.widGetAllProps = null;
       this.widgSticky = null;
     }
-    this.widgDelFile = new GralButton(refPos, "@10.3-3++0.5,-8.5..-0.5=btnDel" + this.name, "delete", this.actionButton);
+    this.widgDelFile = new GralButton(refPos, "@10.3-3++0.5,-8.5..-0.5=btnDel_" + this.name, "delete", this.actionButton);
     this.widgCreateDirFile = new GralButton(refPos, "btnCreate" + this.name, "mkdir/ file", this.actionButton);
     this.widgRename =  new GralButton(refPos, "@+,-17..-9++0.5=btnRename" + this.name, "rename", this.actionButton);
     this.widgCopyFile =  new GralButton(refPos, "buttonFilePropsCopy" + this.name, sCmdCopy, this.actionButton);

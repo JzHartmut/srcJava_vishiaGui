@@ -15,6 +15,7 @@ import org.vishia.fileRemote.FileRemoteProgress;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
@@ -66,7 +67,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 {
   /**Version and History
    * <ul>
-   * <li>2015-01-03 Hartmut refactory
+   * <li>2023-04-06 Hartmut restructured also in widgets as in functionality, in progress, for version 2.0 of The.file.Commander
    * <li>2013-02-03 Hartmut chg: set the destination only if it is not set on button setSrc
    * <li>2013-02-03 Hartmut chg: {@link #execMove()} with files
    * <li>2013-02-03 Hartmut new: Copy exception (on file open to write) cases a message, the key {@link #widgOverwrFile}
@@ -92,20 +93,20 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   //GralWidget widgdCopyFrom, widgdCopyTo;
 
-  GralTextField widgShowSrc, widgFromConditions;
+  GralTextField widgSrcDir, widgSrcSelection;
 
-  GralButton widgButtonModeDst;
+  //GralButton widgButtonModeDst;
 
-  GralTextField widgInputDst, widgCopyState;
+  GralTextField widgDstDir, widgDstFileModification;
 
-  GralTextField widgCopyDirDst, widgCopyNameDst;  //TODO with progress
+  GralTextField widgCopyDirDst, widgCopyNameDst, widgCopyState;  //TODO with progress
 
   GralButton widgdChoiceCreateNew, widgdChoiceOverwrExists, widgdChoiceOverwrReadOnly;
 
   GralButton widgOverwrFile, widgSkipFile, widgSkipDir, widgBtnPause;
 
 
-  GralButton widgState, widgButtonSetSrc, widgButtonSetDst, widgButtonCheck, widgButtonMove, widgButtonOk;
+  GralButton widgState, widgButtonSetSrc, widgButtonSetDst, widgButtonCheck, widgButtonMove, widgBtnDstExec;
 
   GralButton widgButtonClearSel, widgButtonShowSrc, widgButtonShowDst, widgButtonShowResult;
 
@@ -145,11 +146,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   /**True then some more files or dirs are selected in the current dir in the file panel to copy.
    * False then only the current selected or directory file is used for copy*/
-  boolean srcSomeFiles;
+  //boolean srcSomeFiles;
 
   /**If more as one files are selected to copy, the names are contained here separated with ' : '.
    * Elsewhere it is "*". */
-  String sFilesSrc;
+  //String sFilesSrc;
 
   /**The destination selected directory and file as destination for compare and move or second tree for comparison.
    * The fileDst is build with the name of the source file for copy and move and with the real dst file for compare
@@ -159,13 +160,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   String sFileMaskDst;
 
   /**Name of the file for dst. */
-  CharSequence sFileDstCopy;
+  //CharSequence sFileDstCopy;
 
   StringBuilder bufferDstChars = new StringBuilder(100);
 
   StringFormatter formatShow = new StringFormatter(100);
 
-  /**If true then the {@link #widgInputDst} was changed for this session. Not automatically change the content. */
+  /**If true then the {@link #widgDstDir} was changed for this session. Not automatically change the content. */
   boolean bDstChanged;
 
   boolean bFirstSelect;
@@ -226,6 +227,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   EventSource evSrc = new EventSource("FcmdCopy-GUIaction");
 
 
+//  static final String[] sTextsBtnSrcSel =        { "check/sel"    , "check/select"    , "check/select", "check/select"  , "search"  };
+//  static final String[] sTextsBtnDstExec =    { "delete"       , "move"            , "copy",         "compare"  , null  };
 
 
   /**This reference is set with the callback of operation cmd.
@@ -239,61 +242,64 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   FcmdCopyCmprDel(Fcmd main, Ecmd cmdArg)
   { super(cmdArg);                         // FcmdActionBase
     this.main = main;
+    //                       delete            move               copy                  cmp                  search 
+    String[] promptSrcDirSel =  { "delete base dir", "move from base dir", "copy from base dir", "compare base dir1"  , "search base dir" };
+    String[] promptSrcFileSel = { "file mask"   , "file mask"       , "select src files: ?#+ [dirA|dirB]/**/*.ext (F1 for help) ", "file mask"  , "file mask"  };
+    String[] promptDstDirSel =  { null           , "move to dir"     , "copy to dir"      , "compare with dir"  , null  };
+    String[] promptDstFileSel = { null           , "rename to"       , "file modification", null  , null  };
     String name = cmdArg.name;
     this.action = new Actions();
     GralPos refPos = new GralPos(main.gui.gralMng.screen);
-    int windprops = GralWindow_ifc.windConcurrently; // + GralWindow.windResizeable;
-    this.windConfirmCopy = new GralWindow(refPos, "@screen,30+37,30+70=" + name + "Window", cmdArg.name, windprops);
-    this.windConfirmCopy.setVisible(false);                // invisible per default, activate with setFocus()
+    int windprops = GralWindow_ifc.windConcurrently + GralWindow_ifc.windResizeable;
+    this.windConfirmCopy = new GralWindow(refPos, "@screen,30+42,30+70=" + name + "Window", cmdArg.name, windprops);
+    this.windConfirmCopy.setVisible(true);       // invisible per default, activate with setFocus()
     //source path and check:
-    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
-      this.widgButtonModeDst = new GralButton(refPos, "@2.5-2, 1..7.5++=dst-" + name, null, this.actionChgModeDst);
-      this.widgButtonModeDst.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("ye"));
-      this.widgButtonModeDst.setSwitchMode("dst/..", "dst/dst");
-    }
-    this.widgButtonSetSrc = new GralButton(refPos, "@2.5-2, 15+12++=setSrc-" + name, "set source", this.actionConfirmCopy);
-    this.widgButtonClearSel = new GralButton(refPos, "clrSel", "clear selection", null);
+    //this.widgButtonClearSel = new GralButton(refPos, "clrSel", "clear selection", null);
     //
-    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
-      this.widgButtonSetDst = new GralButton(refPos, "@,-17..-1=setDst-" + name, "set destination", this.actionSetDst );
+    this.widgSrcDir = new GralTextField(refPos, "@3.5-3.2, 1..-9=SrcDir-" + name, promptSrcDirSel[cmdArg.ix], "t");
+    this.widgSrcDir.setBackColor(GralColor.getColor("am"),0);
+    this.widgButtonSetSrc = new GralButton(refPos, "@+0-2, -8..-1=SetSrc-" + name, "set source", this.actionSetSrc);
+    //this.widgButtonShowSrc = new GralButton(refPos, "@5.5-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
+
+    this.widgSrcSelection = new GralTextField(refPos, "@+3.5-3.2, 5..-13++0.3=copyCond-" + name
+        , promptSrcFileSel[cmdArg.ix] , "t", GralTextField.Type.editable);
+    this.widgSrcSelection.specifyActionChange(null, this.actionSelectMask, null);
+    if(cmdArg != Ecmd.search) {
+      this.widgButtonCheck = new GralButton(refPos, "@+0-3,-12..-1=check" + name, "check/mark", this.actionCheck );
     }
-    //main.gralMng.addText("source:", 0, GralColor.getColor("bk"), GralColor.getColor("lgr"));
-    this.widgShowSrc = new GralTextField(refPos, "@5.5-3.2, 1..-4=showSrc-" + name, "source root path", "t");
-    this.widgShowSrc.setBackColor(GralColor.getColor("am"),0);
-    this.widgButtonShowSrc = new GralButton(refPos, "@5.5-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
-
-    this.widgFromConditions = new GralTextField(refPos, "@+3.5-3.2, 1..-13++0.3=copyCond-" + name
-        , "select src files: ?#+ [dirA|dirB]/**/*.ext (F1 for help) ", "t", GralTextField.Type.editable);
-    this.widgFromConditions.specifyActionChange(null, this.actionSelectMask, null);
-    this.widgButtonCheck = new GralButton(refPos, "@+0-3,-12..-1=check" + name, "check", this.actionCheck );
-
     //dst path, set dst
-    if(this.cmdWind != Ecmd.delete) {
-      this.widgInputDst = new GralTextField(refPos, "@+3.5-3.2,1..-4=InputDst-" + name, "destination:", "t", GralTextField.Type.editable);
-      this.widgInputDst.specifyActionChange(null, this.actionEnterTextInDst, null);
-      this.widgButtonShowDst = new GralButton(refPos, "+0-2.5, -4..-1=showDst" + name, "=>", null );
+    String promptDstDir = promptDstDirSel[cmdArg.ix];
+    if(promptDstDir !=null) {
+      this.widgDstDir = new GralTextField(refPos, "@+3.5-3.2,1..-9=DstDir-" + name, promptDstDir, "t");
+      this.widgButtonSetDst = new GralButton(refPos, "@+0-2.5,-8..-1=setDst-" + name, "set dst", this.actionSetDst );
+      //this.widgButtonShowDst = new GralButton(refPos, "+0-2.5, -4..-1=showDst" + name, "=>", null );
+      String promptDstFile = promptDstFileSel[cmdArg.ix];
+      if(promptDstFile !=null) {
+        this.widgDstFileModification = new GralTextField(refPos, "@+3.5-3.2,5..-13=DstFileModification-" + name, promptDstFile, "t", GralTextField.Type.editable);
+        this.widgDstFileModification.specifyActionChange(null, this.actionEnterTextInDst, null);
+      }
     }
-
+    //String sBtnDstExec = sTextsBtnDstExec[cmdArg.ix]; 
     if(this.cmdWind == Ecmd.delete) {
-      new GralLabel(refPos, "@+2-2, 1..18", "Del read only ?", 0);
-    } else if(this.cmdWind == Ecmd.compare) {
-      //nothing such
-    } else {
-      new GralLabel(refPos, "@+2-2, 1+17++", "Overwr read only ?", 0);
-      new GralLabel(refPos, null, "Overwr exists ?", 0);
-      new GralLabel(refPos, null, "Create ?", 0);
-    }
-
-    if(this.cmdWind != Ecmd.compare) {
+      new GralLabel(refPos, "@+4+2, 1..18", "Del read only ?", 0);
       this.widgdChoiceOverwrReadOnly = new GralButton(refPos, "@+3-3,1+12++1=overwriter-" + name, "ask ?yes ?no", this.actionOverwrReadonly);
       this.widgdChoiceOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
-    }
-    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.compare) {
+    } else if(this.cmdWind == Ecmd.compare) {
+      try{ refPos.setPosition("+4", refPos);} catch(java.text.ParseException exc) {}
+    } else if(this.cmdWind != Ecmd.compare && this.cmdWind != Ecmd.search) {
+      new GralLabel(refPos, "@+4+2, 1+17++", "Overwr read only ?", 0);
+      new GralLabel(refPos, null, "Overwr exists ?", 0);
+      new GralLabel(refPos, null, "Create ?", 0);
+      this.widgdChoiceOverwrReadOnly = new GralButton(refPos, "@+3-3,1+12++1=overwriter-" + name, "ask ?yes ?no", this.actionOverwrReadonly);
+      this.widgdChoiceOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
       this.widgdChoiceOverwrExists = new GralButton(refPos, "@,+13+17=copyOverwriteReadonly", "ask ?newer?older?all ?no", this.actionOverwrDate );
       this.widgdChoiceOverwrExists.setBackColor(GralColor.getColor("lam"), 0);
       this.widgdChoiceCreateNew = new GralButton(refPos, "@,+18+13=copyCreate", "yes ?no ?ask", this.actionCreateCopy );
       this.widgdChoiceCreateNew.setBackColor(GralColor.getColor("lam"), 0);
     }
+    //if(sBtnDstExec !=null) {
+      this.widgBtnDstExec = new GralButton(refPos, "@+0-3.5, -15..-1=BtnDstExec" + name, "exec-?", this.actionButtonOk);
+    //}
 
     //field for showing the current action or state, not for input:
     //field for showing the current name, not for input:
@@ -323,7 +329,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //widgBtnPause = main.gralMng.addButton("pause", null, "pause", null, "pause");
       //widgBtnPause.setHtmlHelp(main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + helpPrefix + ".pause.");
     }
-    this.widgButtonOk = new GralButton(refPos, "@-4+3, -13+-1=copyOk" + name, "ok", this.actionButtonOk);
     this.progressEv = new EventWithDst<FileRemoteProgressEvData, Payload>(name, this.evSrc, this.action.progressAction, null, new FileRemoteProgressEvData());
     //this.evWalker = new FileRemoteWalkerEvent(name, null, null, this.action.progressEv, 200);
 
@@ -351,93 +356,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     if( !this.windConfirmCopy.isVisible() || this.state == Estate.finit) {
       //only if it is ready to check, get the files.
       this.bFirstSelect = true;
-      this.filesToCopy.clear();
-      FcmdFileCard[] lastFileCards = this.main.getLastSelectedFileCards();
-      if(lastFileCards[0] !=null){ ///
-        this.fileCardSrc = lastFileCards[0];
-        this.fileCardDst = lastFileCards[1];
+      this.filesToCopy.clear();                 // list todo remove.
+      this.widgSrcSelection.setText("");
+      FileRemote[] srcDirFile = getSrcDstFileDir(false, this.widgSrcDir, this.widgSrcSelection);
+      this.srcDir = srcDirFile[0]; 
+      this.srcFile = srcDirFile[1];
+      this.widgDstFileModification.setText("");
+      getDstFileDir(FcmdCopyCmprDel.this.main.getLastSelectedFileCards()[1], false);
 
-        //widgButtonDst.setState(GralButton.kOff);  //maybe disabled, set off.
-        List<FileRemote> listFileSrc = this.fileCardSrc.getSelectedFiles(true, 1);
-        //String sDirSrc;
-        if(listFileSrc == null){
-          //widgShowSrc.setText("??? listFileSrc==null");
-
-        } else {
-          if(listFileSrc.size() ==1){
-            //only one file is selected:
-            this.srcFile = listFileSrc.get(0);
-            this.srcDir = this.srcFile.getParentFile();
-            this.srcSomeFiles = false;
-            this.sFilesSrc = null;  //only one file,
-            //widgShowSrc.setText(fileSrc.getAbsolutePath());
-//            if(srcFile.isDirectory()) {
-//              sFileDstCopy = "*";
-//            } else {
-              this.sFileDstCopy = this.srcFile.getName();  //name of source file as default for destination.
-//            }
-          } else {
-            //more as one file:
-            this.sFileDstCopy = "*";
-            //StringBuilder uFileSrc = new StringBuilder();
-            //fileSrc = fileCardSrc.currentFile();
-            this.srcFile = this.srcDir = this.fileCardSrc.currentDir();
-            this.srcDir.setMarked(FileMark.selectSomeInDir);
-            this.srcSomeFiles = true;
-            //srcFile = null;
-            this.sFilesSrc = null;  //only one file,
-            //widgShowSrc.setText(dirSrc.getAbsolutePath() + "/?+");
-            /*
-            fileSrc = dirSrc
-            String sSep = "";
-            for(FileRemote srcFile : listFileSrc){
-              srcFile.resetMarked(1);
-              uFileSrc.append(sSep).append(srcFile.getName());
-              sSep = " : "; //For next one.
-              //FileRemote fileSrc = FileRemote.fromFile(srcFile);
-              //filesToCopy.add(fileSrc);
-            }
-            sFilesSrc = uFileSrc.toString();
-            uFileSrc.insert(0, " : ").insert(0, fileSrc.getAbsolutePath());
-            widgShowSrc.setText(uFileSrc);
-            */
-          }
-        }
-        //sDstName = listFileSrc.size() >1 ? "*"
-        //           : listFileSrc.size() ==1 ? listFileSrc.get(0).getName() : "??";
-        //sSrc = fileSrc.getAbsolutePath() + "/" + sDstName;
-        if(this.fileCardDst !=null){
-          this.dirDst = this.fileCardDst.currentDir();
-          this.fileDst = this.fileCardDst.currentFile();  //it is ==dirDst if .. is selected.
-          /*
-          if(dirDst !=null) {
-            if(!dirDst.isDirectory()) {
-              dirDst = dirDst.getParentFile();  //a file selected, use the directory of the panel.
-            } else {
-              //dirDst.getPathChars(bufferDstChars);
-            }
-          }
-          */
-          //dirDstCmpr = fileCardDst.currentFile();  //should be a directory, check later before compare.
-          //sDstDir = dirDst.getAbsolutePath();
-        } else {
-          this.dirDst = null;
-          this.fileDst = null;
-          //sDstDir = "??";
-        }
-        //bLockSrc = true;
-        //widgFromConditions.setText("");
-      } else { //FileCard not found:
-        this.srcFile = null;
-        this.dirDst = null;
-        this.fileDst = null;
-
-        //listFileSrc = null;
-        //sSrc = "???";
-        //sDstName = "??";
-        //sDstDir = "??";
-        this.widgShowSrc.setText("??");
-      }
       /*
       String sTextDst = widgCopyDirDst.getText().trim();
       if(!sCmd.equals("setSrc") || sTextDst.length() == 0){
@@ -449,10 +375,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       }
       */
       this.bDstChanged = false;
-      if(this.widgInputDst !=null) {
-        this.widgInputDst.setBackColor(this.colorNoChangedText, 0);
+      if(this.widgDstDir !=null) {
+        this.widgDstDir.setBackColor(this.colorNoChangedText, 0);
       }
-      setTexts(Estate.start);
       //widgButtonOk.setText("check");
       //widgButtonOk.setCmd("check");
       this.widgCopyState.setText("check?", 0);
@@ -460,13 +385,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.zFiles = 0; this.zBytes = 0;
     }
     this.windConfirmCopy.setVisible(true);
-    this.widgButtonOk.setFocus(); //PrimaryWidgetOfPanel();
+    this.widgBtnDstExec.setFocus(); //PrimaryWidgetOfPanel();
     this.main.gui.gralMng.setHelpUrl(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".");
   }
 
 
   protected void closeWindow ( ){
-    this.widgButtonOk.setText("close");
+    this.widgBtnDstExec.setText("close");
     //widgButtonOk.setCmd("close");
     this.filesToCopy.clear();
 //    listEvCheck.clear();
@@ -478,7 +403,181 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
 
+  
+  /**Gets the situation of selection in the file panels for source and destination.
+   * 
+   * @param bAlsoDst false then handle only the current panel.
+   */
+  protected FileRemote[] getSrcDstFileDir ( boolean bAlsoDst, GralWidget widgShowSrcArg, GralWidget widgShowMask) {
+    final FileRemote[] setSrc = new FileRemote[2];
+    final GralWidget widgShowSrc;
+    if(widgShowSrcArg !=null) { widgShowSrc = widgShowSrcArg; }
+    else { widgShowSrc = this.widgSrcDir; }
+    //
+    this.fileCardSrc = this.main.getLastSelectedFileCards()[0];
+    final Estate newState;
+    if(fileCardSrc ==null) { ///
+      widgShowSrc.setText("??");  
+      widgShowMask.setText("");
+      newState = Estate.finit;
+    } else {
+//      this.fileCardSrc = fileCardSrc;     // Filecards: active is src, second is destination.
+//      this.fileCardDst = lastFileCards[1];
 
+      //widgButtonDst.setState(GralButton.kOff);  //maybe disabled, set off.
+      // detect whether some files are currently marked. If the current file is not marked but some other are marked,
+      // this routine returns the only one current file. This behavior assures, that the one file in focus is returned
+      // and not some files which are marked outside of the own focus. 
+      // If you want to copy some marked files you should select on of these marked files.
+      List<FileRemote> listFileSrc = this.fileCardSrc.getSelectedFiles(true, FileMark.selectSomeInDir | FileMark.select);
+      FileRemote srcFile = this.fileCardSrc.currentFile();
+      FileRemote srcDir = this.fileCardSrc.currentDir();
+      this.widgSrcDir.gralMng.log.sendMsg(55, "srcDir = %s, srcFile = %s", srcDir.getPathChars(), srcFile.getName());
+      //String sDirSrc;
+      if(listFileSrc == null){ // this does never occur but show it:
+        widgShowSrc.setText("??? listFileSrc==null");
+        newState = Estate.error;
+      } else if(srcFile == srcDir) { //------------ .. is selected:
+          setSrc[0] = srcDir;
+          setSrc[1] = null;                      // offering with "../*" illustrates, it is a directory with selection.
+          if(listFileSrc.size() >1) {            // there are some more files immediately selected
+            widgShowSrc.setText(srcFile.getPathChars().toString() + "*");  // it ends with "/*" means use the content of directory
+            widgShowMask.setText("?");
+            newState = Estate.check;
+          } else {
+            widgShowSrc.setText(srcFile.getPathChars().toString() + "*");  // it ends with "/*" means use the content of directory
+            String sShowMask = widgShowMask.getText();
+            //if(sShowMask.length() ==0) {
+              widgShowMask.setText("**/*.*");
+              newState = Estate.check;
+            //}
+          }
+      } else {
+        if(listFileSrc.size() ==1) { //------------ either only one is marked and selected, or one no marked selected file or dir
+          assert(srcFile == listFileSrc.get(0));
+          if(srcFile.isDirectory()) {         // it is assumed that the list is currently refreshed with the file system.
+              setSrc[0] = srcDir;               // only one file is selected, do not use walk-dir
+              setSrc[1] = srcFile;            // offering with "../" illustrates, it is a directory without selection.
+              widgShowSrc.setText(srcDir.getPathChars());  // it ends with "/" means use this directory
+              widgShowMask.setText(srcFile.getName() + "/**/*.*");  // not ends with "/"
+              newState = Estate.check;
+          } else {
+            setSrc[0] = null;                    // only one file is selected, do not use walk-dir
+            setSrc[1] = srcFile;                 // assume it exists
+            widgShowSrc.setText(srcFile.getDirChars());  // not ends with "/"
+            widgShowMask.setText(srcFile.getName());     // not ends with "/"
+            newState = Estate.ready;
+          }
+        } else {                                 // more as one files/dirs are marked, also the current
+          widgShowSrc.setText(srcDir.getPathChars().toString() + "*");  // not ends with "/"
+          if(!srcDir.isMarked(FileMark.select | FileMark.selectSomeInDir)) {
+            srcDir.resetMarked(FileMark.select | FileMark.selectSomeInDir);  // srcDir should be not marked, not to copy
+          }
+          String sShowMask = widgShowMask.getText();
+          if(listFileSrc.size() ==0) {
+            if(sShowMask.length() == 0) {
+              widgShowMask.setText("*.*");
+            }
+            newState = Estate.check;
+          }else {
+            if(!sShowMask.startsWith("?")) {     // showMask: write a "?" for "selected" as first char.
+              widgShowMask.setText("?" + sShowMask);
+            }
+            newState = Estate.checked;
+          }
+          setSrc[0] = srcDir;                    // note: srcDir is not selected as info, inside are selected.
+          setSrc[1] = null;                      // then srcFile = null;
+        }
+      }
+
+    }
+    setTexts(newState);
+    return setSrc;
+  }
+
+  
+  /**
+   * @param fromCard Either the fileCard[0] on command "set dst" or fileCard[1] on command activate.
+   * @param bSetFile true then set the selected file as current, it is for "set dst"
+   */
+  protected void getDstFileDir ( FcmdFileCard fromCard, boolean bSetFile) {
+    if(this.widgDstDir ==null) return;
+    this.fileCardDst = fromCard;
+    if(fromCard ==null) {
+      this.dirDst = null;
+      this.fileDst = null;
+      this.widgDstDir.setText( "??" );
+    } else {
+//      if(dirFileDst.isDirectory()) {           // destination: a directory is selected:
+//        if(this.srcFile !=null) {              // proposal: selected dir / srcFileName, can be changed
+//          this.widgInputDst.setText( dirFileDst.getPathChars().toString() + srcFile.getName() ); 
+//        } else {
+//          this.widgInputDst.setText( dirFileDst.getPathChars().toString() + "*" );
+//        }
+//      } else {                                 // destination: a file is selected
+//        if(this.srcFile !=null) {              // proposal: selected file as destination, can be changed
+//          this.widgInputDst.setText( dirFileDst.getPathChars() ); 
+//        } else {                               // respectively: use its directory.
+//          this.widgInputDst.setText( dirFileDst.getParentFile().getPathChars().toString() + "*" );
+//        }
+//      }
+      
+      this.dirDst = fromCard.currentDir();
+      this.widgDstDir.setText( this.dirDst.getPathChars() ); 
+      FileRemote fileDst = fromCard.currentFile();
+      if(bSetFile) {
+        if(this.srcFile !=null) {              // on src any is selected, file or dir
+          if(this.srcFile.isDirectory()) {     // a single directory is selected as source
+            if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
+              this.widgDstFileModification.setText(this.srcFile.getName() + "/*");
+            } else if(fileDst.isDirectory()) {        // dst is a directory:
+              this.widgDstFileModification.setText(fileDst.getName() + "/" + this.srcFile.getName() + "/*");
+            } else {                           // dst is a file
+              this.widgDstFileModification.setText("*");
+            }
+          } else {                             // a single file is selected as source 
+            if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
+              this.widgDstFileModification.setText(this.srcFile.getName());
+            } else if(fileDst.isDirectory()) {        // dst is a directory:
+              this.widgDstFileModification.setText(fileDst.getName() + "/" + this.srcFile.getName());
+            } else {                           // dst is a file
+              this.widgDstFileModification.setText(fileDst.getName());
+            }
+          }
+        }
+        else { //-------------------------------- src is on ..
+          if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
+            this.widgDstFileModification.setText("*");
+          } else if(fileDst.isDirectory()) {        // dst is a directory:
+            this.widgDstFileModification.setText(fileDst.getName() + "/*");
+          } else {                           // dst is a file
+            this.widgDstFileModification.setText("*");
+          }
+        }
+      } else { // ------------------------------- on activating the window or setSrc
+        if(this.srcFile !=null) {
+          if(this.srcFile.isDirectory()) { //------ directory selected
+            this.widgDstFileModification.setText(srcFile.getName() + "/**/*.*");  // not ends with "/"
+          } else {
+            this.widgDstFileModification.setText(this.srcFile.getName());
+          }
+        } else { //-------------------------------- .. is selected on src.
+          this.widgDstFileModification.setText("**/*.*");
+        }
+      }
+      if(this.srcFile !=null) {
+        
+      }
+//        if(dirFileDst.isDirectory()) {           // destination: a directory is selected:
+//          this.widgDstDir.setText( dirFileDst.getPathChars().toString() + this.srcFile.getName() ); 
+//        } else {
+//          this.widgDstDir.setText( dirFileDst.getPathChars() ); 
+//        }
+    }
+    
+  }
+  
+  
 
   /**Last files which are in copy process. Typical contains one file only.
    * This list will be filled in {@link #actionButtonCopy} if the copy process will be started.
@@ -503,14 +602,15 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   final void execCheck(){
     setTexts(Estate.busyCheck);
     this.widgCopyState.setText("busy-check");
-    this.widgButtonOk.setText("busy-check");
+    this.widgBtnDstExec.setText("busy-check");
     this.widgButtonCheck.setState(GralButton.State.Disabled);
     this.widgButtonEsc.setText("abort");
-    String sSrcMask= this.widgFromConditions.getText();
+    String sSrcMask= this.widgSrcSelection.getText();
     //FileSystem: acts in other thread.
     //regards mark in first level ?
-    int depths = this.srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
-    long bMarkSelect = this.srcSomeFiles ? 0x200000000L + FileMark.select : 0;
+    //int depths = this.srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
+    //long bMarkSelect = this.srcSomeFiles ? 0x200000000L + FileMark.select : 0;
+    long bMarkSelect = 0;
     if(sSrcMask.startsWith("?")) {                         // select mask: use mark bits:
       for(int ix=1; ix < sSrcMask.length(); ++ix) {
         char cs = sSrcMask.charAt(ix);
@@ -527,7 +627,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     this.action.progressAction.clear();
-    this.srcFile.refreshAndMark(false, depths, FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect
+    this.srcFile.refreshAndMark(false, 0, FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect
         , this.callbackFromFilesCheck, this.progressEv);
     this.widgCopyNameDst.setText(this.srcDir.getStateDevice());
     this.bFirstSelect = false;
@@ -544,7 +644,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   final protected void execMove() {
-    String sDst = this.widgInputDst.getText();
+    String sDst = this.widgDstDir.getText();
     String sDstDir;
     int posWildcard = sDst.indexOf('*');
     if(posWildcard >0) {
@@ -570,20 +670,32 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   final protected void execCopy(){
     this.widgCopyState.setText("busy-copy");
-    this.widgButtonOk.setText("busy-copy");
+    this.widgBtnDstExec.setText("busy-copy");
     this.widgButtonEsc.setText("abort");
-    String sDst = this.widgInputDst.getText();
+    String sDst = this.widgDstDir.getText();
     String[] sDstFileMaskRet = new String[1];
-    this.dirDst = FileRemote.getDirFileDst(sDst, this.srcDir, sDstFileMaskRet);
-    this.sFileMaskDst = sDstFileMaskRet[0];
-    if(this.filesToCopy.size()>0) {
-      for(FileRemote fileSrc: this.filesToCopy) {
-      //======>>>>
-        execCopy(fileSrc);
+    //this.dirDst = FileRemote.getDirFileDst(sDst, this.srcDir, sDstFileMaskRet);
+    this.sFileMaskDst = this.widgDstFileModification.getText(); //sDstFileMaskRet[0];
+    int posStar = this.sFileMaskDst.indexOf('*');
+    if(this.srcFile !=null && !this.srcFile.isDirectory()) {
+      //------------------------------------------- copy only one file
+      FileRemote dstFile;
+      if(posStar ==-1) {
+        dstFile = this.dirDst.child(this.sFileMaskDst);
+      } else {
+        dstFile = null; //todo
       }
+      this.srcFile.copyTo(dstFile, this.progressEv);
     } else {
-      //======>>>>
-      execCopy(this.srcFile);                    // maybe the selected directory or a simple file
+      if(this.filesToCopy.size()>0) {
+        for(FileRemote fileSrc: this.filesToCopy) {
+        //======>>>>
+          execCopy(fileSrc);
+        }
+      } else {
+        //======>>>>
+        execCopy(this.srcFile);                    // maybe the selected directory or a simple file
+      }
     }
     setTexts(Estate.busy);
   }
@@ -603,6 +715,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //TODO maybe evaluate
       final String sName;
       int posMask;
+      //if(this.fileDst !=null && this.fileDst.exists()) {
       if(this.sFileMaskDst ==null || this.sFileMaskDst.equals("*")) {
         sName = this.srcFile.getName();
       } else if( (posMask = this.sFileMaskDst.indexOf("*."))>=0) {
@@ -624,7 +737,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * and refreshes the files therewith. See {@link FileRemote#refreshAndCompare(FileRemote, int, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
    */
   final protected void execSearch(){
-    String sSearch = this.widgInputDst.getText();
+    String sSearch = this.widgDstDir.getText();
     sSearch=sSearch.replace("\\r", "\r");
     sSearch=sSearch.replace("\\n", "\n");
     byte[] search = { 0x0d, 0x0a};
@@ -637,7 +750,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 //      }
 //    }
     if(bOk) {
-      String sSrcMask= this.widgFromConditions.getText();
+      String sSrcMask= this.widgSrcSelection.getText();
 //      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state,
       //it is a check of sendEvent and it should relinguish the event.
       //====>
@@ -666,11 +779,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 //      }
 //    }
     if(bOk) {
-      String sSrcMask= this.widgFromConditions.getText();
+      String sSrcMask= this.widgSrcSelection.getText();
 //      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state,
       //it is a check of sendEvent and it should relinguish the event.
       //====>
-      this.srcFile.refreshAndCompare(this.dirDst, 0, sSrcMask, 0, this.progressEv); //evCallback); //evCallback able to use from callback.
+      this.srcFile.cmprDirTreeTo(false, this.dirDst, sSrcMask, 0, this.progressEv);
       //setTexts(Estate.busy);
     } else {
       this.widgCopyState.setText("evCallback hangs");
@@ -682,7 +795,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   private void setDirFileDst ( ) {
-    String sDst = this.widgInputDst.getText();
+    String sDst = this.widgDstDir.getText();
     int posSep = sDst.lastIndexOf('/');
     int posSep2 = sDst.lastIndexOf('\\');
     if(posSep2 >=0 && posSep2 > posSep){ posSep = posSep2; }
@@ -709,7 +822,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //if(fileSrc !=null ) {fileSrc.abortAction();}
     this.state = Estate.start;
     this.progressEv.data().setAbort();
-    String sDirSrc = this.widgShowSrc.getText();
+    String sDirSrc = this.widgSrcDir.getText();
     //FileRemote dirSrc = main.fileCluster.getFile(sDirSrc, null); //new FileRemote(sDirSrc);
     if(this.srcDir !=null) { this.srcDir.abortAction(); }  //to set stateMachine of copy in ready state
     else {
@@ -724,67 +837,67 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   }
 
 
-  /**Sets the source and destination depending on the cmd and given {@link #srcFile}, {@link #dirDst}
-   * The {@link #widgInputDst} will be not changed if {@link #bDstChanged} is set.
-   */
-  final void setTextSrcDst(){
-    //
-    //show source files, it is only to show, no functionality.
-    if(this.srcFile == null){
-      this.widgShowSrc.setText("--no source--");
-    } else {
-      if(this.sFilesSrc == null) {
-        if(this.srcFile.isDirectory()) { // && cmd == Ecmd.copy) {
-          if(this.srcSomeFiles){
-            this.widgShowSrc.setText(this.srcFile.getAbsolutePath() + "/?+");  //copy some files dir/?+ signals, there are more files but add mask into
-          } else {
-            this.widgShowSrc.setText(this.srcFile.getAbsolutePath() + "/*");  //copy a directory: show dir/* to signal, there are more files.
-          }
-        } else {
-          this.widgShowSrc.setText(this.srcFile.getAbsolutePath());         //compare, move or copy only one file: show only srcfile or srcdir
-        }
-      } else {
-        this.widgShowSrc.setText(this.srcFile.getAbsolutePath() + "/" + this.sFilesSrc);  //more as one
-      }
-    }
-    //
-    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
-      if(this.fileDst == null){
-        this.bufferDstChars.setLength(0); this.bufferDstChars.append("??");
-      } else if(!this.bDstChanged) {
-        if(this.cmd == Ecmd.compare) {
-          FileRemote dirDstCmpr = this.fileDst !=null && this.fileDst.isDirectory() ? this.fileDst : this.dirDst;
-          this.bufferDstChars.setLength(0); this.bufferDstChars.append(dirDstCmpr.getPathChars()); //.append('/').append(sFileDstCopy);
-        } else {
-          this.bufferDstChars.setLength(0);
-          final FileRemote dstSet;
-          if(/*!widgButtonModeDst.isOn() || */ this.srcFile.isDirectory() && !this.fileDst.isDirectory()){
-            dstSet = this.dirDst;
-            this.bufferDstChars.append(this.dirDst.getPathChars()); //the directory of the file.
-          } else {
-            //select "dst/dst" in mode or
-            dstSet = this.fileDst;
-            this.bufferDstChars.append(this.fileDst.getPathChars()); //file or directory
-          }
-          //if(cmd == Ecmd.copy || cmd == Ecmd.move){
-          //if(dirDst == fileDst || fileSrc.isDirectory() && !fileDst.isDirectory()) {  // .. is selected
-//          if(dstSet.isDirectory()) {  // .. is selected
-//            if(srcSomeFiles){
-//              bufferDstChars.append("/*");
-//            } else {
-//              String nameSrc = fileDst.getName();
-//              bufferDstChars.append('/').append(nameSrc);
-//            }
+//  /**Sets the source and destination depending on the cmd and given {@link #srcFile}, {@link #dirDst}
+//   * The {@link #widgInputDst} will be not changed if {@link #bDstChanged} is set.
+//   */
+//  final void setTextSrcDst(){
+//    //
+//    //show source files, it is only to show, no functionality.
+//    if(this.srcFile == null){
+//      this.widgShowSrc.setText("--no source--");
+//    } else {
+//      if(this.sFilesSrc == null) {
+//        if(this.srcFile.isDirectory()) { // && cmd == Ecmd.copy) {
+//          if(this.srcSomeFiles){
+//            this.widgShowSrc.setText(this.srcFile.getAbsolutePath() + "/?+");  //copy some files dir/?+ signals, there are more files but add mask into
+//          } else {
+//            this.widgShowSrc.setText(this.srcFile.getAbsolutePath() + "/*");  //copy a directory: show dir/* to signal, there are more files.
 //          }
-//          if(cmd == Ecmd.copy && srcFile != null && srcFile.isDirectory()) {
-//            bufferDstChars.append("/*");
+//        } else {
+//          this.widgShowSrc.setText(this.srcFile.getAbsolutePath());         //compare, move or copy only one file: show only srcfile or srcdir
+//        }
+//      } else {
+//        this.widgShowSrc.setText(this.srcFile.getAbsolutePath() + "/" + this.sFilesSrc);  //more as one
+//      }
+//    }
+//    //
+//    if(this.cmdWind != Ecmd.delete && this.cmdWind != Ecmd.search) {
+//      if(this.fileDst == null){
+//        this.bufferDstChars.setLength(0); this.bufferDstChars.append("??");
+//      } else if(!this.bDstChanged) {
+//        if(this.cmd == Ecmd.compare) {
+//          FileRemote dirDstCmpr = this.fileDst !=null && this.fileDst.isDirectory() ? this.fileDst : this.dirDst;
+//          this.bufferDstChars.setLength(0); this.bufferDstChars.append(dirDstCmpr.getPathChars()); //.append('/').append(sFileDstCopy);
+//        } else {
+//          this.bufferDstChars.setLength(0);
+//          final FileRemote dstSet;
+//          if(/*!widgButtonModeDst.isOn() || */ this.srcFile.isDirectory() && !this.fileDst.isDirectory()){
+//            dstSet = this.dirDst;
+//            this.bufferDstChars.append(this.dirDst.getPathChars()); //the directory of the file.
+//          } else {
+//            //select "dst/dst" in mode or
+//            dstSet = this.fileDst;
+//            this.bufferDstChars.append(this.fileDst.getPathChars()); //file or directory
 //          }
-        }
-      }
-      this.widgInputDst.setText(this.bufferDstChars);
-    }
-
-  }
+//          //if(cmd == Ecmd.copy || cmd == Ecmd.move){
+//          //if(dirDst == fileDst || fileSrc.isDirectory() && !fileDst.isDirectory()) {  // .. is selected
+////          if(dstSet.isDirectory()) {  // .. is selected
+////            if(srcSomeFiles){
+////              bufferDstChars.append("/*");
+////            } else {
+////              String nameSrc = fileDst.getName();
+////              bufferDstChars.append('/').append(nameSrc);
+////            }
+////          }
+////          if(cmd == Ecmd.copy && srcFile != null && srcFile.isDirectory()) {
+////            bufferDstChars.append("/*");
+////          }
+//        }
+//      }
+//      this.widgInputDst.setText(this.bufferDstChars);
+//    }
+//
+//  }
 
 
   /**Set the texts to any widgets depending on the state of execution and the activated switch key.
@@ -793,20 +906,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   void setTexts( Estate newState) {  ////
     this.state = newState;
     //Texts depending from pressed command button:
-    String[][] textOk =
-    { { "check del"  , "move"        , "check copy", "compare", "search" }
-    , { "check del"  , "move"        , "check copy", "compare", "search" }
-    , { "busy check" , "busy check"  , "busy check", "compare", "search" }
-    , { "del checked", "move checked", "copy checked", "compare", "search" }
-    , { "pause del"  , "pause move"  , "pause copy", "pause cmpr", "pause" }
-    , { "close del"  , "close move"  , "close copy", "close cmpr", "close"  }
-    };
     String[][] textSrc =
     { { "set src + dst", "set src + dst", "busy check", "set src + dst", "busy", "set src + dst" }
     , { "set dst", "set dst", "busy check", "set dst", "busy", "set dst" }
     };
     String[] textAbort = { "abort"         , "abort"       , "abort"        , "abort", "abort", "close" };
-    String[] textDest =  { "---"           , "move to"     , "copy to"      , "compare with"  , "search"  };
 
     int ix1;
     if(this.cmdWind == Ecmd.delete){
@@ -814,19 +918,19 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.cmd = Ecmd.delete;
       if(this.cmdWind != Ecmd.delete) {
         this.widgButtonMove.setState(GralButton.State.Off);
-        this.widgInputDst.setEditable(false);
-        this.widgInputDst.setBackColor(this.colorGrayed, 0);
+        this.widgDstDir.setEditable(false);
+        this.widgDstDir.setBackColor(this.colorGrayed, 0);
       }
     } else if(this.cmdWind == Ecmd.compare){
       ix1 = 3;
       this.cmd = Ecmd.compare;
-      this.widgInputDst.setEditable(true);
-      this.widgInputDst.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
+      this.widgDstDir.setEditable(true);
+      this.widgDstDir.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
     } else if(this.cmdWind == Ecmd.search){
       ix1 = 4;
       this.cmd = Ecmd.search;
-      this.widgInputDst.setEditable(true);
-      this.widgInputDst.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
+      //this.widgDstDir.setEditable(true);
+      //this.widgDstDir.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
     } else {
       //move or copy window:
       if(this.state == Estate.finit) {
@@ -836,20 +940,17 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       if(this.widgButtonMove.isOn()) {
       ix1 = 1;
         this.cmd = Ecmd.move;
-        this.widgInputDst.setEditable(true);
-        this.widgInputDst.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
+        this.widgDstDir.setEditable(true);
+        this.widgDstDir.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
       } else {
         ix1 = 2;
         this.cmd = Ecmd.copy;
-        this.widgInputDst.setEditable(true);
-        this.widgInputDst.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
+        this.widgDstDir.setEditable(true);
+        this.widgDstDir.setBackColor(this.bDstChanged ? this.colorChangedText : this.colorNoChangedText, 0);
       }
     }
-    if(this.cmdWind != Ecmd.delete) {
-      this.widgInputDst.setPrompt(textDest[ix1]);
-    }
     if(!this.bDstChanged) {
-      setTextSrcDst();
+//      setTextSrcDst();
     }
     int ix2;
     GralButton.State checkDisable;
@@ -865,11 +966,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       case finit: setSrcPossible = true; checkDisable = GralButton.State.On; ix2=5; break;
       default: setSrcPossible = true; checkDisable = GralButton.State.On; ix2=0;
     }
-    String sTextBtnOk = textOk[ix2][ix1];
-    this.widgButtonOk.setText(sTextBtnOk);
+    String sTextBtnOk = this.state.sBtnOk[ix1];
+    this.widgBtnDstExec.setText(sTextBtnOk);
     //String sTextSrc = textSrc[bLockSrc? 1: 0][ix2];
     //widgButtonCheck.setText(sTextSrc);
-    this.widgButtonCheck.setState(checkDisable);
+    if(widgButtonCheck !=null) { this.widgButtonCheck.setState(checkDisable); }
     this.widgButtonSetSrc.setState(setSrcPossible ? GralButton.State.On : GralButton.State.Disabled);
     String sTextAbort = textAbort[ix2];
     this.widgButtonEsc.setText(sTextAbort);
@@ -899,7 +1000,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         synchronized(this) { try{ wait(200);} catch(InterruptedException exc) {}}
       }
       System.out.println(LogMessage.timeCurr("stop testProgressThread"));
-      progressEvData.done(EventConsumer.mEventConsumFinished, null);
+      progressEvData.done(FileRemote.Cmd.copyFile, null);
     }
   };
 
@@ -919,7 +1020,18 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.widgCopyNameDst.setText("?");
     }
     if(order.done()) {
-      this.widgCopyState.setText("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
+      String sError = order.sError;
+      if(sError !=null) {
+        this.widgCopyState.setText(sError);
+        this.state = Estate.error;
+      } else {
+        this.widgCopyState.setText("finish");
+        this.state = Estate.finit;
+      }
+      setTexts(this.state);
+      if(this.fileCardDst !=null) {
+        this.fileCardDst.refresh();
+      }
       //setTexts(Estate.finit);
     }
 
@@ -1010,12 +1122,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) {
         showCurrentProcessedFileAndDir(progress); //this.currFile, this.nrFilesProcessed, this.bDone);
         if(progress.done()) {
-          switch(progress.answerToCmd) {
-          case walkSelectMark: setTexts(Estate.checked); break;
-          case walkCopyDirTree: setTexts(Estate.finit); break;
-          default: setTexts(Estate.error);
-          }
-
           return EventConsumer.mEventConsumFinished;
         }
         else return 0;
@@ -1042,7 +1148,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   }
 
   /**Shows the state of FileRemote, especially for debug and problems. */
-  GralUserAction actionShowState = new GralUserAction("actionConfirmCopy")
+  GralUserAction actionShowState = new GralUserAction("actionShowState")
   {
     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
@@ -1109,50 +1215,56 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    }
 
 
-   protected GralUserAction actionSetDst = new GralUserAction("actionSetDst") ///
-   { @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
-     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-         GralButton widgb = (GralButton)(widgP);
-         FcmdFileCard[] lastFileCards = FcmdCopyCmprDel.this.main.getLastSelectedFileCards();
-         FcmdCopyCmprDel.this.fileCardDst = lastFileCards[0];
-         FcmdCopyCmprDel.this.fileDst = FcmdCopyCmprDel.this.fileCardDst.currentFile();
-         FcmdCopyCmprDel.this.dirDst = FcmdCopyCmprDel.this.fileCardDst.currentDir();
-
-         CharSequence sText = FcmdCopyCmprDel.this.dirDst.getAbsolutePath();
-         /*
-         if(sFilesSrc == null || sFilesSrc.isEmpty()){
-           StringBuilder u = new StringBuilder(sText);
-           sText = u.append("/").append( fileSrc.getName());
-         }
-         */
-         FcmdCopyCmprDel.this.bDstChanged = false;
-         setTextSrcDst();
+   protected GralUserAction actionSetSrc = new GralUserAction("actionSetSrc") { 
+     @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params) { 
+       if(KeyCode.isControlFunctionMouseUpOrMenu(key)) {
+         FileRemote[] srcDirFile = getSrcDstFileDir(false, FcmdCopyCmprDel.this.widgSrcDir, FcmdCopyCmprDel.this.widgSrcSelection);
+         FcmdCopyCmprDel.this.srcDir = srcDirFile[0]; FcmdCopyCmprDel.this.srcFile = srcDirFile[1];
+         getDstFileDir(FcmdCopyCmprDel.this.main.getLastSelectedFileCards()[1], false);
        }
        return true;
      }
    };
 
 
-   protected GralUserAction actionChgModeDst = new GralUserAction("actionChgModeDst") ///
-   { @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params)
-     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-         setTextSrcDst();
+   protected GralUserAction actionSetDst = new GralUserAction("actionSetDst") {
+     @Override public boolean exec(int key, GralWidget_ifc widgP, Object... params) {
+       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+         getDstFileDir(FcmdCopyCmprDel.this.main.getLastSelectedFileCards()[0], true);
+       
+//         GralButton widgb = (GralButton)(widgP);
+//         FcmdFileCard[] lastFileCards = FcmdCopyCmprDel.this.main.getLastSelectedFileCards();
+//         FcmdCopyCmprDel.this.fileCardDst = lastFileCards[0];
+//         FcmdCopyCmprDel.this.fileDst = FcmdCopyCmprDel.this.fileCardDst.currentFile();
+//         FcmdCopyCmprDel.this.dirDst = FcmdCopyCmprDel.this.fileCardDst.currentDir();
+//
+//         CharSequence sText = FcmdCopyCmprDel.this.dirDst.getAbsolutePath();
+//         /*
+//         if(sFilesSrc == null || sFilesSrc.isEmpty()){
+//           StringBuilder u = new StringBuilder(sText);
+//           sText = u.append("/").append( fileSrc.getName());
+//         }
+//         */
+//         FcmdCopyCmprDel.this.bDstChanged = false;
+//         setTextSrcDst();
        }
        return true;
      }
    };
+
+
 
 
   protected GralUserAction actionEnterTextInDst = new GralUserAction("actionSelectMask")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
     { if(key == KeyCode.valueChanged) {
-        String text = FcmdCopyCmprDel.this.widgInputDst.getText();
+        String text = FcmdCopyCmprDel.this.widgDstDir.getText();
         if(StringFunctions.compare(text, FcmdCopyCmprDel.this.bufferDstChars) ==0) {
           //unchanged text or the original text again:
-          FcmdCopyCmprDel.this.widgInputDst.setBackColor(FcmdCopyCmprDel.this.colorNoChangedText, 0);
+          FcmdCopyCmprDel.this.widgDstDir.setBackColor(FcmdCopyCmprDel.this.colorNoChangedText, 0);
           FcmdCopyCmprDel.this.bDstChanged = false;
         } else {
-          FcmdCopyCmprDel.this.widgInputDst.setBackColor(FcmdCopyCmprDel.this.colorChangedText, 0);
+          FcmdCopyCmprDel.this.widgDstDir.setBackColor(FcmdCopyCmprDel.this.colorChangedText, 0);
           FcmdCopyCmprDel.this.bDstChanged = true;
         }
       } else {
@@ -1297,20 +1409,20 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected GralUserAction actionButtonOk = new GralUserAction("actionButtonCopy")
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-//        if(state == Estate.start) { //widgg.sCmd.equals("check")){
-//          action.progressAction.clear();
-//          if(cmd == Ecmd.delete){
-//            execCheck();
-//          } else if(cmd == Ecmd.copy || bFineSelect){
-//            execCheck();
-//          } else if(cmd == Ecmd.move){
-//            execCheck();
-//          } else if(cmd == Ecmd.compare){
-//            execCompare();
-//          } else if(cmd == Ecmd.search){
-//            execSearch();
-//          }
-//        } else if(state == Estate.checked) { //widgg.sCmd.equals("copy")) {
+        if(FcmdCopyCmprDel.this.state == Estate.start) { //widgg.sCmd.equals("check")){
+          FcmdCopyCmprDel.this.action.progressAction.clear();
+          if(FcmdCopyCmprDel.this.cmd == Ecmd.delete){
+            execCheck();
+          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.copy || FcmdCopyCmprDel.this.bFineSelect){
+            execCheck();
+          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.move){
+            execCheck();
+          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.compare){
+            execCompare();
+          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.search){
+            execSearch();
+          }
+        } else if(FcmdCopyCmprDel.this.state == Estate.checked || FcmdCopyCmprDel.this.state == Estate.ready) { //widgg.sCmd.equals("copy")) {
           if(FcmdCopyCmprDel.this.state != Estate.finit) {
             switch(FcmdCopyCmprDel.this.cmd){
             case copy: execCopy(); break;
@@ -1319,11 +1431,12 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
             case compare: execCompare(); break;
             case search: execSearch(); break;
           }//switch
-        } else if(FcmdCopyCmprDel.this.state == Estate.finit) { //widgg.sCmd.equals("close")){
-          closeWindow();
-        } else {
-          //should be state pause
-//          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+          } else if(FcmdCopyCmprDel.this.state == Estate.finit) { //widgg.sCmd.equals("close")){
+            closeWindow();
+          } else {
+            //should be state pause
+  //          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+          }
         }
       }
       return true;
@@ -1474,10 +1587,10 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     if(nrofPendingFiles == 0){
       if(!ok){
         this.widgCopyState.setText("error");
-        this.widgButtonOk.setText("quit");
+        this.widgBtnDstExec.setText("quit");
         //widgButtonOk.setCmd("quit");
       } else {
-        this.widgButtonOk.setText("close");
+        this.widgBtnDstExec.setText("close");
         //widgButtonOk.setCmd("close");
       }
       this.widgButtonEsc.setText("close");
@@ -1714,17 +1827,32 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   };
 
-
-  enum Estate{ inactive, start, checked, busyCheck, busy, quest, error, finit};
+                                  //del            move            copy               cmp            search 
+  enum Estate{ inactive(-1, new String[] { "check del"  , "move"        , "check copy"    , "compare"     , "search" }), 
+    start(0, new String[]     { "check del"  , "move"        , "check copy"    , "compare"     , "search" }), 
+    check(1, new String[]     { "check del"  , "move"        , "check copy"    , "compare"     , "search" }), 
+    busyCheck(2, new String[] { "busy check" , "busy check"  , "busy check"    , "compare"     , "search" }), 
+    checked(3, new String[]   { "del checked", "move checked", "copy checked"  , "compare"     , "search" }), 
+    ready(4, new String[]     { "delete"     , "move"        , "copy"          , "compare"     , "search" }), 
+    busy(5, new String[]      { "pause del"  , "pause move"  , "pause copy"    , "pause cmpr"  , "pause" }), 
+    quest(6, new String[]     { "cont del"   , "cont move"   , "cont copy"     , "cont cmpr"   , "cont" }), 
+    error(7, new String[]     { "abort del"  , "abort move"  , "abort copy"    , "abort cmpr"  , "abort" }), 
+    finit(8, new String[]     { "close del"  , "close move"  , "close copy"    , "close cmpr"  , "close" })
+    ;
+    Estate(int ixText, String[] sBtnOk) { this.ixText = ixText; this.sBtnOk = sBtnOk; }
+    public final int ixText;
+    public final String[] sBtnOk;
+  };
 
   enum Ecmd{
-    copy("copy"),
-    move("move"),
-    delete("del"),
-    compare("cmp"),
-    search("search");
-    Ecmd(String name){ this.name = name; }
+    copy("copy", 2),
+    move("move", 1),
+    delete("del", 0),
+    compare("cmp", 3),
+    search("search", 4);
+    Ecmd(String name, int ix){ this.name = name; this.ix = ix; }
     public final String name;
+    public final int ix;
   };
 
   void stop(){}

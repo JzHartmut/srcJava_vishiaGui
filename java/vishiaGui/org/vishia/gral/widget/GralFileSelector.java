@@ -547,6 +547,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
 
     protected int refreshCount;
 
+    /**If false then a time order calls continue refresh.
+     * 
+     */
     boolean donotCheckRefresh = true;
 
     String sDatePrefixNewer = "";
@@ -1655,7 +1658,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   
   
   
+  /**Refreshes the content especially after change as copy, delete etc.*/
+  public void refresh () {
+    fillIn(this.idata.currentDir, false);
+  }
   
+  
+  /**Refreshes cyclically
+   * @param since
+   */
   public void checkRefresh(long since){
     if(this.idata.currentDir !=null 
       && (  !this.idata.donotCheckRefresh && !this.idata.currentDir.isTested(since - 5000)
@@ -1696,12 +1707,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   /**Gets the selected file from this panel.
    * If the current file of this panel is marked, then all other marked files and directories
    * of this panel are returned too. If the current file is not marked, then only this current file
-   * is returned as selected file.
-   * <br><br>
-   * Strategy changed since 2013-09-05: Before, the marked files are returned. But it is possible
-   * that some files are marked outside of the visible area, and the user does not know that there are
-   * marked files.
-   * In this case an unexpected behavior from the user's view occurs. 
+   * is returned as selected file. This behavior assures, that the one file in focus is returned
+   * and not some files which are marked outside of the own focus. 
+   * That prevents an unexpected behavior from the user's view occurs. 
+   * Hence, if you want to handle some marked files you should select on of these marked files.
    * If the user selects a marked file, then one should be sure that there are other marked files 
    * in non visible areas too.
    * 
