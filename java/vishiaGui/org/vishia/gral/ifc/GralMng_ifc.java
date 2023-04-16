@@ -202,7 +202,7 @@ import org.vishia.msgDispatch.LogMessage;
   /**Forces the resizing of the given widged. 
    * @param widgd the widget
    */
-  void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent);
+  void resizeWidget(GralWidget widgd, GralRectangle parentPix);
   
   
   /**Sets a given and registered window visible at the given position and size or set it invisible.

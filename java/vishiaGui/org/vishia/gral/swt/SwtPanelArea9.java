@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralArea9Panel;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.util.Debugutil;
 
 public class SwtPanelArea9 extends SwtGridPanel{
@@ -26,9 +27,10 @@ public class SwtPanelArea9 extends SwtGridPanel{
     { 
       //Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
+      GralRectangle parentPix = getPixelPositionSize();
       for(GralWidget widg1: SwtPanelArea9.this.gralPanel.getWidgetsToResize()){
         if(widg1._wdgImpl !=null) {
-          widg1._wdgImpl.setPosBounds();
+          widg1._wdgImpl.setPosBounds(parentPix);
         } else {
           Debugutil.stop();
         }

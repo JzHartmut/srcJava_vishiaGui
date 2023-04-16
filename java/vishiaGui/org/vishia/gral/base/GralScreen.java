@@ -69,6 +69,16 @@ public class GralScreen implements GralPanel_ifc {
     return false;
   }
 
+  /**This operation can be called from the implementation graphic if the focus is gained for an implementation widget.
+   * It is also called for all parents of a widget if a child gets the focus.
+   * The specific widget implementation can override this operation to do specifics.
+   * It should call super.focused(bGained) to forward the focus to parents.
+   * @param bGained
+   */
+  @Override public void focused(boolean bGained) {
+    // does nothing here.
+  }
+
   @Override public boolean isGraphicDisposed () {
     return false;
   }

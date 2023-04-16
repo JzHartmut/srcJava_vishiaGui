@@ -73,6 +73,15 @@ public interface GralWidgetBase_ifc {
    * of which is in use currently from a comprehensive widget.
    */
   GralWidgetBase_ifc getFocusedWidget ( );
+  
+  /**This operation can be called from the implementation graphic if the focus is gained or lost for an implementation widget.
+   * It is also called from the default implementation in {@link GralWidget#focused(boolean)} 
+   * for all parents of a widget if a child gets or lost the focus.
+   * The specific widget implementation can override this operation to do specifics.
+   * It should call super.focused(bGained) to forward the focus to parents.
+   * @param bGained false then lost.
+   */
+  void focused(boolean bGained);
 
   
   /**Returns the associated GralMng. The GralMng is associated by construction,

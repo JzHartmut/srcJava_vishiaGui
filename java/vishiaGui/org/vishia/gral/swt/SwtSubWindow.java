@@ -221,7 +221,8 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     }
     //super.panelComposite = window;
     if(sTitle !=null){ window.setText(sTitle); }
-    if(!bHasResizeAction && super.resizeAction() != null){
+    //if(!bHasResizeAction && super.resizeAction() != null){
+    if((windProps & GralWindow.windResizeable) !=0) {
       window.addControlListener(resizeListener);  //This listener calls the resizeAction
     }
     //this.checkCreateTabFolder(this.window, mng);
@@ -554,6 +555,12 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     { 
       Shell window = SwtSubWindow.this.window;
       Object widgg = window.getData();
+      if(widgg == null) return;
+      if(!(widgg instanceof GralWindow)) {
+        Debugutil.stop();
+      }
+      GralWindow widgw = (GralWindow)widgg;
+      Rectangle xy = window.getClientArea();
       if(widgg instanceof GralPanelContent.ImplAccess) {
         Debugutil.stop();  //TODO same algorithm as on SwtPanel
       } else {
@@ -567,7 +574,6 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
 //              Rectangle xy = window.getBounds();           // x and y is the absolute position on screen
 //              xy.x = 0;                                    // relative position inside the window is necessary.
 //              xy.y = 0;                                    // relative from left top [0,0] to given size
-              Rectangle xy = window.getClientArea();
               child.setBounds(xy);                         // call its resize as Swt-listener.
 //            } else {
 //              Rectangle xy = window.getBounds();
@@ -580,11 +586,14 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
           }
         }
       }
-      
-      
-      if(SwtSubWindow.this.resizeAction() !=null){
-        SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
+      if((widgw.windProps() & GralWindow.windResizeable)!=0){
+        GralRectangle windowPix = new GralRectangle(0, 0, xy.width, xy.height);
+        widgw.mainPanel.resizeWidgets(windowPix);
       }
+      
+//      if(SwtSubWindow.this.resizeAction() !=null){
+//        SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
+//      }
     }
   };
 

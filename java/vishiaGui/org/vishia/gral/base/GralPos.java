@@ -472,7 +472,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @param parent panel for the widget where the GralPos is used.
    * @return
    */
-  public GralPos setParent(GralWidget_ifc parent) {
+  public GralPos setParent(GralWidgetBase_ifc parent) {
     this.parent = parent;
     return this;
   }
@@ -1116,7 +1116,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @return A rectangle for setBounds. It is exclusively the right and bottom pixel. dx and dy are calc -1
    */
   public GralRectangle calcWidgetPosAndSize(GralGridProperties propertiesGui,
-      int widthParentPixel, int heightParentPixel,
+      GralRectangle parentPix,
       int widthWidgetNat, int heightWidgetNat
   )
   {
@@ -1137,10 +1137,10 @@ public class GralPos extends ObjectVishia implements Cloneable
       //Position values are 1, 2 or 3
       assert(  this.x.p1 >=0 && this.x.p1 <=2 && this.x.p2 >=1 && this.x.p2 <=3
             && this.y.p1 >=0 && this.y.p1 <=2 && this.y.p2 >=1 && this.y.p2 <=3);
-      x1 = (int)((float)area9.xpFrameArea[this.x.p1] / area9.xpFrameArea[3] * widthParentPixel);
-      x2 = (int)((float)area9.xpFrameArea[this.x.p2] / area9.xpFrameArea[3] * widthParentPixel);
-      y1 = (int)((float)area9.ypFrameArea[this.y.p1] / area9.ypFrameArea[3] * heightParentPixel);
-      y2 = (int)((float)area9.ypFrameArea[this.y.p2] / area9.ypFrameArea[3] * heightParentPixel);
+      x1 = (int)((float)area9.xpFrameArea[this.x.p1] / area9.xpFrameArea[3] * parentPix.dx);
+      x2 = (int)((float)area9.xpFrameArea[this.x.p2] / area9.xpFrameArea[3] * parentPix.dx);
+      y1 = (int)((float)area9.ypFrameArea[this.y.p1] / area9.ypFrameArea[3] * parentPix.dy);
+      y2 = (int)((float)area9.ypFrameArea[this.y.p2] / area9.ypFrameArea[3] * parentPix.dy);
 
     } else {
       int x1g = this.x.p1 / 10;                            // -5 results in 0
@@ -1151,7 +1151,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 //         : widthParentPixel - (-x1g * xPixelUnit + propertiesGui.xPixelFrac(x1i));
       x1 = x1g * xPixelUnit + propertiesGui.xPixelFrac(x1i);
       if(this.x.p1 <0) {                                   // x1 = -nn is from right side
-        x1 += widthParentPixel;
+        x1 += parentPix.dx;
       }
       int y1g = this.y.p1 / 10;
       int y1i = this.y.p1 - y1g*10;
@@ -1161,7 +1161,7 @@ public class GralPos extends ObjectVishia implements Cloneable
 //         : widthParentPixel - (-y1g * yPixelUnit + propertiesGui.yPixelFrac(y1i));
       y1 = y1g * yPixelUnit + propertiesGui.yPixelFrac(y1i);
       if(this.y.p1 <0) {                                   // y1 = -nn is from bottom
-        y1 += heightParentPixel;
+        y1 += parentPix.dy;
       }
       if(this.x.p2 == GralPos.useNatSize){
         x2 = x1 + widthWidgetNat;
@@ -1172,7 +1172,7 @@ public class GralPos extends ObjectVishia implements Cloneable
         assert(x2i >=0 && x2i <10);
         x2 = x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i);
         if(this.x.p2 <=0) {                                // x2 = -nn .. 0 is from right side
-          x2 += widthParentPixel;
+          x2 += parentPix.dx;
         }
 //        x2 = this.x.p2 >0 ?       x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i)
 //           : widthParentPixel - (-x2g * xPixelUnit + propertiesGui.xPixelFrac(x2i));
@@ -1187,7 +1187,7 @@ public class GralPos extends ObjectVishia implements Cloneable
         assert(y2i >=0 && y2i <10);
         y2 = y2g * yPixelUnit + propertiesGui.yPixelFrac(y2i);
         if(this.y.p2 <=0) {                                // y2 = -nn .. 0 is from bottom
-          y2 += heightParentPixel;
+          y2 += parentPix.dy;
         }
 //
 //        y2 = this.y.p2 >0 ?       y2g * xPixelUnit + propertiesGui.xPixelFrac(y2i)

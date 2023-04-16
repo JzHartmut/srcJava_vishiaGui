@@ -202,8 +202,10 @@ public abstract class GralSelectList<UserData> extends GralWidgetBase implements
   
   
   
-  
   @Override public void setFocusedWidget ( GralWidgetBase_ifc widg) {} //nothing, not for here.
+  
+  
+  
   
   @Override public GralWidgetBase_ifc getFocusedWidget() { return null; }
 

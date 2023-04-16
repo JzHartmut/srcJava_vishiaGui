@@ -52,6 +52,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetComposite;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -481,15 +482,21 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       wdga = new SwtCurveView(widgp, this); 
       
     }
+    else if(widgg instanceof GralWidgetComposite) {   // a composite widget which is not a panel
+      widgg._wdgImpl = widgg.pos().parent.getImplAccess(); // has not an own Swt composite, uses from the panel.
+      wdga = null;
+    }
     else {
       throw new IllegalArgumentException("missing Widget type: " + widgg.toString());
     }
     //-------------------------------- // It should be always possible to access GralWidget from the implementation Swt-Control
-    Control widgSwt = (Control)wdga.getWidgetImplementation();
-    (widgSwt).setData(widgg);
-    boolean bSwtVisible = widgSwt.isVisible();
-    if(bSwtVisible && ! widgg.isVisible()) {
-      Debugutil.stop();
+    if(wdga !=null) {
+      Control widgSwt = (Control)wdga.getWidgetImplementation();
+      (widgSwt).setData(widgg);
+      boolean bSwtVisible = widgSwt.isVisible();
+      if(bSwtVisible && ! widgg.isVisible()) {
+        Debugutil.stop();
+      }
     }
   }
   
@@ -612,8 +619,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       rectParent = parentFrame.getBounds();
       dxFrame = rectParent.width; dyFrame = rectParent.height;
+      assert(false);
     }
-    final GralRectangle rectangle = gralMng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
+    final GralRectangle rectangle = gralMng.calcWidgetPosAndSize(posWindow, windowFrame, 400, 300);
     rectangle.x += windowFrame.x;
     rectangle.y += windowFrame.y;
     
@@ -788,7 +796,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     Object oParent = pos.parent.getImplAccess().getWidgetImplementation();
     Composite parentComp = (Composite) oParent; //((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite; //(Composite)pos().panel.getPanelImpl();
     //Rectangle pos;
-    final GralRectangle rectangle;
     final Rectangle parentSize;
     if(parentComp == null){
       parentSize = new Rectangle(0,0,800, 600);
@@ -797,7 +804,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    GralRectangle parentPix = new GralRectangle(parentSize.x, parentSize.y, parentSize.width, parentSize.height);
+
+    return pos.calcWidgetPosAndSize(this.gralMng.gralProps, parentPix, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -816,7 +825,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   GralRectangle calcWidgetPosAndSizeSwt(GralPos pos, Control parentComp, int widthwidgetNat, int heigthWidgetNat){
     //Rectangle pos;
-    final GralRectangle rectangle;
     final Rectangle parentSize;
     if(parentComp == null){
       parentSize = new Rectangle(0,0,800, 600);
@@ -825,7 +833,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(super.gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    final GralRectangle parentPix = new GralRectangle(parentSize.x, parentSize.y, parentSize.width, parentSize.height);
+    return pos.calcWidgetPosAndSize(super.gralMng.gralProps, parentPix, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -938,7 +947,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     Image image = new Image(swtWidg.getDisplay(), imageData); 
     GralImageBase imageGui = new SwtImage(image);
     GralRectangle size = imageGui.getPixelSize();
-    GralRectangle rr = gralMng.calcWidgetPosAndSize(pos(), 0, 0, size.dx, size.dy);
+    GralRectangle rr = gralMng.calcWidgetPosAndSize(pos(), size, size.dx, size.dy);
     GralCanvasStorage canvas = ((GralPanelContent)pos().parent).canvas();  
     if(canvas !=null){
       canvas.drawImage(imageGui, rr.x, rr.y, rr.dx, rr.dy, size);
@@ -1103,11 +1112,14 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	}
 
 	
-	@Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
+	@Override public GralRectangle resizeWidget(GralWidget widgd, GralRectangle parentPix)
 	{
 	  //GralWidget_ifc widget = widgd.getGraphicWidgetWrapper();
 	  if(widgd._wdgImpl !=null) {
-	    widgd._wdgImpl.setPosBounds();
+	    GralRectangle pix = widgd.pos().calcWidgetPosAndSize(this.gralMng.gralProps, parentPix,800,600);
+	    widgd._wdgImpl.setBoundsPixel(pix.x, pix.y, pix.dx, pix.dy);
+	    return pix;
+	    //return widgd._wdgImpl.setPosBounds(parentPix);
 //  	  Object owidg = widgd._wdgImpl.getWidgetImplementation();
 //  	  
 //  	  int test = 6;
@@ -1120,6 +1132,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 //  	    swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
 //    	  swtWidget.redraw();
 //  	  }
+	  } else {
+	    return null;
 	  }
 	}
 	
@@ -1327,7 +1341,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       GralWindow wind = ewind.getValue();
       
       out.append("\n==== SwtMng.reportContent: Window: ").append(wind.getName()).append("\n");
-      reportContent(out, (Composite)getSwtImpl(wind), "wind: ", 0);
+      Composite swtWidg = (Composite)getSwtImpl(wind);
+      reportContent(out, swtWidg, "wind: ", 0);
       out.append("\n====\n");
     }
   }
@@ -1343,9 +1358,6 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     if(bVisible) { out.append("+*-"); }
     else { out.append("+--"); }
     out.append(mark);
-    out.append(sType).append(':');
-    GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
-    out.append(parent.toString());
     Object data = parent.getData();
     if(data instanceof GralWidget) {
       String sClass = data.getClass().getName();
@@ -1354,6 +1366,9 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       out.append("data = ").append(data == null ? "null" : data.toString());
     }
+    out.append(sType).append(':');
+    GralRectangle.toString(out, pos.x, pos.y, pos.width, pos.height);
+    out.append(parent.toString());
     if(parent instanceof TabFolder) {
       TabItem[] items = ((TabFolder)parent).getItems();
       for(TabItem item: items) {
@@ -1361,10 +1376,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
         reportContent(out, itemWdg, "tab: ", recursion +1);
       }
     }
-    if(parent instanceof Composite && !(data instanceof GralTable)) {
+    if(parent instanceof Composite) { // && !(data instanceof GralTable)) {
       Control[] children = ((Composite)parent).getChildren();
       for(Control child : children) {
         if(child !=null) {
+          if(child instanceof SwtTable.Table)
+            Debugutil.stop();
           reportContent(out, child, "", recursion +1);
         }
       } }

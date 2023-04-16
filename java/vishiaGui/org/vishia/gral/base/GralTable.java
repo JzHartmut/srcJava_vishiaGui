@@ -2002,7 +2002,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //Now draw:
       //
       int ix = -1;
-      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
+      //this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
       while(++ix < this.outer.zLineVisible) {
         if(true || (this.outer.bitLinesForCellChanged & (1<<ix)) !=0) {  // non relevant CPU load impact
           line = this.outer.linesForCell[ix];                            // marking with bitLinesForCellChanged is not sufficient yet.
@@ -2289,9 +2289,13 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 //          actionOnLineSelected(KeyCode.focusGained, line);
           //super.focusGained();
           //System.out.println("GralTable - debugInfo; focusGained " + GralTable.this.toString() );
-          redraw(50,100);       //to show all table cells with the focused background color.
+          redraw(0,0);       //to show all table cells with the focused background color.
         }
+
       }
+      boolean bGrThread = this.widgg.gralMng.currThreadIsGraphic();
+      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_setFocusCell, "set Focus Table %b:[%d, %d]", bGrThread, this.outer.lineSelectedixCell, this.outer.colSelectedixCellC);
+      
     }
 
     /**Invoked if any cell has lost the focus.
@@ -2755,6 +2759,17 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
     @Override public boolean isVisible(){ return GralTable.this.isVisible(); }
 
 
+    /**This operation can be called from the implementation graphic if the focus is gained for an implementation widget.
+     * It is also called for all parents of a widget if a child gets the focus.
+     * The specific widget implementation can override this operation to do specifics.
+     * It should call super.focused(bGained) to forward the focus to parents.
+     * @param bGained
+     */
+    @Override public void focused(boolean bGained) {
+      // does nothing here.
+    }
+
+    
     @Override @Deprecated public GralColor setBackgroundColor(GralColor color) {
       GralColor ret = this.colorBackground;
       this.colorBackground = color;

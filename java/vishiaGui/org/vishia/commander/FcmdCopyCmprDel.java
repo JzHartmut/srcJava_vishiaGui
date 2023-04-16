@@ -361,7 +361,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       FileRemote[] srcDirFile = getSrcDstFileDir(false, this.widgSrcDir, this.widgSrcSelection);
       this.srcDir = srcDirFile[0]; 
       this.srcFile = srcDirFile[1];
-      this.widgDstFileModification.setText("");
+      if(this.widgDstFileModification !=null) { this.widgDstFileModification.setText(""); }
       getDstFileDir(FcmdCopyCmprDel.this.main.getLastSelectedFileCards()[1], false);
 
       /*
@@ -442,7 +442,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           setSrc[1] = null;                      // offering with "../*" illustrates, it is a directory with selection.
           if(listFileSrc.size() >1) {            // there are some more files immediately selected
             widgShowSrc.setText(srcFile.getPathChars().toString() + "*");  // it ends with "/*" means use the content of directory
-            widgShowMask.setText("?");
+            widgShowMask.setText("?!");
             newState = Estate.check;
           } else {
             widgShowSrc.setText(srcFile.getPathChars().toString() + "*");  // it ends with "/*" means use the content of directory
@@ -471,7 +471,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         } else {                                 // more as one files/dirs are marked, also the current
           widgShowSrc.setText(srcDir.getPathChars().toString() + "*");  // not ends with "/"
           if(!srcDir.isMarked(FileMark.select | FileMark.selectSomeInDir)) {
-            srcDir.resetMarked(FileMark.select | FileMark.selectSomeInDir);  // srcDir should be not marked, not to copy
+            srcDir.setMarked(FileMark.selectSomeInDir);  // srcDir should be not marked, not to copy
           }
           String sShowMask = widgShowMask.getText();
           if(listFileSrc.size() ==0) {
@@ -481,7 +481,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
             newState = Estate.check;
           }else {
             if(!sShowMask.startsWith("?")) {     // showMask: write a "?" for "selected" as first char.
-              widgShowMask.setText("?" + sShowMask);
+              widgShowMask.setText("?! " + sShowMask);
             }
             newState = Estate.checked;
           }
@@ -524,57 +524,58 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       
       this.dirDst = fromCard.currentDir();
       this.widgDstDir.setText( this.dirDst.getPathChars() ); 
-      FileRemote fileDst = fromCard.currentFile();
-      if(bSetFile) {
-        if(this.srcFile !=null) {              // on src any is selected, file or dir
-          if(this.srcFile.isDirectory()) {     // a single directory is selected as source
+      if(this.widgDstFileModification !=null) {  // it is null for compare window
+        FileRemote fileDst = fromCard.currentFile();
+        if(bSetFile) {
+          if(this.srcFile !=null) {              // on src any is selected, file or dir
+            if(this.srcFile.isDirectory()) {     // a single directory is selected as source
+              if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
+                this.widgDstFileModification.setText(this.srcFile.getName() + "/*");
+              } else if(fileDst.isDirectory()) {        // dst is a directory:
+                this.widgDstFileModification.setText(fileDst.getName() + "/" + this.srcFile.getName() + "/*");
+              } else {                           // dst is a file
+                this.widgDstFileModification.setText("*");
+              }
+            } else {                             // a single file is selected as source 
+              if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
+                this.widgDstFileModification.setText(this.srcFile.getName());
+              } else if(fileDst.isDirectory()) {        // dst is a directory:
+                this.widgDstFileModification.setText(fileDst.getName() + "/" + this.srcFile.getName());
+              } else {                           // dst is a file
+                this.widgDstFileModification.setText(fileDst.getName());
+              }
+            }
+          }
+          else { //-------------------------------- src is on ..
             if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
-              this.widgDstFileModification.setText(this.srcFile.getName() + "/*");
+              this.widgDstFileModification.setText("*");
             } else if(fileDst.isDirectory()) {        // dst is a directory:
-              this.widgDstFileModification.setText(fileDst.getName() + "/" + this.srcFile.getName() + "/*");
+              this.widgDstFileModification.setText(fileDst.getName() + "/*");
             } else {                           // dst is a file
               this.widgDstFileModification.setText("*");
             }
-          } else {                             // a single file is selected as source 
-            if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
+          }
+        } else { // ------------------------------- on activating the window or setSrc
+          if(this.srcFile !=null) {
+            if(this.srcFile.isDirectory()) { //------ directory selected
+              this.widgDstFileModification.setText(srcFile.getName() + "/**/*.*");  // not ends with "/"
+            } else {
               this.widgDstFileModification.setText(this.srcFile.getName());
-            } else if(fileDst.isDirectory()) {        // dst is a directory:
-              this.widgDstFileModification.setText(fileDst.getName() + "/" + this.srcFile.getName());
-            } else {                           // dst is a file
-              this.widgDstFileModification.setText(fileDst.getName());
             }
+          } else { //-------------------------------- .. is selected on src.
+            this.widgDstFileModification.setText("**/*.*");
           }
         }
-        else { //-------------------------------- src is on ..
-          if(fileDst == this.dirDst) {       // .. is selected, store in this directory:
-            this.widgDstFileModification.setText("*");
-          } else if(fileDst.isDirectory()) {        // dst is a directory:
-            this.widgDstFileModification.setText(fileDst.getName() + "/*");
-          } else {                           // dst is a file
-            this.widgDstFileModification.setText("*");
-          }
-        }
-      } else { // ------------------------------- on activating the window or setSrc
         if(this.srcFile !=null) {
-          if(this.srcFile.isDirectory()) { //------ directory selected
-            this.widgDstFileModification.setText(srcFile.getName() + "/**/*.*");  // not ends with "/"
-          } else {
-            this.widgDstFileModification.setText(this.srcFile.getName());
-          }
-        } else { //-------------------------------- .. is selected on src.
-          this.widgDstFileModification.setText("**/*.*");
+          
         }
+  //        if(dirFileDst.isDirectory()) {           // destination: a directory is selected:
+  //          this.widgDstDir.setText( dirFileDst.getPathChars().toString() + this.srcFile.getName() ); 
+  //        } else {
+  //          this.widgDstDir.setText( dirFileDst.getPathChars() ); 
+  //        }
       }
-      if(this.srcFile !=null) {
-        
-      }
-//        if(dirFileDst.isDirectory()) {           // destination: a directory is selected:
-//          this.widgDstDir.setText( dirFileDst.getPathChars().toString() + this.srcFile.getName() ); 
-//        } else {
-//          this.widgDstDir.setText( dirFileDst.getPathChars() ); 
-//        }
     }
-    
   }
   
   
@@ -594,6 +595,54 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     return mode;
   }
 
+  
+  protected boolean occupyProgress() {
+    if(this.progressEv.occupy(this.evSrc, true)) {
+      return true;
+    } else {
+      this.widgState.setText("event blocks - may pressing abort");
+      return false;
+    }
+  }
+  
+  
+  
+  protected void exec() {
+    if(FcmdCopyCmprDel.this.state == Estate.start || FcmdCopyCmprDel.this.state == Estate.check) { //widgg.sCmd.equals("check")){
+      FcmdCopyCmprDel.this.action.progressAction.clear();
+      if(occupyProgress()) {
+        if(FcmdCopyCmprDel.this.cmd == Ecmd.delete){
+          execCheck();
+        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.copy || FcmdCopyCmprDel.this.bFineSelect){
+          execCheck();
+        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.move){
+          execCheck();
+        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.compare){
+          execCompare();
+        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.search){
+          execSearch();
+        }
+      }
+    } else if(FcmdCopyCmprDel.this.state == Estate.checked || FcmdCopyCmprDel.this.state == Estate.ready) { //widgg.sCmd.equals("copy")) {
+      if(occupyProgress()) {
+        switch(FcmdCopyCmprDel.this.cmd){
+        case copy: execCopy(); break;
+        case move: execMove(); break;
+        case delete: execDel(); break;
+        case compare: execCompare(); break;
+        case search: execSearch(); break;
+        }//switch
+      }
+    } else if(FcmdCopyCmprDel.this.state == Estate.finit) { //widgg.sCmd.equals("close")){
+      closeWindow();
+    } else {
+        //should be state pause
+//          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+    }
+    
+  }
+  
+  
 
   /**Starts the execution of mark in another thread. Note that the mark works with the walk-file algorithm
    * and refreshes the files therewith. The #this.progress is used as callback.
@@ -611,23 +660,26 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //int depths = this.srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
     //long bMarkSelect = this.srcSomeFiles ? 0x200000000L + FileMark.select : 0;
     long bMarkSelect = 0;
-    if(sSrcMask.startsWith("?")) {                         // select mask: use mark bits:
-      for(int ix=1; ix < sSrcMask.length(); ++ix) {
-        char cs = sSrcMask.charAt(ix);
-        switch(cs) {                       // for file                  for directory
-        case '#': bMarkSelect |= FileMark.cmpContentNotEqual | FileMark.cmpFileDifferences; break;
-        case '+': bMarkSelect |= FileMark.cmpAlone           | FileMark.cmpMissingFiles;    break;
-        case '!': bMarkSelect |= FileMark.select             | FileMark.selectSomeInDir;    break;
-        }
+    int ix = 0;
+    boolean bCont = sSrcMask.startsWith("?");
+    while(bCont && ++ix < sSrcMask.length()) {
+      char cs = sSrcMask.charAt(ix);
+      switch(cs) {                       // for file                  for directory
+      case '#': bMarkSelect |= FileMark.cmpContentNotEqual | FileMark.cmpFileDifferences; break;
+      case '+': bMarkSelect |= FileMark.cmpAlone           | FileMark.cmpMissingFiles;    break;
+      case '!': bMarkSelect |= FileMark.select             | FileMark.selectSomeInDir;    break;
+      default: bCont = false;                  // ix refers the first char which is not ?#+!
       }
+    }
+    sSrcMask = sSrcMask.substring(ix).trim();
+    if(sSrcMask.isEmpty()) {
       sSrcMask = null;
-    } else if(sSrcMask.isEmpty()) {
-      sSrcMask = "**/*";
+      //sSrcMask = "**/*";
     }
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     this.action.progressAction.clear();
-    this.srcFile.refreshAndMark(false, 0, FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect
+    this.srcDir.refreshAndMark(false, 0, FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect
         , this.callbackFromFilesCheck, this.progressEv);
     this.widgCopyNameDst.setText(this.srcDir.getStateDevice());
     this.bFirstSelect = false;
@@ -694,7 +746,29 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         }
       } else {
         //======>>>>
-        execCopy(this.srcFile);                    // maybe the selected directory or a simple file
+        if(this.srcDir !=null) {
+          int selectMark = FileMark.select | FileMark.selectSomeInDir;
+          int resetMark = FileMark.resetMark + selectMark;
+          this.srcDir.copyDirTreeTo(false, this.dirDst, 0, resetMark, resetMark, null, selectMark, null, this.progressEv);
+        } else {
+          //TODO maybe evaluate
+          final String sName;
+          int posMask;
+          //if(this.fileDst !=null && this.fileDst.exists()) {
+          if(this.sFileMaskDst ==null || this.sFileMaskDst.equals("*")) {
+            sName = this.srcFile.getName();
+          } else if( (posMask = this.sFileMaskDst.indexOf("*."))>=0) {
+            String sNameSrc = this.srcFile.getName();
+            int posExt = sNameSrc.lastIndexOf('.');
+            if(posExt >0) { sNameSrc = sNameSrc.substring(0, posExt); }
+            sName = this.sFileMaskDst.substring(0, posMask) + sNameSrc + this.sFileMaskDst.substring(posMask+1);
+          } else {
+            sName = this.sFileMaskDst;
+          }
+          this.fileDst = this.dirDst.child(sName);
+
+          this.srcFile.copyTo(this.fileDst, null);
+        }
       }
     }
     setTexts(Estate.busy);
@@ -707,29 +781,6 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * @param filedir
    */
   final private void execCopy(FileRemote filedir) {
-    if(filedir.isDirectory()) {
-      int selectMark = FileMark.select | FileMark.selectSomeInDir;
-      int resetMark = FileMark.resetMark + selectMark;
-      filedir.copyDirTreeTo(false, this.dirDst, 0, resetMark, resetMark, null, selectMark, null, this.progressEv);
-    } else {
-      //TODO maybe evaluate
-      final String sName;
-      int posMask;
-      //if(this.fileDst !=null && this.fileDst.exists()) {
-      if(this.sFileMaskDst ==null || this.sFileMaskDst.equals("*")) {
-        sName = this.srcFile.getName();
-      } else if( (posMask = this.sFileMaskDst.indexOf("*."))>=0) {
-        String sNameSrc = this.srcFile.getName();
-        int posExt = sNameSrc.lastIndexOf('.');
-        if(posExt >0) { sNameSrc = sNameSrc.substring(0, posExt); }
-        sName = this.sFileMaskDst.substring(0, posMask) + sNameSrc + this.sFileMaskDst.substring(posMask+1);
-      } else {
-        sName = this.sFileMaskDst;
-      }
-      this.fileDst = this.dirDst.child(sName);
-
-      filedir.copyTo(this.fileDst, null);
-    }
   }
 
 
@@ -769,7 +820,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * and refreshes the files therewith. See {@link FileRemote#refreshAndCompare(FileRemote, int, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
    */
   final protected void execCompare(){
-    setDirFileDst();
+    //setDirFileDst();
     boolean bOk = true;
     //check whether the event is able to occupy, use it to check.
 //    if(evCallback.occupyRecall(100, evSrc, evConsumerCallbackFromFileMachine, null, true) == 0){
@@ -783,7 +834,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 //      evCallback.sendEvent(FileRemote.CallbackCmd.start);  //sends to myself for showing the state,
       //it is a check of sendEvent and it should relinguish the event.
       //====>
-      this.srcFile.cmprDirTreeTo(false, this.dirDst, sSrcMask, 0, this.progressEv);
+      if(this.srcDir !=null) {
+        this.srcDir.cmprDirTreeTo(false, this.dirDst, sSrcMask, 0, this.progressEv);
+      }
       //setTexts(Estate.busy);
     } else {
       this.widgCopyState.setText("evCallback hangs");
@@ -833,6 +886,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //bLockSrc = false;
     //widgButtonOk.setText("close");
     //widgButtonOk.setCmd("close");
+    this.progressEv.relinquish();
     setTexts(Estate.finit);
   }
 
@@ -1019,63 +1073,67 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.widgCopyDirDst.setText("?");
       this.widgCopyNameDst.setText("?");
     }
+    this.zFiles = order.nrofFilesSelected;
     if(order.done()) {
+      this.zBytes = order.nrofBytesAll;
       String sError = order.sError;
       if(sError !=null) {
-        this.widgCopyState.setText(sError);
+        u.append(sError);
         this.state = Estate.error;
+      } else if(order.answerToCmd == FileRemote.Cmd.walkSelectMark) {
+        u.append("checked");
+        this.state = Estate.checked;
       } else {
-        this.widgCopyState.setText("finish");
+        u.append("finish");
         this.state = Estate.finit;
       }
+      this.progressEv.relinquish();
+      this.progressEv.clean();
       setTexts(this.state);
       if(this.fileCardDst !=null) {
         this.fileCardDst.refresh();
       }
       //setTexts(Estate.finit);
     }
-
-
-    this.zFiles = order.nrofFilesSelected;
-    this.zBytes = order.nrofBytesFileCopied;
-    this.widgCopyState.setText("files:" + this.zFiles + ", size:" + this.zBytes);
-
-    if(order.progressCmd !=null) {
-      switch(order.progressCmd){
-        case askDstOverwr:
-          u.append("overwrite file? ");
-          this.widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
-          this.widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
-          break;
-        case askDstNotAbletoOverwr:
-          u.append("cannot overwrite file? ");
-          this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
-          break;
-        case askErrorCopy:
-          u.append("error copy? ");
-          this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
-          break;
-        case askErrorDstCreate:
-          u.append("cannot create? ");
-          this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
-          break;
-        case askDstReadonly:
-          u.append("overwrite readonly file? ");
-          this.widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
-          this.widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
-          break;
-        case askErrorSrcOpen:
-          u.append("cannot open sourcefile ");
-          this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
-          break;
-        case done:
-          u.append("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
-          setTexts(Estate.finit);
-          break;
-
+    else {
+      this.zBytes = order.nrofBytesFileCopied;
+      if(order.progressCmd !=null) {
+        switch(order.progressCmd){
+          case askDstOverwr:
+            u.append("overwrite file? ");
+            this.widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
+            this.widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
+            break;
+          case askDstNotAbletoOverwr:
+            u.append("cannot overwrite file? ");
+            this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+            break;
+          case askErrorCopy:
+            u.append("error copy? ");
+            this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+            break;
+          case askErrorDstCreate:
+            u.append("cannot create? ");
+            this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+            break;
+          case askDstReadonly:
+            u.append("overwrite readonly file? ");
+            this.widgOverwrFile.setBackColor(GralColor.getColor("lng"), 0);
+            this.widgSkipFile.setBackColor(GralColor.getColor("lgn"), 0);
+            break;
+          case askErrorSrcOpen:
+            u.append("cannot open sourcefile ");
+            this.widgSkipFile.setBackColor(GralColor.getColor("lrd"), 0);
+            break;
+          case done:
+            u.append("ok: "); // + ev1.nrofBytesInFile/1000000 + " M / " + ev1.nrofBytesAll + "M / " + ev1.nrofFiles + " Files");
+            setTexts(Estate.finit);
+            break;
+  
+        }
       }
     }
-    u.append("; Files:").append(Integer.toString(this.zFiles)).append(": ");
+    u.append("; Files:").append(Integer.toString(this.zFiles)).append(" Bytes: ").append(Long.toString(this.zBytes));
     this.widgCopyState.setText(u.toString());
   }
 
@@ -1194,7 +1252,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
      { //String sSrc, sDstName, sDstDir;
        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
          if(!FcmdCopyCmprDel.this.widgButtonCheck.isDisabled()){
-           execCheck();
+           if(occupyProgress()) {
+             execCheck();
+           }
          }
        }
        return true;
@@ -1409,35 +1469,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   protected GralUserAction actionButtonOk = new GralUserAction("actionButtonCopy")
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
-        if(FcmdCopyCmprDel.this.state == Estate.start) { //widgg.sCmd.equals("check")){
-          FcmdCopyCmprDel.this.action.progressAction.clear();
-          if(FcmdCopyCmprDel.this.cmd == Ecmd.delete){
-            execCheck();
-          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.copy || FcmdCopyCmprDel.this.bFineSelect){
-            execCheck();
-          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.move){
-            execCheck();
-          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.compare){
-            execCompare();
-          } else if(FcmdCopyCmprDel.this.cmd == Ecmd.search){
-            execSearch();
-          }
-        } else if(FcmdCopyCmprDel.this.state == Estate.checked || FcmdCopyCmprDel.this.state == Estate.ready) { //widgg.sCmd.equals("copy")) {
-          if(FcmdCopyCmprDel.this.state != Estate.finit) {
-            switch(FcmdCopyCmprDel.this.cmd){
-            case copy: execCopy(); break;
-            case move: execMove(); break;
-            case delete: execDel(); break;
-            case compare: execCompare(); break;
-            case search: execSearch(); break;
-          }//switch
-          } else if(FcmdCopyCmprDel.this.state == Estate.finit) { //widgg.sCmd.equals("close")){
-            closeWindow();
-          } else {
-            //should be state pause
-  //          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
-          }
-        }
+        FcmdCopyCmprDel.this.exec();
       }
       return true;
     }

@@ -94,15 +94,15 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)}
    * for all widgets in the {@link GralPanelContent#widgetsToResize}
    */
-  protected class ActionResizeOnePanel extends GralUserAction
+  protected class XXXActionResizeOnePanel extends GralUserAction
   {
-    ActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
+    XXXActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
     @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
     { for(GralWidget widgd: GralWindow.this.mainPanel.getWidgetsToResize()){
         if(widgd instanceof GralWindow) {
           System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
         } else {
-          widgd.gralMng()._mngImpl.resizeWidget(widgd, 0, 0);
+          widgd.gralMng()._mngImpl.resizeWidget(widgd, null);
         }
       }
       return true;
@@ -150,9 +150,9 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     super((GralPos)null, posString, nameWindow, 'w');
     this.dyda.displayedText = sTitle;  //maybe null
     this.windProps = windProps;
-    if((windProps & windResizeable)!=0){
-      this.resizeAction = new ActionResizeOnePanel();
-    }
+//    if((windProps & windResizeable)!=0){
+//      this.resizeAction = new ActionResizeOnePanel();
+//    }
 
   }
 
@@ -188,9 +188,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     this.mainPanel = new GralPanelContent(posPanel, sNamePanel, this.gralMng());
     //                                                     // A window has anytime only one GralPanel, the mainPanel.
     super.gralMng.registerWindow(this);
-    if((windProps & windResizeable)!=0){
-      this.resizeAction = new ActionResizeOnePanel();
-    }
+//  ^  }
     refPos.set(posPanel);                                  // at least: the refPos for further usage is the position on the whole panel.
 
   }
@@ -353,6 +351,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   public GralWidgetBase_ifc getFocusedWidget() { return this.mainPanel; }
 
 
+  public int windProps ( ) { return windProps; }
+  
 
   public void reportAllContent(Appendable out) {
     try {

@@ -1420,11 +1420,11 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     }
     //The last action, set the GuiThread
     synchronized(this){
-      this.awakeThread.start();                                     // Starts the timer wake up thread
+      this.awakeThread.start();                  // Starts the timer wake up thread
       this.bStarted = true;
-      this.notify();                                       // wake up the waiting calling thread.
+      this.notify();                             // wake up the waiting calling thread.
     }
-    this.checkTimes.init();                                // a checker for calculation time usage
+    this.checkTimes.init();                      // a checker for calculation time usage
     this.checkTimes.adjust();
     this.checkTimes.cyclTime();
     super.bThreadRun = true;
@@ -2128,9 +2128,9 @@ public GralButton addCheckButton(
    * @deprecated, use {@link #calcWidgetPosAndSizeSwt(GralPos, int, int)} because the parent is known in pos.
    */
   public GralRectangle calcWidgetPosAndSize(GralPos pos,
-    int widthParentPixel, int heightParentPixel,
+    GralRectangle parentPix,
     int widthWidgetNat, int heightWidgetNat
-  ){ return pos.calcWidgetPosAndSize(this.gralProps, widthParentPixel, heightParentPixel
+  ){ return pos.calcWidgetPosAndSize(this.gralProps, parentPix
                                     , widthWidgetNat, heightWidgetNat);
   }
 
@@ -2641,7 +2641,7 @@ public GralButton addCheckButton(
     /**Forces the resizing of the given widged.
      * @param widgd the widget
      */
-    protected abstract void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent);
+    protected abstract GralRectangle resizeWidget(GralWidget widgd, GralRectangle parentPix);
 
 
     /**Adds a sampling value set.
@@ -2858,11 +2858,11 @@ public GralButton addCheckButton(
     }
   }
 
-  @Override public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
+  @Override public void resizeWidget(GralWidget widgd, GralRectangle parentPix)
   {
     // TODO Auto-generated method stub
     if(this._mngImpl !=null) {
-      this._mngImpl.resizeWidget(widgd, xSizeParent, ySizeParent);
+      this._mngImpl.resizeWidget(widgd,parentPix);
     }
   }
 
@@ -2899,6 +2899,7 @@ public GralButton addCheckButton(
     public static final int setFocus = 1133;
 
     public static final int gralTable_updateCells = 1201;
+    public static final int gralTable_setFocusCell = 1202;
     public static final int gralFileSelector_fillin = 1211;
     public static final int gralFileSelector_fillinFinished = 1212;
     public static final int gralFileSelector_selectFavor = 1213;
@@ -2907,6 +2908,7 @@ public GralButton addCheckButton(
     public static final int gralFileSelector_ClickFile = 1216;
 
     public static final int evFocused = 1501;
+    public static final int panelFocused = 1502;
   }
 
 }

@@ -1,30 +1,23 @@
 package org.vishia.gral.swt;
 
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.io.IOException;
-import java.util.List;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
-import org.vishia.gral.ifc.GralColor;
-import org.vishia.gral.ifc.GralPrimaryWindow_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.Debugutil;
@@ -101,7 +94,8 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     } else {
       panelSwtImpl = panelSwt;
     }
-    panelSwt.addControlListener(resizeItemListener);
+    panelSwt.addControlListener(this.resizeItemListener);
+    panelSwt.addFocusListener(this.focusListener);
     super.createALlImplWidgets();
   }
 
@@ -112,7 +106,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   }*/
   
   
-  @Override public GralRectangle getPixelPositionSize(){ return SwtWidgetHelper.getPixelPositionSize((Composite)panelSwtImpl); }
+  @Override public GralRectangle getPixelPositionSize () { 
+    GralPos pos = this.widgg.pos();
+    return this.widgg.gralMng._mngImpl.calcWidgetPosAndSize(this.widgg.pos(), 600, 800);
+    
+    //return SwtWidgetHelper.getPixelPositionSize((Composite)panelSwtImpl); 
+  }
 
 
 
@@ -279,6 +278,22 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   }
   
 
+  
+  protected FocusListener focusListener = new FocusListener() {
+
+    @Override public void focusGained ( FocusEvent e ) {
+      SwtPanel.super.widgg.gralMng.log.sendMsg(GralMng.LogMsg.evFocused, "Panel focused %s", SwtPanel.super.widgg.toString());
+      
+    }
+
+    @Override public void focusLost ( FocusEvent e ) {
+      // TODO Auto-generated method stub
+      
+    }
+    
+  };
+  
+  
   protected ControlListener resizeItemListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
@@ -289,8 +304,10 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
       for(GralWidget widg1: ((GralPanelContent)gralPanel).getWidgetsToResize()){
+        
+        GralRectangle panelPix = getPixelPositionSize();
         if(widg1._wdgImpl !=null) {
-          widg1._wdgImpl.setPosBounds();
+          widg1._wdgImpl.setPosBounds(panelPix);
         } else {
           Debugutil.stop();
         }

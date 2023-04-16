@@ -497,7 +497,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       dxFrame = rectParent.width; dyFrame = rectParent.height;
     }
     */
-    final GralRectangle rectangle = gralMng.calcWidgetPosAndSize(posWindow, dxFrame, dyFrame, 400, 300);
+    final GralRectangle rectangle = gralMng.calcWidgetPosAndSize(posWindow, windowFrame, 400, 300);
     rectangle.x += windowFrame.x;
     rectangle.y += windowFrame.y;
     /*
@@ -568,7 +568,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   }
 
   @Override
-  public void resizeWidget(GralWidget widgd, int xSizeParent, int ySizeParent)
+  public GralRectangle resizeWidget(GralWidget widgd, GralRectangle parentPix)
   {
     Object owidg = widgd._wdgImpl.getWidgetImplementation();
     int test = 6;
@@ -576,10 +576,13 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       Component swtWidget = (Component)owidg;
       GralWidgetBase_ifc panel = widgd.pos().parent;
       GralRectangle size = panel.getImplAccess().getPixelPositionSize(); //PixelSize();
-      GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size.dx, size.dy, 0, 0);
+      GralRectangle posSize = gralMng.calcWidgetPosAndSize(widgd.pos(), size, 0, 0);
       //Note: the swtWidget may have a resizeListener, see there.
       swtWidget.setBounds(posSize.x, posSize.y, posSize.dx, posSize.dy );
       swtWidget.repaint();
+      return posSize;
+    } else {
+      return null;
     }
   }
 
@@ -606,30 +609,6 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   protected void setPosAndSize_(GralPos pos, Component component)
   { setPosAndSizeAwt(pos, component, 0,0);
   }  
-  
-  /**
-   * @param component
-   * @param widthwidgetNat
-   * @param heigthWidgetNat
-   *
-   * NOTE: 2015-07-13: This method is set to unused because it uses the mng-position additional to the constructor of GralWidget.
-   * This is the old concept which is in conflict with the usuage there.
-   */
-  protected void XXXsetPosAndSize_(Component component, int widthwidgetNat, int heigthWidgetNat)
-  {
-    gralMng.setNextPosition();
-    Component parentComp = component.getParent();
-    //Rectangle pos;
-    final GralRectangle rectangle;
-    if(parentComp == null){
-      rectangle = gralMng.calcWidgetPosAndSize(pos(), 800, 600, widthwidgetNat, heigthWidgetNat);
-    } else {
-      final Rectangle parentSize = parentComp.getBounds();
-      rectangle = gralMng.calcWidgetPosAndSize(pos(), parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
-    }
-    component.setBounds(rectangle.x, rectangle.y, rectangle.dx, rectangle.dy );
-       
-  }
   
 
   
@@ -671,7 +650,7 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
     Component parentComp = (Component)pos.parent.getImplAccess().getWidgetImplementation();
     //Rectangle pos;
-    final GralRectangle rectangle;
+    final GralRectangle parentPix;
     final Rectangle parentSize;
     if(parentComp == null){
       parentSize = new Rectangle(0,0,800, 600);
@@ -682,7 +661,8 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return pos.calcWidgetPosAndSize(gralMng.gralProps, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    parentPix = new GralRectangle(parentSize.x, parentSize.y, parentSize.width, parentSize.height);
+    return pos.calcWidgetPosAndSize(this.gralMng.gralProps, parentPix, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -704,7 +684,6 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   GralRectangle calcWidgetPosAndSizeAwt(GralPos pos, Component component, int widthwidgetNat, int heigthWidgetNat){
     Component parentComp = component.getParent();
     //Rectangle pos;
-    final GralRectangle rectangle;
     final Rectangle parentSize;
     if(parentComp == null){
       parentSize = new Rectangle(0,0,800, 600);
@@ -714,7 +693,8 @@ public class AwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    return gralMng.calcWidgetPosAndSize(pos, parentSize.width, parentSize.height, widthwidgetNat, heigthWidgetNat);
+    final GralRectangle parentPix = new GralRectangle(parentSize.x, parentSize.y, parentSize.width, parentSize.height);
+    return gralMng.calcWidgetPosAndSize(pos, parentPix, widthwidgetNat, heigthWidgetNat);
   }
   
 

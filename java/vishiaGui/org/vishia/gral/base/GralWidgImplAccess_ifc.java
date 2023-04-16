@@ -122,7 +122,7 @@ public interface GralWidgImplAccess_ifc
    * then this operation should care about the parts of the widget.
    * The position is gotten from the gral widget.
    */
-  void setPosBounds ( );
+  GralRectangle setPosBounds ( GralRectangle parentPix );
   
   
   GralRectangle getPixelPositionSize();

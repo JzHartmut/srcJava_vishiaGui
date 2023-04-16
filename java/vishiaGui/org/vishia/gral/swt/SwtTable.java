@@ -191,8 +191,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     setColorsSwt();
     int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
     this.cellsSwt = new Text[zLineVisibleMax][zColumn()];
-    int zColumn = zColumn();
-    Composite swtTable = new SwtTable.Table(parent, zColumn, mng);
+    int zColumn = zColumn();                               // tehe tables cells are assembled in an own Composite
+    Composite swtTable = new SwtTable.Table(parent, zColumn, mng);       // it is not a panel.
     //The background of the panel, which does not contain cells of Text:
     swtTable.setBackground(mng.getColorImpl(GralColor.getColor("pgr")));
     GralMenu[] contextMenuColumns = super.getContextMenuColumns();
@@ -677,8 +677,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           String sText = widgSwt.getText();
           SwtTable.this.checkAndUpdateText(sText, celldata);
         }
-        //System.out.println("SwtTableCell - focus lost;");
+        SwtTable.this.widgg.focused(false);                 // notes the focus lost to the GralWidget and its parents.
       }
+      System.out.println("SwtTableCell - focus lost;");
     }
 
     /**Focus listener implementation for all cells.
@@ -697,8 +698,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         SwtTable.this.focusGainedTable();
         setFocused(SwtTable.this.widgg, true);
         SwtTable.this.cellInFocus = (Text)ev.getSource();
+        SwtTable.this.widgg.focused(true);                 // notes the focus gained to the GralWidget and its parents.
       }
-      //System.out.println("SwtTableCell - focus gained;");
+      System.out.println("SwtTableCell - focus gained;");
     }
   };
 
@@ -803,7 +805,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
 
   /**The SWT-Composite for the cell texts and the scroll bar. */
-  private class Table extends Composite {
+  class Table extends Composite {
 
     public Table(Composite parent, int zColumns, SwtMng mng) {
       super(parent, 0);

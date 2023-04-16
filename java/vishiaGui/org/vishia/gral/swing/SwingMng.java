@@ -152,9 +152,9 @@ public class SwingMng  extends GralMng.ImplAccess {
     
   }
 
-  @Override protected void resizeWidget ( GralWidget widgd, int xSizeParent, int ySizeParent ) {
+  @Override protected GralRectangle resizeWidget ( GralWidget widgd, GralRectangle parentPix ) {
     // TODO Auto-generated method stub
-    
+    return null;
   }
 
   @Override protected void setSampleCurveViewY ( String sName, float[] values ) {

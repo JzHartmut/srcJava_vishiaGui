@@ -37,6 +37,7 @@ import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetBase;
+import org.vishia.gral.base.GralWidgetComposite;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMngBuild_ifc;
@@ -54,7 +55,6 @@ import org.vishia.util.IndexMultiTable;
 import org.vishia.util.KeyCode;
 import org.vishia.util.Removeable;
 import org.vishia.util.MarkMask_ifc;
-import org.vishia.util.SortedTreeWalkerCallback;
 import org.vishia.util.StringFunctions_B;
 
 /**This class is a large widget which contains a list to select files in a directory, 
@@ -77,7 +77,7 @@ import org.vishia.util.StringFunctions_B;
  * @author Hartmut Schorrig
  *
  */
-public class GralFileSelector extends GralWidgetBase implements Removeable //extends GralWidget
+public class GralFileSelector extends GralWidgetComposite implements Removeable //extends GralWidget
 {
   
   /**Version, history and copyright/copyleft.
@@ -688,7 +688,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       StringBuilder sLog = new StringBuilder(100);
       sLog.append("new GralFileSelector ");
       this.windFileSelector = windFileSelector;              // may be null if not an own window
-      GralPos refPos = thisf._wdgPos.clone().setAsFrame(); //panelMng.getPositionInPanel();
+      //GralPos refPos = thisf._wdgPos.clone().setAsFrame(); //panelMng.getPositionInPanel();
+      //refPos.setParent(thisf);
+      GralPos refPos = new GralPos(thisf);  //thisf._wdgPos);
+      refPos.setAsFrame();
       refPos.toString(sLog);
       panelMng.log.sendMsg(GralMng.LogMsg.ctorWdg, sLog);
       //GralWidgetBase_ifc panel = refPos.parent;
@@ -855,7 +858,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       , GralFileProperties wdgFileProperties
       )
   { //this.name = name; this.rows = rows; this.columns = columns; this.size = size;
-    super(refPosParent, posName, null);
+    super(refPosParent, posName, '&');
     this.gui = new Gui(this, windFileSelector, rows, columns, bWithFavor, sExecBtn, fileViewer, wdgFileProperties);
     this.fillinEv = new EventWithDst<FileRemoteProgressEvData, Payload>(name, this.evSrc, this.action.fillinCallback, null, new FileRemoteProgressEvData());
   }
@@ -2111,7 +2114,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * {@link #windSearch}
    *
    */
-  @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+  //@Override 
+  public boolean XXXcreateImplWidget_Gthread() throws IllegalStateException {
+    this._wdgImpl = this.pos().parent.getImplAccess();
     this.windSearch.windConfirmSearch.createImplWidget_Gthread();
     if(this.gui.widgSelectList.createImplWidget_Gthread()) {
       return true;
@@ -2125,7 +2130,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * This is a internal operation not intent to use by an application. 
    * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
    */
-  @Override public void removeImplWidget_Gthread() {
+  ///@Override 
+  public void XXXremoveImplWidget_Gthread() {
     this.gui.widgSelectList.removeImplWidget_Gthread();                     // recursively call of same
     this.gui.widgFavorTabs.removeImplWidget_Gthread();                     // recursively call of same
     this.gui.widgFavorTable.removeImplWidget_Gthread();                     // recursively call of same

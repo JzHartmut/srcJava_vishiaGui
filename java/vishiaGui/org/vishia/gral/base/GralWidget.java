@@ -523,6 +523,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * <li>^: A tabbed panel, for tab panels
    * <li>@: A Panel as tab of a tabbed panel
    * <li>$: Any Panel (composite)
+   * <li>&: A {@link GralWidgetComposite}
    * <li>+: A canvas panel
    * <li>*: A type (not a widget, common information) See {@link org.vishia.gral.cfg.GralCfgData#new_Type()}
    * <li>9: GralArea9Panel
@@ -810,8 +811,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   void registerWidget() {
     if(this._wdgPos.parent == this) {
       //don't register the panel itself!
-    } else if(this._wdgPos.parent !=null && this._wdgPos.parent instanceof GralPanelContent){
-      ((GralPanelContent)this._wdgPos.parent).addWidget(this, this._wdgPos.toResize());
+    } else if(this._wdgPos.parent !=null && this._wdgPos.parent instanceof GralWidgetComposite){
+      ((GralWidgetComposite)this._wdgPos.parent).addWidget(this, this._wdgPos.toResize());
     } else if(this._wdgPos ==null) {
       this._wdgPos.parent = this.gralMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
@@ -1824,12 +1825,13 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   { return this.itsCfgElement;
   }
 
+  
 
 
   /**Standard implementation. Override only if necessary for sepcial handling.
    * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
    */
-  public void setFocus ( ){ setFocus(0,0); }
+  @Override public void setFocus ( ){ setFocus(0,0); }
 
   /**The default implementation is empty.
    * It is valid for simple widgets which have not sub widgets.
@@ -2075,7 +2077,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
     /**Set the bounds of the widget from the stored GralPos.
      * It can be overridden for special widgets, for example for depending bounds from content.
      */
-    @Override public void setPosBounds ( ) {
+    @Override public GralRectangle setPosBounds ( GralRectangle parentPix ) {
       GralRectangle xyPix = this.mngImpl.calcWidgetPosAndSize(this.widgg.pos(), 600, 800);
       if(this.widgg instanceof GralPanelContent) {         // it may be a tab of a tabbed panel
         GralWidgetBase_ifc parent_ifc = this.widgg.pos().parent;    // its parent may be a tab folder
@@ -2092,6 +2094,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
       } //if check tab folder, pixelTab
       //
       setBoundsPixel(xyPix.x, xyPix.y, xyPix.dx, xyPix.dy ); //may be widget type specific, in its ImplAccess.
+      return xyPix;
     }
 
     /**Access to the GralMng from the implementation level.  */

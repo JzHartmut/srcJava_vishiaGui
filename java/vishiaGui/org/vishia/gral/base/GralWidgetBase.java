@@ -145,7 +145,17 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
 
   public abstract boolean setVisible(boolean visible);
   
-  
+  /**This operation can be called from the implementation graphic if the focus is gained for an implementation widget.
+   * It is also called for all parents of a widget if a child gets the focus.
+   * The specific widget implementation can override this operation to do specifics.
+   * It should call super.focused(bGained) to forward the focus to parents.
+   * @param bGained
+   */
+  @Override public void focused(boolean bGained) {
+    this._wdgPos.parent.focused(bGained);
+  }
+
+
   
 //  /**Standard implementation. Override only if necessary for sepcial handling.
 //   * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()

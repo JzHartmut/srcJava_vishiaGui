@@ -507,6 +507,19 @@ public class FcmdFileCard extends GralFileSelector
   
   
   
+  /**This operation can be called from the implementation graphic if the focus is gained for an implementation widget.
+   * It is also called for all parents of a widget if a child gets the focus.
+   * The specific widget implementation can override this operation to do specifics.
+   * It should call super.focused(bGained) to forward the focus to parents.
+   * @param bGained
+   */
+  @Override public void focused(boolean bGained) {
+    this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "FcmdFileCard focused: %s", super.name);
+    super.focused(bGained);
+  }
+
+  
+  
   
   /**Sets the panel which contains this File card as actual, adjust the order of actual file panels
    * and sets the color of the current line of table of all 3 current file panels to the 3-stage color
@@ -520,7 +533,7 @@ public class FcmdFileCard extends GralFileSelector
       this.main.currentFileCard = this;
       this.mainPanel.actFileCard = FcmdFileCard.this;
       this.main.setLastSelectedPanel(mainPanel);
-      //System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.label + "#" + this.wdgFavorCard.sActSelectedFavorPath);
+      System.out.println("setActFilePanel: " + this.sTabSelection + " =^ " + this.nameFilePanel + " : " + super.getCurrentDirPath());
       //System.out.println(Assert.stackInfo("FcmdFileCard - setActFilePanel_setColorLine;",10));
       int ixMainPanel = -1;
       for(FcmdLeftMidRightPanel panel: main.lastFilePanels){

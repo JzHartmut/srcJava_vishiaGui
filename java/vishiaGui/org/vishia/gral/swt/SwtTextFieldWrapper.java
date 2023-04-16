@@ -189,7 +189,8 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(textFieldSwt, swtMng);
 
     swtMng.gralMng.registerWidget(widgg);
-    setPosBounds();
+    GralRectangle parentPix = widgg.pos().parent.getImplAccess().getPixelPositionSize();
+    setPosBounds(parentPix);
     redrawGthread();
     
   }
@@ -374,12 +375,16 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   }
 
   @Override public void setBoundsPixel(int x, int y, int dx, int dy) { 
-    throw new IllegalStateException("should not called because setPosBounds() is overridden.");
-    //textFieldSwt.setBounds(x,y,dx,dy);
+    //throw new IllegalStateException("should not called because setPosBounds() is overridden.");
+    if(this.posPrompt ==null) {
+      this.textFieldSwt.setBounds(x,y,dx,dy);
+    } else {
+      Debugutil.stop();
+    }
   }
   
   
-  @Override public void setPosBounds ( ) {
+  @Override public GralRectangle setPosBounds ( GralRectangle parentPix ) {
     SwtMng swtMng = (SwtMng)super.mngImpl;
     if(posPrompt !=null) {
       GralRectangle boundsPrompt;
@@ -410,7 +415,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       
       
     }
-
+    return null;  //GralRectanvle pos))
   }
   
   
