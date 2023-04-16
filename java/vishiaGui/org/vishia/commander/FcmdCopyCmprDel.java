@@ -106,7 +106,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   GralButton widgOverwrFile, widgSkipFile, widgSkipDir, widgBtnPause;
 
 
-  GralButton widgState, widgButtonSetSrc, widgButtonSetDst, widgButtonCheck, widgButtonMove, widgBtnDstExec;
+  GralButton widgState, widgButtonSetSrc, widgButtonSetDst, widgButtonCheck, widgButtonMove, widgBtnExec;
 
   GralButton widgButtonClearSel, widgButtonShowSrc, widgButtonShowDst, widgButtonShowResult;
 
@@ -298,7 +298,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.widgdChoiceCreateNew.setBackColor(GralColor.getColor("lam"), 0);
     }
     //if(sBtnDstExec !=null) {
-      this.widgBtnDstExec = new GralButton(refPos, "@+0-3.5, -15..-1=BtnDstExec" + name, "exec-?", this.actionButtonOk);
+      this.widgBtnExec = new GralButton(refPos, "@+0-3.5, -15..-1=BtnExec-" + name, "exec-?", this.actionButtonOk);
     //}
 
     //field for showing the current action or state, not for input:
@@ -385,13 +385,13 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.zFiles = 0; this.zBytes = 0;
     }
     this.windConfirmCopy.setVisible(true);
-    this.widgBtnDstExec.setFocus(); //PrimaryWidgetOfPanel();
+    this.widgBtnExec.setFocus(); //PrimaryWidgetOfPanel();
     this.main.gui.gralMng.setHelpUrl(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp." + this.helpPrefix + ".");
   }
 
 
   protected void closeWindow ( ){
-    this.widgBtnDstExec.setText("close");
+    this.widgBtnExec.setText("close");
     //widgButtonOk.setCmd("close");
     this.filesToCopy.clear();
 //    listEvCheck.clear();
@@ -607,6 +607,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   
   
   
+  /**Operation associated to the Ok or Exec key: {@link #widgBtnExec} associated to its {@link #actionButtonOk}.
+   * It executes the operation set by construction (via {@link #cmd} and depending from {@link #state}.
+   * It calls {@link #execCheck()} if the state is {@link Estate#start} or {@link Estate#check}.
+   * It closes the window on state {@link Estate#finit}.
+   */
   protected void exec() {
     if(FcmdCopyCmprDel.this.state == Estate.start || FcmdCopyCmprDel.this.state == Estate.check) { //widgg.sCmd.equals("check")){
       FcmdCopyCmprDel.this.action.progressAction.clear();
@@ -651,7 +656,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   final void execCheck(){
     setTexts(Estate.busyCheck);
     this.widgCopyState.setText("busy-check");
-    this.widgBtnDstExec.setText("busy-check");
+    this.widgBtnExec.setText("busy-check");
     this.widgButtonCheck.setState(GralButton.State.Disabled);
     this.widgButtonEsc.setText("abort");
     String sSrcMask= this.widgSrcSelection.getText();
@@ -722,7 +727,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    */
   final protected void execCopy(){
     this.widgCopyState.setText("busy-copy");
-    this.widgBtnDstExec.setText("busy-copy");
+    this.widgBtnExec.setText("busy-copy");
     this.widgButtonEsc.setText("abort");
     String sDst = this.widgDstDir.getText();
     String[] sDstFileMaskRet = new String[1];
@@ -1021,7 +1026,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       default: setSrcPossible = true; checkDisable = GralButton.State.On; ix2=0;
     }
     String sTextBtnOk = this.state.sBtnOk[ix1];
-    this.widgBtnDstExec.setText(sTextBtnOk);
+    this.widgBtnExec.setText(sTextBtnOk);
     //String sTextSrc = textSrc[bLockSrc? 1: 0][ix2];
     //widgButtonCheck.setText(sTextSrc);
     if(widgButtonCheck !=null) { this.widgButtonCheck.setState(checkDisable); }
@@ -1619,10 +1624,10 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     if(nrofPendingFiles == 0){
       if(!ok){
         this.widgCopyState.setText("error");
-        this.widgBtnDstExec.setText("quit");
+        this.widgBtnExec.setText("quit");
         //widgButtonOk.setCmd("quit");
       } else {
-        this.widgBtnDstExec.setText("close");
+        this.widgBtnExec.setText("close");
         //widgButtonOk.setCmd("close");
       }
       this.widgButtonEsc.setText("close");

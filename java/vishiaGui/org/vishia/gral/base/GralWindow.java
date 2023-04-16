@@ -29,6 +29,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-04-16 Hartmut chg: resizing is done via {@link GralWidgComposite#resizeWidgets(GralRectangle)}.
    * <li>2016-09-23 Hartmut chg: {@link #create(String, char, LogMessage, GralGraphicOrder)} now needs an obligate argument which can be null
    *   for the first callback routine for graphic initializing.
    * <li>2016-09-18 Hartmut chg: renaming {@link #specifyActionOnCloseWindow(GralUserAction)} instead 'setActionOnSettingInvisible', more expressive name.
@@ -90,36 +91,12 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   @SuppressWarnings("hiding")
   public static final String version = "2016-08-28";
 
-  /**Standard action for resizing, used if the window contains one panel.
-   * It calls {@link GralMng_ifc#resizeWidget(GralWidget, int, int)}
-   * for all widgets in the {@link GralPanelContent#widgetsToResize}
-   */
-  protected class XXXActionResizeOnePanel extends GralUserAction
-  {
-    XXXActionResizeOnePanel(){ super("actionResizeOnePanel - window: " + GralWindow.this.name); }
-    @Override public boolean exec(int keyCode, GralWidget_ifc widgi, Object... params)
-    { for(GralWidget widgd: GralWindow.this.mainPanel.getWidgetsToResize()){
-        if(widgd instanceof GralWindow) {
-          System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
-        } else {
-          widgd.gralMng()._mngImpl.resizeWidget(widgd, null);
-        }
-      }
-      return true;
-    }
-  };
 
   /**Or of some wind... constants.
    */
   int windProps;
 
   public GralPanelContent mainPanel;
-
-  /**This action is called whenever the window is resized by user handling on GUI
-   * and the window is determined as {@link GralWindow_ifc#windResizeable}.
-   * Per default an instance of {@link ActionResizeOnePanel} is called.
-   * See {@link GralWindow_ifc#setResizeAction(GralUserAction)}. */
-  protected GralUserAction resizeAction;
 
   protected GralUserAction actionOnCloseWindow;
 
@@ -133,7 +110,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
   /**State of visible, fullScreen, close set by {@link #setVisible(boolean)}, {@link #setFullScreen(boolean)},
    * {@link #closeWindow()} called in another thread than the graphic thread. It is stored here
    * and executed in the {@link GralWidgImplAccess_ifc#redrawGthread()}. */
-  protected boolean XXXbVisible, bFullScreen, bShouldClose;
+  protected boolean bFullScreen, bShouldClose;
 
 
 
@@ -170,7 +147,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    */
   public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
-    super(refPos.setParent(gralMng.screen), posName, 'w', gralMng);
+    super(refPos.setParent(gralMng.screen), posName, 'w', gralMng, true);
     int lenNameWindow = super.name.length();
     final String sNamePanel;
     final String sTitleDefault;
@@ -314,12 +291,6 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
 
 
-  @Override
-  public void setResizeAction(GralUserAction action)
-  { this.resizeAction = action;
-    //repaint(repaintDelay, repaintDelayMax);
-  }
-
 
 
   @Override
@@ -440,9 +411,6 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     public boolean isFullScreen(){ return this.gralWindow.bFullScreen; }
 
     public boolean shouldClose(){ return this.gralWindow.bShouldClose; }
-
-    /**The resizeAction from the {@link GralWindow_ifc#setResizeAction(GralUserAction)} */
-    public GralUserAction resizeAction(){ return this.gralWindow.resizeAction; }
 
     /**The mouseAction from the {@link GralWindow_ifc#setMouseAction(GralUserAction)} */
     public GralUserAction mouseAction(){ return this.gralWindow.mouseAction; }

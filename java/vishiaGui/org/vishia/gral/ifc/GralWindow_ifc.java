@@ -90,12 +90,6 @@ public interface GralWindow_ifc extends GralWindow_getifc, GralWindow_setifc, Gr
   static final int windIsMain =  1 ;
   
   
-  /**Sets an action which is invoked if the whole window is resized by user handling on the window borders.
-   * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
-   *   without parameter.
-   */
-  public abstract void setResizeAction(GralUserAction action);
-  
   /**Sets an action which is invoked if any mouse button is pressed in the windows area on the screen.
    * @param action The {@link GralUserAction#userActionGui(int, GralWidget, Object...)} will be called
    *   with parameter key: The mouse key. params[0]: Instance of {@link GralRectangle} with mouse coordinates.

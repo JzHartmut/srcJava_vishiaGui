@@ -6,6 +6,7 @@ import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.impl_ifc.GralWidgetImpl_ifc;
 
 /**Abstraction of an {@link GralPanelContent} which may also the whole display
@@ -19,7 +20,7 @@ public interface GralPanel_ifc extends GralWidget_ifc {
   
   GralWidget getPanelWidget();
   
-  List<GralWidget> getWidgetList();
+  List<GralWidgetBase> getWidgetList();
   
   GralPos pos();
   

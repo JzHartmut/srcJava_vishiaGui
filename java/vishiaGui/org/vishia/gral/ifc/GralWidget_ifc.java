@@ -56,7 +56,7 @@ import org.vishia.util.Removeable;
  * @author Hartmut Schorrig
  *
  */
-public interface GralWidget_ifc extends Removeable, GralWidgetBase_ifc
+public interface GralWidget_ifc extends GralWidgetBase_ifc
 {
   
   /**Version, history and license.

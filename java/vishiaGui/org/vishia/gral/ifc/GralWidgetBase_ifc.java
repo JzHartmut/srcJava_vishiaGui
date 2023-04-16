@@ -3,6 +3,7 @@ package org.vishia.gral.ifc;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.util.Removeable;
 
 /**This is the basic interface of all widgets. 
  * It is especially important for comprehensive widgets which are not derived from {@link org.vishia.gral.base.GralWidget}
@@ -13,7 +14,7 @@ import org.vishia.gral.base.GralWidget;
  * @author hartmut
  *
  */
-public interface GralWidgetBase_ifc {
+public interface GralWidgetBase_ifc extends Removeable {
 
   /**Access to the name of the widget. But you can also access the final public {@link org.vishia.gral.base.GralWidgetBase#name} immediately.
    * @return the name

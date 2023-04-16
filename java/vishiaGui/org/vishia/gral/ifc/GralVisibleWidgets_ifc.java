@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Queue;
 
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 
 /**This interface should be implemented by all classes, which presents some Graphical Panels,
  * which may be visible or not. Especially it is for {@link GralTabbedPanel}, which shows only one Tab
@@ -47,7 +48,7 @@ public interface GralVisibleWidgets_ifc
   /**Gets the list of all widgets which are visible yet and should be updated with values therefore. 
    * @return The list.
    */
-  List<GralWidget> getWidgetsVisible();
+  List<GralWidgetBase> getWidgetsVisible();
   
   
 }

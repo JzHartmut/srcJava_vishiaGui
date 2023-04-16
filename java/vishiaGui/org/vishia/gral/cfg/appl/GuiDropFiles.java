@@ -17,6 +17,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralUserAction;
@@ -189,7 +190,7 @@ public class GuiDropFiles {
       logTextbox(exc.getMessage());
     }
     //assign button to subroutines
-    for(GralWidget wdg: gralMng.getWidgetIter()) {
+    for(GralWidgetBase wdg: gralMng.getWidgetIter()) {
       if(wdg instanceof GralButton) {
         String name = wdg.getName();
         if(this.systemButtons.get(name) == null && !name.endsWith("<")) {
@@ -248,12 +249,12 @@ public class GuiDropFiles {
     if(jzSub.formalArgs !=null) {
       for(JZtxtcmdScript.DefVariable arg :jzSub.formalArgs){
         String name1 = arg.getVariableIdent();
-        GralWidget wdg = this.gralMng.getWidget(name1);
+        GralWidgetBase wdg = this.gralMng.getWidget(name1);
         String val = "??";
-        if(wdg ==null) {
+        if(!(wdg instanceof GralWidget)) {
           this.logTextbox("error arg "+ name1 + "not found as textfield");
         } else {
-          val = wdg.getText();
+          val = ((GralWidget)wdg).getText();
         }
         DataAccess.Variable<Object> var = new DataAccess.Variable<Object>('S', name1, val, true);
         args.add(var);

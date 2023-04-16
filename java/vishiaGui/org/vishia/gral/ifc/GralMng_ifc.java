@@ -9,6 +9,7 @@ import org.vishia.gral.base.GralGridProperties;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.msgDispatch.LogMessage;
 
 
@@ -104,14 +105,14 @@ import org.vishia.msgDispatch.LogMessage;
    * @param name The name which is assigned on build.
    * @return null if the widget is not found.
    */
-  GralWidget getWidget(String name);
+  GralWidgetBase getWidget(String name);
   
 	/**Returns the list of all widgets with its informations. 
 	 * The graphical representation of the widgets is unknown here.
 	 * If it should be used, the graphic implementation should be known
 	 * and a adequate instanceof-test and cast is necessary. 
 	 */
-	@Deprecated List<GralWidget> getListCurrWidgets();
+	@Deprecated List<GralWidgetBase> getListCurrWidgets();
 	
 	
 	

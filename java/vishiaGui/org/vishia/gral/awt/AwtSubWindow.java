@@ -375,11 +375,7 @@ public class AwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
     @Override public void componentResized(ComponentEvent e)
     {
       System.out.println("AwtWindow: component resized");
-      { if(resizeAction() !=null){
-          resizeAction().exec(0, AwtSubWindow.super.gralWindow);
-        }
-      }
-
+      //invoke resize see swt.
     }
     
     

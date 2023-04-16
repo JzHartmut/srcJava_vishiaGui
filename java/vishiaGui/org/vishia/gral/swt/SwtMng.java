@@ -2,6 +2,8 @@ package org.vishia.gral.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -52,7 +54,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWidgetComposite;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
@@ -220,8 +222,17 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   
   
   
-  public static Composite getSwtParent ( GralPos pos) {
-    return (Composite)getSwtImpl(pos.parent);
+  /**This operation is similar {@link #getWidgetsPanel(GralWidget)}
+   * @param pos
+   * @return
+   */
+  @Deprecated public static Composite getSwtParent ( GralPos pos) {
+    GralWidgetBase_ifc parent = pos.parent;
+    while(parent !=null && !(parent instanceof GralWidget)) {
+      parent = parent.pos().parent;               // loop if the parent is a simple GralWidgetBase without implementation
+    }     
+    //return ((Composite)parent.getImplAccess().getWidgetImplementation()); 
+    return (Composite)getSwtImpl(parent);
   }
   
   
@@ -408,10 +419,14 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     //return ((Composite)pos().parent.getImplAccess().getWidgetImplementation()); 
   }
 
-  public Composite getWidgetsPanel(GralWidget widg){ 
-    GralPos pos = widg.pos();
-    if(pos == null) { pos = pos(); } //from GralMng
-    return ((Composite)pos.parent.getImplAccess().getWidgetImplementation()); 
+  public static Composite getWidgetsPanel(GralWidget widg){ 
+    GralWidgetBase_ifc parent = widg;
+    do {
+      parent = parent.pos().parent;
+    } while(parent !=null && !(parent instanceof GralWidget));    // loop if the parent is a simple GralWidgetBase without implementation
+    return (Composite)getSwtImpl(parent);
+
+    //return ((Composite)parent.getImplAccess().getWidgetImplementation()); 
   }
 
   
@@ -482,10 +497,10 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
       wdga = new SwtCurveView(widgp, this); 
       
     }
-    else if(widgg instanceof GralWidgetComposite) {   // a composite widget which is not a panel
-      widgg._wdgImpl = widgg.pos().parent.getImplAccess(); // has not an own Swt composite, uses from the panel.
-      wdga = null;
-    }
+//    else if(widgg instanceof GralWidgetComposite) {   // a composite widget which is not a panel
+//      widgg._wdgImpl = widgg.pos().parent.getImplAccess(); // has not an own Swt composite, uses from the panel.
+//      wdga = null;
+//    }
     else {
       throw new IllegalArgumentException("missing Widget type: " + widgg.toString());
     }
@@ -793,9 +808,17 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
    */
   @Override public GralRectangle calcWidgetPosAndSize(GralPos pos, int widthwidgetNat, int heigthWidgetNat){
     
-    Object oParent = pos.parent.getImplAccess().getWidgetImplementation();
-    Composite parentComp = (Composite) oParent; //((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite; //(Composite)pos().panel.getPanelImpl();
-    //Rectangle pos;
+//    Object oParent = pos.parent.getImplAccess().getWidgetImplementation();
+//    Composite parentComp = (Composite) oParent; //((SwtPanel)(pos().panel.getWidgetImplementation())).panelComposite; //(Composite)pos().panel.getPanelImpl();
+    List<GralPos> listPos = new LinkedList<GralPos>();
+    GralWidgetBase_ifc parent = pos.parent;
+    listPos.add(pos);
+    while(parent !=null && !(parent instanceof GralWidget)) {
+      listPos.add(0, parent.pos());
+      parent = parent.pos().parent;               // loop if the parent is a simple GralWidgetBase without implementation
+    }     
+    //return ((Composite)parent.getImplAccess().getWidgetImplementation()); 
+    Composite parentComp =  (Composite)getSwtImpl(parent);
     final Rectangle parentSize;
     if(parentComp == null){
       parentSize = new Rectangle(0,0,800, 600);
@@ -804,9 +827,12 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     } else {
       parentSize = parentComp.getBounds();
     }
-    GralRectangle parentPix = new GralRectangle(parentSize.x, parentSize.y, parentSize.width, parentSize.height);
-
-    return pos.calcWidgetPosAndSize(this.gralMng.gralProps, parentPix, widthwidgetNat, heigthWidgetNat);
+    GralRectangle pix = new GralRectangle(parentSize.x, parentSize.y, parentSize.width, parentSize.height);
+    for(GralPos pos2: listPos) {
+      pix = pos2.calcWidgetPosAndSize(parent.gralMng().gralProps, pix, 800, 600);
+    }
+    return pix;
+    //return pos.calcWidgetPosAndSize(this.gralMng.gralProps, parentPix, widthwidgetNat, heigthWidgetNat);
   }
   
   
@@ -998,7 +1024,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	
 	@Override public GralWidget addFocusAction(String sName, GralUserAction action, String sCmdEnter, String sCmdRelease)
 	{
-    GralWidget widget = indexNameWidgets(sName);
+    GralWidget widget = (GralWidget)indexNameWidgets(sName);
   	if(widget == null || widget._wdgImpl ==null || !(widget._wdgImpl.getWidgetImplementation() instanceof Control)){
   		gralMng.log.sendMsg(0, "GuiMainDialog:addClickAction: unknown widget %s", sName);
   	} else {
@@ -1094,7 +1120,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 
 	@Override
 	public void setSampleCurveViewY(String sName, float[] values) {
-		GralWidget descr = indexNameWidgets(sName);
+		GralWidget descr = (GralWidget)indexNameWidgets(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	}
@@ -1104,7 +1130,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
 	
 	@Override public void redrawWidget(String sName)
 	{
-		GralWidget descr = indexNameWidgets(sName);
+		GralWidget descr = (GralWidget)indexNameWidgets(sName);
 		if(descr == null){
   		//log.sendMsg(0, "GuiMainDialog:setSampleCurveViewY: unknown widget %s", sName);
   	} else {

@@ -273,9 +273,9 @@ public class ViewCfg //extends GuiCfg
     this.oamShowValues = new OamShowValues(this.logCfg, this.gralMng, cargs.argClassEvalRcvValues);
     //oamOutValues = new OamOutFileReader(cargs.sFileOamValues, cargs.sFileOamUcell, gui, oamShowValues);
     
-    GralWidget btnCurveView = gralMng.getWidget("curveWindow");
+    GralWidget btnCurveView = (GralWidget)gralMng.getWidget("curveWindow");
     if(btnCurveView !=null && btnCurveView instanceof GralButton) {
-      GralWidget gralwidgetCurveView = gralMng.getWidget("userCurves");
+      GralWidget gralwidgetCurveView = (GralWidget)gralMng.getWidget("userCurves");
       final GralCurveView.CommonCurve commonCurve; 
       final TimedValues tracksValues;
       if(gralwidgetCurveView !=null) {
@@ -292,7 +292,7 @@ public class ViewCfg //extends GuiCfg
     } else {
       //TDOD this.curveView = null;
     }
-    GralWidget wdgbtnOnOff = gralMng.getWidget("btnOnOff");
+    GralWidget wdgbtnOnOff = (GralWidget)gralMng.getWidget("btnOnOff");
     this.wdgbtnOnOff = wdgbtnOnOff instanceof GralButton ? (GralButton) wdgbtnOnOff : null;
     this.window.reportAllContent(this.logCfg);
     this.logCfg.flush();
@@ -334,7 +334,7 @@ public class ViewCfg //extends GuiCfg
       System.err.println("error oamShowValues.readVariableCfg()");
     }
     
-    GralWidget curveView = this.gralMng.getWidget("userCurves");
+    GralWidget curveView = (GralWidget)this.gralMng.getWidget("userCurves");
     if(curveView !=null && curveView instanceof GralCurveView) {
       this.oamShowValues.setCurveView((GralCurveView)curveView);
     }

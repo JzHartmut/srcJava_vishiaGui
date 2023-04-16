@@ -187,6 +187,9 @@ public class GralPos extends ObjectVishia implements Cloneable
 {
   /**Version, history and license.
    * <ul>
+   * <li>2023-04-16 chg: {@link #calcWidgetPosAndSize(GralGridProperties, GralRectangle, int, int)} now uses {@link GralRectangle} for the parent.
+   *   It is supported that the parent is any pixel region on the environment panel, not the whole panel. 
+   *   This is necessary for real {@link GralWidgComposite} without an own panel.  
    * <li>2023-01-30 chg: {@link #set10Position(int, int, int, int, char, int, GralPos)} now instead setFinePositon(...),
    *   this is a explicitly different name to the old concept with two values for grid and fine grid position.
    *   Designation of some operations as deprecated, comment some stuff.

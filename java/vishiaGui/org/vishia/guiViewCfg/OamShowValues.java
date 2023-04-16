@@ -27,6 +27,7 @@ import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralSetValue_ifc;
@@ -291,8 +292,8 @@ public class OamShowValues
     //TEST TODO:
     //accessOamVariable.setFloat("ctrl/energyLoadCapac2Diff", checkWithoutNewdata);
     //current panel:
-    List<GralWidget> listWidgets = this.gralMng.getListCurrWidgets();
-    for(GralWidget widgetInfo : listWidgets){
+    List<GralWidgetBase> listWidgets = this.gralMng.getListCurrWidgets();
+    for(GralWidgetBase widgetInfo : listWidgets){
       @SuppressWarnings("unused")
       String sName = widgetInfo.name;
     }
@@ -349,14 +350,14 @@ public class OamShowValues
         //other format
         sValue = "?type=" + varType;
       }
-      GralWidget widg = this.gralMng.getWidget(sName);  
-      widg.setText(sValue);
+      GralWidgetBase widg = this.gralMng.getWidget(sName);  
+      ((GralWidget)widg).setText(sValue);
       //guiAccess.setText(sName, sValue);
       long timeLastRefresh = variable.getLastRefreshTime();
       if( (this.timeNow - timeLastRefresh) < this.milliSecondsOk){
-        widg.setBackColor(this.colorBackValueOk, 0);
+        ((GralWidget)widg).setBackColor(this.colorBackValueOk, 0);
       } else {
-        widg.setBackColor(this.colorBackValueOld, 0);
+        ((GralWidget)widg).setBackColor(this.colorBackValueOld, 0);
       }
     }
     
@@ -382,8 +383,8 @@ public class OamShowValues
       //GralWidget widgdRemove = null;
       try{
         for(GralVisibleWidgets_ifc panel: listPanels){
-          List<GralWidget> widgetsVisible = panel.getWidgetsVisible();
-          if(widgetsVisible !=null) for(GralWidget widget: widgetsVisible){
+          List<GralWidgetBase> widgetsVisible = panel.getWidgetsVisible();
+          if(widgetsVisible !=null) for(GralWidgetBase widget: widgetsVisible){
             if(widget instanceof GralCurveView){
               GralCurveView curve = (GralCurveView)widget;
               curve.bActive = true;
@@ -404,9 +405,9 @@ public class OamShowValues
 //                values[++ixValues] = value;
 //              }
 //              curve.setSample(values, (int)timeMilliSecFromBaseyear);
-            } else {
+            } else if(widget instanceof GralWidget){
               //Note: the variable is assigned from container only once, no effort
-              widget.refreshFromVariable(this.accessOamVariable);  
+              ((GralWidget)widget).refreshFromVariable(this.accessOamVariable);  
             }
           }
         }

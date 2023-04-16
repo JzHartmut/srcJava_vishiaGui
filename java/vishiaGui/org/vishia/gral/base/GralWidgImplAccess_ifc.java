@@ -25,9 +25,10 @@ public interface GralWidgImplAccess_ifc
   
   /**Version, history and license .
    * <ul>
+   * <li>2023-04-16 {@link #setPosBounds(GralRectangle)} with GralRectangle for composite widgets.
    * <li>2022-01-29 Hartmut add: {@link #updateValuesForAction()} used for GralTextField
    *   for cursor positions. 
-   * <li>2031-06-20 Hartmut Creation. 
+   * <li>2013-06-20 Hartmut Creation. 
    * </ul>
    * 
    * <b>Copyright/Copyleft</b>:
@@ -106,7 +107,8 @@ public interface GralWidgImplAccess_ifc
    * */
   Object getWidgetImplementation();
   
-  /**This is called especially on resize from the panel, but also on creation for comprehensive widgets.
+  /**Set the bounds of the implementation widget.
+   * This is called especially on resize from the panel, but also on creation for comprehensive widgets.
    * If the widget is more comprehensive, consist of more basic widgets,
    * then this operation should care about the parts of the widget.
    * @param x
@@ -117,10 +119,9 @@ public interface GralWidgImplAccess_ifc
   void setBoundsPixel(int x, int y, int dx, int dy);
  
   
-  /**This is called especially on resize from the panel, but also on creation for comprehensive widgets.
-   * If the widget is more comprehensive, consist of more basic widgets,
-   * then this operation should care about the parts of the widget.
-   * The position is gotten from the gral widget.
+  /**Set the bounds of a widget using the {@link GralWidgetBase#pos()} coordinates and the pixels from a parent.
+   * @param parentPix the bounds of a parent. It is not necessary that this is the bounds of an existing panel.
+   *   Also a sub region in a panel can be described with it, used for {@link GralWidgComposite}.  
    */
   GralRectangle setPosBounds ( GralRectangle parentPix );
   

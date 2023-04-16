@@ -137,7 +137,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     if(widgg.name !=null && widgg.name.startsWith("showSrc"))
       Debugutil.stop();
     this.bbox = bbox;
-    Composite panelSwt = SwtMng.getSwtParent(widgg.pos()); //    mng.getCurrentPanel();
+    Composite panelSwt = SwtMng.getWidgetsPanel(widgg);
     //in ctor: setPanelMng(mng);
     //Text widgetSwt;
     //
@@ -189,8 +189,10 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     super.wdgimpl = swtWidgHelper = new SwtWidgetHelper(textFieldSwt, swtMng);
 
     swtMng.gralMng.registerWidget(widgg);
-    GralRectangle parentPix = widgg.pos().parent.getImplAccess().getPixelPositionSize();
-    setPosBounds(parentPix);
+    //GralRectangle parentPix = SwtMng.  //widgg.pos().parent.getImplAccess().getPixelPositionSize();
+    GralRectangle pix = this.mngImpl.calcWidgetPosAndSize(this.widgg.pos(), 800, 600);
+    setBoundsPixel(pix.x, pix.y, pix.dx, pix.dy);
+    //setPosBounds(parentPix);
     redrawGthread();
     
   }
@@ -378,8 +380,15 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     //throw new IllegalStateException("should not called because setPosBounds() is overridden.");
     if(this.posPrompt ==null) {
       this.textFieldSwt.setBounds(x,y,dx,dy);
-    } else {
-      Debugutil.stop();
+    } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
+      int yPrompt = dy / 3 +1;
+      int yText = dy - yPrompt;
+      if(yPrompt < 7) { yPrompt = 7; }
+      this.promptSwt.setBounds(x, y, dx, yPrompt);
+      this.textFieldSwt.setBounds(x, y + dy - yPrompt, dx, dy - yPrompt);
+    } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
+      this.promptSwt.setBounds(x, y + dy, dx, dy);
+      this.textFieldSwt.setBounds(x, y, dx, dy);
     }
   }
   
@@ -396,25 +405,25 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       promptSwt.setBounds(boundsPrompt.x, boundsPrompt.y, boundsPrompt.dx, boundsPrompt.dy+1);
     }
     swtMng.setPosAndSizeSwt(posField,textFieldSwt, 800, 600);
-    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
-      Rectangle swtField = textFieldSwt.getBounds();
-      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
-      float hight = widgg.pos().height();
-      final Font promptFont;
-      if(hight <2.0){
-        promptFont = swtMng.propertiesGuiSwt.smallPromptFont;  
-      } else { 
-        promptFont = swtMng.propertiesGuiSwt.stdInputFont;  
-      }
-      promptSwt = new SwtTransparentLabel(swtMng.getCurrentPanel(), SWT.TRANSPARENT);
-      promptSwt.setFont(promptFont);
-      promptSwt.setText(prompt());
-      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-      swtPrompt.width = promptSize.x;
-      promptSwt.setBounds(swtPrompt);
-      
-      
-    }
+//    if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
+//      Rectangle swtField = textFieldSwt.getBounds();
+//      Rectangle swtPrompt = new Rectangle(swtField.x + swtField.width, swtField.y, 0, swtField.height);
+//      float hight = widgg.pos().height();
+//      final Font promptFont;
+//      if(hight <2.0){
+//        promptFont = swtMng.propertiesGuiSwt.smallPromptFont;  
+//      } else { 
+//        promptFont = swtMng.propertiesGuiSwt.stdInputFont;  
+//      }
+//      promptSwt = new SwtTransparentLabel(swtMng.getCurrentPanel(), SWT.TRANSPARENT);
+//      promptSwt.setFont(promptFont);
+//      promptSwt.setText(prompt());
+//      Point promptSize = promptSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+//      swtPrompt.width = promptSize.x;
+//      promptSwt.setBounds(swtPrompt);
+//      
+//      
+//    }
     return null;  //GralRectanvle pos))
   }
   

@@ -152,7 +152,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   protected boolean bFullScreen;
   
   /**Some flags to set an action listener a first time if the action is given. */
-  private boolean bHasResizeAction, bHasMouseAction;
+  private boolean bHasMouseAction;
   
   
   
@@ -318,9 +318,6 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   @Override public void redrawGthread() {
     int chg = getChanged();
     int acknChg = 0;
-    if(!this.bHasResizeAction && this.resizeAction() != null){
-      this.window.addControlListener(this.resizeListener);
-    }
     if(!this.bHasMouseAction && this.mouseAction() != null){
       this.window.addControlListener(this.resizeListener);
     }
@@ -409,14 +406,14 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
       }
       setVisibleState(false);
       if((windProps & GralWindow_ifc.windRemoveOnClose)!=0) {
-        window.dispose();
-        window = null;
-        menuBar = null;
-        SwtSubWindow.this.widgg._wdgImpl = null;  //therewith garbage this class.
-
-        SwtSubWindow.this.gralWindow.remove();  //remove the window as widget.
         GralWindow windg = (GralWindow)SwtSubWindow.this.widgg;
-        if( windg == windg.gralMng.getPrimaryWindow()) {
+        boolean bIsPrimarywindow = windg == windg.gralMng.getPrimaryWindow();
+        SwtSubWindow.this.window.dispose();
+        SwtSubWindow.this.window = null;
+        SwtSubWindow.this.menuBar = null;
+        SwtSubWindow.this.widgg._wdgImpl = null;  //therewith garbage this class.
+        SwtSubWindow.this.gralWindow.remove();  //remove the window as widget.
+        if( bIsPrimarywindow) {
           windg.gralMng.closeApplication();
         }
         e.doit = true;
@@ -588,7 +585,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
       }
       if((widgw.windProps() & GralWindow.windResizeable)!=0){
         GralRectangle windowPix = new GralRectangle(0, 0, xy.width, xy.height);
-        widgw.mainPanel.resizeWidgets(windowPix);
+        widgw.mainPanel._compt.resizeWidgets(windowPix);
       }
       
 //      if(SwtSubWindow.this.resizeAction() !=null){

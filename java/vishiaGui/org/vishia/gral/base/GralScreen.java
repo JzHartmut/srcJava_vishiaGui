@@ -224,7 +224,7 @@ public class GralScreen implements GralPanel_ifc {
     return null;
   }
 
-  @Override public List<GralWidget> getWidgetList () {
+  @Override public List<GralWidgetBase> getWidgetList () {
  
     return null;
   }

@@ -332,7 +332,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   public final GralGridProperties gralProps;
 
   /**Index of all input fields to access symbolic for all panels. */
-  protected final Map<String, GralWidget> idxNameWidgets = new TreeMap<String, GralWidget>();
+  protected final Map<String, GralWidgetBase> idxNameWidgets = new TreeMap<String, GralWidgetBase>();
 
   /**Index of all input fields to access symbolic. NOTE: The generic type of WidgetDescriptor is unknown,
    * because the set is used independently from the graphic system. */
@@ -808,7 +808,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
   //private String lastClickedVariable;
 
-  @Deprecated @Override public List<GralWidget> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
+  @Deprecated @Override public List<GralWidgetBase> getListCurrWidgets(){ return ((GralPanelContent)pos().pos.parent).getWidgetList(); }
 
 
   public void setProperties(GralGridProperties.ImplAccess props) {
@@ -1042,13 +1042,13 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
 
 
-  @Override public GralWidget getWidget(String name)
+  @Override public GralWidgetBase getWidget(String name)
   { return this.idxNameWidgets.get(name);
   }
 
 
 
-  public Iterable<GralWidget> getWidgetIter() {
+  public Iterable<GralWidgetBase> getWidgetIter() {
     return this.idxNameWidgets.values();
   }
 
@@ -1134,7 +1134,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   }
 
 
-  void registerWidget(String name, GralWidget widgd) {
+  void registerWidget(String name, GralWidgetBase widgd) {
     this.idxNameWidgets.put(name, widgd);
   }
 
@@ -1142,7 +1142,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     this.idxNameWidgets.remove(name);
   }
 
-  @Override public void registerWidget(GralWidget widgd)
+  @Override public void registerWidget(GralWidgetBase widgd)
   {
     if(widgd.name != null){
       this.idxNameWidgets.put(widgd.name, widgd);
@@ -1150,7 +1150,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   }
 
 
-  public void deregisterWidgetName(GralWidget widg)
+  public void deregisterWidgetName(GralWidgetBase widg)
   {
     if(widg.name != null){
       this.idxNameWidgets.remove(widg.name);
@@ -1222,21 +1222,22 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   }
 
 
-  public Map<String, String> getAllValues()
-  {
-      Map<String, String> values = new TreeMap<String, String>();
-  for(GralWidget input: this.idxNameWidgets.values()){
-      String sValue = getValueFromWidget(input);
-    values.put(input.name, sValue);
-  }
-  return values;
+  public Map<String, String> getAllValues() {
+    Map<String, String> values = new TreeMap<String, String>();
+    for(GralWidgetBase input: this.idxNameWidgets.values()){
+      if(input instanceof GralWidget) {
+        String sValue = getValueFromWidget((GralWidget)input);
+        values.put(input.name, sValue);
+      }
+    }
+    return values;
   }
 
   @Override public String getValue(String sName)
   { final String sValue;
-      GralWidget widgetDescr = this.idxNameWidgets.get(sName);
-      if(widgetDescr !=null){
-          sValue = getValueFromWidget(widgetDescr);
+      GralWidgetBase widgetDescr = this.idxNameWidgets.get(sName);
+      if(widgetDescr instanceof GralWidget){
+          sValue = getValueFromWidget((GralWidget)widgetDescr);
       } else {
           sValue = null;
       }
@@ -1575,8 +1576,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   }
 
 
-  private GralWidget findWidget(String name){
-    GralWidget widg = this.idxNameWidgets.get(name);
+  private GralWidgetBase findWidget(String name){
+    GralWidgetBase widg = this.idxNameWidgets.get(name);
     if(widg == null){
       this.log.sendMsg(0, "GuiMainDialog:setBackColor: unknown widget %s", name);
     }
@@ -1604,26 +1605,26 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    */
   @Override public void setBackColor(String name, int ix, int color)
   {
-    GralWidget widg;
-    if( (widg = findWidget(name)) !=null){
-      widg.setBackColor(GralColor.getColor(color), ix);
+    GralWidgetBase widg;
+    if( (widg = findWidget(name)) !=null && widg instanceof GralWidget){
+      ((GralWidget)widg).setBackColor(GralColor.getColor(color), ix);
     }
   }
 
 
   @Override public void setText(String name, CharSequence text){
-    GralWidget widg;
+    GralWidgetBase widg;
     if( (widg = findWidget(name)) !=null){
-      widg.setText(text);
+      ((GralWidget)widg).setText(text);
     }
   }
 
 
 
   @Override public void setValue(String widget, Object visibleInfo, Object userData){
-    GralWidget widg;
+    GralWidgetBase widg;
     if( (widg = findWidget(widget)) !=null){
-      widg.setValue(0,0, visibleInfo, userData);
+      ((GralWidget)widg).setValue(0,0, visibleInfo, userData);
     }
 
   }
@@ -1693,7 +1694,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    *   It is over-engineered to offer all operations also in the GralMng.
    */
   @Deprecated @Override public void addText(String name, CharSequence text){
-    GralWidget widg;
+    GralWidgetBase widg;
     if( (widg = findWidget(name)) !=null){
       if(widg instanceof GralTextBox_ifc){
         try{ ((GralTextBox)widg).append(text); }
@@ -2516,7 +2517,7 @@ public GralButton addCheckButton(
      */
     @Deprecated public abstract Object getCurrentPanel();
 
-    protected GralWidget indexNameWidgets(String name){ return this.gralMng.idxNameWidgets.get(name); }
+    protected GralWidgetBase indexNameWidgets(String name){ return this.gralMng.idxNameWidgets.get(name); }
 
     protected GralUserAction userMainKeyAction(){ return this.gralMng.userMainKeyAction; }
 

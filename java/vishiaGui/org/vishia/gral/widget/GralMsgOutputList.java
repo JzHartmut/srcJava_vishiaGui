@@ -12,6 +12,7 @@ import org.vishia.bridgeC.OS_TimeStamp;
 import org.vishia.bridgeC.Va_list;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.ifc.GralMng_ifc;
 import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralTable_ifc;
@@ -121,7 +122,7 @@ public class GralMsgOutputList  extends LogMessageBase
     //String sInfoLine = sTime + '\t' + identNumber + '\t' + state + '\t' + sText;
     String[] sInfoLine = {sTime, "" + identNumber1, state, "" + sText};
 
-    GralWidget oTable = guiAccess.getWidget("msgOfDay");
+    GralWidgetBase oTable = guiAccess.getWidget("msgOfDay");
     if(oTable == null){
       Assert.consoleErr("GuiMainDialog:insertInfo: unknown widget; %s; message:%d;%s;\n", "msgOfDay", new Integer(identNumber), sText);
     } else {

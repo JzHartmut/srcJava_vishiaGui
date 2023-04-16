@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
@@ -301,18 +302,25 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
     @Override public void controlResized(ControlEvent e) 
     { 
+      
       Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
-      //Control parent = wparent;
-      for(GralWidget widg1: ((GralPanelContent)gralPanel).getWidgetsToResize()){
-        
-        GralRectangle panelPix = getPixelPositionSize();
-        if(widg1._wdgImpl !=null) {
-          widg1._wdgImpl.setPosBounds(panelPix);
-        } else {
-          Debugutil.stop();
-        }
-        //widg1.gralMng().resizeWidget(widg1, 0, 0);
+      if(wparent instanceof Control) {
+        Rectangle bounds = ((Control)wparent).getBounds();
+        GralRectangle pixBounds = new GralRectangle(bounds.x, bounds.y, bounds.width, bounds.height);
+        widgg._compt.resizeWidgets(pixBounds);
       }
+      //gralPanel.resi
+      //Control parent = wparent;
+//      for(GralWidgetBase widg1: ((GralPanelContent)gralPanel).getWidgetsToResize()){
+//        
+//        GralRectangle panelPix = getPixelPositionSize();
+//        if(widg1._wdgImpl !=null) {
+//          widg1._wdgImpl.setPosBounds(panelPix);
+//        } else {
+//          Debugutil.stop();
+//        }
+        //widg1.gralMng().resizeWidget(widg1, 0, 0);
+      //}
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
     }
     

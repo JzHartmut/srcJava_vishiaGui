@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.vishia.event.EventConsumer;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
+import org.vishia.util.Debugutil;
 import org.vishia.util.ObjectVishia;
 
 /**It is the base calss for comprehensive widgets,
@@ -65,17 +66,27 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
 
   /**Name of the widget in the panel. */
   public final String name;
+  
+  public final GralWidgComposite _compt;
 
-//  /**Set on focus gained, false on focus lost. */
-//  protected boolean bHasFocus;
-//  
-//  
-//  /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
-//   * It is an estimation whether this widget is be shown yet. 
-//   */
-//  protected boolean bVisibleState = true;
-//  
-//
+  /**Set on focus gained, false on focus lost. */
+  protected boolean bHasFocus;
+  
+  
+  /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
+   * It is an estimation whether this widget is be shown yet. 
+   */
+  protected boolean bVisibleState = true;
+  
+  public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng) {
+    this(refPos, sPosName, gralMng, false);
+  }
+
+  
+  
+  public GralWidgetBase(GralPos refPos, String sPosName, boolean isComposite) {
+    this(refPos, sPosName, null, isComposite);
+  }
   
 
   /**Either the GralMng is given, or pos should be given, then the GralMng is gotten from {@link GralPos#parent}.
@@ -84,7 +95,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
    * @param sPosName syntax "[@[@<?preventRefPos>] <posString> [= <$?name>] | <$?name>]. 
    * @param gralMng
    */
-  public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng) {
+  public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng, boolean isComposite) {
     if(gralMng !=null) {
       this.gralMng = gralMng;
     } else if(refPos !=null && refPos.parent !=null) {
@@ -92,6 +103,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
     } else {
       this.gralMng = gralMng; //deprecated approach with singleton.
     }
+    this._compt = isComposite ? new GralWidgComposite(this) : null;
     final GralPos currPos1;
     final boolean bFramePos;
     if(sPosName !=null && sPosName.startsWith("@")) {
@@ -122,8 +134,23 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
     currPos1.assertCorrectness();
     currPos1.setUsed();           //mark "used" for the referred GralPos
     this._wdgPos = bFramePos ? currPos1 : currPos1.clone();   //use always a clone for the widget.
+    //
+    //============================================= Register the widget
+    if(this._wdgPos.parent == this) {
+      //don't register the panel itself!
+    } else if(this._wdgPos.parent !=null && this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._compt !=null){
+      ((GralWidgetBase)this._wdgPos.parent)._compt.addWidget(this, this._wdgPos.toResize());
+    } else if(this._wdgPos ==null) {
+      this._wdgPos.parent = this.gralMng.getCurrentPanel();
+      System.out.println("GralWidget.GralWidget - pos without panel");
+    }
+    //already done: this.gralMng.registerWidget(this);
   }
 
+  
+  
+  
+  
   /**Access to the name of the widget. But you can also access the final public {@link org.vishia.gral.base.GralWidgetBase#name} immediately.
    * Defined in {@link GralWidgetBase_ifc#getName()}
    * @return the name
@@ -256,10 +283,21 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   /**This operation is implemented in the {@link GralWidget} by the default behavior.
    * Or it should be overridden in instances which are not derived from GralWidget itself,
    * on instances of comprehensive widgets.
+   * This implementation is only called in {@link GralWidget#createImplWidget_Gthread()} for composite widgets.
    * @return true if created.
    * @throws IllegalStateException if called though the GralMng is not implemented. 
    */
-  public abstract boolean createImplWidget_Gthread() throws IllegalStateException;
+  public boolean createImplWidget_Gthread() throws IllegalStateException {
+    if(this._compt !=null) {                           // is it a composite widget? a Panel or comprehensive widget?
+      for(GralWidgetBase widg: this._compt.widgetList) {
+        if(widg instanceof org.vishia.gral.widget.GralFileSelector)
+          Debugutil.stop();
+        widg.createImplWidget_Gthread();               // recursively call of same for all members.
+      }
+      return true;
+    }
+    else return false;
+  }
 
   /**Checks whether the creation of the implementation widget is admissible
    * @param implAccess use this._widgImpl for a normal widget, or use one of the (the primary) widgets
@@ -286,6 +324,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
    * If the conditions to create are given, either immediately the {@link #createImplWidget_Gthread()} is called
    * if it is in the graphic thread, or a GralGraphicTimeOrder is created to do so in the graphic thread.
    * It means this operation can be called in any thread.
+   * Calls the overridden {@link GralWidget#createImplWidget_Gthread()}
    * 
    * @return true if created or the time order for creation is started.
    *   false if creation is not possible yet.
@@ -295,7 +334,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
       //assume the widget is not implemented, elsewhere this operation may not be called,
       //but the conditions for implementation are given: parent is implemented.
       if(this.gralMng.currThreadIsGraphic()){
-        return createImplWidget_Gthread();      // call immediately the graphic thread operation.
+        return createImplWidget_Gthread();      // call immediately the graphic thread operation, overridden in GralWidget.
       } else {
         GralGraphicOrder order = new TimeOrderCreateImplWidget(this);
         this.gralMng.addDispatchOrder(order);
@@ -311,9 +350,31 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
    * This is a internal operation not intent to use by an application. 
    * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
    */
-  abstract public void removeImplWidget_Gthread();
+  public void removeImplWidget_Gthread () {
+    if(this._compt !=null) {
+      for(GralWidgetBase widg: this._compt.widgetList) {
+        widg.removeImplWidget_Gthread();                     // recursively call of same
+      }
+    }
+  }
 
-  
+  /**Removes the widget from the lists in its panel and from the graphical representation.
+   * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
+   */
+  @Override public boolean remove()
+  {
+    if(this instanceof GralWidget && ((GralWidget)this)._wdgImpl !=null) {
+      ((GralWidget)this)._wdgImpl.removeWidgetImplementation();
+      ((GralWidget)this)._wdgImpl = null;
+    }
+    if(this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._compt !=null) {
+      ((GralWidgetBase)this._wdgPos.parent)._compt.removeWidget(this);
+    }
+    this.gralMng.deregisterWidgetName(this);
+    return true;
+  }
+
+
   
   
   @Override public GralWidget.ImplAccess getImplAccess() {

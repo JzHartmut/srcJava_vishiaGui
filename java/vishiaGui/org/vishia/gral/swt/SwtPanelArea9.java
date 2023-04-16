@@ -28,14 +28,14 @@ public class SwtPanelArea9 extends SwtGridPanel{
       //Widget wparent = e.widget; //it is the SwtCanvas because this method is assigned only there.
       //Control parent = wparent;
       GralRectangle parentPix = getPixelPositionSize();
-      for(GralWidget widg1: SwtPanelArea9.this.gralPanel.getWidgetsToResize()){
-        if(widg1._wdgImpl !=null) {
-          widg1._wdgImpl.setPosBounds(parentPix);
-        } else {
-          Debugutil.stop();
-        }
-        //widg1.gralMng().resizeWidget(widg1, 0, 0);
-      }
+//      for(GralWidget widg1: SwtPanelArea9.this.gralPanel.getWidgetsToResize()){
+//        if(widg1._wdgImpl !=null) {
+//          widg1._wdgImpl.setPosBounds(parentPix);
+//        } else {
+//          Debugutil.stop();
+//        }
+//        //widg1.gralMng().resizeWidget(widg1, 0, 0);
+//      }
       //validateFrameAreas();  //calculates the size of the areas newly and redraw.
     }
     

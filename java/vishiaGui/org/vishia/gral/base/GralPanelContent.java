@@ -30,12 +30,13 @@ import org.vishia.util.KeyCode;
  * <br>
  * For positioning grid lines can be drawn in the implementing graphic.
  */
-public class GralPanelContent extends GralWidgetComposite implements GralPanel_ifc, GralWidget_ifc, GralVisibleWidgets_ifc
+public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralWidget_ifc, GralVisibleWidgets_ifc
 {
 
   /**Version history:
    *
    * <ul>
+   * <li>2023-04-15: Because of new aggregated {@link GralWidgetBase#_compt} class {@link GralWidgComposite} some operations are located there. 
    * <li>2023-01-20: refactoring: up to now the swt.TabFolder and TabItem is no more used.
    *   Instead a {@link GralHorizontalSelector} is used to select panels. The panels are normal panels
    *   which are set visible or invisible. Also remove a tab is possible.
@@ -159,7 +160,7 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
    */
   public GralPanelContent(GralPos refPos, String posName, String labelTab, char whatIsit, GralMng gralMng) {
   //public PanelContent(CanvasStorePanel panelComposite)
-    super(refPos, posName, whatIsit);
+    super(refPos, posName, whatIsit, true);
     assert("^$@".indexOf(whatIsit) >=0);    //TODO the ^ is not used, remove it again. (Test!)
     this._panel = new Data(labelTab);
     refPos.setFullPanel(this);
@@ -225,7 +226,7 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
 
   public void setPanelVisible ( boolean bVisible) {
     this.setVisible(bVisible);
-    for(GralWidget widget: this._compt.widgetList){
+    for(GralWidgetBase widget: this._compt.widgetList){
       widget.setVisible(bVisible);
     }
   }
@@ -308,7 +309,8 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
     int catastrophicCt = 100000; //safety of all while loops! No more than 100000 widgets.
     while(--catastrophicCt >=0 && this._compt.widgetList.size() >0){
       //remove all widgets from the panel via Widget.remove, it removes it from this list too.
-      this._compt.widgetList.get(0).remove();
+      GralWidgetBase widg = this._compt.widgetList.get(0);
+      widg.remove();
     }
     assert(catastrophicCt >0);
     this._compt.widgetList.clear();      //the lists may be cleared already
@@ -326,13 +328,20 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
    * @return true then widget is removed, false: Widget not exists here.
    */
   public boolean removeWidget(String name) {
-    GralWidget child = this._compt.idxWidgets.get(name);
+    GralWidgetBase child = this._compt.idxWidgets.get(name);
     if(child !=null) {
       return child.remove();
     } else {
       gralMng().log.writeError("remove - does not exist: " + name);
       return false;
     }
+  }
+  
+  
+
+  /**Remove a dedicated widget from the panel. */
+  @Override public void removeWidget ( GralWidget widg ) {
+    super._compt.removeWidget(widg);
   }
 
   @Override public GralCanvasStorage canvas() { return this._panel.canvas; }
@@ -361,22 +370,22 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
   /**
    * @deprecated use {@link #getWidgetList()}
    */
-  @Deprecated public List<GralWidget> widgetList(){ return this._compt.widgetList; }
+  @Deprecated public List<GralWidgetBase> widgetList(){ return this._compt.widgetList; }
 
-  @Override public List<GralWidget> getWidgetList(){ return this._compt.widgetList; }
+  @Override public List<GralWidgetBase> getWidgetList(){ return this._compt.widgetList; }
 
-  @Override public List<GralWidget> getWidgetsVisible () {
+  @Override public List<GralWidgetBase> getWidgetsVisible () {
     return this._compt.widgetList;    //all widgets is too much, first version. Compare with GralTabbedPanel
   }
 
 
 
-  public List<GralWidget> getWidgetsToResize(){ return this._compt.widgetsToResize; }
+  public List<GralWidgetBase> getWidgetsToResize(){ return this._compt.widgetsToResize; }
 
   /**Gets a named widget on this panel. Returns null if faulty name.
    * @since 2018-09
    */
-  public GralWidget getWidget(String name){ return this._compt.idxWidgets.get(name); }
+  public GralWidgetBase getWidget(String name){ return this._compt.idxWidgets.get(name); }
 
 
 
@@ -388,9 +397,9 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
    * @since 2015-05-02
    */
   public void setTextIn(String nameWidget, CharSequence text) {
-    GralWidget widg = this._compt.idxWidgets.get(nameWidget);
-    if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
-    widg.setText(text);
+    GralWidgetBase widg = this._compt.idxWidgets.get(nameWidget);
+    if(!(widg instanceof GralWidget)) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
+    ((GralWidget)widg).setText(text);
   }
 
 
@@ -402,9 +411,9 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
    * @since 2015-05-02
    */
   public String getTextFrom(String nameWidget) {
-    GralWidget widg = this._compt.idxWidgets.get(nameWidget);
+    GralWidgetBase widg = this._compt.idxWidgets.get(nameWidget);
     if(widg == null) throw new IllegalArgumentException("GralPanel - Widget not found, " + nameWidget);
-    return widg.getText();
+    return ((GralWidget)widg).getText();
   }
 
 
@@ -455,7 +464,7 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
         out.append('(').append(this._panel.labelTab).append(')');
       }
       out.append(" @").append(this._wdgPos.toString());
-      for(GralWidget widg: this._compt.widgetList) {
+      for(GralWidgetBase widg: this._compt.widgetList) {
         if(widg instanceof GralPanelContent) {
           ((GralPanelContent)widg).reportAllContent(out, level+1);
         } else {
@@ -473,9 +482,9 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
 
   /**This class is instantiated and used for a {@link GralHorizontalSelector} as action for tab is selection and rmove. */
   private static class ActionSetFromTabSelection extends GralUserAction {
-    final GralWidgetComposite._Composite _compt;
+    final GralWidgComposite _compt;
 
-    ActionSetFromTabSelection(GralWidgetComposite._Composite _compt) {
+    ActionSetFromTabSelection(GralWidgComposite _compt) {
       super("ActionSetFromTabSelection");
       this._compt = _compt;
     }
@@ -527,7 +536,7 @@ public class GralPanelContent extends GralWidgetComposite implements GralPanel_i
      *
      */
     protected void createALlImplWidgets ( ) {
-      for(GralWidget widg: this.gralPanel._compt.widgetList) {
+      for(GralWidgetBase widg: this.gralPanel._compt.widgetList) {
         widg.createImplWidget_Gthread();
       }
     }

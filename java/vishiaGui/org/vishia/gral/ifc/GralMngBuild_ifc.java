@@ -18,6 +18,7 @@ import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GralPanelContent;
@@ -645,7 +646,7 @@ public interface GralMngBuild_ifc
    * The widgets are stored in the index of names.
    * @param widgd
    */
-  void registerWidget(GralWidget widgd);
+  void registerWidget(GralWidgetBase widgd);
   
   /**Sets the values for a line
    * @param sName The registered name
