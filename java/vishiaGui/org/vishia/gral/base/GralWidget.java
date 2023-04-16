@@ -869,6 +869,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    *   was called.
    */
   @Override public boolean createImplWidget_Gthread() throws IllegalStateException {
+    boolean ret = false;
     try {
       if(checkImplWidgetCreation(this._wdgImpl)) {
         if(this.dyda.textFont == null) { //maybe set with knowledge of the GralMng before.
@@ -880,13 +881,17 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
         if(this.contextMenu !=null) {
           this.gralMng._mngImpl.createContextMenu(this);
         }
-        super.createImplWidget_Gthread();                  // creates if necessary component widgets.
-        return true;
+        ret = true;
       }
     } catch(Throwable exc) {
       System.err.println(ExcUtil.exceptionInfo("\nERROR: implementing widget " + this.name +": ", exc, 0,10));
+      ret = false;
     }
-    return false; //on catched exception of not implementation. see return inside.
+    // -----------------------------     // creates if necessary component widgets.
+    // should be called independent of _wdgImpl because it is possible that some more widgets were added meanwhile.
+    boolean ok = super.createImplWidget_Gthread();                  
+    ret |= ok;
+    return ret; //on catched exception of not implementation. see return inside.
   }
 
 
