@@ -513,9 +513,9 @@ public class FcmdFileCard extends GralFileSelector
    * It should call super.focused(bGained) to forward the focus to parents.
    * @param bGained
    */
-  @Override public void focused(boolean bGained) {
+  @Override public void setFocused(boolean bGained) {
     this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "FcmdFileCard focused: %s", super.name);
-    super.focused(bGained);
+    super.setFocused(bGained);
   }
 
   
@@ -577,7 +577,10 @@ public class FcmdFileCard extends GralFileSelector
       if(actionCode == KeyCode.activated) {
         //FcmdFileCard.this.main.setLastSelectedPanel(FcmdFileCard.this.mainPanel);
       }
-      if(FcmdFileCard.this.main.lastFilePanels.size()>=1 && FcmdFileCard.this.main.lastFilePanels.get(0) == FcmdFileCard.this.mainPanel) {
+      if(FcmdFileCard.this.hasFocus()) {
+        if(FcmdFileCard.this.main.lastFilePanels.size()<1 || FcmdFileCard.this.main.lastFilePanels.get(0) != FcmdFileCard.this.mainPanel) {
+          FcmdFileCard.this.main.setLastSelectedPanel(FcmdFileCard.this.mainPanel);
+        }
         setActFilePanel_setColorCurrLine();                // action on this card: It is the first one
         FcmdFileCard.this.mainPanel.bFavorCardHasFocus = false;
         FcmdFileCard.this.mainPanel.bFavorThemeCardHasFocus = false;

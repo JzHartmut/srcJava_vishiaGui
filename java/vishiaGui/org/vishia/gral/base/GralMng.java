@@ -2421,7 +2421,8 @@ public GralButton addCheckButton(
      * @param widgg
      */
     public void focusLostGral(GralWidget widgg){
-      GralWidget.ImplAccess.setFocused(widgg, false);  //denotes that the GralWidget has lost the focus
+      widgg.setFocused(false);
+      //GralWidget.ImplAccess.setFocused(widgg, false);  //denotes that the GralWidget has lost the focus
       widgg.redraw();  //maybe changed outfit on focus lost.
       if(widgg.cfg.actionFocused !=null){ widgg.cfg.actionFocused.exec(KeyCode.focusLost, widgg); }
       //CharSequence text = Assert.stackInfo("", 1, 5);
@@ -2438,7 +2439,8 @@ public GralButton addCheckButton(
      */
     public void focusGainedGral(GralWidget widgg){
       GralMng.this.notifyFocus(widgg);
-      GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
+      //GralWidget.ImplAccess.setFocused(widgg, true);  //denotes that the GralWidget has gained the focus
+      widgg.setFocused(true);
       widgg.redraw();  //maybe changed outfit on focus gained.
       //widgg.gralMng.log.sendMsg(GralMng.LogMsg.evFocused, "ev-focusGained: " + widgg.getName() + ":" + widgg.pos());
       String htmlHelp = widgg.getHtmlHelp();

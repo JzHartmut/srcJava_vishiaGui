@@ -75,7 +75,7 @@ public class GralScreen implements GralPanel_ifc {
    * It should call super.focused(bGained) to forward the focus to parents.
    * @param bGained
    */
-  @Override public void focused(boolean bGained) {
+  @Override public void setFocused(boolean bGained) {
     // does nothing here.
   }
 

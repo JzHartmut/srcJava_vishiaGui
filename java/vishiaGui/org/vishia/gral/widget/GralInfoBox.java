@@ -337,7 +337,7 @@ public final class GralInfoBox implements GralTextBox_ifc, GralWindow_setifc, Gr
    * It should call super.focused(bGained) to forward the focus to parents.
    * @param bGained
    */
-  @Override public void focused(boolean bGained) {
+  @Override public void setFocused(boolean bGained) {
     // does nothing here.
   }
 

@@ -381,7 +381,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     if(this.posPrompt ==null) {
       this.textFieldSwt.setBounds(x,y,dx,dy);
     } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
-      int yPrompt = dy / 3 +4;
+      int yPrompt = dy / 3 +4;                // should follow the text size, todo...
       int yText = dy - yPrompt;
       if(yPrompt < 7) { yPrompt = 7; }
       this.promptSwt.setBounds(x, y, dx, yPrompt);

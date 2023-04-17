@@ -1,5 +1,6 @@
 package org.vishia.gral.base;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -141,6 +142,33 @@ public final class GralWidgComposite {
           widgd._compt.resizeWidgets(pix);
         }
       }
+    }
+  }
+
+  
+  
+  void reportAllContent(Appendable out, int level) throws IOException {
+    if(level < 20) {
+      final String nl = "\n| | | | | | |                               ";
+      if(level >0) {
+        out.append(nl.substring(0, 2*level-1));
+      }
+      out.append(this.widg.isVisible() ? this.widg.hasFocus()? '*' : '+' : ':');
+      out.append("-Panel: ").append(this.widg.name);
+      if(this.widg instanceof GralPanelContent && ((GralPanelContent)this.widg)._panel.labelTab !=null) {
+        out.append('(').append(((GralPanelContent)this.widg)._panel.labelTab).append(')');
+      }
+      out.append(" @").append(this.widg._wdgPos.toString());
+      for(GralWidgetBase widg: this.widgetList) {
+        if(widg._compt !=null) { // instanceof GralPanelContent) {
+          widg._compt.reportAllContent(out, level+1);
+        } else {                                   // simple widget without sub widgets
+          out.append(nl.substring(0,2*level+1)).append(this.widg.isVisible() ? this.widg.hasFocus()? "*-" : "+-" : ":-");
+          widg.toString(out);
+        }
+      }
+    } else {
+      out.append("\n .... more");
     }
   }
 

@@ -454,27 +454,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   //public abstract Object getPanelImpl();
 
   void reportAllContent(Appendable out, int level) throws IOException {
-    if(level < 20) {
-      final String nl = "\n| | | |                               ";
-      if(level >0) {
-        out.append(nl.substring(0, 2*level-1));
-      }
-      out.append("+-Panel: ").append(this.name);
-      if(this._panel.labelTab !=null) {
-        out.append('(').append(this._panel.labelTab).append(')');
-      }
-      out.append(" @").append(this._wdgPos.toString());
-      for(GralWidgetBase widg: this._compt.widgetList) {
-        if(widg instanceof GralPanelContent) {
-          ((GralPanelContent)widg).reportAllContent(out, level+1);
-        } else {
-          out.append(nl.substring(0,2*level+1)).append("+-");
-          widg.toString(out);
-        }
-      }
-    } else {
-      out.append("\n .... more");
-    }
+    this._compt.reportAllContent(out, level);
   }
 
   @Override public String toString(){ return "GralPanel:" + this.name + (super._wdgPos == null ? "" : "@" + super._wdgPos.toString()); }

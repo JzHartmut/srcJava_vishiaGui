@@ -394,6 +394,11 @@ public class FcmdLeftMidRightPanel
     }
     
     
+    @Override public void setFocused(boolean bGained) {
+      this.mainPanel.main.setLastSelectedPanel(mainPanel);
+      super.setFocused(bGained);
+    }
+    
     @Override protected boolean actionOk(Object userData, GralTableLine_ifc line)
     {
       FcmdFavorPathSelector.FavorFolder favorTabInfo = null;
@@ -486,6 +491,11 @@ public class FcmdLeftMidRightPanel
       @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) {
         if(actionCode == KeyCode.userSelect){
           mainPanel.bFavorThemeCardHasFocus = true;
+          if(FcmdFavorThemeCard.this.mainPanel.main.lastFilePanels.size()<1 || FcmdFavorThemeCard.this.mainPanel.main.lastFilePanels.get(0) != FcmdFavorThemeCard.this.mainPanel) {
+            FcmdFavorThemeCard.this.mainPanel.main.setLastSelectedPanel(FcmdFavorThemeCard.this.mainPanel);
+          }
+          FcmdFavorThemeCard.this.mainPanel.main.statusLine.widgFileInfo.setText("Favor selection: " + FcmdFavorThemeCard.this.mainPanel.cc);
+          
           //GralTableLine_ifc line = (GralTableLine_ifc) params[0];
           //Object oData = line.getUserData();
           //System.out.println("FcmdFavorCard.actionFavorSelected: " + fileTable.label);

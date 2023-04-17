@@ -1606,7 +1606,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
 
 
   @Override public boolean isInFocus(){
-    return this.bHasFocus;
+    return this.hasFocus();
   }
 
 
@@ -2177,19 +2177,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
       return ret;
     }
 
-    /**This routine does not change the focus state in the implementation widget,
-     * it denotes only that the GralWidget has the focus or not.
-     * The method is static because it gets the widgg instance.
-     * Note that it is not member of GralWidget itself because the application
-     * should not invoke it (which may be possible on a public GralWidget-method).
-     * @param widgg the GralWidget instance
-     * @param focus true on focus gained, false on focus lost.
-     */
-    protected static void setFocused(GralWidget widgg, boolean focus){
-      widgg.bHasFocus = focus;
-      if(focus == false) { widgg.dyda.bTouchedField = false; }
-    }
-  }
+ }
 
   /**Not intent to get from user: The instance which's methods can be called from an event method of the implementation of the GralWidget.
    * Note: This Method is public only because the implementation in another package need to use it.

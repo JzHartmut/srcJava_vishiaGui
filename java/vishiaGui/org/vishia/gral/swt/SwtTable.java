@@ -41,8 +41,8 @@ import org.vishia.gral.ifc.GralTableLine_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
 
 /**Implementation of the GralTable for Swt graphic.
@@ -313,7 +313,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       //this is about 50 ms after focus lost, the focus has lost really.
       this.bFocused = false;
       this.bFocusLost = false;
-      setFocused(this.widgg, false);
+      this.widgg.setFocused(false);
     }
     if(this.swtWidgHelper.widgetSwt !=null && !this.swtWidgHelper.widgetSwt.isDisposed()){
       int chg = getChanged();
@@ -321,7 +321,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       if((chg & chgVisible)!=0){
         acknChg |= chgVisible;
         setVisibleState(true);
-        this.swtWidgHelper.widgetSwt.setVisible(true);  //the composite.
+        if(!this.swtWidgHelper.widgetSwt.isVisible()) {
+          this.swtWidgHelper.widgetSwt.setVisible(true);  //the composite.
+        }
         //for(Text[] lines: cellsSwt){
         //  for(Text cell: lines){ cell.setVisible(true); }
         //}
@@ -329,7 +331,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       if((chg & chgInvisible)!=0){
         acknChg |= chgInvisible;
         setVisibleState(false);
-        this.swtWidgHelper.widgetSwt.setVisible(false);  //the composite.
+        if(this.swtWidgHelper.widgetSwt.isVisible()) {
+          this.swtWidgHelper.widgetSwt.setVisible(false);  //the composite.
+        }
         //for(Text[] lines: cellsSwt){
         //  for(Text cell: lines){ cell.setVisible(false); }
         //}
@@ -387,11 +391,17 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
 
   @Override public void setVisibleGThread(boolean bVisible) {
-    this.swtWidgHelper.setVisibleGThread(bVisible);
+    if(this.swtWidgHelper.widgetSwt.isVisible() != bVisible) { 
+      this.swtWidgHelper.widgetSwt.setVisible(bVisible);
+    }
+    if(bVisible)
+      Debugutil.stop();
     super.setVisibleState(bVisible);
     for(Text[] cell1 : this.cellsSwt) for(Text cell: cell1){
       if(cell !=null) {
-        cell.setVisible(bVisible);
+        if(cell.isVisible() != bVisible) {
+          cell.setVisible(bVisible);
+        }
       }
     }
     redrawGthread();
@@ -479,9 +489,14 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           //
           cellSwt.setText(text);
         }
+        if(cellSwt.isFocusControl()) {
+          System.out.printf("SwtTable cell in focus: %s, %d\n", line.toString(), col);
+          this.widgg.setFocused(true);
+        }
         if(cellData.bSetFocus){
-          boolean bFocusOk = cellSwt.setFocus();
+          boolean bFocusOk = cellSwt.forceFocus();
           cellData.bSetFocus = false;
+          System.out.printf("SwtTable cell set focus: %b %s, %d\n", bFocusOk, line.toString(), col);
           //this.widgg.gralMng.log().sendMsg(GralMng.LogMsg.setFocus, "set Focus %d %d %s", iCellLine, col, bFocusOk ? "ok" : "no");
         }
         GralColor colorBackCell = linePresentationP.cellsColorBack !=null && linePresentationP.cellsColorBack[col] !=null
@@ -497,7 +512,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           cellSwt.setForeground(this.swtWidgHelper.mng.getColorImpl(linePresentationP.colorText));
           cellData.colorText = linePresentationP.colorText;
         }
-        cellSwt.setVisible(true);
+        ///cellSwt.setVisible(true);
         cellSwt.redraw();
       }
     } else {
@@ -619,7 +634,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       if(ixrow < zLineVisible) {
         int ixColumn = 0;
         for(Text cell: row){
-          cell.setVisible(true);
+          ///cell.setVisible(true);
           int xleft = 0;
           cell.setBounds(xleft + this.xpixelCell[ixColumn], yPix, this.xpixelCell[ixColumn+1] - this.xpixelCell[ixColumn], this.linePixel);
           ixColumn +=1;
@@ -668,18 +683,20 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      */
     @Override public void focusLost(FocusEvent ev){
       //System.out.println("Cell focus lost");
+      String textLost = "---" + ((Text)ev.widget).getText();
       if(!SwtTable.this.bRedrawPending && System.currentTimeMillis() - (((GralTable)SwtTable.this.widgg).timeLastKeyUpDn) > 300){
         SwtTable.this.focusLostTable();         // do not call during redrawpending, supress unnecessary redraw action.
         //System.out.println("SwtTable - cell focus lost;" + (SwtTable.this).outer.toString());
         GralTable.CellData celldata = (GralTable.CellData)ev.widget.getData();
         Text widgSwt = (Text)ev.widget;
+        String sText = widgSwt.getText();
+        textLost = sText;
         if(SwtTable.this.bColumnEditable(celldata.ixCellColumn)){
-          String sText = widgSwt.getText();
           SwtTable.this.checkAndUpdateText(sText, celldata);
         }
-        SwtTable.this.widgg.focused(false);                 // notes the focus lost to the GralWidget and its parents.
+        SwtTable.this.widgg.setFocused(false);                 // notes the focus lost to the GralWidget and its parents.
       }
-      System.out.println("SwtTableCell - focus lost;");
+      System.out.printf("SwtTableCell - focus lost %s\n", textLost);
     }
 
     /**Focus listener implementation for all cells.
@@ -691,16 +708,22 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
      * @see org.eclipse.swt.events.FocusListener#focusGained(org.eclipse.swt.events.FocusEvent)
      */
     @Override public void focusGained(FocusEvent ev) {
+      String sText = "---" + ((Text)ev.widget).getText();
+      if(sText.equals("---Download")) {
+        Debugutil.stop();
+      }
       if(!SwtTable.this.bRedrawPending && System.currentTimeMillis() - (((GralTable)SwtTable.this.widgg).timeLastKeyUpDn) > 300){
+        Text widgSwt = (Text)ev.widget;
+        sText = widgSwt.getText();
         GralTable.CellData cell = (GralTable.CellData)((Text)ev.getSource()).getData();
         SwtTable.this.ixLineFocus = cell.ixCellLine;
         SwtTable.this.ixColumnFocus = cell.ixCellColumn;
         SwtTable.this.focusGainedTable();
-        setFocused(SwtTable.this.widgg, true);
-        SwtTable.this.cellInFocus = (Text)ev.getSource();
-        SwtTable.this.widgg.focused(true);                 // notes the focus gained to the GralWidget and its parents.
+        //setFocused(SwtTable.this.widgg, true);
+        SwtTable.this.cellInFocus = widgSwt; //(Text)ev.getSource();
+        SwtTable.this.widgg.setFocused(true);                 // notes the focus gained to the GralWidget and its parents.
       }
-      System.out.println("SwtTableCell - focus gained;");
+      System.out.printf("SwtTableCell - focus gained %s\n", sText);
     }
   };
 
@@ -805,10 +828,12 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
 
   /**The SWT-Composite for the cell texts and the scroll bar. */
-  class Table extends Composite {
+  static class Table extends Composite {
 
+    final SwtMng mng;
     public Table(Composite parent, int zColumns, SwtMng mng) {
       super(parent, 0);
+      this.mng = mng;
     }
 
 
@@ -817,13 +842,17 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     //}
 
 
+    @Override
+    public boolean setFocus () {
+      this.mng.gralMng.log.sendMsg(GralMng.LogMsg.newImplTable, "set Focus of SwtTable.Table");
 
+      return true;
+    }
 
 
   }
 
-
-
+  
   protected void keyPressed(KeyEvent keyEv){
     try{
       if((keyEv.keyCode & 0xffff) !=0){
@@ -831,7 +860,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         processKeys(keyCode);
       }
     } catch(Exception exc){
-      String txt = Assert.exceptionInfo("SwtTable - keyPressed Exception", exc, 0, 20, true).toString();
+      String txt = ExcUtil.exceptionInfo("SwtTable - keyPressed Exception", exc, 0, 20, true).toString();
       this.swtWidgHelper.mng.gralMng.log.sendMsg(0, txt);
       //CharSequence stackInfo = Assert.exceptionInfo("Gral - SwtTable;", exc, 1, 5);
       //System.err.append(stackInfo);

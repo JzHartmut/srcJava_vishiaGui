@@ -2002,7 +2002,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //Now draw:
       //
       int ix = -1;
-      //this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
+      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
       while(++ix < this.outer.zLineVisible) {
         if(true || (this.outer.bitLinesForCellChanged & (1<<ix)) !=0) {  // non relevant CPU load impact
           line = this.outer.linesForCell[ix];                            // marking with bitLinesForCellChanged is not sufficient yet.
@@ -2765,7 +2765,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
      * It should call super.focused(bGained) to forward the focus to parents.
      * @param bGained
      */
-    @Override public void focused(boolean bGained) {
+    @Override public void setFocused(boolean bGained) {
       // does nothing here.
     }
 

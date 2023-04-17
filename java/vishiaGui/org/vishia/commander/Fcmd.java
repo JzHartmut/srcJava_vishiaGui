@@ -618,7 +618,12 @@ public class Fcmd //extends GuiCfg
       }
       lastFilePanels.add(0, panel);
     }
-
+    String sPanels = "";
+    for(FcmdLeftMidRightPanel panel2: lastFilePanels) {
+      sPanels += panel2.cc;
+    }
+    this.gui.gralMng.log().sendMsg(555, "changed act panel: %s", sPanels);
+    this.statusLine.widgFilePath.setText(panel.toString());
   }
 
   /**Get the last selected files in order of selection of the file panels.

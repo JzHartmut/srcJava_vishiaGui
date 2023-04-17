@@ -70,7 +70,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   public final GralWidgComposite _compt;
 
   /**Set on focus gained, false on focus lost. */
-  protected boolean bHasFocus;
+  private boolean bHasFocus;
   
   
   /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
@@ -172,17 +172,29 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
 
   public abstract boolean setVisible(boolean visible);
   
-  /**This operation can be called from the implementation graphic if the focus is gained for an implementation widget.
+  /**This operation should be called from the implementation graphic 
+   * if the focus was changed for an implementation widget by user handling.
+   * It does not change the focus state in the implementation widget,
+   * it denotes only that the GralWidget has the focus or not.
+   * <br>
    * It is also called for all parents of a widget if a child gets the focus.
    * The specific widget implementation can override this operation to do specifics.
    * It should call super.focused(bGained) to forward the focus to parents.
    * @param bGained
    */
-  @Override public void focused(boolean bGained) {
-    this._wdgPos.parent.focused(bGained);
+  @Override public void setFocused(boolean bGained) {
+    if (this instanceof GralTextBox)
+      Debugutil.stop();
+    this.bHasFocus = bGained;
+    if(bGained == false && this instanceof GralWidget) { ((GralWidget)this).dyda.bTouchedField = false; }
+    this._wdgPos.parent.setFocused(bGained);
   }
 
-
+  public boolean hasFocus () { return this.bHasFocus; }
+  
+  public boolean isVisible () { return this.bVisibleState; }
+  
+  
   
 //  /**Standard implementation. Override only if necessary for sepcial handling.
 //   * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()
@@ -381,6 +393,8 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
     return null;  //default, it is overridden if it is a Widget.
   }
   
+  
+
   
   /**Especially for test and debug, short info about widget.
    * @see java.lang.Object#toString()

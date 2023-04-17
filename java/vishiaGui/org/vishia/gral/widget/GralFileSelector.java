@@ -589,6 +589,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     /**The directory which was used on start. */
     FileRemote originDir;
 
+    boolean bNew = true;
+    
     /**This action will be called any time when the selection of a current file is changed. */
     protected GralUserAction actionOnFileSelected;
 
@@ -704,6 +706,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         GralMenu menuFavor = this.widgFavorTable.getContextMenu();
         menuFavor.addMenuItem("save", thisf.action.actionSaveFavors);
         this.widgFavorTable.setVisible(true);
+        this.widgFavorTable.setFocus();
       } else {
         this.indexFavorPaths = null;
         this.widgFavorTable = null;
@@ -1174,13 +1177,15 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     if(startFile !=null) {
       this.fillIn(startFile, false);
       this.gui.widgSelectList.setVisible(true);                // file table should be shown.
+      this.gui.widgSelectList.setFocus();
       if(this.gui.widgFavorTable !=null) {                     
         this.gui.widgFavorTable.setVisible(false);               // favor table should be hidden
       }
     } else {
       if(this.gui.widgFavorTable !=null) {                     // only if favor exist.
         this.gui.widgFavorTable.setVisible(true);              // favor table should be shown
-        this.gui.widgSelectList.setVisible(true);              // file table should be hidden
+        this.gui.widgFavorTable.setFocus();
+        this.gui.widgSelectList.setVisible(false);              // file table should be hidden
       } else {
         // do nothing                                      // startFile not given, no Favors, only activate the window
       }
@@ -1495,6 +1500,10 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       this.gui.widgSelectList.wdgdTable.setCurrentLine(tline, -3, 1);  
       if(tline !=null)
       this.idata.currentFile = tline.getUserData();  //adjust the file if the currentFile was not found exactly.
+    }
+    if(this.idata.bNew) {                        // set focus on a new created table, especially not if fillin in forced from a synchronizing action. 
+      this.gui.widgSelectList.wdgdTable.setFocus();
+      this.idata.bNew = false;
     }
     this.gui.widgSelectList.wdgdTable.redraw(50, 100);
     if(this.idata.actionOnFileSelected !=null) {
