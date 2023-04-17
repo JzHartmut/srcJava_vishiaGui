@@ -135,11 +135,16 @@ public final class GralWidgComposite {
         System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
       } else {
         GralRectangle pix = widgd.pos().calcWidgetPosAndSize(this.widg.gralMng.gralProps, parentPix,800,600);
+        widgd.pixSize.set(pix);
         if(widgd instanceof GralWidget && ((GralWidget)widgd)._wdgImpl !=null) {
-          ((GralWidget)widgd)._wdgImpl.setBoundsPixel(pix.x, pix.y, pix.dx, pix.dy);
+          GralWidget widg = (GralWidget)widgd;
+          widg._wdgImpl.setBoundsPixel(pix.x, pix.y, pix.dx, pix.dy);
         }
+        widgd.resize();                // some additional things, _wdgImpl should have the porper size already.
+        //
+        //------------------------------- recursive for child widgets
         if(widgd._compt !=null) {
-          widgd._compt.resizeWidgets(pix);
+          widgd._compt.resizeWidgets(pix); //recursively call of same
         }
       }
     }

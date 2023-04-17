@@ -1619,6 +1619,14 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //System.out.println("Key done");
     }
   };
+  
+  
+  
+  @Override protected void resize ( ) {
+    if(this._wdgImpl !=null) {
+      ((GraphicImplAccess)this._wdgImpl).resizeTable(super.pixSize);
+    }
+  }
 
   /**It is called whenever another line is selected, if the focus is gotten by mouse click
    * or a navigation key is pressed.

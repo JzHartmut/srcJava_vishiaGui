@@ -6,6 +6,7 @@ import java.util.EventObject;
 import java.util.List;
 
 import org.vishia.event.EventConsumer;
+import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ObjectVishia;
@@ -72,6 +73,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   /**Set on focus gained, false on focus lost. */
   private boolean bHasFocus;
   
+  public final GralRectangle pixSize = new GralRectangle(0,0,0,0);
   
   /**Set true if its shell, tab card etc is be activated. Set false if it is deactivated.
    * It is an estimation whether this widget is be shown yet. 
@@ -194,7 +196,12 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   
   public boolean isVisible () { return this.bVisibleState; }
   
+  // can be specific implemented
+  protected void resize () {
+    
+  }
   
+
   
 //  /**Standard implementation. Override only if necessary for sepcial handling.
 //   * @see org.vishia.gral.ifc.GralWidget_ifc#setFocus()

@@ -171,7 +171,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   //private final SwtTable.Table table;
 
-  private final FocusListener focusListenerTable;
+  //private final FocusListener focusListenerTable;
 
   //private final FocusListener focusListenerCell;
 
@@ -186,7 +186,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     //super(name, mng, columnWidths);
     StringBuilder sLog = new StringBuilder(120);
     this.myKeyListener = this.new TableKeyListerner(null);
-    this.focusListenerTable = this.new FocusListenerTable(mng);
+    //this.focusListenerTable = this.new FocusListenerTable(mng);
     //focusListenerCell = this;
     setColorsSwt();
     int zLineVisibleMax = gralTable.nrofLinesVisibleMax();
@@ -206,8 +206,8 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     //this.menuColumns = new SwtMenu[zColumn];
     swtTable.addKeyListener(this.myKeyListener);
     //table.addSelectionListener(selectionListener);
-    swtTable.addControlListener(this.resizeListener);
-    swtTable.addFocusListener(this.focusListenerTable);
+    //swtTable.addControlListener(this.resizeListener);
+    //swtTable.addFocusListener(this.focusListenerTable);
 
     swtTable.setFont(mng.propertiesGuiSwt.stdInputFont);
     GralRectangle pixTable = this.swtWidgHelper.mng.setBounds_(this.widgg.pos(), swtTable);
@@ -512,7 +512,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           cellSwt.setForeground(this.swtWidgHelper.mng.getColorImpl(linePresentationP.colorText));
           cellData.colorText = linePresentationP.colorText;
         }
-        ///cellSwt.setVisible(true);
+        if(!cellSwt.isVisible()) {
+          cellSwt.setVisible(true);
+        }
         cellSwt.redraw();
       }
     } else {
@@ -912,7 +914,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
    * The controlResized(...) operation calls {@link #resizeTable(GralRectangle)}
    * which calculates and sets the bounds of all swt.Text fields.
    */
-  ControlListener resizeListener = new ControlListener()
+  ControlListener XXXresizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e)
     { //do nothing if moved.
       stop();
@@ -985,9 +987,9 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
   /**Debug: this focus listener is not invoked any time. It is associated to a swt.Composite.
    *
    */
-  private class FocusListenerTable implements FocusListener //extends SwtWidgetMng.SwtMngFocusListener
+  private class XXXFocusListenerTable implements FocusListener //extends SwtWidgetMng.SwtMngFocusListener
   {
-    FocusListenerTable(SwtMng mng){
+    XXXFocusListenerTable(SwtMng mng){
       //mng.super();
     }
 

@@ -48,6 +48,10 @@ public class GralRectangle
   }
  
   
+  public void set(GralRectangle src) {
+    x = src.x; y = src.y; dx = src.dx; dy = src.dy; 
+  }
+  
   public static void toString(Appendable out, int x, int y, int dx, int dy) throws IOException {
     out.append("[bounds x,y=").append(Integer.toString(x)).append('+').append(Integer.toString(dx)).append(", ").append(Integer.toString(y)).append('+').append(Integer.toString(dy)).append(']');
     
