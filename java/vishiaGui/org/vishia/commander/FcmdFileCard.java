@@ -514,7 +514,7 @@ public class FcmdFileCard extends GralFileSelector
    * @param bGained
    */
   @Override public void setFocused(boolean bGained) {
-    this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "FcmdFileCard focused: %s", super.name);
+    //this.gralMng.log.sendMsg(GralMng.LogMsg.setFocus, "FcmdFileCard focused: %s", super.name);
     super.setFocused(bGained);
   }
 
@@ -582,19 +582,19 @@ public class FcmdFileCard extends GralFileSelector
           FcmdFileCard.this.main.setLastSelectedPanel(FcmdFileCard.this.mainPanel);
         }
         setActFilePanel_setColorCurrLine();                // action on this card: It is the first one
-        FcmdFileCard.this.mainPanel.bFavorCardHasFocus = false;
-        FcmdFileCard.this.mainPanel.bFavorThemeCardHasFocus = false;
-        @SuppressWarnings("unchecked") 
-        GralTableLine_ifc<FileRemote> line = (GralTableLine_ifc<FileRemote>) params[0];
-        if(line ==null) {
-          FcmdFileCard.this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillinFinished, "ERROR no selected line");
-        } else {
-          String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
-          Object oData = line.getUserData();
-          if(oData instanceof File){
-            actionOnFileSelection((FileRemote)oData, sFileCell);
-          }
-        }
+//        FcmdFileCard.this.mainPanel.bFavorCardHasFocus = false;
+//        FcmdFileCard.this.mainPanel.bFavorThemeCardHasFocus = false;
+//        @SuppressWarnings("unchecked") 
+//        GralTableLine_ifc<FileRemote> line = (GralTableLine_ifc<FileRemote>) params[0];
+//        if(line ==null) {
+//          FcmdFileCard.this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillinFinished, "ERROR no selected line");
+//        } else {
+//          String sFileCell = line.getCellText(GralFileSelector.Constants.kColFilename);
+//          Object oData = line.getUserData();
+//          if(oData instanceof File){
+//            actionOnFileSelection((FileRemote)oData, sFileCell);
+//          }
+//        }
       } else {
         Debugutil.stop();
       }

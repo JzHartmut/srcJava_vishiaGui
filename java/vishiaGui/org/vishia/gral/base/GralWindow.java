@@ -404,7 +404,14 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     /**Window properties as Gral bits given on ctor of GralWindow. */
     public int getWindowProps(){ return this.gralWindow.windProps; }
 
-
+    /**This operation should be called by the resize listener of the implementing graphic
+     * (for example {@link org.vishia.gral.swt.SwtSubWindow#resizeListener}.
+     * @param parentPixelRectangle the client area of the GralWindow implementation.
+     */
+    protected void resizeWidgets ( GralRectangle parentPixelRectangle) {
+      this.gralWindow.mainPanel._wdgImpl.setBoundsPixel(parentPixelRectangle.x, parentPixelRectangle.y, parentPixelRectangle.dx, parentPixelRectangle.dy);
+      this.gralWindow.mainPanel._compt.resizeWidgets(parentPixelRectangle, 0);  //note: does not resize itself, only the children
+    }
 
     //protected boolean isVisible(){ return gralWindow.bVisible; }
 

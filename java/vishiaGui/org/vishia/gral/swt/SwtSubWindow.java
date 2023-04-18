@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWidgImplAccess_ifc;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralWindow;
@@ -353,6 +354,33 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   }
 
   
+  protected void resizeWindow() {
+    Object widgg = this.window.getData();
+    if(widgg == null) return;
+    if(!(widgg instanceof GralWindow)) {
+      Debugutil.stop();
+    }
+    GralWindow widgw = (GralWindow)widgg;
+    Rectangle xy = this.window.getClientArea();
+//    if(widgg instanceof GralPanelContent.ImplAccess) {
+//      Debugutil.stop();  //TODO same algorithm as on SwtPanel
+//    } else {
+//      Control[] children = window.getChildren();          //Note: on first call only after creation of Shell it has no children.
+//      for(Control child: children) {
+//        if(children.length==1 && child instanceof Composite) {
+//            Debugutil.stop();
+//            child.setBounds(xy);                         // call its resize as Swt-listener.
+//        } else {
+//          Debugutil.stop(); //TODO
+//        }
+//      }
+//    }
+    if((widgw.windProps() & GralWindow_ifc.windResizeable)!=0) {
+      GralRectangle windowPix = new GralRectangle(0, 0, xy.width, xy.height);
+      super.resizeWidgets(windowPix);
+    }
+  }
+  
   /**Reports the tree of content of the window from view of swt {@link Composite#getChildren()}
    * @param out 
    * @throws IOException
@@ -532,16 +560,16 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
 
   
   /**The resizeListener is always associated to the Shell (Swt Window). 
-   * It checks whether the Shell has only one child, which is usual a Composite (a GralPanel).
-   * Then this Composite will be resized with the same size. 
+   * It calls {@link SwtSubWindow#resizeWidgets(GralRectangle)} with the client area of the window.
+   * This calls via {@link GralWidgetBase.GralWidgComposite#resizeWidgets(GralRectangle, int)} 
+   * the necessary setBounds() for all members, without any other resizeListener of components.
    * <br>
-   * The resizing of the Composite will force calling the {@link SwtPanel#resizeItemListener}
-   * which is the listener for the Composite to resize the content. See there.
-   * <br>
-   * Resizing of the Window can call a user defined resize action. 
-   * This can be defined from user level with {@link GralWindow#setResizeAction(GralUserAction)}.
-   * The user's action is optional, it is not necessary for resizing itself (changed in 2022-09).
-   * History: before 2022-09 this action does the resizing itself. 
+   * Any widget can have a user defined resize action, that is {@link GralWidgetBase#resizePostPreparation()}.
+   * That is called from {@link GralWidgetBase.GralWidgComposite#resizeWidgets(GralRectangle, int)} 
+   * from the window down to all widgets.
+   * History: 
+   * 2023-04 resize actions were removed.
+   * before 2022-09 this action does the resizing itself. 
    */
   private final ControlListener resizeListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
@@ -550,47 +578,7 @@ public class SwtSubWindow extends GralWindow.WindowImplAccess implements GralWid
   
     @Override public void controlResized(ControlEvent e) 
     { 
-      Shell window = SwtSubWindow.this.window;
-      Object widgg = window.getData();
-      if(widgg == null) return;
-      if(!(widgg instanceof GralWindow)) {
-        Debugutil.stop();
-      }
-      GralWindow widgw = (GralWindow)widgg;
-      Rectangle xy = window.getClientArea();
-      if(widgg instanceof GralPanelContent.ImplAccess) {
-        Debugutil.stop();  //TODO same algorithm as on SwtPanel
-      } else {
-        Control[] children = window.getChildren();          //Note: on first call only after creation of Shell it has no children.
-        for(Control child: children) {
-          if(children.length==1 && child instanceof Composite) {
-//            Object widgachild = child.getData();
-//            if(widgachild instanceof GralPanelContent.ImplAccess) {
-              //GralUserAction resizeAction = ((GralPanelContent.ImplAccess)widgachild).resizeAction();
-              Debugutil.stop();
-//              Rectangle xy = window.getBounds();           // x and y is the absolute position on screen
-//              xy.x = 0;                                    // relative position inside the window is necessary.
-//              xy.y = 0;                                    // relative from left top [0,0] to given size
-              child.setBounds(xy);                         // call its resize as Swt-listener.
-//            } else {
-//              Rectangle xy = window.getBounds();
-//              child.setBounds(xy);     //call its resize as Swt-listener.
-//            }
-          } else {
-            // the window may be a GralPanelContent.ImplAccess
-            // this is quest above.
-            Debugutil.stop(); //TODO
-          }
-        }
-      }
-      if((widgw.windProps() & GralWindow.windResizeable)!=0){
-        GralRectangle windowPix = new GralRectangle(0, 0, xy.width, xy.height);
-        widgw.mainPanel._compt.resizeWidgets(windowPix);
-      }
-      
-//      if(SwtSubWindow.this.resizeAction() !=null){
-//        SwtSubWindow.this.resizeAction().exec(0, SwtSubWindow.super.gralWindow);
-//      }
+      SwtSubWindow.this.resizeWindow();
     }
   };
 

@@ -373,7 +373,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
       super.bChangedLinesForCell(false);
       //System.out.println("test SwtTable redraw " + ++redrawct);
     } else {
-      System.out.println("test SwtTable redraw disposed" + ++this.redrawct);
+      //System.out.println("test SwtTable redraw disposed" + ++this.redrawct);
     }
     this.bRedrawPending = false;
 
@@ -490,13 +490,13 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           cellSwt.setText(text);
         }
         if(cellSwt.isFocusControl()) {
-          System.out.printf("SwtTable cell in focus: %s, %d\n", line.toString(), col);
+          //System.out.printf("SwtTable cell in focus: %s, %d\n", line.toString(), col);
           this.widgg.setFocused(true);
         }
         if(cellData.bSetFocus){
           boolean bFocusOk = cellSwt.forceFocus();
           cellData.bSetFocus = false;
-          System.out.printf("SwtTable cell set focus: %b %s, %d\n", bFocusOk, line.toString(), col);
+          //System.out.printf("SwtTable cell set focus: %b %s, %d\n", bFocusOk, line.toString(), col);
           //this.widgg.gralMng.log().sendMsg(GralMng.LogMsg.setFocus, "set Focus %d %d %s", iCellLine, col, bFocusOk ? "ok" : "no");
         }
         GralColor colorBackCell = linePresentationP.cellsColorBack !=null && linePresentationP.cellsColorBack[col] !=null
@@ -698,7 +698,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         }
         SwtTable.this.widgg.setFocused(false);                 // notes the focus lost to the GralWidget and its parents.
       }
-      System.out.printf("SwtTableCell - focus lost %s\n", textLost);
+      //System.out.printf("SwtTableCell - focus lost %s\n", textLost);
     }
 
     /**Focus listener implementation for all cells.
@@ -725,7 +725,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         SwtTable.this.cellInFocus = widgSwt; //(Text)ev.getSource();
         SwtTable.this.widgg.setFocused(true);                 // notes the focus gained to the GralWidget and its parents.
       }
-      System.out.printf("SwtTableCell - focus gained %s\n", sText);
+      //System.out.printf("SwtTableCell - focus gained %s\n", sText);
     }
   };
 

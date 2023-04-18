@@ -3,9 +3,13 @@ package org.vishia.gral.base;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.EventObject;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.vishia.event.EventConsumer;
+import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.Debugutil;
@@ -22,6 +26,13 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-04-17 Hartmut new
+   *   <ul><li> {@link GralWidgComposite} as inner class for composite widgets, also for {@link GralPanelContent} 
+   *     as also for comprehensive widgets as container for all Gral sub widgets. 
+   *   <li>Resizing is done for all children widgets in {@link GralWidgComposite#resizeWidgets(GralRectangle, int)}.
+   *   <li>{@link #pixSize} is set while resizing
+   *   <li>properties {@link #hasFocus()} ( {@link #bHasFocus} and {@link #bVisibleState} is stored and handled here.  
+   *   </ul> 
    * <li>2022-12-17 Hartmut new {@link #createImplWidget()} able to call in any thread,
    *   to create the implementation widget afterwards. 
    * <li>2022-06-00 Hartmut created, It was now obviously, that comprehensive widgets are necessary,
@@ -68,6 +79,161 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   /**Name of the widget in the panel. */
   public final String name;
   
+  
+  
+  public final class GralWidgComposite {
+      /**List of all widgets which are contained in this panel.
+     * This list is used in the communication thread to update the content of all widgets in the panel.
+     */
+    protected List<GralWidgetBase> widgetList = new LinkedList<GralWidgetBase>();
+
+    public List<GralWidgetBase> widgetsToResize = new LinkedList<GralWidgetBase>();
+
+    /**The widget which should be focused if the panel is focused.
+     * It is possible to set any actual widget to store the focus situation,
+     * It is possible too to have only one widget to focus. if the panel gets the focus. */
+    protected GralWidgetBase_ifc primaryWidget;
+
+    protected final Map<String, GralWidgetBase> idxWidgets = new TreeMap<String, GralWidgetBase>();
+
+
+    
+    protected GralWidgComposite (  ) {}
+
+    /*package private*/
+    /**Adds a widget to its panel. This method will be called in {@link GralWidgetBase#initPosAndRegisterWidget(GralPos)}
+     * either on creation the GralWidget with a given position String or on {@link GralWidget#setToPanel(GralMngBuild_ifc)}
+     * with the given currently {@link GralMng#pos()}.
+     * @param widg
+     * @param toResize
+     */
+    void addWidget(GralWidgetBase widg, boolean toResize){
+      String nameWidg = widg.name;
+      if(widg instanceof GralWindow)
+        Debugutil.stop();
+      if(nameWidg !=null) {
+        String nameGlobal;
+        if(nameWidg.startsWith("@")) {
+          nameWidg = nameWidg.substring(1);  //without @
+          nameGlobal = widg.name + "." + nameWidg;  //panel.widget
+        } else {
+          nameGlobal = nameWidg;
+        }
+        widg.gralMng.registerWidget(nameGlobal, widg);
+        this.idxWidgets.put(nameWidg, widg);
+      }
+      if(this.widgetList.remove(widg)){
+        System.err.println("Widget added twice; " + nameWidg);
+      }
+      this.widgetList.add(widg);
+      if(toResize) {
+        if(widg instanceof GralWindow) {
+          System.err.println("GralPanelContent.addWidget - A window itself should not be added to widgetsToResize, " + widg.name);
+        } else {
+          this.widgetsToResize.add(widg);
+        }
+      }
+      if(this.primaryWidget ==null && !(widg instanceof GralPanelContent)) {  //register only a non-panel widget as primary - for the panel or window.
+        this.primaryWidget = widg;
+      }
+    }
+
+
+    /**Removes this widget from the lists in this panel. This method is not intent to invoke
+     * by an application. It is only used in {@link GralWidgetBase#remove()}. Use the last one method
+     * to remove a widget includint is disposition and remove from the panel.
+     * @param widg The widget.
+     */
+    public void removeWidget(GralWidgetBase widg)
+    { String nameWidg = widg.name;
+      if(nameWidg !=null) {
+        String nameGlobal;
+        if(nameWidg.startsWith("@")) {
+          nameWidg = nameWidg.substring(1);  //without @
+          nameGlobal = widg.name + "." + nameWidg;  //panel.widget
+        } else {
+          nameGlobal = nameWidg;
+        }
+        widg.gralMng.removeWidget(nameGlobal);
+        this.idxWidgets.remove(nameWidg);
+      }
+
+      this.widgetList.remove(widg);
+      this.widgetsToResize.remove(widg);
+
+    }
+
+
+    /**Resizes the current widget and all child widgets with the known {@link GralWidgetBase#_wdgPos} and the parent bounds.
+     * This operation is called recursively for all children widgets which have composite children ( {@link GralWidgetBase#_compt} is given ).
+     * The implementing graphic should only call this operation in the resize listener of the window. 
+     * All others is done recursively. 
+     * A resize listener of panels (swt.widget.Composite) is not necessary, because the widget structure is completely contained
+     * in this class itself. Specific operations to determine the bounds of widgets are not necessary.
+     * <br>
+     * But for any widget the operation {@link GralWidgetBase#resizePostPreparation()} is called. This operation is empty per default
+     * but can be overridden, for example to detect number of shown lines in the GralTable.
+     * <br>
+     * The user's application should never call this operation. It is only a Gral system operation to resize.
+     * Thats why it is protected. 
+     * 
+     * @param parentPixelRectangle parent bounds, either the client area of a window by the first call
+     *   or the bounds of the parent, which are set before, calculated from the size of the parent.
+     * @param recursion as usual on recursively call, prevents too much erroneous recursions, 
+     *   to prevent a stack overflow on faulty situations.    
+     *   The limit is 50, it means 50 nested widgets, enough at all.
+     */
+    protected void resizeWidgets ( GralRectangle parentPixelRectangle, int recursion) {
+      for(GralWidgetBase widgd: this.widgetsToResize) {
+        if(widgd instanceof GralWindow) {
+          System.err.println("GralWindow.ActionResizeOnePanel - A window itself should not be added to widgetsToResize");
+        } else {
+          GralRectangle pix = widgd.pos().calcWidgetPosAndSize(GralWidgetBase.this.gralMng.gralProps, parentPixelRectangle, 800, 600);
+          widgd.pixSize.set(pix);
+          if(widgd instanceof GralWidget && ((GralWidget)widgd)._wdgImpl !=null) {
+            GralWidget widg = (GralWidget)widgd;
+            widg._wdgImpl.setBoundsPixel(pix.x, pix.y, pix.dx, pix.dy);
+          }
+          widgd.resizePostPreparation();                // some additional things, _wdgImpl should have the porper size already.
+          //
+          //------------------------------- recursive for child widgets
+          if(widgd._compt !=null && recursion < 50) {
+            widgd._compt.resizeWidgets(pix, recursion+1); //recursively call of same
+          }
+        }
+      }
+    }
+
+    
+    
+    void reportAllContent(Appendable out, int level) throws IOException {
+      if(level < 20) {
+        final String nl = "\n| | | | | | |                               ";
+        if(level >0) {
+          out.append(nl.substring(0, 2*level-1));
+        }
+        out.append(GralWidgetBase.this.isVisible() ? GralWidgetBase.this.hasFocus()? '*' : '+' : ':');
+        out.append("-Panel: ").append(GralWidgetBase.this.name);
+        if(GralWidgetBase.this instanceof GralPanelContent && ((GralPanelContent)GralWidgetBase.this)._panel.labelTab !=null) {
+          out.append('(').append(((GralPanelContent)GralWidgetBase.this)._panel.labelTab).append(')');
+        }
+        out.append(" @").append(GralWidgetBase.this._wdgPos.toString());
+        for(GralWidgetBase widg: this.widgetList) {
+          if(widg._compt !=null) { // instanceof GralPanelContent) {
+            widg._compt.reportAllContent(out, level+1);
+          } else {                                   // simple widget without sub widgets
+            out.append(nl.substring(0,2*level+1)).append(GralWidgetBase.this.isVisible() ? GralWidgetBase.this.hasFocus()? "*-" : "+-" : ":-");
+            widg.toString(out);
+          }
+        }
+      } else {
+        out.append("\n .... more");
+      }
+    }
+
+  }
+
+  
   public final GralWidgComposite _compt;
 
   /**Set on focus gained, false on focus lost. */
@@ -105,7 +271,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
     } else {
       this.gralMng = gralMng; //deprecated approach with singleton.
     }
-    this._compt = isComposite ? new GralWidgComposite(this) : null;
+    this._compt = isComposite ? new GralWidgComposite() : null;
     final GralPos currPos1;
     final boolean bFramePos;
     if(sPosName !=null && sPosName.startsWith("@")) {
@@ -197,9 +363,13 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
   public boolean isVisible () { return this.bVisibleState; }
   
   // can be specific implemented
-  protected void resize () {
-    
-  }
+  /**This operation is called after the widget itself was resized but not just redrawn.
+   * It is called from {@link GralWidgComposite#resizeWidgets(GralRectangle, int)}
+   * If some specific resize operations should be done for redraw (for example calculate which implementation widgets are visible)
+   * Then this operation should be overridden.
+   * It is done for example in {@link GralTable#resizePostPreparation()}.
+   */
+  protected void resizePostPreparation () {}
   
 
   

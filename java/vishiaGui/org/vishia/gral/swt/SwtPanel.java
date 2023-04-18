@@ -93,10 +93,10 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       Composite swtParent = (Composite)SwtMng.getSwtImpl(panelg.pos().parent);
       this.panelSwtImpl = new Composite(swtParent,0);
     } else {
-      panelSwtImpl = panelSwt;
+      this.panelSwtImpl = panelSwt;
     }
-    panelSwt.addControlListener(this.resizeItemListener);
-    panelSwt.addFocusListener(this.focusListener);
+    //panelSwt.addControlListener(this.resizeItemListener);
+    //panelSwt.addFocusListener(this.focusListener);
     super.createALlImplWidgets();
   }
 
@@ -280,7 +280,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
 
   
-  protected FocusListener focusListener = new FocusListener() {
+  protected FocusListener XXXfocusListener = new FocusListener() {
 
     @Override public void focusGained ( FocusEvent e ) {
       SwtPanel.super.widgg.gralMng.log.sendMsg(GralMng.LogMsg.evFocused, "Panel focused %s", SwtPanel.super.widgg.toString());
@@ -295,7 +295,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   };
   
   
-  protected ControlListener resizeItemListener = new ControlListener()
+  protected ControlListener XXXresizeItemListener = new ControlListener()
   { @Override public void controlMoved(ControlEvent e) 
     { //do nothing if moved.
     }
@@ -307,7 +307,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       if(wparent instanceof Control) {
         Rectangle bounds = ((Control)wparent).getBounds();
         GralRectangle pixBounds = new GralRectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-        widgg._compt.resizeWidgets(pixBounds);
+//        widgg._compt.resizeWidgets(pixBounds, 0);
       }
       //gralPanel.resi
       //Control parent = wparent;

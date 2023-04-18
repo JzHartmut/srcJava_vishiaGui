@@ -53,7 +53,7 @@ public class XXXSwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
     //gralPanel().panel.canvas = new GralCanvasStorage();
     SwtWdgCanvas swtCanvas = new SwtWdgCanvas(this, (SwtMng)gralMng._mngImpl, this._panel.canvas, parent, style);
     super.panelSwtImpl = swtCanvas;
-    swtCanvas.addControlListener(resizeItemListener);
+    //swtCanvas.addControlListener(resizeItemListener);
     swtCanvas.setData(this);
     swtCanvas.setLayout(null);
     XXXcurrColor = swtCanvas.getForeground();

@@ -1622,7 +1622,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
   
   
   
-  @Override protected void resize ( ) {
+  @Override protected void resizePostPreparation ( ) {
     if(this._wdgImpl !=null) {
       ((GraphicImplAccess)this._wdgImpl).resizeTable(super.pixSize);
     }
@@ -2010,7 +2010,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       //Now draw:
       //
       int ix = -1;
-      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
+      //this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_updateCells, "updTableCells %d->%d: %8X", this.outer.lineSelectedixCellLast, this.outer.lineSelectedixCell, this.outer.bitLinesForCellChanged);
       while(++ix < this.outer.zLineVisible) {
         if(true || (this.outer.bitLinesForCellChanged & (1<<ix)) !=0) {  // non relevant CPU load impact
           line = this.outer.linesForCell[ix];                            // marking with bitLinesForCellChanged is not sufficient yet.
@@ -2302,7 +2302,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
 
       }
       boolean bGrThread = this.widgg.gralMng.currThreadIsGraphic();
-      this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_setFocusCell, "set Focus Table %b:[%d, %d]", bGrThread, this.outer.lineSelectedixCell, this.outer.colSelectedixCellC);
+      //this.widgg.gralMng.log.sendMsg(GralMng.LogMsg.gralTable_setFocusCell, "set Focus Table %b:[%d, %d]", bGrThread, this.outer.lineSelectedixCell, this.outer.colSelectedixCellC);
       
     }
 

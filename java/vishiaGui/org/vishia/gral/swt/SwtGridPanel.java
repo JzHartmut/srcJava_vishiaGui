@@ -103,9 +103,9 @@ public class SwtGridPanel extends SwtPanel { //XXXSwtCanvasStorePanel {
       super.wdgimpl = panel;                  // unified access in GraLWidget 
       
       if(whatis !='9') {
-        panel.addControlListener(this.resizeItemListener);
+        //panel.addControlListener(this.resizeItemListener);
       }
-      panel.addFocusListener(super.focusListener);
+      //panel.addFocusListener(super.focusListener);
       sLog.append("new swt.Panel "); wdgg.pos().toString(sLog);
       panel.setData(this);
       panel.setLayout(null);
