@@ -217,32 +217,10 @@ public class SwtPanel extends GralPanelContent.ImplAccess
   
   final static String nl = "\n| | | |                               ";
 
-  private void XXXreportAllContent(Appendable out, int level) throws IOException {
-    if(level < 20) {
-      out.append(nl.substring(0, 2*level+1)).append("SwtComposite: ").append(this.widgg.name);
-      outBounds(this.panelSwtImpl, out);
-      for(Control wdgswt: this.panelSwtImpl.getChildren()) {
-        Object widggo = wdgswt.getData();
-        out.append(nl.substring(0,2*level+1)).append("+-").append(wdgswt.toString());
-        outBounds(wdgswt, out);
-        if(wdgswt instanceof Composite) {
-         
-          SwtPanel swtPanel = (SwtPanel)wdgswt.getData();
-          swtPanel.XXXreportAllContent(out, level+1);
-        } else {
-          out.append(nl.substring(0,2*level+1)).append("+-");
-          GralWidget.ImplAccess wdgi = (SwtPanel)wdgswt.getData();
-          wdgi.widgg.toString(out);
-          outBounds(this.panelSwtImpl, out);
-        }
-      }
-    } else {
-      out.append("\n .... more");
-    }
-  }
 
   
   private static void reportAllContentImpl(Composite swtComp, Appendable out, int level) throws IOException {
+    StringBuilder sb = new StringBuilder(100);
     for(Control wdgswt: swtComp.getChildren()) {
       Object widggo = wdgswt.getData();
       out.append(nl.substring(0,2*level+1)).append("+-").append(wdgswt.toString());
@@ -250,10 +228,12 @@ public class SwtPanel extends GralPanelContent.ImplAccess
       if(widggo == null ) { out.append(" no gral aggr"); }
       else if(widggo instanceof GralWidget) {
         GralWidget wdgg = (GralWidget)widggo;
-        wdgg.toString(out);
+        sb.setLength(0);
+        out.append(wdgg.toString(sb));
       } else if(widggo instanceof GralWidget.ImplAccess) {
         GralWidget wdgg = ((GralWidget.ImplAccess)widggo).widgg;
-        wdgg.toString(out);
+        sb.setLength(0);
+        out.append(wdgg.toString(sb));
       } else if(widggo instanceof GralTable.CellData) {
         out.append("GralTable.CellData");
       } else {

@@ -10,7 +10,7 @@ import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
-import org.vishia.util.ObjectVishia;
+import org.vishia.util.ToStringBuilder;
 import org.vishia.util.StringPart;
 import org.vishia.util.StringPartScan;
 
@@ -183,7 +183,7 @@ java org.vishia.gral.base.GralPos.testScanSize();
  * @author Hartmut Schorrig
  *
  */
-public class GralPos extends ObjectVishia implements Cloneable
+public class GralPos implements Cloneable, ToStringBuilder
 {
   /**Version, history and license.
    * <ul>
@@ -204,7 +204,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * <li>2022-12-20 Hartmut chg {@link #parent} can now be also a comprehensive widget, using {@link GralWidgetBase_ifc}.
    * <li>2022-12-17 Hartmut new {@link #setAsFrame()}
    * <li>2022-11-20 showing Area9 positions, now ABC ar colomns not rows.
-   * <li>2022-11-20 Using {@link ObjectVishia} for improved {@link ObjectVishia#toString(Appendable, String...)}
+   * <li>2022-11-20 Using {@link ToStringBuilder} for improved {@link ToStringBuilder#toString(Appendable, String...)}
    * <li>2022-11-12 accepts also a GralWindow instead a GralPanel to replace the {@link GralWindow#mainPanel}
    * <li>2022-11-11 accepts positions A1C3 for Area9
    * <li>2022-10-27 new {@link #calcWidgetPosAndSize(GralGridProperties)} without more arguments.
@@ -1304,7 +1304,7 @@ public class GralPos extends ObjectVishia implements Cloneable
    * @return b for concatenate.
    * @throws IOException can be force RuntimeException if a StringBuilder is given as Appendable
    */
-  @Override public Appendable toString(Appendable b, String ... appendPanel) {
+  @Override public StringBuilder toString(StringBuilder b, String ... appendPanel) {
     try {
       b.append('@');
       if(appendPanel !=null && this.parent != null) {

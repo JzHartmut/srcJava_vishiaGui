@@ -51,8 +51,7 @@ public class GralLabel extends GralWidget
   
   @Override public String toString() {
     StringBuilder b = new StringBuilder();
-    try { super._wdgPos.toString(b, "p").append(" Text:").append(getText());
-    } catch(IOException exc) { throw new RuntimeException("unexpected: ", exc); };
+    super._wdgPos.toString(b, "p").append(" Text:").append(getText());
     return b.toString();
   }
   

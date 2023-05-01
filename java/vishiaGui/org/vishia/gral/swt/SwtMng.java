@@ -1388,7 +1388,7 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
     if(data instanceof GralWidget) {
       String sClass = data.getClass().getName();
       out.append(" ").append(sClass).append(": ");
-      ((GralWidget)data).toString(out);
+      out.append(((GralWidget)data).toString(new StringBuilder(200)));
     } else {
       out.append("data = ").append(data == null ? "null" : data.toString());
     }

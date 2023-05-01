@@ -13,14 +13,14 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.Debugutil;
-import org.vishia.util.ObjectVishia;
+import org.vishia.util.ToStringBuilder;
 
 /**It is the base calss for comprehensive widgets,
  * contains only the basically data for GralPos os the whole widget,
  * the GralMng and the  
  *
  */
-public abstract class GralWidgetBase  extends ObjectVishia implements GralWidgetBase_ifc {
+public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuilder  {
 
 
 
@@ -218,12 +218,14 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
           out.append('(').append(((GralPanelContent)GralWidgetBase.this)._panel.labelTab).append(')');
         }
         out.append(" @").append(GralWidgetBase.this._wdgPos.toString());
+        StringBuilder sb = new StringBuilder(100);
         for(GralWidgetBase widg: this.widgetList) {
           if(widg._compt !=null) { // instanceof GralPanelContent) {
             widg._compt.reportAllContent(out, level+1);
           } else {                                   // simple widget without sub widgets
             out.append(nl.substring(0,2*level+1)).append(GralWidgetBase.this.isVisible() ? GralWidgetBase.this.hasFocus()? "*-" : "+-" : ":-");
-            widg.toString(out);
+            sb.setLength(0);
+            out.append(widg.toString(sb));
           }
         }
       } else {
@@ -584,7 +586,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
 
   
   
-  @Override public Appendable toString(Appendable u, String ... cond) {
+  @Override public StringBuilder toString(StringBuilder u, String ... cond) {
     try {
       if(this.name !=null) { u.append(":").append(this.name);}
       if(this._wdgPos !=null){
@@ -592,7 +594,7 @@ public abstract class GralWidgetBase  extends ObjectVishia implements GralWidget
       } else {
         u.append("@?");
       }
-    } catch(IOException exc) {
+    } catch(Exception exc) {
       throw new RuntimeException("unexpected", exc);
     }
     return u;

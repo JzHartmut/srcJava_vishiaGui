@@ -26,7 +26,7 @@ import org.vishia.gral.widget.GralLabel;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
-import org.vishia.util.ObjectVishia;
+import org.vishia.util.ToStringBuilder;
 
 
 
@@ -1949,7 +1949,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
 
 
 
-  @Override public Appendable toString(Appendable u, String ... cond) {
+  @Override public StringBuilder toString(StringBuilder u, String ... cond) {
     try {
       u.append(this.whatIs);
       if(this instanceof GralLabel)
@@ -1972,7 +1972,7 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
         String vString = this.variable.toString();
         u.append(" var=").append(vString);
       }
-    } catch(IOException exc) {
+    } catch(Exception exc) {
       throw new RuntimeException("unexpected", exc);
     }
     return u;
@@ -2323,7 +2323,12 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
  * @since 2022-10, necessary for referenced GralMng, not as singleton.
  *
  */
-class GralWidgetSetMng extends ObjectVishia {
+class GralWidgetSetMng implements ToStringBuilder {
+
+  @Override public StringBuilder toString ( StringBuilder app, String... cond ) {
+    // TODO Auto-generated method stub
+    return app;
+  }
 
 
 }
