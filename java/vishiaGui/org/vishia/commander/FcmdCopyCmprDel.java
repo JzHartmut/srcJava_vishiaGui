@@ -134,9 +134,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   /**The file card where the directory content is shown where the files will be copied to, the destination. */
   FcmdFileCard fileCardSrc, fileCardDst;
 
-  /**The source file to copy. It is set in the {@link #actionConfirmCopy()}. Either dirSrc == fileSrc
-   * and the {@link #sFilesSrc} contains some file names, or dirSrc is the directory of fileSrc, fileSrc is the only one
-   * file to copy (maybe a directory) and sFilesSrc is empty.
+  /**The source dir and file to use. 
+   * It is set in the {@link #activateWindow()} due to the situation of selected files in the first file table of the Fcmd:
+   * see {@link #getSrcDstFileDir(boolean, GralWidget, GralWidget)}.
    */
   FileRemote srcDir, srcFile;
 
@@ -252,7 +252,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     GralPos refPos = new GralPos(main.gui.gralMng.screen);
     int windprops = GralWindow_ifc.windConcurrently + GralWindow_ifc.windResizeable;
     this.windConfirmCopy = new GralWindow(refPos, "@screen,30+42,30+70=" + name + "Window", cmdArg.name, windprops);
-    this.windConfirmCopy.setVisible(true);       // invisible per default, activate with setFocus()
+    this.windConfirmCopy.setVisible(false);       // invisible per default, activate with setFocus()
     //source path and check:
     //this.widgButtonClearSel = new GralButton(refPos, "clrSel", "clear selection", null);
     //
@@ -405,6 +405,24 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   
   /**Gets the situation of selection in the file panels for source and destination.
+   * <ul><li>If ".." is selected, and no entry is marked, it means to somewhat with this whole directory.
+   *   Then {@link #srcDir} is set with the tables dir, {@link #srcFile} = null, showMask = "** /*"
+   * <li>If ".." is selected, and one or some entries are marked, it means to somewhat with the selected files.
+   *   Then {@link #srcDir} is set with the tables dir, {@link #srcFile} = null, showMask = "?!"
+   *   It means the marked files should be taken. 
+   * <li>If any directory entry is selected and not marked or only this entry is marked, 
+   *   then it means somewhat should be done with the whole directory.
+   *   Then {@link #srcDir} is set with the tables dir, {@link #srcFile} is set with the dir, 
+   *   and showMask is set with  "dirname/** /*". Do not use {@link #srcFile}, use the mask to walk.
+   * <li>If any file entry is selected and not marked or only this entry is marked, 
+   *   then it means somewhat should be done with the ony one file.
+   *   Then {@link #srcFile} is set with it, {@link #srcDir} = null, the mask is set with the file name (but not changeable)
+   * <li>If more as one entry is marked and one of them is also selected, 
+   *   then it means somewhat should be done with all marked entries.
+   *   Then {@link #srcDir} is set with the tables dir, {@link #srcFile} = null
+   *   The mask is set with "?!", it means do somewhat with the marked files.
+   * </ul>  
+   * Hint: The mask is able to change if {@link #srcDir} is set only.   
    * 
    * @param bAlsoDst false then handle only the current panel.
    */
@@ -412,14 +430,14 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     final FileRemote[] setSrc = new FileRemote[2];
     final GralWidget widgShowSrc;
     if(widgShowSrcArg !=null) { widgShowSrc = widgShowSrcArg; }
-    else { widgShowSrc = this.widgSrcDir; }
+    else { widgShowSrc = this.widgSrcDir; }                // decide using widgSrcDir or another from argument
     //
     this.fileCardSrc = this.main.getLastSelectedFileCards()[0];
     final Estate newState;
-    if(fileCardSrc ==null) { ///
-      widgShowSrc.setText("??");  
+    if(fileCardSrc ==null) { //------------------------------ non first panel given:
+      widgShowSrc.setText("??");                           // show ?? as source dir
       widgShowMask.setText("");
-      newState = Estate.finit;
+      newState = Estate.finit;                             // state finit, offer [close] on widgBtnExec
     } else {
 //      this.fileCardSrc = fileCardSrc;     // Filecards: active is src, second is destination.
 //      this.fileCardDst = lastFileCards[1];
@@ -430,45 +448,45 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       // and not some files which are marked outside of the own focus. 
       // If you want to copy some marked files you should select on of these marked files.
       List<FileRemote> listFileSrc = this.fileCardSrc.getSelectedFiles(true, FileMark.selectSomeInDir | FileMark.select);
-      FileRemote srcFile = this.fileCardSrc.currentFile();
-      FileRemote srcDir = this.fileCardSrc.currentDir();
+      FileRemote srcFile = this.fileCardSrc.currentFile(); // the selected file or dir
+      FileRemote srcDir = this.fileCardSrc.currentDir();   // the dir of the card
       this.widgSrcDir.gralMng.log.sendMsg(55, "srcDir = %s, srcFile = %s", srcDir.getPathChars(), srcFile.getName());
       //String sDirSrc;
       if(listFileSrc == null){ // this does never occur but show it:
         widgShowSrc.setText("??? listFileSrc==null");
         newState = Estate.error;
-      } else if(srcFile == srcDir) { //------------ .. is selected:
+      } else if(srcFile == srcDir) { //------------ ".." is selected:
           setSrc[0] = srcDir;
           setSrc[1] = null;                      // offering with "../*" illustrates, it is a directory with selection.
           if(listFileSrc.size() >1) {            // there are some more files immediately selected
             widgShowSrc.setText(srcFile.getPathChars().toString() + "*");  // it ends with "/*" means use the content of directory
             widgShowMask.setText("?!");
             newState = Estate.check;
-          } else {
+          } else {                               // one file or dir is selected
             widgShowSrc.setText(srcFile.getPathChars().toString() + "*");  // it ends with "/*" means use the content of directory
             String sShowMask = widgShowMask.getText();
             //if(sShowMask.length() ==0) {
-              widgShowMask.setText("**/*.*");
+              widgShowMask.setText("**/*");
               newState = Estate.check;
             //}
           }
-      } else {
+      } else {                       //------------ one or more files (dirs) are marked
         if(listFileSrc.size() ==1) { //------------ either only one is marked and selected, or one no marked selected file or dir
           assert(srcFile == listFileSrc.get(0));
-          if(srcFile.isDirectory()) {         // it is assumed that the list is currently refreshed with the file system.
-              setSrc[0] = srcDir;               // only one file is selected, do not use walk-dir
-              setSrc[1] = srcFile;            // offering with "../" illustrates, it is a directory without selection.
+          if(srcFile.isDirectory()) {  //---------- directory selected, it is assumed that the list is currently refreshed with the file system.
+              setSrc[0] = srcDir;                // the base directory of the table
+              setSrc[1] = srcFile;               // only one directory is selected, do not use walk-dir
               widgShowSrc.setText(srcDir.getPathChars());  // it ends with "/" means use this directory
-              widgShowMask.setText(srcFile.getName() + "/**/*.*");  // not ends with "/"
+              widgShowMask.setText(srcFile.getName() + "/**/*");  // the file is part of the mask
               newState = Estate.check;
-          } else {
+          } else {                     //--------- file is selected
             setSrc[0] = null;                    // only one file is selected, do not use walk-dir
             setSrc[1] = srcFile;                 // assume it exists
             widgShowSrc.setText(srcFile.getDirChars());  // not ends with "/"
             widgShowMask.setText(srcFile.getName());     // not ends with "/"
             newState = Estate.ready;
           }
-        } else {                                 // more as one files/dirs are marked, also the current
+        } else {                     //------------ more as one files/dirs are marked, also the current
           widgShowSrc.setText(srcDir.getPathChars().toString() + "*");  // not ends with "/"
           if(!srcDir.isMarked(FileMark.select | FileMark.selectSomeInDir)) {
             srcDir.setMarked(FileMark.selectSomeInDir);  // srcDir should be not marked, not to copy
@@ -476,7 +494,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
           String sShowMask = widgShowMask.getText();
           if(listFileSrc.size() ==0) {
             if(sShowMask.length() == 0) {
-              widgShowMask.setText("*.*");
+              widgShowMask.setText("*");
             }
             newState = Estate.check;
           }else {
@@ -600,7 +618,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     if(this.progressEv.occupy(this.evSrc, true)) {
       return true;
     } else {
-      this.widgState.setText("event blocks - may pressing abort");
+      this.widgCopyState.setText("event blocks - may pressing abort");
       return false;
     }
   }
@@ -616,16 +634,16 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     if(FcmdCopyCmprDel.this.state == Estate.start || FcmdCopyCmprDel.this.state == Estate.check) { //widgg.sCmd.equals("check")){
       FcmdCopyCmprDel.this.action.progressAction.clear();
       if(occupyProgress()) {
-        if(FcmdCopyCmprDel.this.cmd == Ecmd.delete){
-          execCheck();
+        if(FcmdCopyCmprDel.this.cmd == Ecmd.compare){
+          execCompare();
+        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.search){ // bFineSelect? todo debug it
+          execSearch();
+        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.delete){
+          execDel();
         } else if(FcmdCopyCmprDel.this.cmd == Ecmd.copy || FcmdCopyCmprDel.this.bFineSelect){
           execCheck();
         } else if(FcmdCopyCmprDel.this.cmd == Ecmd.move){
           execCheck();
-        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.compare){
-          execCompare();
-        } else if(FcmdCopyCmprDel.this.cmd == Ecmd.search){
-          execSearch();
         }
       }
     } else if(FcmdCopyCmprDel.this.state == Estate.checked || FcmdCopyCmprDel.this.state == Estate.ready) { //widgg.sCmd.equals("copy")) {
@@ -692,10 +710,19 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   final protected void execDel(){
-    if(this.state == Estate.checked){
-      this.srcFile.deleteMarkedInThread(FileMark.select, this.callbackFromFilesExec, this.progressEv.data());
-    } else if(this.state == Estate.start){
+    String selectMask = this.widgSrcSelection.getText();
+    if(this.srcDir !=null) {
+      assert(selectMask.length()>0);             // some files should be selected in
+      if(selectMask.startsWith("?")) {
+        this.widgCopyState.setText("todo deal with marked files to delete");
+      } else {
+        this.srcDir.deleteFilesDirTree(false, 999, selectMask, this.progressEv);
+      }
+    } 
+    else if(this.srcFile !=null) {
+      this.srcFile.delete(this.progressEv);
     }
+    // if the progressEv receives "done" or an error, it changes the dialog texts. Especially on done offer 'close' on exec button 
   }
 
 
@@ -754,7 +781,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         if(this.srcDir !=null) {
           int selectMark = FileMark.select | FileMark.selectSomeInDir;
           int resetMark = FileMark.resetMark + selectMark;
-          this.srcDir.copyDirTreeTo(false, this.dirDst, 0, resetMark, resetMark, null, selectMark, null, this.progressEv);
+          this.srcDir.copyDirTreeTo(false, this.dirDst, 0, resetMark, resetMark, null, selectMark, this.progressEv);
         } else {
           //TODO maybe evaluate
           final String sName;
@@ -1182,7 +1209,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
     protected final FileRemoteProgress progressAction = new FileRemoteProgress("progressAction", null) {
 
-      @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) {
+      @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEventData, ?> evCmd) {
         showCurrentProcessedFileAndDir(progress); //this.currFile, this.nrFilesProcessed, this.bDone);
         if(progress.done()) {
           return EventConsumer.mEventConsumFinished;
@@ -1249,7 +1276,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     */
    GralUserAction actionCheck = new GralUserAction("actionCheck")
    {
-     /**Opens the confirm-copy window and fills its fields to ask the user whether confirm.
+     /**Openls its fields to ask the user whether confirm.
       * @param dst The path which is selected as destination. It may be a directory or a file
       * @param src The path which is selected as source. It may be a directory or a file.
       */
@@ -1471,7 +1498,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
    * progression. The operator on this machine sees this situation because the progression bar stands.
    * The operator can abort the copy process to preset to a default empty state.
    */
-  protected GralUserAction actionButtonOk = new GralUserAction("actionButtonCopy")
+  protected GralUserAction actionButtonOk = new GralUserAction("actionButtonOk")
   { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
     { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
         FcmdCopyCmprDel.this.exec();
@@ -1770,11 +1797,11 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   FileRemoteWalkerCallback callbackFromFilesCheck = new FileRemoteWalkerCallback() {
-    @Override public void start(FileRemote startDir) {
+    @Override public void start(FileRemote startDir, FileRemote.CmdEventData co) {
       FcmdCopyCmprDel.this.fileProcessed = null;
     }
 
-    @Override public Result offerParentNode(FileRemote file) {
+    @Override public Result offerParentNode(FileRemote file, Object data, Object filter) {
       if(file.isSymbolicLink()) {
         return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
       } else {
@@ -1786,7 +1813,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     /**Finish a directory, check whether a file panel should be refreshed.
      * @see org.vishia.util.SortedTreeWalkerCallback#finishedParentNode(java.lang.Object, org.vishia.util.SortedTreeWalkerCallback.Counters)
      */
-    @Override public Result finishedParentNode(FileRemote dir) {
+    @Override public Result finishedParentNode(FileRemote dir, Object data, Object oWalkInfo) {
       FcmdCopyCmprDel.this.main.refreshFilePanel(dir);
       return Result.cont;
     }
@@ -1820,9 +1847,10 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   FileRemoteWalkerCallback callbackFromFilesExec = new FileRemoteWalkerCallback() {
-    @Override public void start(FileRemote startDir) {  }
+    
+    @Override public void start(FileRemote startDir, FileRemote.CmdEventData co) {  }
 
-    @Override public Result offerParentNode(FileRemote file) {
+    @Override public Result offerParentNode(FileRemote file, Object data, Object filter) {
       if(file.isSymbolicLink()) {
         return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
         //but it does not activate this, deselect before
@@ -1831,7 +1859,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       }
     }
 
-    @Override public Result finishedParentNode(FileRemote dir) {
+    @Override public Result finishedParentNode(FileRemote dir, Object data, Object oWalkInfo) {
       if(dir.isSymbolicLink()) {
         return Result.skipSubtree;  //do not handle symbolic links for cmp, copy and delete
       } else {

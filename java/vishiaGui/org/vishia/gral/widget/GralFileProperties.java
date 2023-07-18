@@ -200,8 +200,8 @@ public class GralFileProperties extends GralWidgetBase {
     } else {
       this.bUnixSystem = System.getenv("WINDIR") == null;
     }
-    this.evBack = new EventWithDst<FileRemoteProgressEvData, FileRemote.CmdEvent>("evBack-Props", new FileRemoteProgressEvData()); //new FileRemote.CallbackEvent("GralFileProperties-evBack", this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
-    this.evCntLen = new EventWithDst<FileRemoteProgressEvData, FileRemote.CmdEvent>("evBack-ctLen", this.evSrc, this.callbackCntLen, this.gralMng, new FileRemoteProgressEvData()); //new FileRemote.CallbackEvent("GralFileProperties-evChg", this.evSrc, null, null, null, null, this.evSrc);
+    this.evBack = new EventWithDst<FileRemoteProgressEvData, FileRemote.CmdEventData>("evBack-Props", new FileRemoteProgressEvData()); //new FileRemote.CallbackEvent("GralFileProperties-evBack", this.evSrc, null, null, this.callbackChgProps, null, this.evSrc);
+    this.evCntLen = new EventWithDst<FileRemoteProgressEvData, FileRemote.CmdEventData>("evBack-ctLen", this.evSrc, this.callbackCntLen, this.gralMng, new FileRemoteProgressEvData()); //new FileRemote.CallbackEvent("GralFileProperties-evChg", this.evSrc, null, null, null, null, this.evSrc);
     this.widgLink = new GralTextField(refPos, "@3.5-3.2++, 1..-1=link-" + this.name, "symbolic link", "t");
     this.widgDir = new GralTextField(refPos, "dir-" + this.name, "directory path", "t");
     this.widgName = new GralTextField(refPos, "@+,1..-9=name-" + this.name, "filename", "t", GralTextField.Type.editable);
@@ -630,7 +630,7 @@ public class GralFileProperties extends GralWidgetBase {
 
   FileRemoteProgress callbackChgProps = new FileRemoteProgress("callbackChgProps", super.gralMng) { 
     
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEventData, ?> evCmd) { 
       if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
         FileRemote newFile = progress.currFile;
         if(newFile == GralFileProperties.this.actFile && newFile.exists()) {   // file itself is not changed (not renamed, not deleted)
@@ -693,7 +693,7 @@ public class GralFileProperties extends GralWidgetBase {
   
   final FileRemoteProgress callbackCntLen = new FileRemoteProgress("callbackCntLen", super.gralMng) { 
     
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEventData, ?> evCmd) { 
 
   
       if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
@@ -717,7 +717,7 @@ public class GralFileProperties extends GralWidgetBase {
    */
   final FileRemoteProgress callbackCopyMove = new FileRemoteProgress("callbackCopyMove", super.gralMng) { 
     
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) { 
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEventData, ?> evCmd) { 
       if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done) {
         GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorUnchanged, -1);
         GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextOk);

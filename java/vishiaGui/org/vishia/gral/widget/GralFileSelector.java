@@ -21,7 +21,7 @@ import org.vishia.fileRemote.FileAccessZip;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.fileRemote.FileRemote.CmdEvent;
+import org.vishia.fileRemote.FileRemote.CmdEventData;
 import org.vishia.fileRemote.FileRemoteProgress;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
@@ -2216,7 +2216,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      */
     final FileRemoteProgress fillinCallback = new FileRemoteProgress("fillinCallback", null) { //GralFileSelector.super.gralMng) {
 
-      @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<CmdEvent, ?> evCmd ) {
+      @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<CmdEventData, ?> evCmd ) {
         if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.refreshFile) {
           showFile(progress.currFile);  //invoked also for dirs because depth=1
         }
@@ -2281,13 +2281,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   protected final FileRemoteWalkerCallback XXXcallbackChildren1 = new FileRemoteWalkerCallback()
   {
 
-    @Override public void start(FileRemote startDir){}
+    @Override public void start(FileRemote startDir, FileRemote.CmdEventData co){}
 
-    @Override public Result offerParentNode(FileRemote file) {
+    @Override public Result offerParentNode(FileRemote file, Object oPath, Object filter) {
       return Result.cont; 
     }
 
-    @Override public Result finishedParentNode(FileRemote file) {
+    @Override public Result finishedParentNode(FileRemote file, Object oPath, Object oWalkInfo) {
       //don't call showFile(file) because it is the parent which should be shown.
       return Result.cont; 
     }

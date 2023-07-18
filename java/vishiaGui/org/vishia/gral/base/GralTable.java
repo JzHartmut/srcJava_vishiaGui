@@ -772,7 +772,7 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         this.colSelectedixCellC = ixcolumn;
       }
       this.bPrepareVisibleArea = true;
-      redraw();
+      redraw(100,100);                 // wait with redraw, else too much redraw requests.
     } else {
       this.gralMng().log().writeWarning("table not visiable");
     }
@@ -1426,8 +1426,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
       } break;
       case KeyCode.mouseWheelUp:                           // cursor or mouse wheel to select lines
       case KeyCode.up: {
-        if(keyCode != KeyCode.mouseWheelUp && (time - this.timeLastKeyUpDn) < 80) {
-          System.out.print("ö");
+        if(keyCode != KeyCode.mouseWheelUp && (time - this.timeLastKeyUpDn) < 50) {
+          //System.out.print("ö");
           done = true;                                     // prevent too much reaction if the key repetition rate is high
         } else {
           this.timeLastKeyUpDn = time;
@@ -1485,8 +1485,8 @@ public final class GralTable<UserData> extends GralWidget implements GralTable_i
         }
         else if(keyCode == KeyCode.dn || keyCode == this.keyMarkDn || keyCode == KeyCode.mouseWheelDn
             ) {                                            // arrow down, mouse wheel down
-          if(keyCode != KeyCode.mouseWheelDn && (time - this.timeLastKeyUpDn) < 80) {
-            System.out.print("ö");
+          if(keyCode != KeyCode.mouseWheelDn && (time - this.timeLastKeyUpDn) < 50) {
+            //System.out.print("ö");
             done = true;                                     // prevent too much reaction if the key repetition rate is high
           } else {
             this.timeLastKeyUpDn = time;

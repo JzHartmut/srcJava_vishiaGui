@@ -17,7 +17,7 @@ public class GitGuiCmd extends MainCmd {
     
     public String startFile = ".";
     
-    public String graphicSize = "C";
+    public String graphicSize = "D";
 
     public CmdArgs(GitGuiPaths guiPaths) {
       this.guiPaths = guiPaths;

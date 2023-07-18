@@ -202,7 +202,7 @@ public class FcmdDelete
   
   
   FileRemoteProgress success = new FileRemoteProgress("success", null){
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEvent, ?> evCmd) {
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEventData, ?> evCmd) {
 //      FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
 //      if(callback.successCode !=0){
 //        main.log.writeError("can't delete " + callback.getFileSrc().getCanonicalPath());
