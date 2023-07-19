@@ -135,9 +135,9 @@ public abstract class GralGraphicOrder extends EventConsumerAwait implements Pay
   public String srcInfo ( ) { return this.sInfo; }
 
   
-  @Override public void clean () {
+  @Override public GralGraphicOrder clean () {
     // TODO Auto-generated method stub
-    
+    return this;
   }
 
 

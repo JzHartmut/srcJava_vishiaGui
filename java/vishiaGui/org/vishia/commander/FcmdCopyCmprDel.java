@@ -11,6 +11,7 @@ import org.vishia.event.EventWithDst;
 import org.vishia.event.Payload;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
+import org.vishia.fileRemote.FileRemoteCmdEventData;
 import org.vishia.fileRemote.FileRemoteProgress;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
@@ -867,7 +868,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //it is a check of sendEvent and it should relinguish the event.
       //====>
       if(this.srcDir !=null) {
-        this.srcDir.cmprDirTreeTo(false, this.dirDst, sSrcMask, 0, this.progressEv);
+        this.srcDir.cmprDirTreeTo(false, this.dirDst, sSrcMask, this.progressEv);
       }
       //setTexts(Estate.busy);
     } else {
@@ -1086,7 +1087,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         synchronized(this) { try{ wait(200);} catch(InterruptedException exc) {}}
       }
       System.out.println(LogMessage.timeCurr("stop testProgressThread"));
-      progressEvData.done(FileRemote.Cmd.copyFile, null);
+      progressEvData.done(FileRemoteCmdEventData.Cmd.copyFile, null);
     }
   };
 
@@ -1112,7 +1113,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       if(sError !=null) {
         u.append(sError);
         this.state = Estate.error;
-      } else if(order.answerToCmd == FileRemote.Cmd.walkSelectMark) {
+      } else if(order.answerToCmd == FileRemoteCmdEventData.Cmd.walkRefresh) {
         u.append("checked");
         this.state = Estate.checked;
       } else {
@@ -1209,7 +1210,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
     protected final FileRemoteProgress progressAction = new FileRemoteProgress("progressAction", null) {
 
-      @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemote.CmdEventData, ?> evCmd) {
+      @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, ?> evCmd) {
         showCurrentProcessedFileAndDir(progress); //this.currFile, this.nrFilesProcessed, this.bDone);
         if(progress.done()) {
           return EventConsumer.mEventConsumFinished;
@@ -1797,7 +1798,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
 
   FileRemoteWalkerCallback callbackFromFilesCheck = new FileRemoteWalkerCallback() {
-    @Override public void start(FileRemote startDir, FileRemote.CmdEventData co) {
+    @Override public void start(FileRemote startDir, FileRemoteCmdEventData co) {
       FcmdCopyCmprDel.this.fileProcessed = null;
     }
 
@@ -1848,7 +1849,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 
   FileRemoteWalkerCallback callbackFromFilesExec = new FileRemoteWalkerCallback() {
     
-    @Override public void start(FileRemote startDir, FileRemote.CmdEventData co) {  }
+    @Override public void start(FileRemote startDir, FileRemoteCmdEventData co) {  }
 
     @Override public Result offerParentNode(FileRemote file, Object data, Object filter) {
       if(file.isSymbolicLink()) {

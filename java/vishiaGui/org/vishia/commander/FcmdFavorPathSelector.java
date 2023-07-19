@@ -742,6 +742,9 @@ class FcmdFavorPathSelector
 
   
 
+  /**This cleans all in the {@link FileCluster} and rereads and recreates all files from the file system.  
+   * TODO It is too much for only deleselect! TODO Should be part of FileRemote, not in this application.
+   */
   GralUserAction actionDeselectDirtree = new GralUserAction("actionDeselectDirtree")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
       FcmdFileCard fileCard = main.getLastSelectedFileCard();
@@ -766,6 +769,9 @@ class FcmdFavorPathSelector
   
   
 
+  /**TODO similar {@link #actionDeselectDirtree}
+   * 
+   */
   GralUserAction actionCleanFileRemote = new GralUserAction("actionCleanFileRemote")
   { @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params) { 
       FcmdFileCard fileCard = main.getLastSelectedFileCard();
