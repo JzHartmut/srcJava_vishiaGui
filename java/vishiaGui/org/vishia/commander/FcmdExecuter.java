@@ -36,7 +36,7 @@ public class FcmdExecuter
   
   /**Version, history and license. This String is visible in the about info.
    * <ul>
-   * <li>2023-07-21 Hartmut test extension not only with lower case, also original. 
+   * <li>2023-07-21 Hartmut test extension not only with lower case, also original, usable for special cases.
    * <li>2017-01-01 Hartmut uses {@link JZtxtcmdExecuter} and {@link CmdExecuter}. CmdQueue and CmdStore are obsolete. 
    * <li>2016-08-28 Hartmut chg: The cfg file for jzcmd commands are named cmdjz.cfg anyway, in the directory given with cmdcfg:path/to/cmd.cfg. 
    * <li>2011-10-00 Hartmut created
