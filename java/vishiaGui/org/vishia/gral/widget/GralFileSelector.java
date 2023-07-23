@@ -2214,9 +2214,9 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      * It is called in the thread of file walking (or in the receive thread of callback)
      * to prevent lagging with event hanging. 
      */
-    final FileRemoteProgress fillinCallback = new FileRemoteProgress("fillinCallback", null) { //GralFileSelector.super.gralMng) {
+    final FileRemoteProgress fillinCallback = new FileRemoteProgress("fillinCallback", null, null) { //GralFileSelector.super.gralMng) {
 
-      @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, ?> evCmd ) {
+      @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd ) {
         if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.refreshFile) {
           showFile(progress.currFile);  //invoked also for dirs because depth=1
         }

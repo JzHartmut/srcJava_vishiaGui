@@ -14,6 +14,11 @@ import org.vishia.event.Payload;
  * Because this class inherits from {@link EventConsumer} the operation {@link EventConsumer#processEvent(EventObject)}
  * need to be overridden. Whereby the argument event is type of the overridden type itself.
  * Hence it is not necessary to evaluate, it is this itself.
+ * <br><br>
+ * The Payload implementation is used only because this order is also the payload for the graphic event itself.
+ * The graphic event is of type 'EventWithDst<GralGraphicOrder, ?>', see {@link EventWithDst}. 
+ * Because the event is used on the same device between threads, communication via a serial line is not necessary.
+ * Hence the {@link Payload#serialize()} and ~deserialize() are dummy implementations. 
  * <br>
  * The instance of this class contains the {@link TimeOrder} which is necessary for the management of the execution time 
  * using the {@link GralMng} as {@link org.vishia.event.EventTimerThread}.
@@ -132,23 +137,24 @@ public abstract class GralGraphicOrder extends EventConsumerAwait implements Pay
     this.sInfo = org.vishia.util.ExcUtil.stackInfo(" src:", 4, 10).toString();
   }
 
+  /**Used for debugging and messaging: gets an information from where the order was created.
+   * @return
+   */
   public String srcInfo ( ) { return this.sInfo; }
 
   
   @Override public GralGraphicOrder clean () {
-    // TODO Auto-generated method stub
+    this.sInfo = "?";
     return this;
   }
 
 
   @Override public byte[] serialize () {
-    // TODO Auto-generated method stub
     return null;
   }
 
 
   @Override public boolean deserialize ( byte[] data ) {
-    // TODO Auto-generated method stub
     return false;
   }
 

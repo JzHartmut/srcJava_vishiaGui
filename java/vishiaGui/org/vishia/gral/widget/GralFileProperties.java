@@ -629,9 +629,9 @@ public class GralFileProperties extends GralWidgetBase {
   
 
 
-  FileRemoteProgress callbackChgProps = new FileRemoteProgress("callbackChgProps", super.gralMng) { 
+  FileRemoteProgress callbackChgProps = new FileRemoteProgress("callbackChgProps", super.gralMng, null) { 
     
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, ?> evCmd) { 
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) { 
       if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
         FileRemote newFile = progress.currFile;
         if(newFile == GralFileProperties.this.actFile && newFile.exists()) {   // file itself is not changed (not renamed, not deleted)
@@ -692,9 +692,9 @@ public class GralFileProperties extends GralWidgetBase {
   
   
   
-  final FileRemoteProgress callbackCntLen = new FileRemoteProgress("callbackCntLen", super.gralMng) { 
+  final FileRemoteProgress callbackCntLen = new FileRemoteProgress("callbackCntLen", super.gralMng, null) { 
     
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, ?> evCmd) { 
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) { 
 
   
       if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
@@ -716,9 +716,9 @@ public class GralFileProperties extends GralWidgetBase {
   /**Callback this in the execution thread of the file system. 
    * 
    */
-  final FileRemoteProgress callbackCopyMove = new FileRemoteProgress("callbackCopyMove", super.gralMng) { 
+  final FileRemoteProgress callbackCopyMove = new FileRemoteProgress("callbackCopyMove", super.gralMng, null) { 
     
-    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, ?> evCmd) { 
+    @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) { 
       if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done) {
         GralFileProperties.this.widgBtnCallback.setBackColor(GralFileProperties.this.colorUnchanged, -1);
         GralFileProperties.this.widgBtnCallback.setText(GralFileProperties.this.sWidgCallbackTextOk);
