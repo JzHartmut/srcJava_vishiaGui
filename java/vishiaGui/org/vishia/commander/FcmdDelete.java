@@ -10,7 +10,7 @@ import org.vishia.event.EventThread_ifc;
 import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCmdEventData;
-import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEventConsumer;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralValueBar;
@@ -202,7 +202,7 @@ public class FcmdDelete
 
   
   
-  FileRemoteProgress success = new FileRemoteProgress("success", null, null){
+  FileRemoteProgressEventConsumer success = new FileRemoteProgressEventConsumer("success", null, null){
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) {
 //      FileRemote.CallbackEvent callback = (FileRemote.CallbackEvent)ev;
 //      if(callback.successCode !=0){

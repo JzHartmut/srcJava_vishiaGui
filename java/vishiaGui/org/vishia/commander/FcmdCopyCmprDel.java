@@ -12,7 +12,7 @@ import org.vishia.event.Payload;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCmdEventData;
-import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEventConsumer;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.gral.base.GralButton;
@@ -1108,7 +1108,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.zFiles = order.nrofFilesSelected;
     if(order.done()) {
       this.zBytes = order.nrofBytesAll;
-      String sError = order.sError;
+      String sError = order.error();
       if(sError !=null) {
         u.append(sError);
         this.state = Estate.error;
@@ -1205,7 +1205,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   /**Will be initialized if the main.gralMng is available.
    */
 
-    class ProgressAction extends FileRemoteProgress {
+    class ProgressAction extends FileRemoteProgressEventConsumer {
 //        "progressAction" + , FcmdCopyCmprDel.this.widgCopyState.gralMng, null) {
 
       public ProgressAction(String name, EventThread_ifc progressThread, EventThread_ifc cmdThread) {

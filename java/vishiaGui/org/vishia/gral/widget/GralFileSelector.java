@@ -22,7 +22,7 @@ import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileMark;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCmdEventData;
-import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEventConsumer;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
 import org.vishia.fileRemote.XXXFileRemoteWalkerEvent;
@@ -2214,7 +2214,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
      * It is called in the thread of file walking (or in the receive thread of callback)
      * to prevent lagging with event hanging. 
      */
-    final FileRemoteProgress fillinCallback = new FileRemoteProgress("fillinCallback", null, null) { //GralFileSelector.super.gralMng) {
+    final FileRemoteProgressEventConsumer fillinCallback = new FileRemoteProgressEventConsumer("fillinCallback", null, null) { //GralFileSelector.super.gralMng) {
 
       @Override protected int processEvent ( FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd ) {
         if(progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.refreshFile) {

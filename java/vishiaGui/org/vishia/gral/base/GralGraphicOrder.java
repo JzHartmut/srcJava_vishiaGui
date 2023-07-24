@@ -11,31 +11,54 @@ import org.vishia.event.Payload;
 
 
 /**This is the base class for user classes, which contains code, that should be executed in the graphic thread.
+ * <br>
+ * This class is both, an EventConsumer to {@link EventConsumer#processEvent(EventObject)} for the graphic (the first task)
+ * as also contains the data for the graphic event by implementation of {@link Payload}.
+ * <ul>
+ * <li>In this manner the activator of the event can store some data for event execution in the order, 
+ * <li>then send the event to the graphic thread, the event refers this as payload.
+ * <li>then process the event exact with the same instance.
+ * </ul>
+ * The instance of this class contains the {@link TimeOrder} which is necessary for the management of the execution time 
+ * using the {@link GralMng} as {@link org.vishia.event.EventTimerThread}.
+ * The time order facility can be used to send the event not immediately but with delay,
+ * so that a renew of the order can be done if the time is not yet elapsed.
+ * <br>
+ * That are all necessities for a graphic oder.
+ * <br>
  * Because this class inherits from {@link EventConsumer} the operation {@link EventConsumer#processEvent(EventObject)}
- * need to be overridden. Whereby the argument event is type of the overridden type itself.
+ * need to be overridden in the inherit class.. Whereby the argument event is type of the overridden type itself.
  * Hence it is not necessary to evaluate, it is this itself.
+ * The 'processEvent(...)' does the necessary work.
  * <br><br>
- * The Payload implementation is used only because this order is also the payload for the graphic event itself.
- * The graphic event is of type 'EventWithDst<GralGraphicOrder, ?>', see {@link EventWithDst}. 
+ * The event instance itself of type 'EventWithDst<GralGraphicOrder, ?>', see {@link EventWithDst}.
+ * is also referenced as composite here, hence any possible order has its specific event. 
+ * It is used and activated if the source of the event becomes active. 
+ * <br><br>
  * Because the event is used on the same device between threads, communication via a serial line is not necessary.
  * Hence the {@link Payload#serialize()} and ~deserialize() are dummy implementations. 
  * <br>
- * The instance of this class contains the {@link TimeOrder} which is necessary for the management of the execution time 
- * using the {@link GralMng} as {@link org.vishia.event.EventTimerThread}.
  *   
  * @author Hartmut Schorrig.
  *
  */
 @SuppressWarnings("serial") 
-public abstract class GralGraphicOrder extends EventConsumerAwait implements Payload
+public abstract class GralGraphicOrder /*extends EventConsumerAwait<GralGraphicOrder, ?>*/ implements EventConsumer, Payload
 {
   
   /**Version and history.
    * <ul>
+   * <li>2023-07-24 Hartmut correct concept of 2023-02-01: Because now {@link EventConsumerAwait} 
+   *   needs a Payload derived from {@link org.vishia.event.PayloadBack} and this is as first type argument the GralGraphicOrder itself,
+   *   the formally refactoring was not possible (two extends will be necessary, from  GralGraphicOrder extends PayloadBack extends EventConsumerAwait).
+   *   But it is substantial a false concept, because this class is not a consumer of a callback event, 
+   *   it is a consumer of a forwarded command event. The {@link EventConsumerAwait#awaitExecution(long, boolean)} was never used also.
+   *   <br>
+   *   It was a slightly refactoring to implement a simple EventConsumer instead the EventConsumerAwait for all stuff.
    * <li>2023-02-21 Hartmut chg renamed from GralGraphicEventTimeOrder
    *   and changed of concept. This order refers now the event, it is not an event. 
    *   This was also done because deviation from {@link EventConsumerAwait} for {@link #awaitExecution(long)}
-   *   es essential operation. All is adapted and runs. 
+   *   as essential operation. All is adapted and runs. 
    * <li>2023-02-12 Hartmut new {@link #setStackInfo()} and {@link #sInfo} possible as information from the event producer
    *   to the event dst to inform from where and why comes the event proper usable to search and improve in software.
    * <li>2023-02-08 Hartmut now because the GralMng is also the {@link org.vishia.event.EventTimerThread}
@@ -124,7 +147,7 @@ public abstract class GralGraphicOrder extends EventConsumerAwait implements Pay
    * @param name The name is only used for showing in debugging.
    */
   protected GralGraphicOrder ( String name, GralMng gralMng) { 
-    super(gralMng);                              // gralMng is the eventThread.
+    //super(gralMng);                              // gralMng is the eventThread.
     this.gralMng = gralMng;
     this.ev = new EventWithDst<GralGraphicOrder, Payload>(name, gralMng.evSrc, this, gralMng, this); //new GraphicEvent(name, this);
     this.timeOrder = new TimeOrder(name, gralMng, this.ev); //this.ev.timeOrder;
@@ -142,6 +165,12 @@ public abstract class GralGraphicOrder extends EventConsumerAwait implements Pay
    */
   public String srcInfo ( ) { return this.sInfo; }
 
+  
+  @Override public EventThread_ifc evThread () {
+    return this.gralMng;
+  }
+
+  
   
   @Override public GralGraphicOrder clean () {
     this.sInfo = "?";

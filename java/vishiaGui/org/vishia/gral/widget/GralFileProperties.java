@@ -13,7 +13,7 @@ import org.vishia.event.EventThread_ifc;
 import org.vishia.event.EventWithDst;
 import org.vishia.fileRemote.FileRemote;
 import org.vishia.fileRemote.FileRemoteCmdEventData;
-import org.vishia.fileRemote.FileRemoteProgress;
+import org.vishia.fileRemote.FileRemoteProgressEventConsumer;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
@@ -635,7 +635,7 @@ public class GralFileProperties extends GralWidgetBase {
   
 
 
-  FileRemoteProgress callbackChgProps = new FileRemoteProgress("callbackChgProps", super.gralMng, null) { 
+  FileRemoteProgressEventConsumer callbackChgProps = new FileRemoteProgressEventConsumer("callbackChgProps", super.gralMng, null) { 
     
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) { 
       if(progress.done() || progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done){
@@ -698,7 +698,7 @@ public class GralFileProperties extends GralWidgetBase {
   
   
   
-  final FileRemoteProgress callbackCntLen = new FileRemoteProgress("callbackCntLen", super.gralMng, null) { 
+  final FileRemoteProgressEventConsumer callbackCntLen = new FileRemoteProgressEventConsumer("callbackCntLen", super.gralMng, null) { 
     
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) { 
 
@@ -722,7 +722,7 @@ public class GralFileProperties extends GralWidgetBase {
   /**Callback this in the execution thread of the file system. 
    * 
    */
-  final FileRemoteProgress callbackCopyMove = new FileRemoteProgress("callbackCopyMove", super.gralMng, null) { 
+  final FileRemoteProgressEventConsumer callbackCopyMove = new FileRemoteProgressEventConsumer("callbackCopyMove", super.gralMng, null) { 
     
     @Override protected int processEvent(FileRemoteProgressEvData progress, EventWithDst<FileRemoteCmdEventData, FileRemoteProgressEvData> evCmd) { 
       if(progress.done() || progress.progressCmd == FileRemoteProgressEvData.ProgressCmd.done) {
