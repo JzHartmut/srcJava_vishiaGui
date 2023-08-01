@@ -15,8 +15,8 @@ public class ButtonInspcCmd extends GralUserAction
   }
   
   
-  static void registerUserAction() {
-    GralMng.get().registerUserAction("ButtonInspcCmd", new ButtonInspcCmd("ButtonInspcCmd"));
+  static void registerUserAction(GralMng mng) {
+     mng.registerUserAction("ButtonInspcCmd", new ButtonInspcCmd("ButtonInspcCmd"));
   }
   
 }
