@@ -85,6 +85,8 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 {
   /**Version, history and license.
    * <ul>
+   * <li>2022-11-14 Hartmut chg: Handle wakeup problem TODO, workarround now:
+   *   It seems that the graphic thread is not woken up if a redraw() comes in a shorter time.
    * <li>2022-11-14 Hartmut chg: Now the EventTimerThread and the graphic thread is one thread.
    *   This has the advantage that an expired time order (now as {@link org.vishia.event.TimeOrder}
    *   can immediately execute its {@link org.vishia.event.EventWithDst#evDst}. {@link org.vishia.event.EventConsumer#processEvent(EventObject)}
@@ -1435,10 +1437,10 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
       this.bDispatcherSleeps = false;
       stepGraphicThread();
       if(!this.bShouldExitImplGraphic){
-        //no order executed. It sleeps. An os event which arrives in this time wakes up the graphic thread.
+        //no order executed. It sleeps.                    //An os event which arrives in this time wakes up the graphic thread.
         this.bDispatcherSleeps = true;
-        this._mngImpl.graphicThreadSleep();
-        this.bDispatcherSleeps = false;
+        this._mngImpl.graphicThreadSleep();                // calls Display#sleep() for SWT
+        this.bDispatcherSleeps = false;                    // woken up also in runAwakeThread ( ) with Display#wakeup()
       }
     }
     synchronized(this.awakeThread) {                       // the awakeThread goes only in wait if !bShouldExitImplGraphic
@@ -1534,30 +1536,30 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * <br>If any time order has elapsed or will be elapsed in the next 2 ms,
    * then wake up the graphic thread calling {@link ImplAccess#wakeup()}
    */
-  protected void runAwakeThread ( ) {
-    while(!this.bShouldExitImplGraphic) {
-      final long timeWait;
-      final boolean bWakeupDispatcher = this.bDispatcherSleeps;
-      if(!bWakeupDispatcher) {
-        timeWait = 10;                                     // wait 10 ns so long the dispatcher works
-      } else {
-        timeWait = super.timeCheckNew - System.currentTimeMillis();
-      }
-      if(timeWait > 2) {                                   // do not wait if in next 2 ms time orders are elapsed
-        synchronized(this.awakeThread) {
-          if( !this.bShouldExitImplGraphic) {
-            try { this.awakeThread.wait(timeWait);
-            } catch (InterruptedException e) { }
-          }
+  protected void stepAwakeThread ( ) {
+    final long timeWait;
+    final boolean bWakeupDispatcher = this.bDispatcherSleeps;
+    if(!bWakeupDispatcher) {
+      timeWait = 10;                                     // wait 10 ms so long the dispatcher works
+    } else {
+      timeWait = super.timeCheckNew - System.currentTimeMillis();
+    }
+    if(timeWait > 2) {                                   // do only wait if in next 2 ms time orders are not elapsed
+      synchronized(this.awakeThread) {
+        if( !this.bShouldExitImplGraphic) {
+          //System.out.println("timeWait awake: " + timeWait);  //TODO 2023-07 notify is missing if a new redraw() comes with near time. 
+          try { this.awakeThread.wait(timeWait > 50 ? 50 :timeWait);
+          } catch (InterruptedException e) { }
         }
       }
-      if(!this.bShouldExitImplGraphic) {                   // check whether meanwhile the graphic is not closed...
+    }
+    if(!this.bShouldExitImplGraphic) {                   // check whether meanwhile the graphic is not closed...
       if( bWakeupDispatcher ) {                            // the graphic dispatcher has slept before.
+        //System.out.println("wakeup graphic thread because time order");
         this._mngImpl.wakeup();                            // time elapsed, now wake up, also if it works per accident just now.
       } else {
         assert(timeWait == 10);                            // the graphic dispatcher has not slept before.
       }                                                    // check again after 10 ms.
-      }
     }
   }
 
@@ -2364,7 +2366,9 @@ public GralButton addCheckButton(
 
   private Runnable runAwakeThread = new Runnable() {
     @Override public void run () {
-      GralMng.this.runAwakeThread();
+      while(!GralMng.this.bShouldExitImplGraphic) {
+        GralMng.this.stepAwakeThread();  //2023-07-05 while outside, better changeable while debug
+      }
     }
   };
 

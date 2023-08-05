@@ -256,7 +256,7 @@ public final class InspcCurveView
    */
   public InspcCurveView(String sName, VariableContainer_ifc variables
       , GralCurveView.CommonCurve common, TimedValues tracksValues
-      , GralMng gralMng
+      , GralMng gralMng, boolean visible
       , FileRemote defaultDirCfg, FileRemote defaultDirSave, String sHelpDir
       , Map<String, String> curveExporterClasses){
     //this.comm = comm;
@@ -264,9 +264,10 @@ public final class InspcCurveView
     int windowProps = GralWindow_ifc.windResizeable;
     final String sPosNameWin = sName.startsWith("@") ? sName + "Window" : "@screen,12+100,20+100=" + sName + "Window";
     this.windCurve = this.gralMng.createWindow(sPosNameWin, null, windowProps);
+    this.windCurve.setVisible(visible);
     this.sName = this.windCurve.mainPanel.getName();
     
-    this.colorSelector = new GralColorSelector("colorSelector", this.gralMng);
+    this.colorSelector = new GralColorSelector("colorSelector", this.gralMng, false);
     //need a panel and position:
     gralMng.selectPanel("curveView");
     //gralMng.setPosition(4, 0, 4, 0, '.');
@@ -275,13 +276,13 @@ public final class InspcCurveView
     this.listDataFavors.add(new GralFileSelector.FavorPath("tmp", "T:/tmp/curveViewData", FileRemote.clusterOfApplication));
     this.listDataFavors.add(new GralFileSelector.FavorPath("test", "D:/vishia/emc/Test_emC/src/test/CurveView/curveViewData", FileRemote.clusterOfApplication));
     this.listDataFavors.add(new GralFileSelector.FavorPath("aux", "D:/vishia/aux", FileRemote.clusterOfApplication));
-    this.widgFileSelector = GralFileSelector.createGralFileSelectorWindow(gralMng, "FileSelection", "Read cfg", this.listDataFavors);   //"@screen, 50+40, 50+80"
+    this.widgFileSelector = GralFileSelector.createGralFileSelectorWindow(gralMng, false, "FileSelection", "Read cfg", this.listDataFavors);   //"@screen, 50+40, 50+80"
 //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
 //    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
 //    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
     this.widgFilename = new GralTextField(gralMng.refPos(), "-filename", GralTextField.Type.editable);
-    buildGraphic(this.windCurve, colorSelector, common, tracksValues);
+    buildGraphic(/*this.windCurve, */colorSelector, common, tracksValues);
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.fileCurveCfg = defaultDirCfg;
@@ -295,7 +296,7 @@ public final class InspcCurveView
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
-  public void buildGraphic(GralWindow_ifc wind, GralColorSelector colorSelector, GralCurveView.CommonCurve common, TimedValues tracksValues)
+  public void buildGraphic(/*GralWindow_ifc wind, */GralColorSelector colorSelector, GralCurveView.CommonCurve common, TimedValues tracksValues)
   { gralMng.selectPanel(this.sName);
     //gralMng.setPosition(4, 0, 4, 0, '.');
     gralMng.setPosition(4, 56, 4, 104, '.');
@@ -392,8 +393,8 @@ public final class InspcCurveView
       this.gralMng.setHelpBase(this.sHelpDir);
       this.gralMng.setHelpUrl("+CurveView_help.html");
     }
-    GralMenu menu = wind.getMenuBar();
-    menu.addMenuItem("&Window/open " + sName, actionOpenWindow);
+//    GralMenu menu = wind.getMenuBar();
+//    menu.addMenuItem("&Window/open " + sName, actionOpenWindow);
     
   }
   
@@ -1399,7 +1400,7 @@ public final class InspcCurveView
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
         if(colorSelector == null) {
-          colorSelector = new GralColorSelector("colorSelector", gralMng);
+          colorSelector = new GralColorSelector("colorSelector", gralMng, false);
           
         }
         colorSelector.openDialog("select Color for selected track", actionColorSet);

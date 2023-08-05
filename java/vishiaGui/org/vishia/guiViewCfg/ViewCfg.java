@@ -91,8 +91,8 @@ public class ViewCfg //extends GuiCfg
    * The separation of command line argument helps to invoke the functionality with different calls, 
    * for example calling in a GUI, calling in a command-line-batch-process or JZtxtcmd. Hence the class and arguments are public.
    */
-  public static class CallingArguments extends GuiCallingArgs
-  {
+  public static class CallingArguments extends GuiCallingArgs {
+    
     /**Name of the config-file for the Gui-appearance. */
     public final Argument sFileGui = new Argument("-gui", ":path/to/config.gui  The gui configuration file. Syntax see ...");
     

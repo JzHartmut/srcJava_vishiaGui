@@ -293,7 +293,8 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
         currPos1.calcNextPos(posString1);  // Note: setNextPos() returns a cloned position.
         //          }
       } catch(ParseException exc) {
-        throw new IllegalArgumentException("GralWidget - position is syntactical faulty; " + posString1);
+        String sExc = exc.getMessage();
+        throw new IllegalArgumentException("GralWidget - position is faulty; " + posString1 + " " + sExc);
       }
     } else {
       this.name = sPosName;            // name maybe null

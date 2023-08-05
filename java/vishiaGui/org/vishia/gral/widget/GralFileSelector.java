@@ -915,7 +915,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
    * @param favors If given initial favors, at least an empty list. If null no favors possible.
    * @return
    */
-  public static GralFileSelector createGralFileSelectorWindow ( GralMng mng, String posName, String sExec, List<FavorPath> favors) {
+  public static GralFileSelector createGralFileSelectorWindow ( GralMng mng, boolean visible, String posName, String sExec, List<FavorPath> favors) {
     GralPos pos = null;
     try {
       pos = new GralPos(mng, "@screen,0..0,0..0");
@@ -925,6 +925,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     //new GralFileSelectWindow(posName, mng);
     int windProps = GralWindow_ifc.windResizeable;
     GralWindow wind = new GralWindow(pos, posName, null, windProps);
+    wind.setVisible(visible);
     GralFileSelector thiz = new GralFileSelector(pos, "FileSelector", wind, 10, null, favors !=null, sExec, fileViewer, wdgFileProperties);
     if(favors !=null) {
       thiz.addFavor(favors);

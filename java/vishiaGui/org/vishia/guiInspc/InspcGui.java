@@ -11,9 +11,7 @@ import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.gral.area9.GuiCallingArgs;
-import org.vishia.gral.area9.GuiCfg;
-import org.vishia.gral.area9.GralArea9MainCmd;
+import org.vishia.gral.base.GralArea9Panel;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
@@ -21,8 +19,11 @@ import org.vishia.gral.base.GralPanelActivated_ifc;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralShowMethods;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.base.GuiCallingArgs;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
@@ -39,6 +40,7 @@ import org.vishia.inspcPC.mng.InspcMng;
 import org.vishia.inspectorTarget.Inspector;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageFile;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Assert;
 import org.vishia.util.CompleteConstructionAndStart;
 import org.vishia.util.FileSystem;
@@ -89,6 +91,27 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   //@SuppressWarnings("hiding")
   public final static String version = "2016-06-26";
   
+  
+  
+  final GralMng gralMng = new GralMng(new LogMessageStream(System.out));
+  
+  /**The meaning of this GralPos is, it contains the reference to this.gralMng.
+   * It can be used especially for new Windows, but also for content in windows.
+   * It is changed while using with the sPosName of the created widget.
+   */
+  final GralPos refPos = new GralPos(this.gralMng);
+  
+  
+  final GralWindow windowInspc = this.gralMng.addWindow("@screen,16+80, 20+120=mainWin", "The.inspector"
+      , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
+  
+  final GralMenu menuBar = this.windowInspc.getMenuBar();
+  
+  final GralArea9Panel area9 = this.gralMng.addArea9Panel("@mainWin = area9");
+ 
+  final GralTextBox outputBox = this.gralMng.addTextBox("@area9,A2C2=outputBox", true, null, '\0');
+
+  
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   
 
@@ -137,7 +160,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     */
   };
 
-  final GuiCfg guiCfg;
+  //final GuiCfg guiCfg;
   
   final InspcMng inspcMng;
   
@@ -160,18 +183,18 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   private final FileCluster fileCluster = FileRemote.clusterOfApplication;
 
-  InspcGui(CallingArguments cargs, GralArea9MainCmd cmdgui)
+  InspcGui(CallingArguments cargs/*, GralArea9MainCmd cmdgui*/)
   {
-    ButtonInspcCmd.registerUserAction();
+    ButtonInspcCmd.registerUserAction(this.gralMng);
     viewTargetComm = new InspcViewTargetComm(this);
-    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
-    GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
+//    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
+//    GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
     for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
       viewTargetComm.addTarget(entry.getKey(), entry.getValue(), 0.2f, 5);
     }
     
 
-    LogMessage log = cmdgui.getLogMessageOutputConsole();
+//    LogMessage log = cmdgui.getLogMessageOutputConsole();
     this.cargs = cargs;  //args in the correct derived type.
     /**
     assert(user instanceof InspcPlugUser_ifc);
@@ -179,9 +202,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       user.init(userInspcPlug, log);
     }
     */
-    GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
-    assert(user == null || user instanceof InspcPlugUser_ifc);
-    inspcMngUser = new InspcPlugUser((InspcPlugUser_ifc)user);
+//    GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
+//    assert(user == null || user instanceof InspcPlugUser_ifc);
+//    inspcMngUser = new InspcPlugUser((InspcPlugUser_ifc)user);
     if(cargs.sOwnIpcAddr ==null){
       System.err.println("arg ownIpc missing");
       System.exit(255);
@@ -189,7 +212,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.cycletime, cargs.bUseGetValueByIndex, inspcMngUser);
     composites.add(variableMng);
     this.inspcMng = variableMng;
-    (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
+//    (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
     variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
     //variableMng.setCallbackShowingState(callbackShowTargetCommState);
     
@@ -198,25 +221,39 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
     if(cargs.sDefaultDirCfgForCurves !=null) {
       CharSequence sDefaultDirCfgForCurves = FileSystem.normalizePath(new File(cargs.sDefaultDirCfgForCurves).getAbsolutePath());
-      FileRemote defaultDirCfg = fileCluster.getFile(sDefaultDirCfgForCurves, null);
+      FileRemote defaultDirCfg = FileRemote.getDir(sDefaultDirCfgForCurves);   //fileCluster.getFile(sDefaultDirCfgForCurves, null);
       FileRemote defaultDirSave;
       if(cargs.sDefaultDirSaveForCurves !=null) {
         CharSequence sDefaultDirSaveForCurves = FileSystem.normalizePath(new File(cargs.sDefaultDirSaveForCurves).getAbsolutePath());
-        defaultDirSave = fileCluster.getFile(sDefaultDirSaveForCurves, null);
+        defaultDirSave = FileRemote.getDir(sDefaultDirSaveForCurves);
       } else {
         defaultDirSave = null;
       }
-      curveA = new InspcCurveView("curve_A", variableMng, null, null, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
-      curveB = new InspcCurveView("curve_B", variableMng, null, null, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
-      curveC = new InspcCurveView("curve_C", variableMng, null, null, cmdgui.gralMng, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveA = new InspcCurveView("curve_A", variableMng, null, null, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveB = new InspcCurveView("curve_B", variableMng, null, null, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveC = new InspcCurveView("curve_C", variableMng, null, null, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
     }
-    fieldsA = new InspcFieldTable(variableMng);
-    fieldsB = new InspcFieldTable(variableMng);
-    
+    fieldsA = new InspcFieldTable(this.gralMng, variableMng);
+    fieldsB = new InspcFieldTable(this.gralMng, variableMng);
+    this.menuBar.addMenuItem("menuBarFieldsA", "&Window/open Fields &1", this.fieldsA.actionOpenWindow);
+    this.menuBar.addMenuItem("menuBarFieldsB", "&Window/open Fields &2", this.fieldsB.actionOpenWindow);
+    this.menuBar.addMenuItem("&Window/open Curve &A ", this.curveA.actionOpenWindow);
+    this.menuBar.addMenuItem("&Window/open Curve &B ", this.curveB.actionOpenWindow);
+    this.menuBar.addMenuItem("&Window/open Curve &C ", this.curveC.actionOpenWindow);
+    this.menuBar.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
+    //
+//    if(user !=null){
+//      user.initGui(_gralMng);
+//      user.addGuiMenu(gui.mainWindow());
+//    }
+//    menuBar.addMenuItem("menuHelp", "&Help/&Help", this.gralMng.getActionHelp());
+//    menuBar.addMenuItem("menuAbout", "&Help/&About", gui.getActionAbout());
+//    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
+
   }
   
   @Override public void completeConstruction(){
-    this.inspcMng.complete_ReplaceAlias_ifc(guiCfg._gralMng.getReplacerAlias());
+    this.inspcMng.complete_ReplaceAlias_ifc(this.gralMng.getReplacerAlias());
 
     for(CompleteConstructionAndStart composite: composites){
       composite.completeConstruction();
@@ -230,6 +267,13 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   }
 
   
+  private final void init() {
+    this.gralMng.createGraphic("SWT", 'D', this.gralMng.log);
+  }
+  
+  protected void stepMain () {
+  }
+
   
   void panelActivated(List<GralWidget> widgets){
     for(GralWidget widget: widgets){
@@ -245,7 +289,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    */
   private void callbackOnReceivedData(){
     long time = System.currentTimeMillis();
-    GralMng gralMng = GralMng.get();
     GralPanelContent primaryWindow = gralMng.getPrimaryWindow().mainPanel; 
     long timeAtleast = System.currentTimeMillis() - 5000;
     checkWidgetsToRefresh(primaryWindow, time, timeAtleast, 0);
@@ -285,8 +328,9 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   void checkWidgetsToRefresh(GralPanelContent panel, long time, long timeAtleast, int recursiveCnt)
   { if(recursiveCnt > 10) { System.err.println("InspcGui: to many recursions"); assert(false); return; }
-    for(GralWidget widget: panel.getWidgetList()){
-      if(widget.isVisible()){
+    for(GralWidgetBase widget1: panel.getWidgetList()){
+      if(widget1.isVisible() && widget1 instanceof GralWidget) {
+        GralWidget widget = (GralWidget)widget1;
         if(widget instanceof GralPanelContent) {
           checkWidgetsToRefresh((GralPanelContent) widget, time, timeAtleast, recursiveCnt +1);
         } else {
@@ -312,14 +356,17 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   
   
-  static class CallingArguments extends GuiCallingArgs
-  {
+  /**The command-line-arguments are stored in an extra class, which can arranged in any other class too. 
+   * The separation of command line argument helps to invoke the functionality with different calls, 
+   * for example calling in a GUI, calling in a command-line-batch-process or JZtxtcmd. Hence the class and arguments are public.
+   */
+  public static class CallingArguments extends GuiCallingArgs {
     /**The target ipc-address for Interprocess-Communication with the target.
      * It is a string, which determines the kind of communication.
      * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
      */
     Map<String, String> indexTargetIpcAddr = new TreeMap<String, String>();
-
+ 
     /**Cohesion between file extension and exporter java class path for curve output.*/
     Map<String, String> curveExporterClasses = new TreeMap<String, String>();
 
@@ -334,83 +381,66 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
     String sDefaultDirSaveForCurves = "C:/";
 
-  }
-  
-  /**Organisation class for the GUI.
-   */
-  private static class CmdLineAndGui extends GralArea9MainCmd
-  {
-
-    /**Aggregation to given instance for the command-line-argument. The instance can be arranged anywhere else.
-     * It is given as ctor-parameter.
-     */
-    final protected CallingArguments cargs;
-    
-    
-    public CmdLineAndGui(CallingArguments cargs, String[] args)
-    {
-      super(cargs, args);
-      this.cargs = cargs;
-      super.addAboutInfo("Inspc-GUI-cfg");
-      super.addAboutInfo("made by HSchorrig, 2011-05-18, 2012-01-17");
-    }
 
     @Override protected boolean testArgument(String arg, int nArg)
     {
       boolean bOk = true;  //set to false if the argc is not passed
+      CallingArguments cargs = this;
+      String value;
       try{
-        if(arg.startsWith("-targetIpc=")) 
-        { String sArg = getArgument(11);
-          int posSep = sArg.indexOf('@');
+        if((value = checkArgVal("-targetIpc", arg))!=null) 
+        { int posSep = value.indexOf('@');
           if(posSep < 0){
             writeError("argument -targetIpc=KEY@ADDR: The '@' is missed.");
             bOk = false;
           } else {
-            String sKey = sArg.substring(0, posSep);
-            String sValue = sArg.substring(posSep+1);
-            cargs.indexTargetIpcAddr.put(sKey, sValue);
+            String sKey = value.substring(0, posSep);
+            String sValue = value.substring(posSep+1);
+            this.indexTargetIpcAddr.put(sKey, sValue);
           }
         }
-        else if(arg.startsWith("-pluginCfg=")) 
-        { cargs.sPluginCfg = getArgument(11);
+        else if((value = checkArgVal("-pluginCfg", arg))!=null) 
+        { cargs.sPluginCfg = value;
         }
-        else if(arg.startsWith("-curve-export=")) 
-        { String sArg = getArgument(14);
-          int posSep = sArg.indexOf('=');
+        else if((value = checkArgVal("-curve-export", arg))!=null) 
+        { int posSep = value.indexOf('=');
           if(posSep < 0){
             writeError("argument -curve-export=EXT=java.class.path");
             bOk = false;
           } else {
-            String sKey = sArg.substring(0, posSep);
-            String sValue = sArg.substring(posSep+1);
-            cargs.curveExporterClasses.put(sKey, sValue);
+            String sKey = value.substring(0, posSep);
+            String sValue = value.substring(posSep+1);
+            this.curveExporterClasses.put(sKey, sValue);
           }
         }
-        else if(arg.startsWith("-cycle=")) 
-        { String sTime = getArgument(7);
-          try{ cargs.cycletime = Integer.parseInt(sTime); }
-          catch(NumberFormatException exc){ bOk = false; writeError("argument \"-cycle=\" should be an integer, read: " + sTime); }
+        else if((value = checkArgVal("-cycle", arg))!=null) 
+        { try{ this.cycletime = Integer.parseInt(value); }
+          catch(NumberFormatException exc){ bOk = false; writeError("argument \"-cycle=\" should be an integer, read: " + value); }
         }
-        else if(arg.startsWith("-targetbyIndex")) 
-        { cargs.bUseGetValueByIndex = true;   //an example for default output
+        else if((value = checkArgVal("-targetbyIndex", arg))!=null) 
+        { this.bUseGetValueByIndex = true;   //an example for default output
         }
-        else if(arg.startsWith("-ownIpc=")) 
-        { cargs.sOwnIpcAddr = getArgument(8);   //an example for default output
+        else if((value = checkArgVal("-ownIpc", arg))!=null) 
+        { cargs.sOwnIpcAddr = value;   //an example for default output
         }
-        else if(arg.startsWith("-dirCurves=")) 
-        { cargs.sDefaultDirCfgForCurves = getArgument(11);   //an example for default output
+        else if((value = checkArgVal("-dirCurves", arg))!=null) 
+        { cargs.sDefaultDirCfgForCurves = value;   //an example for default output
         }
-        else if(arg.startsWith("-dirCurveCfg=")) 
-        { cargs.sDefaultDirCfgForCurves = getArgument(13);   //an example for default output
+        else if((value = checkArgVal("-dirCurveCfg", arg))!=null) 
+        { cargs.sDefaultDirCfgForCurves = value;   //an example for default output
         }
-        else if(arg.startsWith("-dirCurveSave=")) 
-        { cargs.sDefaultDirSaveForCurves = getArgument(14);   //an example for default output
+        else if((value = checkArgVal("-dirCurveSave", arg))!=null) 
+        { cargs.sDefaultDirSaveForCurves = value;   //an example for default output
         }
         else { bOk = super.testArgument(arg, nArg); }
       } catch(Exception exc){ bOk = false; }
       return bOk;
     }
 
+    
+    void writeError(String sError) {
+      System.err.println(sError);
+    }
   
   } //class CmdLineAndGui 
   
@@ -419,88 +449,88 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
  * @author Hartmut Schorrig
  *
  */
-private class InspcGuiCfg extends GuiCfg
-{
-  
-  InspcGuiCfg(CallingArguments cargs, GralArea9MainCmd cmdgui, GralPlugUser2Gral_ifc plugUser2Gui)
-  { super(cargs, cmdgui, null, plugUser2Gui, null); 
-  }
-  
-  
-  /**Initializes the areas for the panels and configure the panels.
-   * This routine overrides {@link GuiCfg#initGuiAreas()} and calls its super.
-   * Additional some user initialization is done.
-   */
-  @Override protected void initGuiAreas(String sAreaMainPanel)
-  {
-    super.initGuiAreas("A1C2");
-    super._gralMng.selectPanel("test");
-    super._gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
-    //btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
-    //btnSwitchOnLog.setActionChange(actionEnableLog);
-    colorSelector = new GralColorSelector("colorSelector", super._gralMng);
-    curveA.buildGraphic(gui.mainWindow(), colorSelector, null, null);
-    curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData(), null);
-    curveC.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData(), null);
-    //
-    _gralMng.selectPanel("primaryWindow");
-    _gralMng.setPosition(14, 84, 4, 64, 0, '.');
-    fieldsA.setToPanel(_gralMng);
-    _gralMng.selectPanel("primaryWindow");
-    _gralMng.setPosition(24, 94, 14, 74, 0, '.');
-    fieldsB.setToPanel(_gralMng);
-    _gralMng.selectPanel("primaryWindow");
-    _gralMng.setPosition(10, 30, 50, 74, 0, '.');
-    viewTargetComm.setToPanel();
-    GralMenu menu = super.guiW.getMenuBar();
-    menu.addMenuItem("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
-    menu.addMenuItem("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
-    menu.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
-    //
-    if(user !=null){
-      user.initGui(_gralMng);
-      user.addGuiMenu(gui.mainWindow());
-    }
-    menu.addMenuItem("menuHelp", "&Help/&Help", gui.getActionHelp());
-    menu.addMenuItem("menuAbout", "&Help/&About", gui.getActionAbout());
-    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
-
-  }
-
-  
-  
-  @Override protected void initMain()
-  {
-    //inspcComm.openComm(cargs.sOwnIpcAddr);
-    //msgReceiver.start();
-    //oamRcvUdpValue.start();
-    super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
-
-  }
-  
-  @Override protected void stepMain()
-  {
-    try{
-      synchronized(this){ wait(100); }
-      curveA.stepSaveCurve();
-      curveB.stepSaveCurve();
-      curveC.stepSaveCurve();
-      //inspcComm.procComm();  
-      //oamRcvUdpValue.sendRequest();
-    } catch(Exception exc){
-      System.out.println(Assert.exceptionInfo("InspcGui - unexpected Exception; ", exc, 0, 7));
-      exc.printStackTrace();
-    }
-
-  }
-  
-  @Override protected void finishMain()
-  {
-    super.finishMain();
-    try{ inspcMng.close(); } catch(IOException exc){}
-  }
-  
-} //class InspcGuiCfg
+//private class InspcGuiCfg// extends GuiCfg
+//{
+//  
+//  /**Initializes the areas for the panels and configure the panels.
+//   * This routine overrides {@link GuiCfg#initGuiAreas()} and calls its super.
+//   * Additional some user initialization is done.
+//   */
+//  InspcGuiCfg(CallingArguments cargs, GralPlugUser2Gral_ifc plugUser2Gui) {
+//    //super(cargs, cmdgui, null, plugUser2Gui, null); 
+//    
+//    
+//    
+//    
+//    
+//    super.initGuiAreas("A1C2");
+//    super._gralMng.selectPanel("test");
+//    super._gralMng.setPosition(5, GralPos.size -3, 0, GralPos.size +18 , 0, 'd',1);
+//    //btnSwitchOnLog = super._gralMng.addSwitchButton("log", "log telg ?", "log telg", GralColor.getColor("wh"), GralColor.getColor("am") );
+//    //btnSwitchOnLog.setActionChange(actionEnableLog);
+//    colorSelector = new GralColorSelector("colorSelector", super._gralMng);
+//    curveA.buildGraphic(gui.mainWindow(), colorSelector, null, null);
+//    curveB.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData(), null);
+//    curveC.buildGraphic(gui.mainWindow(), colorSelector, curveA.widgCurve.getCommonData(), null);
+//    //
+//    _gralMng.selectPanel("primaryWindow");
+//    _gralMng.setPosition(14, 84, 4, 64, 0, '.');
+//    fieldsA.setToPanel(_gralMng);
+//    _gralMng.selectPanel("primaryWindow");
+//    _gralMng.setPosition(24, 94, 14, 74, 0, '.');
+//    fieldsB.setToPanel(_gralMng);
+//    _gralMng.selectPanel("primaryWindow");
+//    _gralMng.setPosition(10, 30, 50, 74, 0, '.');
+//    viewTargetComm.setToPanel();
+//    GralMenu menu = super.guiW.getMenuBar();
+//    menu.addMenuItem("menuBarFieldsA", "&Window/open Fields &A", fieldsA.actionOpenWindow);
+//    menu.addMenuItem("menuBarFieldsB", "&Window/open Fields &B", fieldsB.actionOpenWindow);
+//    menu.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
+//    //
+//    if(user !=null){
+//      user.initGui(_gralMng);
+//      user.addGuiMenu(gui.mainWindow());
+//    }
+//    menu.addMenuItem("menuHelp", "&Help/&Help", gui.getActionHelp());
+//    menu.addMenuItem("menuAbout", "&Help/&About", gui.getActionAbout());
+//    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
+//
+//  }
+//
+//  
+//  
+//  @Override protected void initMain()
+//  {
+//    //inspcComm.openComm(cargs.sOwnIpcAddr);
+//    //msgReceiver.start();
+//    //oamRcvUdpValue.start();
+//    super.initMain();  //starts initializing of graphic. Do it after reading some configurations.
+//
+//  }
+//  
+//  @Override protected void stepMain()
+//  {
+//    try{
+//      synchronized(this){ wait(100); }
+//      curveA.stepSaveCurve();
+//      curveB.stepSaveCurve();
+//      curveC.stepSaveCurve();
+//      //inspcComm.procComm();  
+//      //oamRcvUdpValue.sendRequest();
+//    } catch(Exception exc){
+//      System.out.println(Assert.exceptionInfo("InspcGui - unexpected Exception; ", exc, 0, 7));
+//      exc.printStackTrace();
+//    }
+//
+//  }
+//  
+//  @Override protected void finishMain()
+//  {
+//    super.finishMain();
+//    try{ inspcMng.close(); } catch(IOException exc){}
+//  }
+//  
+//} //class InspcGuiCfg
   
 
   private final UserInspcPlug userInspcPlug = new UserInspcPlug();
@@ -510,7 +540,7 @@ private class InspcGuiCfg extends GuiCfg
   /**The command-line-invocation (primary command-line-call. 
    * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
    */
-  public static void main(String[] args)
+  public static void main(String[] cmdArgs)
   { boolean bOk = true;
     //
     //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
@@ -523,21 +553,34 @@ private class InspcGuiCfg extends GuiCfg
     new InterProcessCommFactorySocket();
     //
     CallingArguments cargs = new CallingArguments();
+    int error = 0;
+    try {
+      cargs.parseArgs(cmdArgs);
+    } catch (Exception exc) {
+      System.err.println("cmdline arg exception: " + exc.getMessage());
+      error = 255;
+    }
     //Initializes the GUI till a output window to show informations:
-    CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-    bOk = cmdgui.parseArgumentsAndInitGraphic(null, "3A3C", GralWindow.windHasMenu | GralWindow_ifc.windResizeable);
-    System.err.println("InspcGui - Test; test");
-    LogMessage log = cmdgui.getLogMessageOutputConsole();
+//    CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
     
-    
-    InspcGui main = new InspcGui(cargs, cmdgui);
-    
-    main.completeConstruction();
-    main.startupThreads();
-
-    main.guiCfg.execute();
-    
-    cmdgui.exit();
+    if(error ==0) {
+      try {
+        InspcGui main = new InspcGui(cargs);
+        main.init();
+        main.completeConstruction();
+        main.startupThreads();
+        while(main.gralMng.isRunning()){
+          try{ Thread.sleep(20);} 
+          catch (InterruptedException e) { }
+          main.stepMain();
+        }
+        main.gralMng.closeApplication();
+      } catch(Exception exc) {
+        System.err.println("Unexpected exception: " + exc.getMessage());
+        exc.printStackTrace(System.err);
+      }
+    }
+    System.exit(error);
   }
 
 

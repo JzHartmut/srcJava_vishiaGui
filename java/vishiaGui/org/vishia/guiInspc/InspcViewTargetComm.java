@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralTable;
 import org.vishia.gral.base.GralTextField;
 import org.vishia.gral.base.GralWidget;
@@ -106,66 +107,70 @@ public class InspcViewTargetComm
   public InspcViewTargetComm(InspcGui gui)
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
     this.gui = gui;
-    this.windStateOfTarget = new GralWindow("@primaryWindow,-21..0,-50..0", "InspcCtrlStatusWind", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    this.widgTable = new GralTable<InspcTargetAccessor>("@InspcCtrlStatusWind,0..-3,0..0=TargetTable", new int[]{3, 0,-6,-6});
+    /**Intermediate Position instance as helper for positioning. */
+    GralPos refPos = new GralPos(gui.gralMng);            // use an own reference position to build
+
+    this.windStateOfTarget = new GralWindow(refPos, "@primaryWindow,-21..0,-50..0=InspcCtrlStatusWin", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    this.windStateOfTarget.setVisible(false);               // the refPos is related to the main panel of the yet created window
+    this.widgTable = new GralTable<InspcTargetAccessor>(refPos, "0..-3,0..0=TargetTable", 10, new int[]{3, 0,-6,-6});
     this.widgTable.setColumnEditable(2,  true);
     this.widgTable.setColumnEditable(3,  true);
     //this.widgTable.setColumnEditable(2, true);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.ctrlStatus.");
-    this.wdgBtnLog = new GralButton("@InspcCtrlStatusWind,-2..0,0..8=BtnLog", "Enable Log", null);
+    this.wdgBtnLog = new GralButton(refPos, "@-2..0,0..8=BtnLog", "Enable Log", null);
     this.wdgBtnLog.setSwitchMode("? Log", "Log ?off");
     this.wdgBtnLog.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     this.wdgBtnLog.specifyActionChange("switch log telg", actionEnableLog, null);
-    this.wdgBtnRetry = new GralButton("@InspcCtrlStatusWind,-2..0,9..17=BtnRetry", "Retry", null);
+    this.wdgBtnRetry = new GralButton(refPos, "@-2..0,9..17=BtnRetry", "Retry", null);
     this.wdgBtnRetry.setSwitchMode("? Retry", "Retry ?off");
     this.wdgBtnRetry.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("am"));
     this.wdgBtnRetry.specifyActionChange("retry variables", gui.actionSetRetryDisabledVariable, null);
-    this.wdgBtnClearReq = new GralButton("@InspcCtrlStatusWind,-2..0,18..27=BtnClearReq", "ClearReq", null);
+    this.wdgBtnClearReq = new GralButton(refPos, "@-2..0,18..27=BtnClearReq", "ClearReq", null);
     this.wdgBtnClearReq.specifyActionChange("retry variables", actionClearReq, null);
-    this.wdgBtnPerHandle = new GralButton("@InspcCtrlStatusWind,-2..0,28..37=BtnLog", "Enable Log", null);
+    this.wdgBtnPerHandle = new GralButton(refPos, "@-2..0,28..37=BtnLog", "Enable Log", null);
     this.wdgBtnPerHandle.setSwitchMode("? use Handle", "use Handle ?off");
     this.wdgBtnPerHandle.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
     this.wdgBtnPerHandle.specifyActionChange("use handle", gui.actionUseGetValueByHandle, null);
-    this.wdgBtnTargetSettings = new GralButton("@InspcCtrlStatusWind,-2..0,38..47=BtnTargetSettings", "@Settings", null);
+    this.wdgBtnTargetSettings = new GralButton(refPos, "@-2..0,38..47=BtnTargetSettings", "@Settings", null);
     this.wdgBtnTargetSettings.specifyActionChange("openPwd", actionOpenWindowTargetSettings, null);
   
-    this.windTargetSettings = new  GralWindow("@primaryWindow,-36..-18,-30..0", "InspcTargetPwdWind", "Passwords for Target", GralWindow_ifc.windOnTop);
-    
-    this.wdgTargetIdent = new GralTextField("@InspcTargetPwdWind, 2-2,1+20=targetident");
-    this.wdgTimeCycle = new GralTextField("@InspcTargetPwdWind, 6-4,1+10=timeCycle", GralTextField.Type.editable);
-    this.wdgTimeout =    new GralTextField("@InspcTargetPwdWind, 6-4,12+10=timeout",   GralTextField.Type.editable);
+    this.windTargetSettings = new  GralWindow(refPos, "@primaryWindow,-36..-17,-40..0=InspcTargetPwdWin", "Passwd for Target", GralWindow_ifc.windOnTop);
+    this.windTargetSettings.setVisible(false);               // the refPos is related to the main panel of the yet created window
+    this.wdgTargetIdent = new GralTextField(refPos, "@2-2,1+20=targetident");
+    this.wdgTimeCycle = new GralTextField(refPos, "@6-4,1+10=timeCycle", GralTextField.Type.editable);
+    this.wdgTimeout =    new GralTextField(refPos, "@6-4,12+14=timeout",   GralTextField.Type.editable);
     this.wdgTimeCycle.setPrompt("cycle [s]", "t");
-    this.wdgTimeout.setPrompt("timeout [s] 0-debug", "t");
+    this.wdgTimeout.setPrompt("timeout [s] 0=debug", "t");
     
-    this.wdgPwdAccess = new GralTextField("@InspcTargetPwdWind, 10-4,1+10=PwdAccess0", GralTextField.Type.editable);
-    this.wdgAccLevels =    new GralTextField("@InspcTargetPwdWind, 10-4,12+10=PwdChg0");
+    this.wdgPwdAccess = new GralTextField(refPos, "@10-4,1+10=PwdAccess0", GralTextField.Type.editable);
+    this.wdgAccLevels =    new GralTextField(refPos, "@10-4,12+14=PwdChg0");
     this.wdgPwdAccess.setPrompt("pwd", "t");
     this.wdgAccLevels.setPrompt("access levels", "t");
-    //    this.wdgPwdAccess1 = new GralTextField("@InspcTargetPwdWind, 6-2,5+10=PwdAccess1", GralTextField.Type.editable);
-//    this.wdgPwdChg1 =    new GralTextField("@InspcTargetPwdWind, 6-2,17+10=PwdChg1",   GralTextField.Type.editable);
-//    this.wdgPwdAccess2 = new GralTextField("@InspcTargetPwdWind, 8-2,5+10=PwdAccess2", GralTextField.Type.editable);
-//    this.wdgPwdChg2 =    new GralTextField("@InspcTargetPwdWind, 8-2,17+10=PwdChg2",   GralTextField.Type.editable);
-//    this.wdgPwdAccess3 = new GralTextField("@InspcTargetPwdWind, 10-2,5+10=PwdAccess3", GralTextField.Type.editable);
-//    this.wdgPwdChg3 =    new GralTextField("@InspcTargetPwdWind, 10-2,17+10=PwdChg3",   GralTextField.Type.editable);
-    this.wdgBtnTargetSettingsOk = new GralButton("@InspcTargetPwdWind, 14-3,16+6=BtnSettingsOk", "ok", null);
-    this.wdgBtnTargetSettingsOk.specifyActionChange("openPwd", actionSetTargetSettings, null);
+    //    this.wdgPwdAccess1 = new GralTextField("@6-2,5+10=PwdAccess1", GralTextField.Type.editable);
+//    this.wdgPwdChg1 =    new GralTextField("@6-2,17+10=PwdChg1",   GralTextField.Type.editable);
+//    this.wdgPwdAccess2 = new GralTextField("@8-2,5+10=PwdAccess2", GralTextField.Type.editable);
+//    this.wdgPwdChg2 =    new GralTextField("@8-2,17+10=PwdChg2",   GralTextField.Type.editable);
+//    this.wdgPwdAccess3 = new GralTextField("@10-2,5+10=PwdAccess3", GralTextField.Type.editable);
+//    this.wdgPwdChg3 =    new GralTextField("@10-2,17+10=PwdChg3",   GralTextField.Type.editable);
+    this.wdgBtnTargetSettingsOk = new GralButton(refPos, "@14-3,16+6=BtnSettingsOk", "Ok", null);
+    this.wdgBtnTargetSettingsOk.specifyActionChange("openPwd", this.actionSetTargetSettings, null);
   
   
   }
   
   
-  /**Invoked in the graphic thread.
-   */
-  public void setToPanel(){
-    GralMng mng = GralMng.get();
-    windStateOfTarget.setToPanel(mng);
-    windTargetSettings.createImplWidget_Gthread();
-    //mng.setPosition(0, 2, 0, 3, 0, 'd');
-    //mng.setPosition(0, 2, 3, 0, 0, 'd');
-    //mng.setPosition(2, -4, 0, 0, 0, 'd');
-    widgTable.setToPanel(mng);
-    //mng.setPosition(-2, 0, 0, 7, 0, 'd');
-  }
+//  /**Invoked in the graphic thread.
+//   */
+//  public void setToPanel(){
+//    GralMng mng = GralMng.get();
+//    windStateOfTarget.setToPanel(mng);
+//    windTargetSettings.createImplWidget_Gthread();
+//    //mng.setPosition(0, 2, 0, 3, 0, 'd');
+//    //mng.setPosition(0, 2, 3, 0, 0, 'd');
+//    //mng.setPosition(2, -4, 0, 0, 0, 'd');
+//    widgTable.setToPanel(mng);
+//    //mng.setPosition(-2, 0, 0, 7, 0, 'd');
+//  }
   
 
   GralUserAction setVisible = new GralUserAction("")

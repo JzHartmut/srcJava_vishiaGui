@@ -137,15 +137,17 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
   /**Constructs a window with an empty {@link #mainPanel}
    * @param refPos The parent will be set related to to the screen: {@link GralMng#screen}.
-   *   The internal used {@link GralWidget#pos()} is cloned.
-   *   The refPos will be set to the whole main panel.
+   *   The internal used {@link GralWidget#pos()} is cloned from this refPos instance (as for all Widgets)..
+   *   After construction the refPos will be set to the whole main panel of this window.
    * @param posName possible position and name. Syntax [@<position> =]<$?name>
    *   If name ends with "Win" or "Window" then the panel name is the same without "Win" or "Window".
    *   Else the panel name is the same + "Panel".
    * @param sTitle can be null then the name is used as title without trailing "Win" or "Window".
    * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
+   * @param gralMng the gral Mng should be the same as in refPos, hence this is deprecated.
+   * @Deprecated use {@link #GralWindow(GralPos, String, String, int)}
    */
-  public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
+  @Deprecated public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
     super(refPos.setParent(gralMng.screen), posName, 'w', gralMng, true);
     int lenNameWindow = super.name.length();
@@ -170,6 +172,16 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
 
   }
 
+  /**Constructs a window with an empty {@link #mainPanel}
+   * @param refPos The parent will be set related to to the screen: {@link GralMng#screen}.
+   *   The internal used {@link GralWidget#pos()} is cloned from this refPos instance (as for all Widgets)..
+   *   After construction the refPos will be set to the whole main panel of this window.
+   * @param posName possible position and name. Syntax [@<position> =]<$?name>
+   *   If name ends with "Win" or "Window" then the panel name is the same without "Win" or "Window".
+   *   Else the panel name is the same + "Panel".
+   * @param sTitle can be null then the name is used as title without trailing "Win" or "Window".
+   * @param windProps See {@link GralWindow_ifc#windResizeable} etc.
+   */
   public GralWindow(GralPos currPos, String posName, String sTitle, int windProps)
   { this(currPos, posName, sTitle, windProps, currPos.parent.gralMng());
   }

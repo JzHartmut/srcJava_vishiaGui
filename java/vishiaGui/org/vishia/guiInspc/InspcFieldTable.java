@@ -210,20 +210,21 @@ public class InspcFieldTable
   
   public InspcFieldTable(GralMng gralMng, InspcMng inspcMng)
   { //inspcMng.addUserOrder(this);  //invoke run in any communication step.
-    this.wind = new GralWindow((GralPos)null, "InspcFieldTableWind", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
-    GralPos pos = gralMng.refPos();
-    this.widgPath = new GralTextField(pos, "0+2,3+10=@InspcFieldTableWind");
-    this.widgTable = new GralTable<InspcFieldOfStruct>(pos, "@-4,0,0,0=InspcFieldTable", 20, new int[]{sizeStruct, sizeName, 0, -sizeType});
+    final GralPos refPos = new GralPos(gralMng);
+    this.wind = new GralWindow(refPos, "@screen,16+44, 20+60=InspcFieldTableWin", "Fields of ...", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
+    this.wind.setVisible(false);
+    this.widgPath = new GralTextField(refPos, "@0+2,3..0=Path");
+    this.widgTable = new GralTable<InspcFieldOfStruct>(refPos, "@2..-2,0..0=InspcFieldTable", 20, new int[]{sizeStruct, sizeName, 0, -sizeType});
     this.widgTable.setColumnEditable(2, true);
     this.widgTable.setActionChange(this.actionChgTable);
     this.widgTable.specifyActionOnLineSelected(actionLineSelected);
     this.widgTable.setHtmlHelp("HelpInspc.html#Topic.HelpInspc.fieldsof.");
-    this.btnBack = new GralButton(pos, "@0+2,0+3=InspcFieldBack", "<<", actionBack);
-    this.btnHelp = new GralButton(pos,"@InspcFieldHelp", "help [F1]", gralMng.actionHelp);
-    this.btnRefresh = new GralButton(pos, "@InspcFieldRefresh", "refresh [F5]", actionRefresh);
-    this.btnShowAll = new GralButton(pos, "@InspcFieldShowAll", "show all [c+]", actionShowAll);
-    this.btnSetValue = new GralButton(pos, "@InspcFieldSetValue", "set values", actionSetValues);
-    this.btnRepeat = new GralButton(pos, "@InspcFieldSetValue", "repeat", null);
+    this.btnBack = new GralButton(refPos, "@0..2,0+3=InspcFieldBack", "<<", actionBack);
+    this.btnHelp = new GralButton(refPos,"@-2..0,0+9++1=InspcFieldHelp", "help [F1]", gralMng.actionHelp);
+    this.btnRefresh = new GralButton(refPos, "InspcFieldRefresh", "refresh [F5]", actionRefresh);
+    this.btnShowAll = new GralButton(refPos, "InspcFieldShowAll", "showAll [c+]", actionShowAll);
+    this.btnSetValue = new GralButton(refPos, "InspcFieldSetValue", "set values", actionSetValues);
+    this.btnRepeat = new GralButton(refPos, "InspcFieldSetValue", "repeat", null);
     this.btnRepeat.setSwitchMode(GralColor.getColor("gn"), GralColor.getColor("wh"), null);
     this.inspcMng = inspcMng;
   }

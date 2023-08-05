@@ -82,10 +82,11 @@ public class GralColorSelector
    * Use {@link #openDialog(String, SetColorIfc)} to open the window and specify the destination for selecting colors. 
    * @return The created window.
    */
-   public GralColorSelector(String name, GralMngBuild_ifc mng){
+   public GralColorSelector(String name, GralMngBuild_ifc mng, boolean visible){
      mng.selectPanel("primaryWindow");
      mng.setPosition(-24, 0, -67, 0, 'r',0); //right bottom, about half less display width and hight.
-     wind = mng.createWindow("windSelectColor", "select file", GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable );
+     this.wind = mng.createWindow("windSelectColor", "select file", GralWindow_ifc.windConcurrently | GralWindow_ifc.windResizeable );
+     this.wind.setVisible(visible);
      for(int irow=0; irow <= 5 /*colors.length*/; ++irow){
        //String[] colorRow = colors[irow];
        mng.setPosition(0.5f + 4*irow, GralPos.size + 2.5f, 0, GralPos.size + 3.5f, 'r', 0.5f);
