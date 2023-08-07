@@ -65,9 +65,36 @@ public class GralTextBox extends GralTextField implements Appendable, GralTextBo
 //  Map<Integer, Integer> posLines;
 
 
-  public GralTextBox(GralPos posCurr, String name, Type... property)
-  { super(posCurr, name, property);
+  /**Constructs a gral text box.
+   * @param refPos contains the parent position, correct with posName for further usage. 
+   *   The internal used GralPos is cloned. This refPos is not referenced in the instance.
+   * @param posName Position and Name of the field. Maybe null if it is not need in management by name
+   *   See {@link GralWidget#GralWidget(String, char)}.
+   * @param property password, editable, maybe left empty.
+   */
+  public GralTextBox(GralPos refPos, String posName, Type... property)
+  { super(refPos, posName, property);
     super.newText = new StringBuffer();
+  }
+
+  /**
+   * @param refPos contains the parent position, correct with posName for further usage. 
+   *   The internal used GralPos is cloned. This refPos is not referenced in the instance.
+   * @param posName Position and Name of the field. Maybe null if it is not need in management by name
+   *   See {@link GralWidget#GralWidget(String, char)}.
+   * @param editable true: can edit. It is also possible to set it with {@link #setEditable(boolean)}
+   * @param prompt a prompt, also able to set with {@link #setPrompt(String, String)} but here concentrated.
+   * @param promptStylePosition 't' ...
+   * @param property password, editable, maybe left empty.
+   */
+  public GralTextBox(GralPos refPos, String posName, boolean editable, String prompt, char promptStylePosition, Type... property)
+  { super(refPos, posName, property);
+    super.newText = new StringBuffer();
+    char[] prompt1 = new char[1];
+    prompt1[0] = promptStylePosition;
+    this.setPrompt(prompt, new String(prompt1));
+    this.setEditable(editable);
+
   }
 
 //  public GralTextBox(String name, Type... property) {

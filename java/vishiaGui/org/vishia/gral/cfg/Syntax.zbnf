@@ -3,7 +3,7 @@
 GuiDialogZbnfControlled::=
 [<*|==vishiaGral==?>==vishiaGral== ]      ## skip over all content till ==vishiaGral== is found, but optional.
 [ size( <#?ySize> , <#?xSize> ) ;]
-{ ==end-vishiaGral==<*\e?>                ## skip till end of file if found. 
+{ ==end-vishiaGral==<*\e?>                ## skip till end of file if ==end-vishiaGral== was found. 
 | DataReplace: <DataReplace>
 | Type <Type>
 | if <Conditional> 

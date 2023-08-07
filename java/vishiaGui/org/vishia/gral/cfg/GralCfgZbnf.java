@@ -62,6 +62,7 @@ public class GralCfgZbnf
   
   /**Version and history
    * <ul>
+   * <li>2023-08-06 Now possible fill a specific panel: {@link #configWithZbnf(File, GralPanelContent)} used for {@link org.vishia.guiInspc.InspcGui} 
    * <li>2022-11-14 new now accepts also a Window in script, syntax also adapted 
    * <li>2022-09-26 new {@link #configureWithZbnf(File, GralCfgData)} and {@link #configWithZbnf(File)} 
    *   Should be used on file input, also regarding encoding.  
@@ -390,13 +391,28 @@ public class GralCfgZbnf
    * @throws ParseException on syntax error in sGui
    */
   public static GralWindow configWithZbnf ( File fGui, String sWinTitle, GralMng gralMng) throws Exception { 
-    GralCfgZbnf thiz = new GralCfgZbnf(gralMng);                  // temporary instance of this
+    GralCfgZbnf thiz = new GralCfgZbnf(gralMng);           // temporary instance of this
     thiz.cfgData = new GralCfgData(null);
     thiz.configureWithZbnf(fGui, thiz.cfgData);
-    thiz.buildGui(sWinTitle);                                       // build only the Gral instances without implementation graphic
-    return thiz.window;                                    // only the window is used, the rest can be garbaged.
+    thiz.buildGui(sWinTitle);                              // builds only the Gral instances without implementation graphic
+    return thiz.window;                                    // returns the last instantiated or the only one Window.
   }
   
+  
+  
+  /**Builds the content of the given panel.
+   * It is assumed that the config file does not contain a Window.
+   * Especially all unknown panel names are recognized as a tab of the given tab panel.
+   * @param fGui The config file
+   * @param dstPanel The panel where the content should applied to
+   * @throws Exception
+   */
+  public static void configWithZbnf ( File fGui, GralPanelContent dstPanel) throws Exception { 
+    GralCfgZbnf thiz = new GralCfgZbnf(dstPanel.gralMng);  // temporary instance of this
+    thiz.cfgData = new GralCfgData(null);
+    thiz.configureWithZbnf(fGui, thiz.cfgData);
+    thiz.buildGui(dstPanel);                               // builds only the Gral instances without implementation graphic
+  }
   
   
   
@@ -439,6 +455,32 @@ public class GralCfgZbnf
   
   
   
+  /**Builds the appearance of the whole graphic with the given {@link GralCfgData} cfgData.
+   * The cfgData can be filled manually per programming, or especially by {@link #configureWithZbnf(CharSequence, GralCfgData)}.
+   * Calls {@link #buildPanel(org.vishia.gral.cfg.GralCfgPanel)} for the any panel 
+   * in the {@link GralCfgData#idxPanels}. Fills the panels one after another.
+   * 
+   * @param log maybe null, errors and warnings are written
+   * @param msgIdent The message identification for output.
+   * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
+   *   The window can be gotten by #window. The rest of this class may be not furthermore used.
+   */
+  public String buildGui ( GralPanelContent dstPanel ) {
+    String sError = null;
+    this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
+    this.currPos = new GralPos(this.gralMng);
+    try {
+        //
+        //======>>>>
+        buildPanel(this.cfgData.currWindow.panelWin, dstPanel);
+        
+    } catch (Exception exc) {
+      sError = exc.getMessage();
+    }
+    return sError;
+  }
+  
+  
   
   /**Builds the appearance of one panel with the given {@link GralCfgPanel} cfgData.
    * @param cfgDataPanel
@@ -447,10 +489,10 @@ public class GralCfgZbnf
   public String buildPanel(GralCfgPanel cfgPanel, GralPanelContent currPanel)
   { String sError = null;
     if(cfgPanel.listTabs.size()>0) {                  // tabs in this panel
-      this.window.mainPanel.setToTabbedPanel();
+      currPanel.setToTabbedPanel();
       for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
-        this.currPos = new GralPos(this.window.mainPanel);
-        GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, "?tab", '@', this.gralMng);
+        this.currPos = new GralPos(currPanel);
+        GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, "?tab", '@');
         panel.setGrid(2,2,5,5,-12,-20);
         //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
         this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.

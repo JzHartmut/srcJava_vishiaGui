@@ -112,7 +112,7 @@ public class InspcViewTargetComm
 
     this.windStateOfTarget = new GralWindow(refPos, "@primaryWindow,-21..0,-50..0=InspcCtrlStatusWin", "State of targets", GralWindow_ifc.windOnTop | GralWindow_ifc.windResizeable);
     this.windStateOfTarget.setVisible(false);               // the refPos is related to the main panel of the yet created window
-    this.widgTable = new GralTable<InspcTargetAccessor>(refPos, "0..-3,0..0=TargetTable", 10, new int[]{3, 0,-6,-6});
+    this.widgTable = new GralTable<InspcTargetAccessor>(refPos, "@0..-3,0..0=TargetTable", 10, new int[]{3, 0,-6,-6});
     this.widgTable.setColumnEditable(2,  true);
     this.widgTable.setColumnEditable(3,  true);
     //this.widgTable.setColumnEditable(2, true);
@@ -257,7 +257,8 @@ public class InspcViewTargetComm
   GralUserAction actionOpenWindowTargetSettings = new GralUserAction("InspcGui - OpenPwd"){
     @Override public boolean userActionGui(int actionCode, GralWidget widgd, Object... params) { 
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        InspcViewTargetComm.this.targetForSettingsWindow = widgTable.getCurrentLine().nd_data;
+        GralTable<InspcTargetAccessor>.TableLineData line = widgTable.getCurrentLine();
+        InspcViewTargetComm.this.targetForSettingsWindow = line.nd_data;  //InspcTargetAccessor as data of line
         InspcViewTargetComm.this.targetKeySettingwindow = InspcViewTargetComm.this.targetForSettingsWindow.name;
         windTargetSettings.setVisible(true);
         wdgTargetIdent.setText(InspcViewTargetComm.this.targetKeySettingwindow);

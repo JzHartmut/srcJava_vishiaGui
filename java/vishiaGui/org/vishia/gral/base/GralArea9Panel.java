@@ -114,8 +114,8 @@ public class GralArea9Panel  extends GralPanelContent //implements GralPanel_ifc
    */
   private final short[] xMaxGralSize = new short[3], yMaxGralSize = new short[3];
 
-  public GralArea9Panel ( GralPos currPos, String posName, GralMng gralMng ) {
-    super(currPos, posName, gralMng);
+  public GralArea9Panel ( GralPos refPos, String posName ) {
+    super(refPos, posName);
     for(int ix = 0; ix < 3; ++ix) for(int iy = 0; iy < 3; ++iy){
       this.xMinGralSize[ix] = 4;
       this.yMinGralSize[iy] = 4;

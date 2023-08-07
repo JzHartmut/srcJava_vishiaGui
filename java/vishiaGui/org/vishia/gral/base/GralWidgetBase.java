@@ -236,6 +236,11 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
   }
 
   
+  /**If this widget is a composite widget (panel, complex widget), from this instance the members are referenced.
+   * It is null for a simple widget. 
+   * Architecture: With this intermediate instance not all GralWidgetBase needs all references which are often unused. 
+   * Only this one reference is given then. 
+   */
   public final GralWidgComposite _compt;
 
   /**Set on focus gained, false on focus lost. */

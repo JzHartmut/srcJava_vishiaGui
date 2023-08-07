@@ -85,6 +85,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 {
   /**Version, history and license.
    * <ul>
+   * <li>2023-08-02 only some adaptions. Sime ctor of Widgets without extra GralMng reference.
    * <li>2022-11-14 Hartmut chg: Handle wakeup problem TODO, workarround now:
    *   It seems that the graphic thread is not woken up if a redraw() comes in a shorter time.
    * <li>2022-11-14 Hartmut chg: Now the EventTimerThread and the graphic thread is one thread.
@@ -215,7 +216,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public final static String sVersion = "2022-10-27";
+  public final static String sVersion = "2023-08-02";
 
 	/**This class is used for a selection field for file names and paths. */
   public static class FileSelectInfo
@@ -1643,8 +1644,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   }
 
   public GralWindow addWindow(String posName, String sTitle, int props) {
-    GralWindow wdgg = new GralWindow(this.refPos(), posName
-        , sTitle, props, this);
+    GralWindow wdgg = new GralWindow(this.refPos(), posName , sTitle, props);     //2023-08-02 without GralMng ref
     return wdgg;
   }
 
@@ -1654,7 +1654,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * @return GralPanelContent to set some more.
    */
   public GralPanelContent addPanel(String posName) {
-    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, this);
+    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName);         //2023-08-02 without GralMng ref
     return wdgg;
   }
 
@@ -1664,7 +1664,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * @return GralPanelContent to set some more.
    */
   public GralPanelContent addTabbedPanel(String posName) {
-    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, this);
+    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName);         //2023-08-02 without GralMng ref
     wdgg.setToTabbedPanel();
     return wdgg;
   }
@@ -1676,7 +1676,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * @return GralPanelContent to set some more.
    */
   public GralPanelContent addTabPanel(String posName, String nameTab) {
-    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, nameTab, this);
+    GralPanelContent wdgg = new GralPanelContent(this.refPos(), posName, nameTab);             //2023-08-02 without GralMng ref
     return wdgg;
   }
 
@@ -1686,7 +1686,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
    * @return GralArea9Panel to set some more.
    */
   public GralArea9Panel addArea9Panel(String posName) {
-    GralArea9Panel wdgg = new GralArea9Panel(this.refPos(),posName, this);
+    GralArea9Panel wdgg = new GralArea9Panel(this.refPos(),posName);            //2023-08-02 without GralMng ref
     return wdgg;
   }
 
@@ -1780,13 +1780,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   if(name !=null && name.charAt(0) == '$'){
     name = this.sCurrPanel + name.substring(1);
   }
-  GralTextBox widgg = new GralTextBox(this.refPos(), name);
-  char[] prompt1 = new char[1];
-  prompt1[0] = promptStylePosition;
-  widgg.setPrompt(prompt, new String(prompt1));
-  widgg.setEditable(editable);
-  // createImplWidget_Gthread(widgg);
-  //SwtTextFieldWrapper.createTextField(widgg, this);
+  GralTextBox widgg = new GralTextBox(this.refPos(), name, editable, prompt, promptStylePosition);   //2023-08-02 uses the new ctor variant.
   return widgg;
 
 }
@@ -2809,13 +2803,13 @@ public GralButton addCheckButton(
 
   @Override public GralPanelContent createCompositeBox(String name)
   {
-    return new GralPanelContent(pos().pos, name, this);
+    return new GralPanelContent(pos().pos, name);
   }
 
   @Override public GralPanelContent createGridPanel(String namePanel, GralColor backGround, int xG, int yG,
       int xS, int yS)
   {
-    GralPanelContent panel = new GralPanelContent(pos().pos, namePanel, this);
+    GralPanelContent panel = new GralPanelContent(pos().pos, namePanel);
     panel.setBackColor(backGround, 0);
     panel.setGrid(yG, xG, yS, xS, 15, 25);
     return panel;

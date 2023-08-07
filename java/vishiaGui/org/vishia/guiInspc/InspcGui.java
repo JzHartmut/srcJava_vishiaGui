@@ -2,6 +2,7 @@ package org.vishia.guiInspc;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GuiCallingArgs;
+import org.vishia.gral.cfg.GralCfgZbnf;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
@@ -43,6 +45,8 @@ import org.vishia.msgDispatch.LogMessageFile;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Assert;
 import org.vishia.util.CompleteConstructionAndStart;
+import org.vishia.util.Debugutil;
+import org.vishia.util.FileFunctions;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
@@ -102,14 +106,17 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   final GralPos refPos = new GralPos(this.gralMng);
   
   
-  final GralWindow windowInspc = this.gralMng.addWindow("@screen,16+80, 20+120=mainWin", "The.inspector"
+  final GralWindow windowInspc = new GralWindow(this.refPos, "@screen,16+80, 20+120=mainWin", "The.inspector"
       , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
   
   final GralMenu menuBar = this.windowInspc.getMenuBar();
   
-  final GralArea9Panel area9 = this.gralMng.addArea9Panel("@mainWin = area9");
+  final GralArea9Panel area9 = new GralArea9Panel(this.refPos, "area9");
  
-  final GralTextBox outputBox = this.gralMng.addTextBox("@area9,A2C2=outputBox", true, null, '\0');
+  final GralTextBox outputBox = new GralTextBox(this.refPos, "@area9,A3C3=outputBox", true, null, '\0');
+
+  /**The panel for all tabs from configuration.*/
+  final GralPanelContent tabPanel = new GralPanelContent(this.refPos, "@area9,A1C2=tabs");
 
   
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
@@ -143,8 +150,6 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   
   
-  /**The communication manager. */
-  //final InspcGuiComm XXXinspcComm;
   
   private final CallingArguments cargs;
   
@@ -183,14 +188,16 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
   
   private final FileCluster fileCluster = FileRemote.clusterOfApplication;
 
+  
+  
   InspcGui(CallingArguments cargs/*, GralArea9MainCmd cmdgui*/)
   {
     ButtonInspcCmd.registerUserAction(this.gralMng);
-    viewTargetComm = new InspcViewTargetComm(this);
+    this.viewTargetComm = new InspcViewTargetComm(this);   // small window to monitor target communication for each target.
 //    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
 //    GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
     for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
-      viewTargetComm.addTarget(entry.getKey(), entry.getValue(), 0.2f, 5);
+      this.viewTargetComm.addTarget(entry.getKey(), entry.getValue(), 0.2f, 5);
     }
     
 
@@ -202,25 +209,21 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
       user.init(userInspcPlug, log);
     }
     */
-//    GralPlugUser_ifc user = guiCfg.getPluggedUser(); 
-//    assert(user == null || user instanceof InspcPlugUser_ifc);
-//    inspcMngUser = new InspcPlugUser((InspcPlugUser_ifc)user);
+    GralPlugUser_ifc user = null; //guiCfg.getPluggedUser(); 
+    assert(user == null || user instanceof InspcPlugUser_ifc);
+    this.inspcMngUser = new InspcPlugUser((InspcPlugUser_ifc)user);
     if(cargs.sOwnIpcAddr ==null){
       System.err.println("arg ownIpc missing");
       System.exit(255);
     }
-    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.cycletime, cargs.bUseGetValueByIndex, inspcMngUser);
-    composites.add(variableMng);
+    InspcMng variableMng = new InspcMng(cargs.sOwnIpcAddr, cargs.indexTargetIpcAddr, cargs.cycletime, cargs.bUseGetValueByIndex, this.inspcMngUser);
+    this.composites.add(variableMng);
     this.inspcMng = variableMng;
-//    (new GralShowMethods(variableMng)).registerShowMethods(cmdgui.gralMng);
-    variableMng.setCallbackOnReceivedData(callbackOnReceivedData);
-    //variableMng.setCallbackShowingState(callbackShowTargetCommState);
-    
-    //this.XXXinspcComm = new InspcGuiComm(this, guiCfg.gralMng, cargs.indexTargetIpcAddr, (InspcPlugUser_ifc)user);
-    //composites.add(XXXinspcComm);
+    (new GralShowMethods(variableMng)).registerShowMethods(this.gralMng);
+    variableMng.setCallbackOnReceivedData(this.callbackOnReceivedData);
     
     if(cargs.sDefaultDirCfgForCurves !=null) {
-      CharSequence sDefaultDirCfgForCurves = FileSystem.normalizePath(new File(cargs.sDefaultDirCfgForCurves).getAbsolutePath());
+      CharSequence sDefaultDirCfgForCurves = FileFunctions.normalizePath(new File(cargs.sDefaultDirCfgForCurves).getAbsolutePath());
       FileRemote defaultDirCfg = FileRemote.getDir(sDefaultDirCfgForCurves);   //fileCluster.getFile(sDefaultDirCfgForCurves, null);
       FileRemote defaultDirSave;
       if(cargs.sDefaultDirSaveForCurves !=null) {
@@ -235,6 +238,8 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     }
     fieldsA = new InspcFieldTable(this.gralMng, variableMng);
     fieldsB = new InspcFieldTable(this.gralMng, variableMng);
+    //
+    //
     this.menuBar.addMenuItem("menuBarFieldsA", "&Window/open Fields &1", this.fieldsA.actionOpenWindow);
     this.menuBar.addMenuItem("menuBarFieldsB", "&Window/open Fields &2", this.fieldsB.actionOpenWindow);
     this.menuBar.addMenuItem("&Window/open Curve &A ", this.curveA.actionOpenWindow);
@@ -242,12 +247,20 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     this.menuBar.addMenuItem("&Window/open Curve &C ", this.curveC.actionOpenWindow);
     this.menuBar.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
     //
+    if(cargs.fileGuiCfg !=null) {
+      try {
+        GralCfgZbnf.configWithZbnf(cargs.fileGuiCfg, this.tabPanel);
+        Debugutil.stop();
+      } catch(Exception exc) {
+        System.err.println(exc.getMessage());
+      }
+    }
 //    if(user !=null){
 //      user.initGui(_gralMng);
 //      user.addGuiMenu(gui.mainWindow());
 //    }
 //    menuBar.addMenuItem("menuHelp", "&Help/&Help", this.gralMng.getActionHelp());
-//    menuBar.addMenuItem("menuAbout", "&Help/&About", gui.getActionAbout());
+//    menuBar.addMenuItem("menuAbout", "&Help/&About", this.gralMng.getActionAbout());
 //    gui.addMenuBarArea9ItemGThread("menuAbout", "&Help/e&Xit", gui.getActionAbout());
 
   }
@@ -449,8 +462,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
  * @author Hartmut Schorrig
  *
  */
-//private class InspcGuiCfg// extends GuiCfg
-//{
+//private class InspcGuiCfg extends GuiCfg {
 //  
 //  /**Initializes the areas for the panels and configure the panels.
 //   * This routine overrides {@link GuiCfg#initGuiAreas()} and calls its super.

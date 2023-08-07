@@ -36,6 +36,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
   /**Version history:
    *
    * <ul>
+   * <li>2023-08-02: Hartmut cleanup: ctor without extra GralMng. The reference to it is contained in GralPos.  
    * <li>2023-04-15: Because of new aggregated {@link GralWidgetBase#_compt} class {@link GralWidgComposite} some operations are located there. 
    * <li>2023-01-20: refactoring: up to now the swt.TabFolder and TabItem is no more used.
    *   Instead a {@link GralHorizontalSelector} is used to select panels. The panels are normal panels
@@ -86,7 +87,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   @SuppressWarnings("hiding")
-  public final static int version = 20221112;
+  public final static String version = "2023-08-02";
 
   //public GralPrimaryWindow_ifc mainWindow;
 
@@ -158,13 +159,13 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @param whatIsit should be one of $ ^ @ for $=simple panel, ^=a tabbed panel, @= a tab of a tabbed panel
    * @param gralMng
    */
-  public GralPanelContent(GralPos refPos, String posName, String labelTab, char whatIsit, GralMng gralMng) {
+  public GralPanelContent(GralPos refPos, String posName, String labelTab, char whatIsit) {
   //public PanelContent(CanvasStorePanel panelComposite)
     super(refPos, posName, whatIsit, true);
     assert("^$@".indexOf(whatIsit) >=0);    //TODO the ^ is not used, remove it again. (Test!)
     this._panel = new Data(labelTab);
     refPos.setFullPanel(this);
-    gralMng.registerPanel(this);
+    this.gralMng.registerPanel(this);
     if(labelTab !=null) {
       assert(whatIsit == '@');
 
@@ -198,12 +199,12 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     setBackColor(GralColor.getColor("pgr"), 0);
   }
 
-  public GralPanelContent(GralPos currPos, String posName, GralMng gralMng) {
-    this(currPos, posName, null, '$', gralMng);
+  public GralPanelContent(GralPos currPos, String posName) {
+    this(currPos, posName, null, '$');
   }
 
-  public GralPanelContent(GralPos currPos, String posName, String labelTab, GralMng gralMng) {
-    this(currPos, posName, labelTab, '@', gralMng);
+  public GralPanelContent(GralPos currPos, String posName, String labelTab) {
+    this(currPos, posName, labelTab, '@');
     GralPanelContent parent = (GralPanelContent)this._wdgPos.parent;
     parent.setToTabbedPanel();           //checks also whether it has already faulty non tab children
   }
@@ -260,7 +261,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
     this.gralMng.log.sendMsg(GralMng.LogMsg.addTabPanel, "add tab panel %s(%s) to %s", name, tabLabel, this.name);
     setToTabbedPanel();
     GralPos refPos = new GralPos(this);                    //has full spread 0..0
-    GralPanelContent widgPanel = new GralPanelContent(refPos, "@2..0,0..0=" + name, tabLabel, this.gralMng());
+    GralPanelContent widgPanel = new GralPanelContent(refPos, "@2..0,0..0=" + name, tabLabel);
     //                                                     // it is added automatically because refPos
     GralWidget currTab = this._panel.widgTabs.getCurrItem();
     if(currTab !=null) {                                   // set the current tab invisible

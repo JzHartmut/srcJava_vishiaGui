@@ -164,7 +164,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
     this.dyda.displayedText = sTitle == null ? sTitleDefault : sTitle;  //maybe null
     this.windProps = windProps;
     GralPos posPanel = new GralPos(this);                  // initial GralPos for the main Panel inside the window.
-    this.mainPanel = new GralPanelContent(posPanel, sNamePanel, this.gralMng());
+    this.mainPanel = new GralPanelContent(posPanel, sNamePanel);
     //                                                     // A window has anytime only one GralPanel, the mainPanel.
     super.gralMng.registerWindow(this);
 //  ^  }
