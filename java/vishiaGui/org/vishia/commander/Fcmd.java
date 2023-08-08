@@ -553,8 +553,6 @@ public class Fcmd //extends GuiCfg
 
   /**
    * Executing in the main thread loop. It handles commands.
-   * 
-   * @see org.vishia.gral.area9.GuiCfg#stepMain()
    */
   public void stepMain()
   {
@@ -592,8 +590,6 @@ public class Fcmd //extends GuiCfg
   
   /**
    * Executing in the main thread loop. It handles commands.
-   * 
-   * @see org.vishia.gral.area9.GuiCfg#stepMain()
    */
   public void finishMain()
   { 

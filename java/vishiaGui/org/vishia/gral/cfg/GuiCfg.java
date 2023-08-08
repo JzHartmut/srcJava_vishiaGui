@@ -1,31 +1,29 @@
-package org.vishia.gral.area9;
+package org.vishia.gral.cfg;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
 import org.vishia.communication.InterProcessCommFactorySocket;
-import org.vishia.gral.base.GralGraphicTimeOrder;
 import org.vishia.gral.base.GralShowMethods;
+import org.vishia.gral.base.GralTextBox;
 import org.vishia.gral.base.GralWidget;
+import org.vishia.gral.base.GralWindow;
+import org.vishia.gral.base.GuiCallingArgs;
+import org.vishia.gral.base.GralArea9Panel;
+import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralTabbedPanel;
-import org.vishia.gral.cfg.GralCfgData;
-import org.vishia.gral.cfg.GralCfgDesigner;
-import org.vishia.gral.cfg.GralCfgZbnf;
-import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralMng_ifc;
+import org.vishia.gral.base.GralPos;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspectorTarget.Inspector;
-import org.vishia.mainCmd.MainCmd_ifc;
-import org.vishia.mainCmd.Report;
-import org.vishia.msgDispatch.MsgDispatchSystemOutErr;
+import org.vishia.msgDispatch.LogMessage;
+import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.KeyCode;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
@@ -64,6 +62,8 @@ public class GuiCfg
 
   /**The version, history and license.
    * <ul>
+   * <li>2013-12-02 Hartmut refactoring: Moved from package org.vishia.gral.area9 (deprecated) to org.vishia.gral.cfg
+   *   where it is conceptual proper. 
    * <li>2013-12-02 Hartmut new Parameter for {@link #GuiCfg(GuiCallingArgs, GralArea9MainCmd, GralPlugUser_ifc, GralPlugUser2Gral_ifc, List)}:
    *    cfgConditions.
    * <li>2012-09-17 Hartmut new: {@link #showMethods}
@@ -122,7 +122,7 @@ public class GuiCfg
   private final Inspector inspector;
   
   /**To Output log informations. The ouput will be done in the output area of the graphic. */
-  public final Report console;
+  public final LogMessage console; //logCfg;
 
   //protected final GralPanelContent panelContent;
 
@@ -159,25 +159,45 @@ protected final GralPlugUser2Gral_ifc plugUser2Gui;
 
 
 
-public final GralArea9_ifc gui;
+//public final GralArea9_ifc gui;
+//
+//public final GralArea9Window guiW;
 
-public final GralArea9Window guiW;
-
-public final MainCmd_ifc mainCmd;
+//public final MainCmd_ifc mainCmd;
 
 /**Especially for debug access to the singleton instance, start with _ to present on top of variables. */
-public GralMng _gralMng;
+public final GralMng gralMng;
+
+/**The meaning of this GralPos is, it contains the reference to this.gralMng.
+ * It can be used especially for new Windows, but also for content in windows.
+ * It is changed while using with the sPosName of the created widget.
+ */
+final GralPos refPos; 
+
+public final GralWindow window;
+
+final GralMenu menuBar;
+
+final GralArea9Panel area9;
+
+/**The panel for all tabs from configuration.
+ * It is assembled as middle area of the area9*/
+final GralPanelContent tabPanel;
+
+/**An output box assembled as bottom area of the area9. */
+final GralTextBox outputBox;
+
 
 
 /**Panel-Management-interface for the panels. */
-public GralMngBuild_ifc panelBuildIfc;
+//public GralMngBuild_ifc panelBuildIfc;
 
-public GralMng_ifc guiAccess;
+//public GralMng_ifc guiAccess;
+//
+//protected GralTabbedPanel mainTabPanel;
 
-protected GralTabbedPanel mainTabPanel;
 
-
-private static GuiCfg singleton;
+//private static GuiCfg singleton;
 
 /**ctor for the main class of the application. 
  * The main class can be created in some other kinds as done in static main too.
@@ -194,16 +214,32 @@ private static GuiCfg singleton;
  *   This instance may be defined in the context which calls this constructor.
  *   Note: A user instance may be instantiated with the cmd line calling argument "-plugin=JAVACLASSPATH"  
  */
-public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
+public GuiCfg(GuiCallingArgs cargs
     , GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui
-    , List<String> cfgConditions) 
-{ if(singleton !=null) throw new IllegalArgumentException("class GuiCfg can instantiate only one time, a singleton!");
-  this.mainCmd = cmdGui;
-  this.gui = cmdGui.gui;
-  guiW = (GralArea9Window)gui;
+    , List<String> cfgConditions) { 
+//  this.mainCmd = cmdGui;
+//  this.gui = cmdGui.gui;
+//  guiW = (GralArea9Window)gui;
   this.cargs = cargs;
   this.plugUser2Gui = plugUser2Gui;
-  this.console = gui.getMainCmd();  
+  this.console = new LogMessageStream(System.out, null, null, true, null);  
+  this.gralMng = new GralMng(this.console);
+  this.refPos = new GralPos(this.gralMng);
+
+  this.window = new GralWindow(this.refPos, "@screen,16+80, 20+120=mainWin", "The.inspector"
+      , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
+
+  this.menuBar = this.window.getMenuBar();
+
+  this.area9 = new GralArea9Panel(this.refPos, "area9");
+
+  this.outputBox = new GralTextBox(this.refPos, "@area9,A3C3=outputBox", true, null, '\0');
+
+  /**The panel for all tabs from configuration.*/
+  this.tabPanel = new GralPanelContent(this.refPos, "@area9,A1C2=tabs");
+
+
+  
   this.guiCfgData = new GralCfgData(cfgConditions);
   
   if(plugUser !=null){
@@ -232,23 +268,17 @@ public GuiCfg(GuiCallingArgs cargs, GralArea9MainCmd cmdGui
     inspector = null; //don't use.
   }
   
-  _gralMng = cmdGui.gralMng; //cargs.graphicFactory.createPanelMng(null, 120,80, propertiesGui, null, log);
-  panelBuildIfc = _gralMng;
-  guiAccess = _gralMng;
   userInit();
   //panelContent = new PanelContent(user);
   
   if(user !=null){
-    user.registerMethods(panelBuildIfc);
+    user.registerMethods(this.gralMng);
   }
 
   //Register any user action. This should be done before the GUI-configuration is read.
-  panelBuildIfc.registerUserAction("cmdInvoke", cmdInvoke);
-  singleton = this;
+  gralMng.registerUserAction("cmdInvoke", cmdInvoke);
 }
 
-
-public static GuiCfg get(){ return singleton; }
 
 public GralPlugUser_ifc getPluggedUser(){ return user; }
 
@@ -260,7 +290,7 @@ public GralPlugUser_ifc getPluggedUser(){ return user; }
 protected void userInit()
 {
   if(user !=null){
-    user.init(plugUser2Gui, _gralMng, guiCfgData.dataReplace, this.cargs, console.getLogMessageOutputConsole());
+    //user.init(plugUser2Gui, _gralMng, guiCfgData.dataReplace, this.cargs, console.getLogMessageOutputConsole());
   }
   
   
@@ -268,120 +298,112 @@ protected void userInit()
 
 
 
-/**Code snippet for initializing the GUI area (panel). This snippet will be executed
- * in the GUI-Thread if the GUI is created. 
- */
-GralGraphicTimeOrder initGraphic = new GralGraphicTimeOrder("GuiCfg.initGraphic", this._gralMng)
-{
-  @Override public void executeOrder()
-  {
-    _gralMng.selectPanel("primaryWindow");
-    _gralMng.setPosition(10, 16,5,20,0,'.');
-    initGuiAreas("A1C1");
-    //gralMng.gralDevice.removeDispatchListener(this);    
-    //countExecution();
-  }
-};
 
 
 /**Code snippet to run the ZBNF-configurator (text controlled GUI)
  * 
  */
-GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GuiCfg.configGuiWithZbnf", this._gralMng)
-{
-  
-  @Override public void executeOrder(){
-    panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
-    _gralMng.initCfgDesigner();
-
-    //gralMng.gralDevice.removeDispatchListener(this);    
-    
-    //countExecution();
-      
-  }
-////
-};
+//GralGraphicTimeOrder configGuiWithZbnf = new GralGraphicTimeOrder("GuiCfg.configGuiWithZbnf", this._gralMng)
+//{
+//  
+//  @Override public void executeOrder(){
+//    panelBuildIfc.buildCfg(guiCfgData, cargs.fileGuiCfg);
+//    gralMng.initCfgDesigner();
+//
+//    //gralMng.gralDevice.removeDispatchListener(this);    
+//    
+//    //countExecution();
+//      
+//  }
+//////
+//};
 
 
 
 /**Initializes the areas for the panels and configure the panels.
  * This routine can be overridden if other areas are need.
  */
-protected void initGuiAreas(String sMainArea)
-{
-  gui.setFrameAreaBorders(20, 80, 60, 85);
-  gui.setStandardMenusGThread(new File("."), actionFile);
-  initMenuGralDesigner();
-  _gralMng.selectPanel("primaryWindow");
-  mainTabPanel = _gralMng.addTabbedPanel("mainTab", null, 0);
-  gui.addFrameArea(sMainArea, mainTabPanel); //dialogPanel);
-  Appendable out = gui.getOutputBox();
-  mainCmd.setOutputChannels(out, out);
- 
+//protected void initGuiAreas(String sMainArea)
+//{
+//  gui.setFrameAreaBorders(20, 80, 60, 85);
+//  gui.setStandardMenusGThread(new File("."), actionFile);
+//  initMenuGralDesigner();
+//  _gralMng.selectPanel("primaryWindow");
+//  mainTabPanel = _gralMng.addTabbedPanel("mainTab", null, 0);
+//  gui.addFrameArea(sMainArea, mainTabPanel); //dialogPanel);
+//  Appendable out = gui.getOutputBox();
+//  mainCmd.setOutputChannels(out, out);
+// 
+//}
+
+
+//protected void initMenuGralDesigner()
+//{
+//  gui.addMenuBarArea9ItemGThread("GralDesignEnable", "&Design/e&Nable", _gralMng.actionDesignEditField);  
+//  gui.addMenuBarArea9ItemGThread("GralDesignEditField", "&Design/Edit &field", _gralMng.actionDesignEditField);  
+//  gui.addMenuBarArea9ItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", _gralMng.actionReadPanelCfg);  
+//  
+//}
+
+
+//protected void initMain()
+//{
+//  //create the basic appearance of the GUI. The execution sets dlgAccess:
+//  System.out.println("GuiCfg.initMain() - addDispatchOrder initGraphic, wait for execution;");
+//  this._gralMng.addDispatchOrder(initGraphic);
+//  
+//  if(!initGraphic.awaitExecution(1, 0)){
+//    System.out.println("GuiCfg.initMain() - initGraphic does not respond;");
+//    throw new RuntimeException("unexpected fail of execution initGuiDialog");
+//  }
+//  System.out.println("GuiCfg.initMain() - await initGraphic ok;");
+//      
+//      
+//  /**Creates the dialog elements while reading a config-file. */
+//  //
+//  //dialogVellMng.re
+//  boolean bConfigDone = false;
+//  if(cargs.fileGuiCfg != null){
+//    //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
+//    if(cargs.fileGuiCfg.exists())
+//    {
+//      File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
+//      GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax, GralMng.get());
+//      System.out.println("GuiCfg - start parsing cfg file; " + cargs.fileGuiCfg.getAbsolutePath());
+//      String sError = "todo"; //cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
+//      System.out.println("GuiCfg - finish parsing cfg file; ");
+//      if(sError !=null){
+//        console.writeError(sError);
+//      } else {
+//        //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
+//        //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
+//        //panelBuildIfc.setCfgBuilder(cfgBuilder);
+//        this._gralMng.addDispatchOrder(configGuiWithZbnf);
+//        bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
+//        if(!bConfigDone){
+//          console.writeError("No configuration");
+//        }  
+//      }
+//    } else {
+//      console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
+//    }
+//  }    
+//  try{ Thread.sleep(10);} catch(InterruptedException exc){}
+//  //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
+//  try{ Thread.sleep(10);} catch(InterruptedException exc){}
+//  //gets all prepared fields to show informations.
+//  //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
+//  
+//}
+
+private final void init() {
+  this.gralMng.createGraphic("SWT", 'D', this.gralMng.log);
+}
+
+protected void stepMain () {
 }
 
 
-protected void initMenuGralDesigner()
-{
-  gui.addMenuBarArea9ItemGThread("GralDesignEnable", "&Design/e&Nable", _gralMng.actionDesignEditField);  
-  gui.addMenuBarArea9ItemGThread("GralDesignEditField", "&Design/Edit &field", _gralMng.actionDesignEditField);  
-  gui.addMenuBarArea9ItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", _gralMng.actionReadPanelCfg);  
-  
-}
-
-
-
-protected void initMain()
-{
-  //create the basic appearance of the GUI. The execution sets dlgAccess:
-  System.out.println("GuiCfg.initMain() - addDispatchOrder initGraphic, wait for execution;");
-  this._gralMng.addDispatchOrder(initGraphic);
-  
-  if(!initGraphic.awaitExecution(1, 0)){
-    System.out.println("GuiCfg.initMain() - initGraphic does not respond;");
-    throw new RuntimeException("unexpected fail of execution initGuiDialog");
-  }
-  System.out.println("GuiCfg.initMain() - await initGraphic ok;");
-      
-      
-  /**Creates the dialog elements while reading a config-file. */
-  //
-  //dialogVellMng.re
-  boolean bConfigDone = false;
-  if(cargs.fileGuiCfg != null){
-    //configGuiWithZbnf.ctDone(0);  //counter for done initialized.
-    if(cargs.fileGuiCfg.exists())
-    {
-      File fileSyntax = new File(cargs.sPathZbnf + "/dialog.zbnf");
-      GralCfgZbnf cfgZbnf = new GralCfgZbnf(console, fileSyntax, GralMng.get());
-      System.out.println("GuiCfg - start parsing cfg file; " + cargs.fileGuiCfg.getAbsolutePath());
-      String sError = "todo"; //cfgZbnf.configureWithZbnf(cargs.fileGuiCfg, guiCfgData);
-      System.out.println("GuiCfg - finish parsing cfg file; ");
-      if(sError !=null){
-        console.writeError(sError);
-      } else {
-        //dialogZbnfConfigurator = new GuiDialogZbnfControlled((MainCmd_ifc)gui, fileSyntax);
-        //cfgBuilder = new GuiCfgBuilder(guiCfgData, panelBuildIfc, fileGui.getParentFile());
-        //panelBuildIfc.setCfgBuilder(cfgBuilder);
-        this._gralMng.addDispatchOrder(configGuiWithZbnf);
-        bConfigDone = configGuiWithZbnf.awaitExecution(1, 10000);
-        if(!bConfigDone){
-          console.writeError("No configuration");
-        }  
-      }
-    } else {
-      console.writeError("Config file not found: " + cargs.fileGuiCfg.getAbsolutePath());
-    }
-  }    
-  try{ Thread.sleep(10);} catch(InterruptedException exc){}
-  //The GUI-dispatch-loop should know the change worker of the panel manager. Connect both:
-  try{ Thread.sleep(10);} catch(InterruptedException exc){}
-  //gets all prepared fields to show informations.
-  //oamShowValues.setFieldsToShow(panelBuildIfc.getShowFields());
-  
-}
-
-protected void stepMain(){}
 
 /**This routine is called on end of main-execution. This default implementation calls 
  * {@link GralPlugUser_ifc#close()}.
@@ -394,15 +416,19 @@ protected void finishMain(){
 
 public final void execute()
 {
-  initMain();
-  //guiAccess.insertInfo("msgOfDay", Integer.MAX_VALUE, "Test\tMsg");
-  //msgReceiver.start();
-  while(this._gralMng.isRunning())
-  { stepMain();
-    try{ Thread.sleep(100);} 
-    catch (InterruptedException e)
-    { //dialogZbnfConfigurator.terminate();
+  try {
+    this.init();
+//    this.completeConstruction();
+//    this.startupThreads();
+    while(this.gralMng.isRunning()){
+      try{ Thread.sleep(20);} 
+      catch (InterruptedException e) { }
+      this.stepMain();
     }
+    this.gralMng.closeApplication();
+  } catch(Exception exc) {
+    System.err.println("Unexpected exception: " + exc.getMessage());
+    exc.printStackTrace(System.err);
   }
 
   if(inspector !=null) { 
@@ -414,16 +440,15 @@ public final void execute()
 
 
 public void showInfoBox(CharSequence text) {
-  GralMng mng = GralMng.get();
-  mng.showInfo(text);
+  this.outputBox.setFocus();
 }
 
 public void setTextInfoBox(CharSequence text) {
-  GralMng.get().setInfo(text);
+  this.outputBox.setText(text);
 }
 
 public void appendTextInfoBox(CharSequence text) {
-  GralMng.get().addInfo(text, false);
+  this.outputBox.append(text);
 }
 
 
@@ -446,9 +471,9 @@ private final GralUserAction cmdInvoke = new GralUserAction("cmdInvoke")
       GralWidget wdg = (GralWidget)wdgi;
       output.setLength(0);
       error.setLength(0);
-      mainCmd.executeCmdLine(processBuilder, wdg.sCmd, null, Report.info, output, error);
+//      thisCmd.executeCmdLine(processBuilder, wdg.sCmd, null, Report.info, output, error);
       stop();
-      guiAccess.addText("output", output);  //adds the result to any widget with name "output"
+//      guiAccess.addText("output", output);  //adds the result to any widget with name "output"
       //gui.executeCmdLine(widgetInfos.sCmd, 0, null, null);
       return true;
     } else return false;
@@ -463,7 +488,7 @@ protected GralUserAction actionFile = new GralUserAction("actionFile")
       String sError = null;
       try{
         Writer writer = new FileWriter(cargs.fileGuiCfg); //"save.cfg");
-        sError = _gralMng.saveCfg(writer);
+        sError = gralMng.saveCfg(writer);
         writer.close();
       } catch(java.io.IOException exc){
         sError = "Problem open file ";
@@ -481,31 +506,40 @@ protected GralUserAction actionFile = new GralUserAction("actionFile")
 /**The command-line-invocation (primary command-line-call). 
  * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
  */
-public static void main(String[] args){ 
+public static void main(String[] cmdArgs) { 
   boolean bOk = true;
   //
-  //Uses the commonly GuiCallingArgs class because here are not extra arguments.
+  new InterProcessCommFactorySocket();
+  //
   GuiCallingArgs cargs = new GuiCallingArgs();
+  int error = 0;
+  try {
+    cargs.parseArgs(cmdArgs);
+  } catch (Exception exc) {
+    System.err.println("cmdline arg exception: " + exc.getMessage());
+    error = 255;
+  }
+  //Initializes the GUI till a output window to show informations:
+//  CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
   
-  //Redirect all outputs from System.out
-  MsgDispatchSystemOutErr.create("D:/DATA/msg/log$yyyy-MMM-dd-HH_mm$.log", 10000, 40000, 10000, 100);
-  //Initializes the GUI till a output window to show information.
-  GralArea9MainCmd cmdGui = new GralArea9MainCmd(cargs, args);  //implements MainCmd, parses calling arguments
-  //Initializes the graphic window and parse the parameter of args (command line parameter).
-  //Parameter errors will be output in the graphic window in its given output area.
-  bOk = cmdGui.parseArgumentsAndInitGraphic("Gui-Cfg", "3A3C");
-  
-  if(bOk){
-    //loads the named class, so it is existent as factory.
-    new InterProcessCommFactorySocket();
-    //
-    //the third parameter may be a plugin, use it in your application if necessary.
-    GuiCfg main = new GuiCfg(cargs, cmdGui, null, null, null);
-    //
-    //starts execution.
-    main.execute();
-  }    
-  cmdGui.exit();
+  if(error ==0) {
+    try {
+      GuiCfg main = new GuiCfg(cargs, null, null, null);
+      main.init();
+//      main.completeConstruction();
+//      main.startupThreads();
+      while(main.gralMng.isRunning()){
+        try{ Thread.sleep(20);} 
+        catch (InterruptedException e) { }
+        main.stepMain();
+      }
+      main.gralMng.closeApplication();
+    } catch(Exception exc) {
+      System.err.println("Unexpected exception: " + exc.getMessage());
+      exc.printStackTrace(System.err);
+    }
+  }
+  System.exit(error);
 }
 
 

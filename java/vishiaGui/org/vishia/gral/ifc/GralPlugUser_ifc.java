@@ -52,8 +52,8 @@ public interface GralPlugUser_ifc extends Closeable
   
   /**This is the first routine that will be called for the plugin. 
    * Note that the constructor is parameterless because the plugin may be instantiated by reflection access
-   * This routine will be called by {@link org.vishia.gral.area9.GuiCfg#userInit()} or any of its derivation 
-   * in the constructor of {@link org.vishia.gral.area9.GuiCfg#GuiCfg(org.vishia.gral.area9.GuiCallingArgs, org.vishia.gral.area9.GralArea9MainCmd, GralPlugUser2Gral_ifc)} 
+   * This routine will be called by {@link org.vishia.gral.cfg.GuiCfg#userInit()} or any of its derivation 
+   * in the constructor of {@link org.vishia.gral.cfg.GuiCfg#GuiCfg(org.vishia.gral.area9.GuiCallingArgs, org.vishia.gral.area9.GralArea9MainCmd, GralPlugUser2Gral_ifc)} 
    * in the main thread, not in the graphic thread.
    * @param plugUser2Gui Access from the plugin to the Gui main implementation. It is offer to use.
    * @param gralMng

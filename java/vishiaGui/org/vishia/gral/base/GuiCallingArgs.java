@@ -95,7 +95,7 @@ public class GuiCallingArgs extends Arguments
   
   
   /**A class which is used as plugin for user specifies. It is of interface {@link PlugUser_ifc}. */
-  String sPluginClass;
+  public String sPluginClass;
   
   /**A plugin specific confic string. */
   public String sPluginCfg;
@@ -106,7 +106,7 @@ public class GuiCallingArgs extends Arguments
    * It is a string, which determines the kind of communication.
    * For example "UDP:0.0.0.0:60099" to create a socket port for UDP-communication.
    */
-  String sInspectorOwnPort;
+  public String sInspectorOwnPort;
 
   public File dirHtmlHelp;
   

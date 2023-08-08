@@ -156,6 +156,7 @@ public class GralPanelContent extends GralWidget implements GralPanel_ifc, GralW
    * @param labelTab =null for a whatIsit ==$ :simple panel,
    *   if given for  whatIsit ==^ :tabbed panel, then the first tab is created as select list for all tabs.
    *   should be given as string, name of the tab for whatIsit ==@
+   *   TODO remove this arg, use only {@link #addTabPanel(String, String, boolean)} to create a tabbed panel with tabs. 
    * @param whatIsit should be one of $ ^ @ for $=simple panel, ^=a tabbed panel, @= a tab of a tabbed panel
    * @param gralMng
    */

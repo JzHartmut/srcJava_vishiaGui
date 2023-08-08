@@ -62,7 +62,8 @@ public class GralCfgZbnf
   
   /**Version and history
    * <ul>
-   * <li>2023-08-06 Now possible fill a specific panel: {@link #configWithZbnf(File, GralPanelContent)} used for {@link org.vishia.guiInspc.InspcGui} 
+   * <li>2023-08-08 Now possible fill a specific panel: {@link #configWithZbnf(File, GralPanelContent)} 
+   *   used for {@link org.vishia.guiInspc.InspcGui} 
    * <li>2022-11-14 new now accepts also a Window in script, syntax also adapted 
    * <li>2022-09-26 new {@link #configureWithZbnf(File, GralCfgData)} and {@link #configWithZbnf(File)} 
    *   Should be used on file input, also regarding encoding.  
@@ -486,17 +487,16 @@ public class GralCfgZbnf
    * @param cfgDataPanel
    * @return null if ok, elsewhere the error hints, one per line.
    */
-  public String buildPanel(GralCfgPanel cfgPanel, GralPanelContent currPanel)
+  public String buildPanel(GralCfgPanel cfgPanel, GralPanelContent parentPanel)
   { String sError = null;
     if(cfgPanel.listTabs.size()>0) {                  // tabs in this panel
-      currPanel.setToTabbedPanel();
+      parentPanel.setToTabbedPanel();
       for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
-        this.currPos = new GralPos(currPanel);
-        GralPanelContent panel = new GralPanelContent(this.currPos, cfgTabPanel.name, "?tab", '@');
-        panel.setGrid(2,2,5,5,-12,-20);
-        //GralPanelContent gralPanel = this.window.addGridPanel(this.currPos, cfgPanel.name, cfgPanel.name, 0,0,0,0);
-        this.currPos = new GralPos(panel);               // GralPos describes the whole panel area of this panel.
-        sError = buildPanel(cfgTabPanel, panel);
+        this.currPos = new GralPos(parentPanel);
+        GralPanelContent panelTab = parentPanel.addTabPanel(cfgTabPanel.name, cfgTabPanel.name, false);
+        panelTab.setGrid(2,2,5,5,-12,-20);
+        this.currPos = new GralPos(panelTab);              // GralPos describes the whole panel area of this panel.
+        sError = buildPanel(cfgTabPanel, panelTab);        // build the content of this tab
         if(sError !=null) { break; }
       }
     }
@@ -506,7 +506,7 @@ public class GralCfgZbnf
         String sErrorWidgd;
         try{
           //======>>>>
-          sErrorWidgd = buildWidget(cfge, currPanel); 
+          sErrorWidgd = buildWidget(cfge, parentPanel); 
         }
         catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
         if(sErrorWidgd !=null){
