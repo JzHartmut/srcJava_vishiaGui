@@ -11,10 +11,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.vishia.gral.base.GralButton;
+import org.vishia.gral.base.GralCanvasStorage;
 import org.vishia.gral.base.GralCurveView;
+import org.vishia.gral.base.GralLed;
 import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralMouseWidgetAction_ifc;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralPos;
+import org.vishia.gral.base.GralTable;
+import org.vishia.gral.base.GralTextBox;
+import org.vishia.gral.base.GralTextField;
+import org.vishia.gral.base.GralValueBar;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.cfg.GralCfgElement;
@@ -23,16 +31,21 @@ import org.vishia.gral.ifc.GralMngBuild_ifc;
 import org.vishia.gral.ifc.GralPoint;
 import org.vishia.gral.ifc.GralUserAction;
 import org.vishia.gral.ifc.GralWidget_ifc;
+import org.vishia.gral.ifc.GralWindow_ifc;
+import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.CalculatorExpr;
 import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
+import org.vishia.util.StringFunctions_B;
 
 public class GralCfgBuilder
 {
 
   /**Version and history
    * <ul>
+   * <li>2023-08-08 Hartmut chg: The content is back moved from {@link GralCfgZbnf}, tested, improved there since 2022-08.
+   *   It is comparable. It is yet here the new concept to build the Gui, so this class can be used yet. 
    * <li>2015-04-27 Hartmut chg: {@link #buildGui(LogMessage, int)} Now regards only one panel in the window, not only tabbed panels.
    * <li>2014-02-24 Hartmut new element help now also in config.
    * <li>2012-09-17 Hartmut chg: showMethod now split functionName and parameters. The function name is used to get
@@ -64,12 +77,29 @@ public class GralCfgBuilder
    * 
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20120303;
+  public static final String version = "2023-08-08";
   
   private final GralCfgData cfgData;
   
   private final GralMng gralMng;
+
+  /**The current position for building all widgets.
+   * This current position holds the value from the last built widget
+   * which can be changed relative to always the next widget.
+   * It means this current position is really the current while building.
+   * Note that the aggregated internal widget position is always a clone of this with the current values whilce building.  
+   */
+  private GralPos currPos;
+
   
+  public GralWindow window;
+  
+  
+  
+  public List<GralWidget> widgets = new LinkedList<GralWidget>();
+
+
+
   /**The current directory is that directory, where the config file is located. 
    * It is used if other files are given with relative path.*/
   private final File currentDir;
@@ -89,118 +119,135 @@ public class GralCfgBuilder
   }
   
   
-  public GralCfgElement XXXnewCfgElement(GralCfgElement previous)
-  { //GuiCfgElement cfge = new GuiCfgElement(cfgData);
-    GralCfgElement cfge = previous.clone();
-    cfge.next = previous.next;
-    cfge.previous = previous;
-    previous.next = cfge;
-    return cfge;
-  }
-  
   /**Builds the appearance of the whole graphic with the given {@link GralCfgData} cfgData.
+   * The cfgData can be filled manually per programming, or especially by {@link #configureWithZbnf(CharSequence, GralCfgData)}.
    * Calls {@link #buildPanel(org.vishia.gral.cfg.GralCfgPanel)} for the any panel 
    * in the {@link GralCfgData#idxPanels}. Fills the panels one after another.
    * 
    * @param log maybe null, errors and warnings are written
    * @param msgIdent The message identification for output.
    * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
+   *   The window can be gotten by #window. The rest of this class may be not furthermore used.
    */
-  /**
-   * @param log
-   * @param msgIdent
-   * @return
-   */
-  public String buildGui(LogMessage log, int msgIdent)
-  {
-    assert(false);
+  public String buildGui ( String sWinTitle ) {
     String sError = null;
     this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
-    
-    Set<Map.Entry<String, GralCfgElement>> iterWindow = this.cfgData.getWindows();
-    for(Map.Entry<String, GralCfgElement> eWin : iterWindow) {
-      GralCfgElement cfg = eWin.getValue();
-      GralCfgWindow win = (GralCfgWindow)cfg.widgetType;
-      
-      Set<Map.Entry<String, GralCfgPanel>> setIdxPanels = cfgData.getPanels();
-      if(setIdxPanels.size()==0){
-        //gralMng.selectPanel(cfgData.actPanel);
-        //==================>
-        String sErrorPanel = buildPanel(win.panelWin);  
-        if(sErrorPanel !=null){
-          if(log !=null){
-            log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
-          }
-          if(sError == null){ sError = sErrorPanel; }
-          else { sError += "\n" + sErrorPanel; }
-        }
-      } else {
-        //some panels are given, therefore selects given panels by name or create tabbed panels.
-        for(Map.Entry<String, GralCfgPanel> panelEntry: setIdxPanels){  //cfgData.idxPanels.entrySet()){
-          GralCfgPanel cfgPanel = panelEntry.getValue();
-  //        if(cfgPanel.windTitle !=null) {
-  //          Debugutil.stop();
-  //          GralWindow wind = gralMng.addWindow(cfgPanel.windPos + "=" + cfgPanel.name, cfgPanel.windTitle, GralWindow.windOnTop | GralWindow.windResizeable);
-  //          wind.createImplWidget_Gthread();
-  //        }
-  //        else {
-            //A tab in the main window
-            //==================>
-            gralMng.selectPanel(cfgPanel.name);
-  //        }
-          String sErrorPanel = buildPanel(cfgPanel);  
-          if(sErrorPanel !=null){
-            if(log !=null){
-              log.sendMsg(msgIdent, "GralCfgBuilder - cfg error; %s", sErrorPanel);
-            }
-            if(sError == null){ sError = sErrorPanel; }
-            else { sError += "\n" + sErrorPanel; }
-          } else {
-            stop();
-          }
-        }
+    this.currPos = new GralPos(this.gralMng);
+    try {
+      Set<Map.Entry<String, GralCfgElement>> iterWindow = this.cfgData.getWindows();
+      for(Map.Entry<String, GralCfgElement> eWin : iterWindow) {
+        GralCfgElement cfg = eWin.getValue();
+        GralCfgWindow win = (GralCfgWindow)cfg.widgetType;
+        String posName = cfg.positionString !=null ? "@" + cfg.positionString + "=" + win.name
+                       : "@screen, 10+80, 20+120 = mainWin";
+        int windowProps = GralWindow_ifc.windResizeable | GralWindow_ifc.windRemoveOnClose;
+        String sWinTitle1 = sWinTitle == null ? win.title : sWinTitle;
+        this.window = new GralWindow(this.currPos, posName, sWinTitle1, windowProps, this.gralMng);
+        this.window.mainPanel.setGrid(2,2,5,5,-8,-30);
+        this.currPos = new GralPos(this.window.mainPanel);             // initial GralPos for widgets inside the window.
+        //
+        //======>>>>
+        buildPanel(win.panelWin, this.window.mainPanel);
+        
       }
+    } catch (Exception exc) {
+      sError = exc.getMessage();
     }
     return sError;
   }
+  
+  
+  
+  /**Builds the appearance of the whole graphic with the given {@link GralCfgData} cfgData.
+   * The cfgData can be filled manually per programming, or especially by {@link #configureWithZbnf(CharSequence, GralCfgData)}.
+   * Calls {@link #buildPanel(org.vishia.gral.cfg.GralCfgPanel)} for the any panel 
+   * in the {@link GralCfgData#idxPanels}. Fills the panels one after another.
+   * 
+   * @param log maybe null, errors and warnings are written
+   * @param msgIdent The message identification for output.
+   * @return null if ok, elsewhere the error hints which maybe written to log too, one per line.
+   *   The window can be gotten by #window. The rest of this class may be not furthermore used.
+   */
+  public String buildGui ( GralCfgData guiCfgData, GralPanelContent dstPanel ) {
+    String sError = null;
+    this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
+    this.currPos = new GralPos(this.gralMng);
+    try {
+        //
+        //======>>>>
+        buildPanel(guiCfgData.currWindow.panelWin, dstPanel);
+        
+    } catch (Exception exc) {
+      sError = exc.getMessage();
+    }
+    return sError;
+  }
+  
   
   
   /**Builds the appearance of one panel with the given {@link GralCfgPanel} cfgData.
    * @param cfgDataPanel
    * @return null if ok, elsewhere the error hints, one per line.
    */
-  public String buildPanel(GralCfgPanel cfgDataPanel)
-  {
-    String sError = null;
-    for(GralCfgElement cfge: cfgDataPanel.listElements){
-      //=================>>
-      String sErrorWidgd;
-      try{ sErrorWidgd = buildWidget(cfge); }
-      catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
-      if(sErrorWidgd !=null){
-        if(sError == null){ sError = sErrorWidgd; }
-        else { sError += "\n" + sErrorWidgd; }
+  public String buildPanel(GralCfgPanel cfgPanel, GralPanelContent parentPanel)
+  { String sError = null;
+    if(cfgPanel.listTabs.size()>0) {                  // tabs in this panel
+      parentPanel.setToTabbedPanel();
+      for(GralCfgPanel cfgTabPanel : cfgPanel.listTabs) {
+        this.currPos = new GralPos(parentPanel);
+        GralPanelContent panelTab = parentPanel.addTabPanel(cfgTabPanel.name, cfgTabPanel.name, false);
+        panelTab.setGrid(2,2,5,5,-12,-20);
+        this.currPos = new GralPos(panelTab);              // GralPos describes the whole panel area of this panel.
+        sError = buildPanel(cfgTabPanel, panelTab);        // build the content of this tab
+        if(sError !=null) { break; }
+      }
+    }
+    else {
+      for(GralCfgElement cfge: cfgPanel.listElements){
+        //=================>>
+        String sErrorWidgd;
+        try{
+          //======>>>>
+          sErrorWidgd = buildWidget(cfge, parentPanel); 
+        }
+        catch(ParseException exc) { sErrorWidgd = exc.getMessage(); }
+        if(sErrorWidgd !=null){
+          if(sError == null){ sError = sErrorWidgd; }
+          else { sError += "\n" + sErrorWidgd; }
+        }
       }
     }
     return sError;
   }
   
+
   
   
-  /**Builds the graphical widget inclusive its {@link GralWidget} and place it in the GUI.
+  /**Builds the instance of one of the {@link GralWidget} from the read ZBNF data.
+   * This operation does nothing with the Graphic Implementation (SWT, AWT,...). 
+   * Hence it can run in the main thread (or any other thread).
+   * <br>
+   * It is new since 2022-08. History: First the GralMng creates also the Implementation widgets
+   * calling {@link GralMng#addSwitchButton(String, String, String, org.vishia.gral.ifc.GralColor, org.vishia.gral.ifc.GralColor)}
+   * and the other operations. This was the originally concept. Hence the building of the GUI should run only in the GUI thread
+   * and was a little bit more difficult to debug.
+   * Since ~2014 more and more only the GralWidget instances without GUI Implementation are firstly created on manual building of the GUI,
+   * for example in {@link org.vishia.gitGui.GitGui}. This is better to manage, better to debug.
+   * The graphical implementation is created with all given GralWidgets later based on even this given GralWidgets.
+   * That is more simple. 
+   * - Now this concept is also used for the configured GralWidgets . 
+   * 
    * @param cfge The configuration element data read from config file or set from the GUI-editor.
    * @return null if OK, an error String for a user info message on warning or error.
    *         It is possible that a named user action is not found etc. 
    * <br>
-   * This is both used from {@link org.vishia.guiInspc.InspcGui} as also from {@link org.vishia.guiViewCfg.ViewCfg}.         
    */
-  public String buildWidget(GralCfgElement cfge)
-  throws ParseException
-  {
+  public String buildWidget(GralCfgElement cfge, GralPanelContent currPanel)
+  throws ParseException {
     String sError = null;
-    //cfge.setPos(gralMng);
+    
     if(cfge.widgetType.type !=null){
-      GralCfgData.GuiCfgWidget typeData = cfgData.idxTypes.get(cfge.widgetType.type);
+      GralCfgData.GuiCfgWidget typeData = this.cfgData.idxTypes.get(cfge.widgetType.type);
       if(typeData == null){
         throw new IllegalArgumentException("GralCfgBuilder.buildWidget - unknown type; " + cfge.widgetType.type + "; in " + cfge.content); 
       } else {
@@ -211,16 +258,16 @@ public class GralCfgBuilder
     GralWidget widgd = null;
     String sName = cfge.widgetType.name;
     if(sName !=null && sName.equals("msgOfDay"))
-      stop();
+      Debugutil.stop();
     
     if(sName ==null && cfge.widgetType.text !=null ){ sName = cfge.widgetType.text; }  //text of button etc.
-    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currWindow.panelWin.name + "/" + cfge.widgetType.prompt; } //the prompt as name
+    if(sName ==null && cfge.widgetType.prompt !=null){ sName = cfgData.currPanel.name + "/" + cfge.widgetType.prompt; } //the prompt as name
     //the name may be null, then the widget is not registered.
     //
     
     String sDataPath = cfge.widgetType.data;
     //text is the default for a datapath.
-    if(sDataPath ==null && cfge.widgetType.text !=null){ sDataPath = cfge.widgetType.text; }
+    //no confuse: if(sDataPath ==null && cfge.widgetType.text !=null){ sDataPath = cfge.widgetType.text; }
     /*
     if(sDataPath !=null){
       //replace a prefix before ':' with its replacement, if the prefix is found.
@@ -239,6 +286,20 @@ public class GralCfgBuilder
       }
     }
     */
+
+    GralColor color0 = null;
+    if(cfge.widgetType.color0 !=null) {                    // color name for main color given: 
+      color0 = cfge.widgetType.color0.color;  //by name 
+    }
+    GralColor color1 = null;
+    if(cfge.widgetType.color1 !=null) {                    // color name for main color given: 
+      color1 = cfge.widgetType.color1.color;  //by name 
+    }
+    //char promptPosition = cfge.widgetType.promptPosition == null ? '.' : cfge.widgetType.promptPosition.charAt(0);
+    String sPrompt = cfge.widgetType.prompt;
+    String sPromptPos = cfge.widgetType.promptPosition;
+    boolean bHasPrompt = sPrompt !=null;
+    
     //
     final GralUserAction userAction; //, mouseAction;
     final String[] sUserActionArgs;
@@ -247,7 +308,7 @@ public class GralCfgBuilder
       String sUserAction = cfge.widgetType.userAction; 
       if(sUserAction.startsWith("@")){
         int posEnd = sUserAction.indexOf(':');
-        if(posEnd < 0) { sError = "GuiCfgBuilder - @m: ':' not found. ";  sUserAction = null; }
+        if(posEnd < 0) { this.gralMng.log.writeError("GuiCfgBuilder - @m: ':' not found. ");  sUserAction = null; }
         else {
           for(int ix = 1; ix < posEnd; ++ix){
             char whatMouseKey = sUserAction.charAt(ix);
@@ -262,7 +323,8 @@ public class GralCfgBuilder
         String[] sMethod = CalculatorExpr.splitFnNameAndParams(sUserAction);
         userAction = gralMng.getRegisteredUserAction(sMethod[0]);
         if(userAction == null){
-          sError = "GuiCfgBuilder - user action ignored because not found: " + cfge.widgetType.userAction;
+          
+          this.gralMng.log.writeError("GuiCfgBuilder - user action ignored because not found: " + cfge.widgetType.userAction);
           sUserActionArgs = null;
         } else {
           sUserActionArgs = sMethod[1] == null ? null : CalculatorExpr.splitFnParams(sMethod[1]);
@@ -271,72 +333,112 @@ public class GralCfgBuilder
       } else { userAction = null; sUserActionArgs = null; }
     } else { userAction = null; sUserActionArgs = null; }
     
-    
+
+    if(cfge.positionString==null) {
+      this.currPos.checkSetNext();
+    } else {
+      this.currPos.calcNextPos(cfge.positionString);
+    }
     
     
     /*
     if(cfge.widgetType.mouseAction !=null){
       mouseAction = gralMng.getRegisteredUserAction(cfge.widgetType.mouseAction);
       if(mouseAction == null){
-        sError = "GuiCfgBuilder - mouse action ignored because not found: " + cfge.widgetType.mouseAction;
+        this.gralMng.log.writeError("GuiCfgBuilder - mouse action ignored because not found: " + cfge.widgetType.mouseAction;
       }
     } else { mouseAction = null; }
     */
+    boolean bColor0Set = false, bColor1Set = false;
     //
     if(cfge.widgetType instanceof GralCfgData.GuiCfgButton){
       GralCfgData.GuiCfgButton wButton = (GralCfgData.GuiCfgButton) cfge.widgetType;
-      if(wButton.bSwitch){
-        widgd = gralMng.addSwitchButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd
-          , cfge.widgetType.data, cfge.widgetType.text, cfge.widgetType.color0.color, cfge.widgetType.color1.color);
-      } else {
-        widgd = gralMng.addButton(cfge.widgetType.name, userAction, cfge.widgetType.cmd, cfge.widgetType.data, cfge.widgetType.text);
+      GralButton widg = new GralButton(this.currPos, sName, cfge.widgetType.text, userAction);
+      widg.setData(cfge.widgetType.data);
+      widg.sCmd = cfge.widgetType.cmd;
+      if(wButton.bSwitch) {
+        widg.setSwitchMode(cfge.widgetType.color0.color, cfge.widgetType.color1.color);
+        int textSep;
+        if(cfge.widgetType.text !=null) {
+          textSep = cfge.widgetType.text.indexOf('/');
+          if(textSep>0) {
+            widg.setSwitchMode(cfge.widgetType.text.substring(0, textSep), cfge.widgetType.text.substring(textSep+1));
+          } else {
+            widg.setText(cfge.widgetType.text);
+          }
+        }
       }
-    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
+      this.widgets.add(widgd = widg);
+    } 
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgText){
       GralCfgData.GuiCfgText wText = (GralCfgData.GuiCfgText)cfge.widgetType;
-      widgd = gralMng.addText(cfge.widgetType.text); 
-    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
+      int origin = 0; //TODO
+      String text = StringFunctions_B.convertBackslashChars(wText.text).toString();
+      GralLabel widg = new GralLabel(this.currPos, sName, text, origin);
+      if(color0 !=null) widg.setTextColor(color0);
+      if(color1 !=null) widg.setBackColor(color1, 0);
+      bColor0Set = bColor1Set = true;
+      this.widgets.add(widgd = widg);
+    } 
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgLed){
       GralCfgData.GuiCfgLed ww = (GralCfgData.GuiCfgLed)cfge.widgetType;
-      widgd = gralMng.addLed(sName, sDataPath);
-      
-    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
+      widgd = new GralLed(this.currPos, sName);
+      this.widgets.add(widgd);
+    } 
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgImage){
       GralCfgData.GuiCfgImage wImage = (GralCfgData.GuiCfgImage)cfge.widgetType;
-      File fileImage = new File(currentDir, wImage.file_);
+      File fileImage = new File(this.currentDir, wImage.file_);
       if(fileImage.exists()){
         try{ InputStream imageStream = new FileInputStream(fileImage); 
-          gralMng.addImage(sName, imageStream, 10, 20, "?cmd");
+          //TODO widgd = new GralImage(imageStream)
           imageStream.close();
         } catch(IOException exc){ }
-          
       }
-      
     } else if(cfge.widgetType instanceof GralCfgData.GuiCfgShowField){
-      //GuiCfgData.GuiCfgShowField wShow = (GuiCfgData.GuiCfgShowField)cfge.widgetType;
-      //char cPromptPosition = cfge.widgetType.promptPosition ==null || cfge.widgetType.promptPosition.length() <1 
-      //                     ? '.' :  cfge.widgetType.promptPosition.charAt(0);
-      widgd = gralMng.addTextField(sName, cfge.widgetType.editable, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
-      widgd.setDataPath(sDataPath);
-    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile){
+      GralTextField widg = new GralTextField(this.currPos, sName);
+      widg.setEditable(cfge.widgetType.editable);
+      if(sPrompt !=null) { widg.setPrompt(sPrompt, sPromptPos); }
+      this.widgets.add(widgd = widg);
+    } 
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgInputFile) {
       GralCfgData.GuiCfgInputFile widgt = (GralCfgData.GuiCfgInputFile)cfge.widgetType;
       final String dirMask;
       if(widgt.data !=null){
         dirMask = replaceAlias(widgt.data);
       } else { dirMask = ""; }
-      widgd = gralMng.addFileSelectField(sName, null, dirMask, null, "t");
-      widgd.setDataPath(sDataPath);
-    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgTable){
+      //reduce the length of the text field:
+      GralPos pos1 = new GralPos(this.currPos);
+      pos1.setPosition(this.currPos, GralPos.same, GralPos.same, GralPos.same, GralPos.same -2);
+      GralTextField widg = new GralTextField(this.currPos, sName);
+      widg.setEditable(cfge.widgetType.editable);
+      if(sPrompt !=null) { widg.setPrompt(sPrompt, sPromptPos); }
+      this.widgets.add(widgd = widg);
+      pos1.setPositionSize(GralPos.same, GralPos.next, 2, 2, 'r', null); // small button right beside the file path field.
+      GralButton widgb = new GralButton(pos1, sName + "<",  "<", this.gralMng.actionFileSelect);
+      List<String> listRecentFiles = null;
+      GralMng.FileSelectInfo fileSelectInfo = new GralMng.FileSelectInfo(sName, listRecentFiles, dirMask, widg);
+      widgb.setData(fileSelectInfo); 
+      //xSize = xSize1;
+      this.widgets.add(widgd = widg);
+      this.widgets.add(widgb);
+
+      //widgd = gralMng.addFileSelectField(sName, null, dirMask, null, "t");
+    } 
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgTable){
       GralCfgData.GuiCfgTable widgt = (GralCfgData.GuiCfgTable)cfge.widgetType;
       List<Integer> columns = widgt.getColumnWidths();
       int zColumn = columns.size();
       int[] aCol = new int[zColumn];
       int ix = -1;
       for(Integer column: columns){ aCol[++ix] = column; }
-      widgd = gralMng.addTable(sName, widgt.height, aCol);
-      widgd.setDataPath(sDataPath);
-    } else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
+      widgd = new GralTable<>(this.currPos, sName, widgt.height, aCol);
+      this.widgets.add(widgd);
+    } 
+    else if(cfge.widgetType instanceof GralCfgData.GuiCfgCurveview){
       GralCfgData.GuiCfgCurveview widgt = (GralCfgData.GuiCfgCurveview)cfge.widgetType;
       int nrofTracks = widgt.lines.size(); 
-      GralCurveView widgc = gralMng.addCurveViewY(sName, widgt.nrofPoints, null, null);
-      widgc.activate(widgt.activate);
+      GralCurveView widg = new GralCurveView(this.currPos, sName, widgt.nrofPoints, null, null);
+      widg.activate(widgt.activate);
       for(GralCfgData.GuiCfgCurveLine line: widgt.lines){
         String sDataPathLine = line.data;
         final GralColor colorLine;
@@ -345,31 +447,35 @@ public class GralCfgBuilder
         } else {
           colorLine = GralColor.getColor(line.colorValue);  //maybe 0 = black if not given.
         }
-        widgc.addTrack(line.name, sDataPathLine, colorLine, 0, line.nullLine, line.scale, line.offset);
+        widg.addTrack(line.name, sDataPathLine, colorLine, 0, line.nullLine, line.scale, line.offset);
       }
-      widgd = widgc;
+      this.widgets.add(widgd = widg);
     } else {
       switch(cfge.widgetType.whatIs){
-        case 'T':{
-          widgd = gralMng.addTextField(sName, true, cfge.widgetType.prompt, cfge.widgetType.promptPosition);
-          widgd.setDataPath(sDataPath);
+        case 'T': {                                        // T= editable text field
+          GralTextField.Type type = GralTextField.Type.editable;
+          GralTextField widg = new GralTextField(this.currPos, sName, type);
+          if(sPrompt !=null) { widg.setPrompt(sPrompt, sPromptPos); }
+          this.widgets.add(widgd = widg);
         } break;
-        case 't':{
-          char promptPosition = cfge.widgetType.promptPosition == null ? '.' : cfge.widgetType.promptPosition.charAt(0);
-          widgd = gralMng.addTextBox(sName, true, cfge.widgetType.prompt, promptPosition);
-          widgd.setDataPath(sDataPath);
+        case 't': {                                        // t= text box
+          GralTextBox widg = new GralTextBox(this.currPos, sName);
+          widg.setEditable(true);
+          this.widgets.add(widgd = widg);
         } break;
         case 'U':{
-          widgd = gralMng.addValueBar(sName, sDataPath);
+          widgd = new GralValueBar(this.currPos, sName);
+          this.widgets.add(widgd);
         } break;
-        case 'I':{
+        case 'I':{                                         // L= Line
           GralCfgData.GuiCfgLine cfgLine = (GralCfgData.GuiCfgLine)cfge.widgetType;
           //copy the points from the type GuiCfgCoord to GralPoint
           List<GralPoint> points = new LinkedList<GralPoint>();
           for(GralCfgData.GuiCfgCoord coord: cfgLine.coords){
             points.add(new GralPoint(coord.x, coord.y));
           }
-          gralMng.addLine(cfgLine.color0.color, points);
+          GralCanvasStorage canvas = currPanel.getCreateCanvas();
+          canvas.drawLine(this.currPos, color0, points);
         } break;
         default: {
           widgd = null;
@@ -386,7 +492,7 @@ public class GralCfgBuilder
        
         GralUserAction actionShow = gralMng.getRegisteredUserAction(sShowMethod[0]);
         if(actionShow == null){
-          sError = "GuiCfgBuilder - show method not found: " + sShowMethod[0];
+          this.gralMng.log.writeError("GuiCfgBuilder - show method not found: " + sShowMethod[0]);
         } else {
           String[] param = sShowMethod[1] == null ? null : CalculatorExpr.splitFnParams(sShowMethod[1]);
           widgd.setActionShow(actionShow, param);
@@ -398,7 +504,7 @@ public class GralCfgBuilder
       if(sCmd !=null){
         GralUserAction actionCmd = gralMng.getRegisteredUserAction(sCmd);
         if(actionCmd == null){
-          sError = "GuiCfgBuilder - cmd action not found: " + sCmd;
+          this.gralMng.log.writeError("GuiCfgBuilder - cmd action not found: " + sCmd;
         } else {
           widgd.setActionChange(actionCmd);
         }
@@ -417,16 +523,16 @@ public class GralCfgBuilder
       if(cfge.widgetType.help!=null){
         widgd.setHtmlHelp(cfge.widgetType.help);
       }
-      if(cfge.widgetType.color0 != null){
+      if(cfge.widgetType.color0 != null && !bColor0Set){
         widgd.setBackColor(cfge.widgetType.color0.color, 0);
       }
-      if(cfge.widgetType.color1 != null){
+      if(cfge.widgetType.color1 != null && !bColor1Set){
         widgd.setLineColor(cfge.widgetType.color1.color, 0);
       }
       if(cfge.widgetType.dropFiles !=null){
         GralUserAction actionDrop = gralMng.getRegisteredUserAction(cfge.widgetType.dropFiles);
         if(actionDrop == null){
-          sError = "GuiCfgBuilder - action for drop not found: " + cfge.widgetType.dropFiles;
+          this.gralMng.log.writeError("GuiCfgBuilder - action for drop not found: " + cfge.widgetType.dropFiles);
         } else {
           widgd.setDropEnable(actionDrop, KeyCode.dropFiles);
         }
@@ -434,7 +540,7 @@ public class GralCfgBuilder
       if(cfge.widgetType.dragFiles !=null){
         GralUserAction actionDrag = gralMng.getRegisteredUserAction(cfge.widgetType.dragFiles);
         if(actionDrag == null){
-          sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragFiles;
+          this.gralMng.log.writeError("GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragFiles);
         } else {
           widgd.setDragEnable(actionDrag, KeyCode.dragFiles);
         }
@@ -442,13 +548,19 @@ public class GralCfgBuilder
       if(cfge.widgetType.dragText !=null){
         GralUserAction actionDrag = gralMng.getRegisteredUserAction(cfge.widgetType.dragText);
         if(actionDrag == null){
-          sError = "GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragText;
+          this.gralMng.log.writeError("GuiCfgBuilder - action for drag not found: " + cfge.widgetType.dragText);
         } else {
           widgd.setDragEnable(actionDrag, KeyCode.dragText);
         }
       }
+      if(sDataPath !=null) {
+        widgd.setDataPath(sDataPath);
+      }
       //save the configuration element as association from the widget.
       widgd.setCfgElement(cfge);
+    }
+    if(sError == null) {
+      
     }
     return sError;
   }

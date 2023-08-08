@@ -473,6 +473,16 @@ public final class GralCfgData
   }
   
   
+  public void clear() {
+    this.dataReplace.clear();
+    this.idxTypes.clear();
+    this.listElementsInTextfileOrder.clear();
+    this.currWindow = null;
+    this.currPanel = null;
+    this.idxPanels.clear();
+    this.idxWindow.clear();
+  }
+  
   public Set<Map.Entry<String, GralCfgPanel>> getPanels(){return this.idxPanels.entrySet(); } 
   
   public Set<Map.Entry<String, GralCfgElement>> getWindows(){return this.idxWindow.entrySet(); } 

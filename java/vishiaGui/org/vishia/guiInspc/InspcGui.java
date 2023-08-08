@@ -26,6 +26,7 @@ import org.vishia.gral.base.GralWidgetBase;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GuiCallingArgs;
 import org.vishia.gral.cfg.GralCfgZbnf;
+import org.vishia.gral.cfg.GuiCfg;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralPlugUser2Gral_ifc;
 import org.vishia.gral.ifc.GralPlugUser_ifc;
@@ -50,7 +51,7 @@ import org.vishia.util.FileFunctions;
 import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 
-public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
+public class InspcGui extends GuiCfg implements CompleteConstructionAndStart
 {
 
   /**Version, history and license
@@ -93,31 +94,10 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String version = "2016-06-26";
+  public final static String version = "2023-08-08";
   
   
   
-  final GralMng gralMng = new GralMng(new LogMessageStream(System.out));
-  
-  /**The meaning of this GralPos is, it contains the reference to this.gralMng.
-   * It can be used especially for new Windows, but also for content in windows.
-   * It is changed while using with the sPosName of the created widget.
-   */
-  final GralPos refPos = new GralPos(this.gralMng);
-  
-  
-  final GralWindow windowInspc = new GralWindow(this.refPos, "@screen,16+80, 20+120=mainWin", "The.inspector"
-      , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
-  
-  final GralMenu menuBar = this.windowInspc.getMenuBar();
-  
-  final GralArea9Panel area9 = new GralArea9Panel(this.refPos, "area9");
- 
-  final GralTextBox outputBox = new GralTextBox(this.refPos, "@area9,A3C3=outputBox", true, null, '\0');
-
-  /**The panel for all tabs from configuration.*/
-  final GralPanelContent tabPanel = new GralPanelContent(this.refPos, "@area9,A1C2=tabs");
-
   
   private final List<CompleteConstructionAndStart> composites = new LinkedList<CompleteConstructionAndStart>();
   
@@ -190,26 +170,25 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
 
   
   
-  InspcGui(CallingArguments cargs/*, GralArea9MainCmd cmdgui*/)
-  {
+  InspcGui(CallingArguments cargs, GralPlugUser_ifc user/*, GralArea9MainCmd cmdgui*/) {
+    super(cargs, user, null, null);
+    this.cargs = cargs;  //args in the correct derived type.
     ButtonInspcCmd.registerUserAction(this.gralMng);
     this.viewTargetComm = new InspcViewTargetComm(this);   // small window to monitor target communication for each target.
 //    guiCfg = new InspcGuiCfg(cargs, cmdgui, userInspcPlug);
 //    GralMng.get().registerUserAction("<name>", actionGetValueByHandleIntern);
     for(Map.Entry<String, String> entry: cargs.indexTargetIpcAddr.entrySet()){
-      this.viewTargetComm.addTarget(entry.getKey(), entry.getValue(), 0.2f, 5);
+      this.viewTargetComm.addTarget(entry.getKey(), entry.getValue(), 0.2f, 5);  // target get visible / parameterizable
     }
     
 
 //    LogMessage log = cmdgui.getLogMessageOutputConsole();
-    this.cargs = cargs;  //args in the correct derived type.
     /**
     assert(user instanceof InspcPlugUser_ifc);
     if(user !=null){
       user.init(userInspcPlug, log);
     }
     */
-    GralPlugUser_ifc user = null; //guiCfg.getPluggedUser(); 
     assert(user == null || user instanceof InspcPlugUser_ifc);
     this.inspcMngUser = new InspcPlugUser((InspcPlugUser_ifc)user);
     if(cargs.sOwnIpcAddr ==null){
@@ -240,21 +219,13 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     fieldsB = new InspcFieldTable(this.gralMng, variableMng);
     //
     //
-    this.menuBar.addMenuItem("menuBarFieldsA", "&Window/open Fields &1", this.fieldsA.actionOpenWindow);
-    this.menuBar.addMenuItem("menuBarFieldsB", "&Window/open Fields &2", this.fieldsB.actionOpenWindow);
-    this.menuBar.addMenuItem("&Window/open Curve &A ", this.curveA.actionOpenWindow);
-    this.menuBar.addMenuItem("&Window/open Curve &B ", this.curveB.actionOpenWindow);
-    this.menuBar.addMenuItem("&Window/open Curve &C ", this.curveC.actionOpenWindow);
-    this.menuBar.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
+    super.menuBar.addMenuItem("menuBarFieldsA", "&Window/open Fields &1", this.fieldsA.actionOpenWindow);
+    super.menuBar.addMenuItem("menuBarFieldsB", "&Window/open Fields &2", this.fieldsB.actionOpenWindow);
+    super.menuBar.addMenuItem("&Window/open Curve &A ", this.curveA.actionOpenWindow);
+    super.menuBar.addMenuItem("&Window/open Curve &B ", this.curveB.actionOpenWindow);
+    super.menuBar.addMenuItem("&Window/open Curve &C ", this.curveC.actionOpenWindow);
+    super.menuBar.addMenuItem("menuBarViewTargetComm", "&Window/view &TargetComm", viewTargetComm.setVisible);
     //
-    if(cargs.fileGuiCfg !=null) {
-      try {
-        GralCfgZbnf.configWithZbnf(cargs.fileGuiCfg, this.tabPanel);
-        Debugutil.stop();
-      } catch(Exception exc) {
-        System.err.println(exc.getMessage());
-      }
-    }
 //    if(user !=null){
 //      user.initGui(_gralMng);
 //      user.addGuiMenu(gui.mainWindow());
@@ -577,7 +548,7 @@ public class InspcGui implements CompleteConstructionAndStart //extends GuiCfg
     
     if(error ==0) {
       try {
-        InspcGui main = new InspcGui(cargs);
+        InspcGui main = new InspcGui(cargs, null);
         main.init();
         main.completeConstruction();
         main.startupThreads();

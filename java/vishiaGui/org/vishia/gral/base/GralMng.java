@@ -1058,12 +1058,13 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
   @Override public void buildCfg(GralCfgData data, File fileCfg) //GuiCfgBuilder cfgBuilder)
   {
-    this.cfgData = data;
-    File currentDir = FileSystem.getDir(fileCfg);
-    this.cfgBuilder = new GralCfgBuilder(this.cfgData, this, currentDir);
-    this.cfgBuilder.buildGui(this.log, 0);
-    this.designer = new GralCfgDesigner(this.cfgBuilder, this, this.log);
-    this.bDesignMode = true;
+    throw new IllegalArgumentException ("deprecated, only supported with GuiCfg");
+//    this.cfgData = data;
+//    File currentDir = FileSystem.getDir(fileCfg);
+//    this.cfgBuilder = new GralCfgBuilder(this.cfgData, this, currentDir);
+//    this.cfgBuilder.buildGui(this.log, 0);
+//    this.designer = new GralCfgDesigner(this.cfgBuilder, this, this.log);
+//    this.bDesignMode = true;
   }
 
   /**Sets or resets the design mode. The design mode allows to change the content.
@@ -2232,7 +2233,8 @@ public GralButton addCheckButton(
       if(widgd !=null){
         GralWidgetBase_ifc panel = widgd.pos().parent;
         String namePanel = panel.getName();
-        GralMng.this.cfgBuilder.buildGui(GralMng.this.log, 0);
+        throw new IllegalArgumentException ("deprecated, only supported with GuiCfg");
+//GralMng.this.cfgBuilder.buildGui(GralMng.this.log, 0);
         //designer.editFieldProperties(widgd, null);
       }
       return true;

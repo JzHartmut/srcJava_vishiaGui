@@ -6,6 +6,7 @@ import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralPos;
 import org.vishia.gral.base.GralWidget;
 import org.vishia.gral.base.GralMng;
+import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralMng_ifc;
@@ -155,6 +156,7 @@ public class GralCfgDesigner
   {
     if(bWidgetMoving){
       bWidgetMoving = false;
+      GralPanelContent panel = widgd.getItsPanel();
       int dxPixel = xy.x - xMouse0;
       int dyPixel = xy.y - yMouse0;
       
@@ -184,7 +186,7 @@ public class GralCfgDesigner
           //mng.remove(widgd);  //remove the widget.
         }
         mng.selectPanel(sPanel);
-        try{ cfgBuilder.buildWidget(cfge);
+        try{ cfgBuilder.buildWidget(cfge, panel);
         } catch(ParseException exc) {
           System.err.println("GralCfgDesigner - setPos, " + exc.getMessage());
         }
@@ -265,6 +267,7 @@ public class GralCfgDesigner
         
         GralCfgElement cfge = (GralCfgElement)widgdInDialog.getCfgElement();
         if(cfge !=null){
+          GralPanelContent panel = ((GralWidget)widgd).getItsPanel();
           String sPanel = cfge.getPanel();  //Note: The cloned Object maybe empty here before buildWidget() is called
             /*if(sName.trim().length() >0) { cfge.widgetType.name = sName; }
           if(sDataPath.trim().length() >0) { cfge.widgetType.info = sDataPath; }
@@ -298,7 +301,7 @@ public class GralCfgDesigner
             stop();
           mng.remove(widgdInDialog);  //remove the widget.
           mng.selectPanel(sPanel);
-          try{ cfgBuilder.buildWidget(cfge);
+          try{ cfgBuilder.buildWidget(cfge, panel);
           } catch(ParseException exc) {
             //show the exception in the dialog box!
           }

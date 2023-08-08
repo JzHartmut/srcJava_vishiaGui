@@ -1,5 +1,6 @@
 package org.vishia.gral.cfg;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -24,6 +25,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.inspectorTarget.Inspector;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
+import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
@@ -62,8 +64,8 @@ public class GuiCfg
 
   /**The version, history and license.
    * <ul>
-   * <li>2013-12-02 Hartmut refactoring: Moved from package org.vishia.gral.area9 (deprecated) to org.vishia.gral.cfg
-   *   where it is conceptual proper. 
+   * <li>2023-08-08 Hartmut refactoring: Moved from package org.vishia.gral.area9 (deprecated) to org.vishia.gral.cfg
+   *   where it is conceptual proper, reactivated as super class for {@link org.vishia.guiInspc.InspcGui}.
    * <li>2013-12-02 Hartmut new Parameter for {@link #GuiCfg(GuiCallingArgs, GralArea9MainCmd, GralPlugUser_ifc, GralPlugUser2Gral_ifc, List)}:
    *    cfgConditions.
    * <li>2012-09-17 Hartmut new: {@link #showMethods}
@@ -115,7 +117,7 @@ public class GuiCfg
    * 
    * 
    */
-  public final static int version = 0x20120303;
+  public final static String version = "2023-08-08";
   
   /**Composition of a Inspector-Target instance. This is only to visit this application for debugging.
    * Not necessary for functionality. */
@@ -140,7 +142,7 @@ final GuiCallingArgs cargs;
 /**The configuration data for graphical appearance. */
 public final GralCfgData guiCfgData;
 
-
+public final GralCfgBuilder guiCfgBuilder;
 
 
 /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
@@ -176,7 +178,7 @@ final GralPos refPos;
 
 public final GralWindow window;
 
-final GralMenu menuBar;
+protected final GralMenu menuBar;
 
 final GralArea9Panel area9;
 
@@ -221,6 +223,9 @@ public GuiCfg(GuiCallingArgs cargs
 //  this.gui = cmdGui.gui;
 //  guiW = (GralArea9Window)gui;
   this.cargs = cargs;
+  if(cargs.fileGuiCfg == null) {
+    throw new IllegalArgumentException("GuiCfg should have a config file. argument -gui=path");
+  }
   this.plugUser2Gui = plugUser2Gui;
   this.console = new LogMessageStream(System.out, null, null, true, null);  
   this.gralMng = new GralMng(this.console);
@@ -241,6 +246,8 @@ public GuiCfg(GuiCallingArgs cargs
 
   
   this.guiCfgData = new GralCfgData(cfgConditions);
+  
+  this.guiCfgBuilder = new GralCfgBuilder(this.guiCfgData, this.gralMng, cargs.fileGuiCfg.getParentFile());
   
   if(plugUser !=null){
     this.user = plugUser;
@@ -267,7 +274,10 @@ public GuiCfg(GuiCallingArgs cargs
   } else {
     inspector = null; //don't use.
   }
-  
+  if(cargs.fileGuiCfg !=null) {
+    readConfig(cargs.fileGuiCfg);
+  }
+
   userInit();
   //panelContent = new PanelContent(user);
   
@@ -337,13 +347,12 @@ protected void userInit()
 //}
 
 
-//protected void initMenuGralDesigner()
-//{
-//  gui.addMenuBarArea9ItemGThread("GralDesignEnable", "&Design/e&Nable", _gralMng.actionDesignEditField);  
-//  gui.addMenuBarArea9ItemGThread("GralDesignEditField", "&Design/Edit &field", _gralMng.actionDesignEditField);  
-//  gui.addMenuBarArea9ItemGThread("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", _gralMng.actionReadPanelCfg);  
+protected void initMenuGralDesigner() {
+  this.menuBar.addMenuItem("GralDesignEnable", "&Design/e&Nable", this.gralMng.actionDesignEditField);
+  this.menuBar.addMenuItem("GralDesignEditField", "&Design/Edit &field", this.gralMng.actionDesignEditField);  
+  this.menuBar.addMenuItem("GralDesignUpdatePanel", "&Design/update &Panel from cfg-file", this.gralMng.actionReadPanelCfg);  
 //  
-//}
+}
 
 
 //protected void initMain()
@@ -399,6 +408,24 @@ protected void userInit()
 private final void init() {
   this.gralMng.createGraphic("SWT", 'D', this.gralMng.log);
 }
+
+
+/**Reads a new configuration from the given file. 
+ * @param fileCfg
+ */
+protected void readConfig(File fileCfg) {
+  try {
+    this.guiCfgData.clear();
+    GralCfgZbnf zbnfCfgParser = new GralCfgZbnf(this.gralMng);  // temporary instance of this
+    zbnfCfgParser.configureWithZbnf(fileCfg, this.guiCfgData);
+    this.guiCfgBuilder.buildGui(this.guiCfgData, this.tabPanel);                               // builds only the Gral instances without implementation graphic
+  } catch(Exception exc) {
+    System.err.println(exc.getMessage());
+  }
+
+}
+
+
 
 protected void stepMain () {
 }
