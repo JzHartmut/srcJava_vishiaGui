@@ -87,7 +87,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
    * @param panelSwt may be null, then the {@link GralPanelContent#panelSwtImpl} should be set 
    *   after construction of a derived class.
    */
-  public SwtPanel(GralPanelContent panelg, Composite panelSwt)
+  public SwtPanel(GralPanelContent panelg, Composite panelSwt, boolean notUsed)
   { super(panelg);
     if(panelSwt ==null){
       Composite swtParent = (Composite)SwtMng.getSwtImpl(panelg.pos().parent);
@@ -97,7 +97,7 @@ public class SwtPanel extends GralPanelContent.ImplAccess
     }
     //panelSwt.addControlListener(this.resizeItemListener);
     //panelSwt.addFocusListener(this.focusListener);
-    super.createALlImplWidgets();
+    super.createAllImplWidgets();
   }
 
   /*

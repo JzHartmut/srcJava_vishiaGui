@@ -15,9 +15,15 @@ import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ToStringBuilder;
 
-/**It is the base calss for comprehensive widgets,
- * contains only the basically data for GralPos os the whole widget,
- * the GralMng and the  
+/**It is the base class for all widgets, via {@link GralWidget} as common base class for all regular widgets,
+ * but as base class without inheritance of 'GralWidget' for composite widgets
+ * such as {@link org.vishia.gral.widget.GralFileSelector}.
+ * It contains only the basically data, especially name, the {@link GralPos} and the reference to the {@link GralMng}
+ * But it contains also via {@link #_cdata} all information for composite widgets.
+ * <br><br>
+ * The {@link #bVisibleState} and {@link #bHasFocus} are the only dynamically data common for all widgets, contained here.
+ * See {@link #isVisible()} and {@link #hasFocus()}. 
+ * 
  *
  */
 public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuilder  {
@@ -81,33 +87,37 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
   
   
   
+  /**This inner class is used for the instance {@link #_cdata} if the widget is a composite widget. 
+   */
   public final class GralWidgComposite {
       /**List of all widgets which are contained in this panel.
      * This list is used in the communication thread to update the content of all widgets in the panel.
      */
     protected List<GralWidgetBase> widgetList = new LinkedList<GralWidgetBase>();
 
+    /**Widgets which should be resized if this parent widget is resized. */
     public List<GralWidgetBase> widgetsToResize = new LinkedList<GralWidgetBase>();
 
-    /**The widget which should be focused if the panel is focused.
-     * It is possible to set any actual widget to store the focus situation,
-     * It is possible too to have only one widget to focus. if the panel gets the focus. */
+    /**The widget which should be focused if this composite widget (panel) is focused.
+     * It is possible to set any current widget to store the focus situation,
+     * It is possible too to have only one dedicated widget to focus. if the panel gets the focus. */
     protected GralWidgetBase_ifc primaryWidget;
 
+    /**Map of widgets by name of this composite widget.*/
     protected final Map<String, GralWidgetBase> idxWidgets = new TreeMap<String, GralWidgetBase>();
 
 
     
+    /**Only used in ctor of {@link GralWidgetBase#GralWidgetBase(GralPos, String, boolean)}, nothing else. */
     protected GralWidgComposite (  ) {}
 
-    /*package private*/
-    /**Adds a widget to its panel. This method will be called in {@link GralWidgetBase#initPosAndRegisterWidget(GralPos)}
-     * either on creation the GralWidget with a given position String or on {@link GralWidget#setToPanel(GralMngBuild_ifc)}
-     * with the given currently {@link GralMng#pos()}.
+    /**Adds a widget to this composite (its panel). 
+     * This method is only used in the ctor of {@link GralWidgetBase#GralWidgetBase(GralPos, String, boolean)}
+     * to add the yet created widget to its parent (panel) given due the {@link GralPos}.
      * @param widg
      * @param toResize
      */
-    void addWidget(GralWidgetBase widg, boolean toResize){
+    protected void addWidget(GralWidgetBase widg, boolean toResize){
       String nameWidg = widg.name;
       if(widg instanceof GralWindow)
         Debugutil.stop();
@@ -139,7 +149,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
     }
 
 
-    /**Removes this widget from the lists in this panel. This method is not intent to invoke
+    /**Removes the widget from the lists of this composite (panel). This method is not intent to invoke
      * by an application. It is only used in {@link GralWidgetBase#remove()}. Use the last one method
      * to remove a widget includint is disposition and remove from the panel.
      * @param widg The widget.
@@ -165,7 +175,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
 
 
     /**Resizes the current widget and all child widgets with the known {@link GralWidgetBase#_wdgPos} and the parent bounds.
-     * This operation is called recursively for all children widgets which have composite children ( {@link GralWidgetBase#_compt} is given ).
+     * This operation is called recursively for all children widgets which have composite children ( {@link GralWidgetBase#_cdata} is given ).
      * The implementing graphic should only call this operation in the resize listener of the window. 
      * All others is done recursively. 
      * A resize listener of panels (swt.widget.Composite) is not necessary, because the widget structure is completely contained
@@ -197,8 +207,8 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
           widgd.resizePostPreparation();                // some additional things, _wdgImpl should have the porper size already.
           //
           //------------------------------- recursive for child widgets
-          if(widgd._compt !=null && recursion < 50) {
-            widgd._compt.resizeWidgets(pix, recursion+1); //recursively call of same
+          if(widgd._cdata !=null && recursion < 50) {
+            widgd._cdata.resizeWidgets(pix, recursion+1); //recursively call of same
           }
         }
       }
@@ -206,11 +216,18 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
 
     
     
-    void reportAllContent(Appendable out, int level) throws IOException {
-      if(level < 20) {
+    /**Writes the content of this composite widget in a readable form
+     * to debug the graphic assembling. 
+     * @param out to this output
+     * @param recursion if level >=50 then it does not get deeper. 
+     *   this operation is recursively called in the tree of widgets.
+     * @throws IOException
+     */
+    void reportAllContent(Appendable out, int recursion) throws IOException {
+      if(recursion < 50) {
         final String nl = "\n| | | | | | |                               ";
-        if(level >0) {
-          out.append(nl.substring(0, 2*level-1));
+        if(recursion >0) {
+          out.append(nl.substring(0, 2*recursion-1));
         }
         out.append(GralWidgetBase.this.isVisible() ? GralWidgetBase.this.hasFocus()? '*' : '+' : ':');
         out.append("-Panel: ").append(GralWidgetBase.this.name);
@@ -220,10 +237,10 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
         out.append(" @").append(GralWidgetBase.this._wdgPos.toString());
         StringBuilder sb = new StringBuilder(100);
         for(GralWidgetBase widg: this.widgetList) {
-          if(widg._compt !=null) { // instanceof GralPanelContent) {
-            widg._compt.reportAllContent(out, level+1);
+          if(widg._cdata !=null) { // instanceof GralPanelContent) {
+            widg._cdata.reportAllContent(out, recursion+1);
           } else {                                   // simple widget without sub widgets
-            out.append(nl.substring(0,2*level+1)).append(GralWidgetBase.this.isVisible() ? GralWidgetBase.this.hasFocus()? "*-" : "+-" : ":-");
+            out.append(nl.substring(0,2*recursion+1)).append(GralWidgetBase.this.isVisible() ? GralWidgetBase.this.hasFocus()? "*-" : "+-" : ":-");
             sb.setLength(0);
             out.append(widg.toString(sb));
           }
@@ -241,7 +258,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
    * Architecture: With this intermediate instance not all GralWidgetBase needs all references which are often unused. 
    * Only this one reference is given then. 
    */
-  public final GralWidgComposite _compt;
+  public final GralWidgComposite _cdata;
 
   /**Set on focus gained, false on focus lost. */
   private boolean bHasFocus;
@@ -253,7 +270,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
    */
   protected boolean bVisibleState = true;
   
-  public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng) {
+  @Deprecated public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng) {
     this(refPos, sPosName, gralMng, false);
   }
 
@@ -269,6 +286,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
    * @param refPos
    * @param sPosName syntax "[@[@<?preventRefPos>] <posString> [= <$?name>] | <$?name>]. 
    * @param gralMng
+   * @param true then creates the {@link #_cdata} instance. 
    */
   public GralWidgetBase(GralPos refPos, String sPosName, GralMng gralMng, boolean isComposite) {
     if(gralMng !=null) {
@@ -278,7 +296,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
     } else {
       this.gralMng = gralMng; //deprecated approach with singleton.
     }
-    this._compt = isComposite ? new GralWidgComposite() : null;
+    this._cdata = isComposite ? new GralWidgComposite() : null;
     final GralPos currPos1;
     final boolean bFramePos;
     if(sPosName !=null && sPosName.startsWith("@")) {
@@ -314,8 +332,8 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
     //============================================= Register the widget
     if(this._wdgPos.parent == this) {
       //don't register the panel itself!
-    } else if(this._wdgPos.parent !=null && this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._compt !=null){
-      ((GralWidgetBase)this._wdgPos.parent)._compt.addWidget(this, this._wdgPos.toResize());
+    } else if(this._wdgPos.parent !=null && this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._cdata !=null){
+      ((GralWidgetBase)this._wdgPos.parent)._cdata.addWidget(this, this._wdgPos.toResize());
     } else if(this._wdgPos ==null) {
       this._wdgPos.parent = this.gralMng.getCurrentPanel();
       System.out.println("GralWidget.GralWidget - pos without panel");
@@ -368,7 +386,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
 
   public boolean hasFocus () { return this.bHasFocus; }
   
-  public boolean isVisible () { return this.bVisibleState; }
+  @Override public boolean isVisible () { return this.bVisibleState; }
   
   // can be specific implemented
   /**This operation is called after the widget itself was resized but not just redrawn.
@@ -477,7 +495,8 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
   
 
 
-  /**This operation is implemented in the {@link GralWidget} by the default behavior.
+  /**This operation is called to create the implementation widget appearance. 
+   * If is either overridden in the specific widget implemented in the {@link GralWidget} by the default behavior.
    * Or it should be overridden in instances which are not derived from GralWidget itself,
    * on instances of comprehensive widgets.
    * This implementation is only called in {@link GralWidget#createImplWidget_Gthread()} for composite widgets.
@@ -485,8 +504,8 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
    * @throws IllegalStateException if called though the GralMng is not implemented. 
    */
   public boolean createImplWidget_Gthread() throws IllegalStateException {
-    if(this._compt !=null) {                           // is it a composite widget? a Panel or comprehensive widget?
-      for(GralWidgetBase widg: this._compt.widgetList) {
+    if(this._cdata !=null) {                           // is it a composite widget? a Panel or comprehensive widget?
+      for(GralWidgetBase widg: this._cdata.widgetList) {
         if(widg instanceof org.vishia.gral.widget.GralFileSelector)
           Debugutil.stop();
         widg.createImplWidget_Gthread();               // recursively call of same for all members.
@@ -548,15 +567,19 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
    * It is called from the {@link GralMng#runGraphicThread()} and hence package private.
    */
   public void removeImplWidget_Gthread () {
-    if(this._compt !=null) {
-      for(GralWidgetBase widg: this._compt.widgetList) {
+    if(this._cdata !=null) {
+      for(GralWidgetBase widg: this._cdata.widgetList) {
         widg.removeImplWidget_Gthread();                     // recursively call of same
       }
     }
   }
 
   /**Removes the widget from the lists in its panel and from the graphical representation.
-   * It calls the protected {@link #removeWidgetImplementation()} which is implemented in the adaption.
+   * If the graphic implementation is given, then {@link GralWidget.ImplAccess#removeWidgetImplementation()}
+   * is called which is overridden in the graphic implementation sources in a specific kind
+   * (SWT: for example {@link org.vishia.gral.swt.SwtTextFieldWrapper#removeWidgetImplementation()}) 
+   * It calls the protected {@link GralWidgComposite#removeWidget(GralWidgetBase)}
+   * and also {@link GralMng#deregisterWidgetName(GralWidgetBase)}.
    */
   @Override public boolean remove()
   {
@@ -564,8 +587,8 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
       ((GralWidget)this)._wdgImpl.removeWidgetImplementation();
       ((GralWidget)this)._wdgImpl = null;
     }
-    if(this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._compt !=null) {
-      ((GralWidgetBase)this._wdgPos.parent)._compt.removeWidget(this);
+    if(this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._cdata !=null) {
+      ((GralWidgetBase)this._wdgPos.parent)._cdata.removeWidget(this);
     }
     this.gralMng.deregisterWidgetName(this);
     return true;
@@ -606,6 +629,13 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
     return u;
   }
 
+  /**Instance of a 'GralGraphicOrder' to create the implementation of only one widget.
+   * This is used if one widget was maybe removed and new created with new properties,
+   * or an additional widget should be created on given graphic implementation.
+   * Note: The whole graphic implementation is created via {@link GralWidget#createImplWidget_Gthread()}
+   * or maybe its overridden versions, first and originally invoked on start of  
+   * {@link GralMng#runGraphicThread()} for all given GralWindow instances in {@link GralMng#idxWindows}.
+   */
   @SuppressWarnings("serial") 
   public static class TimeOrderCreateImplWidget extends GralGraphicOrder implements EventConsumer {
 

@@ -127,12 +127,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
 
   /**Constructs a text field with given properties
+   * @param refPos Reference position contains the parent widget (panel) and the GralMng.
    * @param posName Position and Name of the field. Maybe null if it is not need in management by name
    *   See {@link GralWidget#GralWidget(String, char)}.
    * @param property password, editable, maybe left empty.
    */
-  public GralTextField(GralPos currPos, String posName, Type... property){
-    super(currPos, posName, 't');
+  public GralTextField(GralPos refPos, String posName, Type... property){
+    super(refPos, posName, 't');
     boolean bPassword1 = false;
     if(property !=null){
       for(int ii=0; ii<property.length; ++ii){
@@ -149,12 +150,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
 
   /**Constructs a text field with prompt and given properties
-   * @param posName Position and Name of the field. Maybe null if it is not need in management by name
-   *   See {@link GralWidget#GralWidget(String, char)}.
-   * @param property password, editable, maybe left empty.
-   */
-  /**
-   * @param refPos Reference position
+   * @param refPos Reference position contains the parent widget (panel) and the GralMng.
    * @param posName can contain "@<positionString>=", then the name of the widget
    * @param sPrompt prompt text
    * @param promptStylePos "t" or "r"
@@ -168,29 +164,12 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   }
 
 
-//  public GralTextField(String posName, Type... property){
-//    this(GralMng.get().pos().pos, posName, property);
-//  }
 
-    /**Constructs a text field with given properties
-   * @param name Name of the field. Maybe null if it is not need in management by name
-   * @param property password, editable, maybe left empty.
-   * @deprecated since 2016-09,use {@link GralTextField#GralTextField(String, Type...)} with "@pos=name"
+
+
+  /**Sets a prompt text per default left top of the widget
+   * @param sPrompt
    */
-//  public GralTextField(String pos, String name, Type... property){
-//    this(pos !=null ? (pos.startsWith("@") ? "" : "@" + pos + "=" + name) : name, property);
-//  }
-
-
-  @Deprecated public GralTextField(String name, char whatis, GralMng mng){
-    super(name, whatis, mng);
-    this.bPassword = false;
-    setBackColor(GralColor.getColor("wh"),0);
-    setTextColor(GralColor.getColor("bk"));
-  }
-
-
-
   public void setPrompt(String sPrompt){
     this.sPrompt = sPrompt;
     if(this._wdgImpl !=null){
@@ -202,6 +181,12 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
   }
 
 
+  /**This operation can be called only for a non activated widget in the implementation level,
+   * because the promt position cannnot be changed if the widget is already visible.
+   * @param sPrompt
+   * @param sPromptPos "r" or "t", left is not supported because the start position is not determined.
+   *   To show a text field with a prompt left side add a {@link org.vishia.gral.widget.GralLabel} to the proper position. 
+   */
   public void setPrompt(String sPrompt, String sPromptPos){
     this.sPrompt = sPrompt;
     this.sPromptStylePosition = sPromptPos;
@@ -630,14 +615,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
  }
 
 
-
-
-  /**Sets the action which is invoked while a mouse button is pressed or release on this widget.
-   * Implementation hint: It installs a mouse listener.
-   * TODO: use GralMouseWidgetAction_ifc instead GralUserAction, use another action for mouse than change.
-   */
-  //abstract public void setMouseAction(GralUserAction action);
-
+  
   /**Gets the current value of the text field thread-independent.
    * It is the value stored in the {@link GralWidget.DynamicData#displayedText} which is updated while typing the text
    * or if the focus is changed (depending on implementation).
@@ -714,7 +692,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 
   /**Returns the Label for a prompt or null if there isn't used a prompt
    */
-  public final String getPromptLabelImpl(){ return this.sPrompt; }
+  public final String getPrompt(){ return this.sPrompt; }
 
 
 

@@ -1458,9 +1458,6 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
     this.bStarted = false;
     this.bIsExitImplGraphic = true;
     this.bExitMain = this.bShouldExitMain;
-    //displaySwt.dispose ();
-    //bExit = true;
-    //synchronized(this){ notify(); }  //to weak up waiting on configGrafic().
   }
 
 

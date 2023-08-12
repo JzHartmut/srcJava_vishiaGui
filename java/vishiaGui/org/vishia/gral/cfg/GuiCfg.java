@@ -26,6 +26,7 @@ import org.vishia.inspectorTarget.Inspector;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
 import org.vishia.util.Debugutil;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.KeyCode;
 
 /**This class is the basic class for configurable GUI applications with 9-Area Main window.
@@ -174,7 +175,7 @@ public final GralMng gralMng;
  * It can be used especially for new Windows, but also for content in windows.
  * It is changed while using with the sPosName of the created widget.
  */
-final GralPos refPos; 
+protected final GralPos refPos; 
 
 public final GralWindow window;
 
@@ -201,16 +202,24 @@ final GralTextBox outputBox;
 
 //private static GuiCfg singleton;
 
-/**ctor for the main class of the application. 
- * The main class can be created in some other kinds as done in static main too.
- * But it needs the {@link MainCmdWin}.
+/**ctor for the main class of a GUI application. 
  * <br><br>
- * The ctor checks whether a gUI-configuration file is given. If not then the default configuration is used.
- * It is especially for the Sample.
+ * The ctor checks whether a GUI-configuration file is given. If given, then reads the configuration to determine the graphic.
  * <br><br>
- * The the GUI will be completed with the content of the GUI-configuration file.  
+ * If not given, then only an empty main Window will be created. Whereas name, position and title of the window 
+ * can be gotten from {@link GuiCallingArgs#sTitle}, should be given by command line arguments or set before construction. 
+ * <br><br>
+ * The GUI can be completed after construction with some more GUI elements, also independent sub windows, panels etc.
+ * This can be done in the constructor of an inherit class or also after construction. 
+ * Note that build of the implementation graphic is done in {@link #init()} which can be overridden.
+ * <br><br>
+ * The the GUI will be completed with the content of the GUI-configuration file
+ * or also alternatively by programmed GUI elements. For that the ctor of the inherit class can create widgets.
+ * After finish this (super) constructor the {@link #refPos} refers the last created panel,
+ * so that panel can immediately used for widgets, or the window can be selected etc. pp.  
  *   
  * @param cargs The given calling arguments.
+ *   If {@link GuiCallingArgs#sTitle} is set then this is used as title for the window.  
  * @param cmdGui The GUI-organization.
  * @param plugUser2Gui maybe possible a instances which plugs the user instance to the GUI.
  *   This instance may be defined in the context which calls this constructor.
@@ -218,24 +227,44 @@ final GralTextBox outputBox;
  */
 public GuiCfg(GuiCallingArgs cargs
     , GralPlugUser_ifc plugUser, GralPlugUser2Gral_ifc plugUser2Gui
-    , List<String> cfgConditions) { 
-//  this.mainCmd = cmdGui;
-//  this.gui = cmdGui.gui;
-//  guiW = (GralArea9Window)gui;
+    , List<String> cfgConditions
+  ) { 
+  //
+  new InterProcessCommFactorySocket();
   this.cargs = cargs;
-  if(cargs.fileGuiCfg == null) {
-    throw new IllegalArgumentException("GuiCfg should have a config file. argument -gui=path");
-  }
   this.plugUser2Gui = plugUser2Gui;
   this.console = new LogMessageStream(System.out, null, null, true, null);  
   this.gralMng = new GralMng(this.console);
   this.refPos = new GralPos(this.gralMng);
-
-  this.window = new GralWindow(this.refPos, "@screen,16+80, 20+120=mainWin", "The.inspector"
-      , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
+  
+  this.guiCfgData = new GralCfgData(cfgConditions);
+  if(cargs.fileGuiCfg !=null) {
+    readConfig(cargs.fileGuiCfg);                          // first read the GUI configuration file. may contain info about window.
+  }
+  String sWinTitle = cargs.sTitle !=null ? cargs.sTitle 
+                   : this.guiCfgData.firstWindow.title !=null ? this.guiCfgData.firstWindow.title
+                   : cargs.fileGuiCfg !=null ? "GuiCfg: " + cargs.fileGuiCfg.getName()
+                   : "GuiCfg";
+  int winProps = GralWindow_ifc.windResizeable;
+  boolean bMinimizeOnClose = false;
+  if(this.guiCfgData.firstWindow !=null && this.guiCfgData.firstWindow.data !=null || cargs.aboutInfo() !=null) {
+    bMinimizeOnClose = true;
+  }
+  if(bMinimizeOnClose || this.guiCfgData.firstWindow !=null && this.guiCfgData.firstWindow.help !=null) {
+    winProps |= GralWindow_ifc.windMinimizeOnClose;        // then menues will be created, hence also the exit menu.
+  }
+  this.window = new GralWindow(this.refPos, "@screen,16+80, 20+120=mainWin", sWinTitle
+      , winProps);
 
   this.menuBar = this.window.getMenuBar();
-
+  if((winProps & GralWindow_ifc.windMinimizeOnClose) !=0) {
+    this.menuBar.addMenuItem("menuFClose", "&File/e&Xit", this.gralMng.actionClose);
+    this.menuBar.addMenuItem("menuWClose", "&Window/e&Xit", this.gralMng.actionClose);
+    this.menuBar.addMenuItem("menuHClose", "&Help/e&Xit", this.gralMng.actionClose);
+  }
+  if(this.guiCfgData.firstWindow !=null && this.guiCfgData.firstWindow.data !=null) {
+  }
+  
   this.area9 = new GralArea9Panel(this.refPos, "area9");
 
   this.outputBox = new GralTextBox(this.refPos, "@area9,A3C3=outputBox", true, null, '\0');
@@ -243,11 +272,12 @@ public GuiCfg(GuiCallingArgs cargs
   /**The panel for all tabs from configuration.*/
   this.tabPanel = new GralPanelContent(this.refPos, "@area9,A1C2=tabs");
 
-
-  
-  this.guiCfgData = new GralCfgData(cfgConditions);
-  
-  this.guiCfgBuilder = new GralCfgBuilder(this.guiCfgData, this.gralMng, cargs.fileGuiCfg.getParentFile());
+  if(cargs.fileGuiCfg != null) {
+    this.guiCfgBuilder = new GralCfgBuilder(this.guiCfgData, this.gralMng, cargs.fileGuiCfg.getParentFile());
+    this.guiCfgBuilder.buildGui(this.guiCfgData, this.tabPanel); // builds only the Gral instances without implementation graphic
+  } else {
+    this.guiCfgBuilder = null;
+  }
   
   if(plugUser !=null){
     this.user = plugUser;
@@ -273,9 +303,6 @@ public GuiCfg(GuiCallingArgs cargs
     inspector.start(this);
   } else {
     inspector = null; //don't use.
-  }
-  if(cargs.fileGuiCfg !=null) {
-    readConfig(cargs.fileGuiCfg);
   }
 
   userInit();
@@ -405,7 +432,7 @@ protected void initMenuGralDesigner() {
 //  
 //}
 
-private final void init() {
+protected void initMain() {
   this.gralMng.createGraphic("SWT", 'D', this.gralMng.log);
 }
 
@@ -418,7 +445,9 @@ protected void readConfig(File fileCfg) {
     this.guiCfgData.clear();
     GralCfgZbnf zbnfCfgParser = new GralCfgZbnf(this.gralMng);  // temporary instance of this
     zbnfCfgParser.configureWithZbnf(fileCfg, this.guiCfgData);
-    this.guiCfgBuilder.buildGui(this.guiCfgData, this.tabPanel);                               // builds only the Gral instances without implementation graphic
+    if(this.tabPanel !=null) {                             // on first start, it is not yet prepared.
+      this.guiCfgBuilder.buildGui(this.guiCfgData, this.tabPanel); // builds only the Gral instances without implementation graphic
+    }
   } catch(Exception exc) {
     System.err.println(exc.getMessage());
   }
@@ -441,27 +470,36 @@ protected void finishMain(){
 }
 
 
+/**This operation should be called in main(). It waits for closing graphic,
+ * executes {@link #stepMain()} with 20 ms wait time,
+ * and closes all necessities.
+ * An unexpected exception is written to System.err. 
+ */
 public final void execute()
 {
   try {
-    this.init();
+    this.initMain();
 //    this.completeConstruction();
 //    this.startupThreads();
     while(this.gralMng.isRunning()){
       try{ Thread.sleep(20);} 
       catch (InterruptedException e) { }
-      this.stepMain();
+      try { this.stepMain();}
+      catch (Exception exc) { 
+        CharSequence sMsg = ExcUtil.exceptionInfo("Unexpected exception while stepMain: ", exc, 0, 20);
+        System.err.println(sMsg);
+      }
     }
     this.gralMng.closeApplication();
+    if(this.inspector !=null) { 
+      this.inspector.shutdown(); 
+    }
+    finishMain();
   } catch(Exception exc) {
-    System.err.println("Unexpected exception: " + exc.getMessage());
-    exc.printStackTrace(System.err);
-  }
+    CharSequence sMsg = ExcUtil.exceptionInfo("Unexpected exception: ", exc, 0, 20);
+    System.err.println(sMsg);
+  } 
 
-  if(inspector !=null) { 
-    inspector.shutdown(); 
-  }
-  finishMain();
 }
 
 
@@ -534,41 +572,32 @@ protected GralUserAction actionFile = new GralUserAction("actionFile")
  * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
  */
 public static void main(String[] cmdArgs) { 
-  boolean bOk = true;
   //
-  new InterProcessCommFactorySocket();
-  //
-  GuiCallingArgs cargs = new GuiCallingArgs();
-  int error = 0;
-  try {
-    cargs.parseArgs(cmdArgs);
-  } catch (Exception exc) {
-    System.err.println("cmdline arg exception: " + exc.getMessage());
-    error = 255;
-  }
-  //Initializes the GUI till a output window to show informations:
-//  CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
-  
-  if(error ==0) {
-    try {
-      GuiCfg main = new GuiCfg(cargs, null, null, null);
-      main.init();
-//      main.completeConstruction();
-//      main.startupThreads();
-      while(main.gralMng.isRunning()){
-        try{ Thread.sleep(20);} 
-        catch (InterruptedException e) { }
-        main.stepMain();
-      }
-      main.gralMng.closeApplication();
-    } catch(Exception exc) {
-      System.err.println("Unexpected exception: " + exc.getMessage());
-      exc.printStackTrace(System.err);
-    }
-  }
+  int error = smain(cmdArgs);
   System.exit(error);
 }
 
+
+/**Possible to start from another program, not as main.
+ * @param cmdArgs given arguments
+ * @param cargs
+ * @return
+ */
+public static int smain(String[] cmdArgs) {
+  //
+  GuiCallingArgs cargs = new GuiCallingArgs();
+  boolean bOk = cargs.parseArgs(cmdArgs, System.err);
+  //Initializes the GUI till a output window to show informations:
+//  CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
+  
+  if(bOk) {
+    GuiCfg thiz = new GuiCfg(cargs, null, null, null);
+    thiz.execute();
+    return 0;
+  } else {
+    return 255;
+  }
+}
 
 
 void stop(){} //debug helper

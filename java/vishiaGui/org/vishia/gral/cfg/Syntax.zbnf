@@ -85,7 +85,7 @@ param::=<?>
 
 
 
-Window::= [<""?title> | <$-\ ?title>] [( <param?Window> )] ;.
+Window::= [<""?title> | <$-\ ?title>] [( <param> )] ;.
 
 
 Type::= [(<$?typeName>)|<$?typeName>] [: <param?>|( <param?> )] ;.

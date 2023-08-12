@@ -96,6 +96,7 @@ public class GralCfgElement implements Cloneable, GralWidgetCfg_ifc
   
   GralCfgElement() //GralCfgData itsCfgData)
   { //this.itsCfgData = itsCfgData;
+    this.name = "?";  //default name, formally necessary
   }
   
   @Override

@@ -49,7 +49,7 @@ public class XXXSwtCanvasStorePanel extends SwtPanel  //CanvasStorePanel //
    * @param backGround
    */
   public XXXSwtCanvasStorePanel(GralPanelContent panelg, Composite parent, int style, Color backGround, GralMng gralMng)
-  { super(panelg, (Composite)null);
+  { super(panelg, (Composite)null, false);
     //gralPanel().panel.canvas = new GralCanvasStorage();
     SwtWdgCanvas swtCanvas = new SwtWdgCanvas(this, (SwtMng)gralMng._mngImpl, this._panel.canvas, parent, style);
     super.panelSwtImpl = swtCanvas;

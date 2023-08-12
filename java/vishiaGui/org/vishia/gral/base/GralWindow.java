@@ -149,7 +149,8 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
    */
   @Deprecated public GralWindow(GralPos refPos, String posName, String sTitle, int windProps, GralMng gralMng)
   {
-    super(refPos.setParent(gralMng.screen), posName, 'w', gralMng, true);
+    super(refPos.setParent(gralMng.screen), posName, 'w', true);
+    assert(gralMng == null || gralMng == refPos.parent.gralMng());
     int lenNameWindow = super.name.length();
     final String sNamePanel;
     final String sTitleDefault;
@@ -422,7 +423,7 @@ public class GralWindow extends GralWidget implements GralWindow_ifc
      */
     protected void resizeWidgets ( GralRectangle parentPixelRectangle) {
       this.gralWindow.mainPanel._wdgImpl.setBoundsPixel(parentPixelRectangle.x, parentPixelRectangle.y, parentPixelRectangle.dx, parentPixelRectangle.dy);
-      this.gralWindow.mainPanel._compt.resizeWidgets(parentPixelRectangle, 0);  //note: does not resize itself, only the children
+      this.gralWindow.mainPanel._cdata.resizeWidgets(parentPixelRectangle, 0);  //note: does not resize itself, only the children
     }
 
     //protected boolean isVisible(){ return gralWindow.bVisible; }

@@ -251,11 +251,15 @@ public class InspcGui extends GuiCfg implements CompleteConstructionAndStart
   }
 
   
-  private final void init() {
+  @Override protected void initMain() {
+    completeConstruction();
+    startupThreads();
+    
     this.gralMng.createGraphic("SWT", 'D', this.gralMng.log);
   }
   
   protected void stepMain () {
+    super.stepMain();
   }
 
   
@@ -524,46 +528,20 @@ public class InspcGui extends GuiCfg implements CompleteConstructionAndStart
    * @param args Some calling arguments are taken. This is the GUI-configuration especially.   
    */
   public static void main(String[] cmdArgs)
-  { boolean bOk = true;
-    //
-    //String ipcFactory = "org.vishia.communication.InterProcessComm_Socket";
-    //try{ ClassLoader.getSystemClassLoader().loadClass(ipcFactory, true);
-    //}catch(ClassNotFoundException exc){
-    //  System.out.println("class not found: " + "org.vishia.communication.InterProcessComm_Socket");
-    //}
-    //Loads the named class, and its base class InterProcessCommFactory. 
-    //In that kind the calling of factory methods are regarded to socket.
-    new InterProcessCommFactorySocket();
-    //
+  { 
     CallingArguments cargs = new CallingArguments();
-    int error = 0;
-    try {
-      cargs.parseArgs(cmdArgs);
-    } catch (Exception exc) {
-      System.err.println("cmdline arg exception: " + exc.getMessage());
-      error = 255;
-    }
-    //Initializes the GUI till a output window to show informations:
-//    CmdLineAndGui cmdgui = new CmdLineAndGui(cargs, args);  //implements MainCmd, parses calling arguments
+    boolean bOk = cargs.parseArgs(cmdArgs, System.err);
     
-    if(error ==0) {
-      try {
-        InspcGui main = new InspcGui(cargs, null);
-        main.init();
-        main.completeConstruction();
-        main.startupThreads();
-        while(main.gralMng.isRunning()){
-          try{ Thread.sleep(20);} 
-          catch (InterruptedException e) { }
-          main.stepMain();
-        }
-        main.gralMng.closeApplication();
-      } catch(Exception exc) {
-        System.err.println("Unexpected exception: " + exc.getMessage());
-        exc.printStackTrace(System.err);
+    if(bOk) {
+      if(cargs.sTitle ==null) {    // title= not determined
+        cargs.sTitle = "InspcGui: " + cargs.fileGuiCfg.getAbsolutePath();
       }
+      InspcGui main = new InspcGui(cargs, null);
+      main.execute();
+      System.exit(0);
+    } else {
+      System.exit(255);
     }
-    System.exit(error);
   }
 
 

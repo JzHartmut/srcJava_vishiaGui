@@ -747,7 +747,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
           : ( (posName.startsWith("@") ? "" : "@")         // supplement @ if not given in pos
               + posName +
               ( name == null ? "" : "=" + name) )          // combine @pos = name
-        , whatIs, gralMng, false);
+        , whatIs, false);
+    assert(gralMng==null || gralMng == currPos.parent.gralMng());
   }
 
 
@@ -757,12 +758,12 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
 
 
   protected GralWidget ( GralPos currPos, String sPosName, char whatIs){
-    this(currPos, sPosName, whatIs, null, false );
+    this(currPos, sPosName, whatIs, false );
   }
 
-  protected GralWidget ( GralPos currPos, String sPosName, char whatIs, boolean isComposite){
-    this(currPos, sPosName, whatIs, null, isComposite );
-  }
+//  protected GralWidget ( GralPos currPos, String sPosName, char whatIs, boolean isComposite){
+//    this(currPos, sPosName, whatIs, null, isComposite );
+//  }
 
 
 
@@ -785,8 +786,8 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
    * @param gralMng should be given if currPos is not given, to work with a dedicated GralMng, not with the singleton.
    *   If currPos is given and valid, this argument can be null.
    */
-  public GralWidget ( GralPos refPos, String sPosName, char whatIs, GralMng gralMng, boolean isComposite){
-    super(refPos, sPosName, gralMng, isComposite);                     // set the gralMng reference, maybe from currPos or from gralMng
+  public GralWidget ( GralPos refPos, String sPosName, char whatIs, boolean isComposite){
+    super(refPos, sPosName, null, isComposite);                     // set the gralMng reference, maybe from currPos or from gralMng
     assert(this.gralMng !=null);
     //this.widget = null;
     this.whatIs = whatIs;
@@ -802,19 +803,6 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
 
 
 
-
-
-  void XXXregisterWidget() {
-    if(this._wdgPos.parent == this) {
-      //don't register the panel itself!
-    } else if(this._wdgPos.parent !=null && this._wdgPos.parent instanceof GralWidgetBase && ((GralWidgetBase)this._wdgPos.parent)._compt !=null){
-      ((GralWidgetBase)this._wdgPos.parent)._compt.addWidget(this, this._wdgPos.toResize());
-    } else if(this._wdgPos ==null) {
-      this._wdgPos.parent = this.gralMng.getCurrentPanel();
-      System.out.println("GralWidget.GralWidget - pos without panel");
-    }
-    this.gralMng.registerWidget(this);
-  }
 
 
   @Deprecated public GralWidget(String sName, char whatIs, GralMng mng)

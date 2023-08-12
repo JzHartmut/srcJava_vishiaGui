@@ -142,7 +142,7 @@ public final class GralCfgData
     
     public void set_data(String val){ 
       this.data = val;                           // the data path, usual use a variable
-      if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
+      //if(this.name ==null) { this.name = val; }  // default name, will be overridden if name= is given.
     }
     
     public void set_help(String sHelp){ this.help = sHelp; }
@@ -447,11 +447,10 @@ public final class GralCfgData
    */
   final List<GralCfgElement> listElementsInTextfileOrder = new ArrayList<GralCfgElement>();
   
-  //GralCfgPanel actPanel;
+  /**The first window to create.*/
+  GralCfgWindow firstWindow;
   
-  /**The current window where 
-   * 
-   */
+  /**The current window where new config elements are written in in order of configuration.*/
   GralCfgWindow currWindow;
   
   /**The current panel where a widget is associated to, with or without panel definition.
@@ -589,7 +588,7 @@ public final class GralCfgData
         name = value.name = value.widgetType.name;         // then store also here.
       } else {   //------------------------------------or---  given with syntay <*=:?positionString> [ = <$-/?name>]
         name = value.name;
-        if(value.widgetType.name !=null && ! value.widgetType.name.equals(value.name)) {
+        if(value.widgetType.name !=null && ! value.widgetType.name.equals("?") && ! value.widgetType.name.equals(value.name)) {
           throw new IllegalArgumentException("only one name should be given or name should be the same: " + value.toString());
         } else {
           value.widgetType.name = value.name;              // store it also in the widgettype
@@ -603,10 +602,13 @@ public final class GralCfgData
       if (value.widgetType instanceof GralCfgWindow){      // definitive given window
         this.idxWindow.put(name, value);
         this.currWindow = (GralCfgWindow)value.widgetType;
+        if(this.firstWindow == null) {
+          this.firstWindow = this.currWindow;
+        }
       } else { //-------------------------------------------- not a window
         if(this.currWindow ==null) {                       // Window not given, create a default window of not given.  
           GralCfgElement cfgWindow = new GralCfgElement();
-          this.currWindow = new GralCfgWindow(null);
+          this.firstWindow = this.currWindow = new GralCfgWindow(null);
           cfgWindow.widgetType = this.currWindow;
           this.currWindow.name = "mainWindow";
           this.idxWindow.put(this.currWindow.name, cfgWindow);
