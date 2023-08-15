@@ -26,6 +26,7 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
 {
   /**Version, history and license .
    * <ul>
+   * <li>2023-08-14 prompt right side should now be work again 
    * <li>2023-01-17 enhanced {@link #setText(CharSequence, int, boolean)} now also with negative charetPos count from left.
    * <li>2023-01-17 new {@link #setText(CharSequence, int, boolean)} for unconditional write, this is if a text field itself
    *   causes the operation which the call setText().
@@ -816,7 +817,13 @@ public class GralTextField extends GralWidget implements GralTextField_ifc
                 , GralPos.same, GralPos.same, '.', 0);
           //} break;
         //}
-
+      } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")) {
+        this.posField = widgg.pos();
+        this.posPrompt = new GralPos(this.posField, 'r');
+        this.posPrompt.setPosition(null, GralPos.same      // hint: look on SwtTextFieldWrapper.setBoundsPixel(x,y,dx,dy) how it is used.
+            , GralPos.samesize                             // it is calculated there also in special manner. todo cleanup this.
+            , GralPos.next, GralPos.samesize, 'r', 0);
+            
       } else { //no prompt given
         this.posPrompt = null;
         this.posField = widgg.pos();

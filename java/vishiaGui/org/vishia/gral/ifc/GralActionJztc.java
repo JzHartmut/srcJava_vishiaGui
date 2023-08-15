@@ -1,6 +1,7 @@
 package org.vishia.gral.ifc;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -9,12 +10,16 @@ import javax.script.ScriptException;
 
 import org.vishia.cmd.JZtxtcmdExecuter;
 import org.vishia.cmd.JZtxtcmdScript;
+import org.vishia.cmd.JZtxtcmdScript.DefVariable;
 import org.vishia.cmd.JZtxtcmdThreadQueue;
 import org.vishia.gral.base.GralMng;
-import org.vishia.mainCmd.MainCmdLogging_ifc;
+import org.vishia.gral.cfg.GuiCfg;
+import org.vishia.util.CalculatorExpr;
 import org.vishia.util.DataAccess;
 
-/**This class should be instantiated by a JZtxtcmd script.
+/**This class is used inside GuiCfg.
+ * Old meaning, but maybe no more possible: should be instantiated by a JZtxtcmd script.
+ * New: now GuiCfg is the frame for action sub routines.
  * It is the common container for all actions which are deployed by sub routines of jzcmd.
  * To add an action invoke in JZtxtcmd:<pre>
  * Obj gralActions = java new org.vishia.gral.ifc.GralActionJztc(jztc, out);
@@ -32,6 +37,7 @@ public class GralActionJztc
   
   /**The version, history and license.
    * <ul>
+   * <li>2023-08-15 many renewed using for {@link GuiCfg}
    * <li>2018-09-17 created
    * </ul>
    * 
@@ -74,7 +80,39 @@ public class GralActionJztc
     }
     
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params) {
-      thread.add(jzsub);
+      List<DataAccess.Variable<Object>> args = new LinkedList<DataAccess.Variable<Object>>();
+      for(DefVariable defv: this.jzsub.formalArgs) {
+        String name = defv.getVariableIdent();             // name of the formal argument;
+        if(name.equals("gui")) {                           // reference to the GuiCfg class resp. its derived
+          
+        } 
+        else if(name.equals("gralMng")) {                  // reference to the GuiCfg class resp. its derived
+          DataAccess.Variable<Object> actarg = new DataAccess.Variable<Object>('O', "gralMng", GralActionJztc.this.gui.gralMng, false);
+          args.add(actarg);
+        }
+        else if(name.equals("wdg")) {                  // reference to the GuiCfg class resp. its derived
+          DataAccess.Variable<Object> actarg = new DataAccess.Variable<Object>('O', "wdg", widgd, false);
+          args.add(actarg);
+        }
+        else if(name.equals("param0") && params[0] !=null) {                  // reference to the GuiCfg class resp. its derived
+          DataAccess.Variable<Object> actarg = new DataAccess.Variable<Object>('O', "param0", params[0], false);
+          args.add(actarg);
+        }
+        else if(name.equals("param1") && params[0] !=null) {                  // reference to the GuiCfg class resp. its derived
+          DataAccess.Variable<Object> actarg = new DataAccess.Variable<Object>('O', "param1", params[1], false);
+          args.add(actarg);
+        }
+        else if(name.equals("param2") && params[0] !=null) {                  // reference to the GuiCfg class resp. its derived
+          DataAccess.Variable<Object> actarg = new DataAccess.Variable<Object>('O', "param2", params[2], false);
+          args.add(actarg);
+        }
+        else if(name.equals("key")) {                  // reference to the GuiCfg class resp. its derived
+          CalculatorExpr.Value val = new CalculatorExpr.Value(key);
+          DataAccess.Variable<Object> actarg = new DataAccess.Variable<Object>('K', "key", val, true);
+          args.add(actarg);
+        }
+      }
+      GralActionJztc.this.thread.add(this.jzsub, args);
       return true;
     }
     
@@ -86,12 +124,12 @@ public class GralActionJztc
 
     public ActionRereadScript()
     { super("GralActionJztc-reread script");
-      GralActionJztc.this.gralMng.registerUserAction("GralActionJztc_reread", this);
+      GralActionJztc.this.gui.gralMng.registerUserAction("GralActionJztc_reread", this);
     }
     
     @Override public boolean exec(int key, GralWidget_ifc widgd, Object... params) {
-      if(scriptFile !=null) {
-        GralActionJztc.this.setScript(scriptFile);
+      if(GralActionJztc.this.scriptFile !=null) {
+        GralActionJztc.this.setScript(GralActionJztc.this.scriptFile);
       }
       return true;
     }
@@ -99,25 +137,31 @@ public class GralActionJztc
   }
   
 
-  
+  class ActionArgs {
+    int key;
+    GralWidget_ifc widgd; 
+    Object[] params;
+  }
   
   
   Map<String, Action> actions = new TreeMap<String, Action>();
   
   
   
-  /**The java prepared script which contains subroutines. */
-  JZtxtcmdScript jzcmdScript;
-
   File scriptFile;
   
   final JZtxtcmdThreadQueue thread;
   
   //final JZtxtcmdExecuter cmdExecuter;
 
-  final Appendable out;
+  /**The java prepared script which contains subroutines. */
+  JZtxtcmdScript jzTcScript;
+
+  public final JZtxtcmdExecuter jzTcExec;
+
+  public final Appendable out;
   
-  final GralMng gralMng;
+  public final GuiCfg gui;
   
 //  final MainCmdLogging_ifc log;
   
@@ -125,9 +169,11 @@ public class GralActionJztc
    * @param jztc The main data to access script level
    * @param out Any output used in the sub routine.
    */
-  public GralActionJztc(JZtxtcmdExecuter.JzTcMain jztc, Appendable out, GralMng gralMng){
-    this.gralMng = gralMng;
-    this.thread = new JZtxtcmdThreadQueue("jzTc-GUI", jztc);
+  public GralActionJztc(JZtxtcmdExecuter jzTcExec, JZtxtcmdScript script, Appendable out, GuiCfg gui){
+    this.gui = gui;
+    this.jzTcExec = jzTcExec;
+    this.jzTcScript = script;
+    this.thread = new JZtxtcmdThreadQueue("jzTc-GUI", jzTcExec);
     //this.cmdExecuter = cmdExecuter;
     this.out = out; 
 //    this.log = log;
@@ -141,8 +187,8 @@ public class GralActionJztc
     }
     this.scriptFile = scriptfile;
     try{ 
-      jzcmdScript = JZtxtcmdScript.createScriptFromFile(scriptfile, this.gralMng.log, null);
-      List<Object> listSubs = jzcmdScript.scriptClass().listClassesAndSubroutines();
+      this.jzTcScript = JZtxtcmdScript.createScriptFromFile(scriptfile, this.gui.gralMng.log, null);
+      List<Object> listSubs = this.jzTcScript.scriptClass().listClassesAndSubroutines();
       for(Object e: listSubs) {
         if(e instanceof JZtxtcmdScript.Subroutine) {
           JZtxtcmdScript.Subroutine sub = (JZtxtcmdScript.Subroutine)e;
@@ -156,11 +202,13 @@ public class GralActionJztc
         }
       }
     } catch (ScriptException exc) {
-      this.gralMng.log.writeError("Error GralUserAction.setScript", exc);
+      this.gui.gralMng.log.writeError("Error GralUserAction.setScript", exc);
     }
   }
   
   
+  
+  public final JZtxtcmdScript getScript () { return this.jzTcScript; }
   
   
   /**Adds a JZtxtcmd-subroutine as execution of a {@link GralUserAction}.
@@ -171,13 +219,13 @@ public class GralActionJztc
    */
   public void add(JZtxtcmdScript.Subroutine jzsub) {
     String name = jzsub.name;
-    Action action = actions.get(name);
+    Action action = this.actions.get(name);
     if(action != null) {
       action.jzsub = jzsub;      //replace action on reread script.
     } else {
       action = new Action(jzsub);
-      actions.put(name, action);
-      this.gralMng.registerUserAction(jzsub.name, action);
+      this.actions.put(name, action);
+      this.gui.gralMng.registerUserAction(name, action);
     }
   }
   

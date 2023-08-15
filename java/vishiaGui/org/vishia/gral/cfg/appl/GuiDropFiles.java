@@ -68,6 +68,10 @@ public class GuiDropFiles {
 
     File fjzTc;
     
+    public Args() {
+      super("GuiDropFiles example");
+    }
+
     @Override final protected boolean testArgument(String arg, int nArg) {
       boolean bOk = true;  //set to false if the argc is not passed
       String value;

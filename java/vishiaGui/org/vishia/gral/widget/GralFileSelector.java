@@ -25,7 +25,6 @@ import org.vishia.fileRemote.FileRemoteCmdEventData;
 import org.vishia.fileRemote.FileRemoteProgressEventConsumer;
 import org.vishia.fileRemote.FileRemoteProgressEvData;
 import org.vishia.fileRemote.FileRemoteWalkerCallback;
-import org.vishia.fileRemote.XXXFileRemoteWalkerEvent;
 import org.vishia.gral.base.GralButton;
 import org.vishia.gral.base.GralSwitchButton;
 import org.vishia.gral.base.GralMenu;

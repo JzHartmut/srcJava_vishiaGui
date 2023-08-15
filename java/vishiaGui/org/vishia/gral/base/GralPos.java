@@ -3,15 +3,11 @@ package org.vishia.gral.base;
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.vishia.bridgeC.IllegalArgumentExceptionJc;
-import org.vishia.gral.ifc.GralPanel_ifc;
 import org.vishia.gral.ifc.GralRectangle;
 import org.vishia.gral.ifc.GralWidgetBase_ifc;
 import org.vishia.gral.ifc.GralWidget_ifc;
-import org.vishia.util.Assert;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ToStringBuilder;
-import org.vishia.util.StringPart;
 import org.vishia.util.StringPartScan;
 
 
@@ -187,6 +183,7 @@ public class GralPos implements Cloneable, ToStringBuilder
 {
   /**Version, history and license.
    * <ul>
+   * <li>2023-08-14 new: {@link #GralPos(GralPos, char)} 
    * <li>2023-04-16 chg: {@link #calcWidgetPosAndSize(GralGridProperties, GralRectangle, int, int)} now uses {@link GralRectangle} for the parent.
    *   It is supported that the parent is any pixel region on the environment panel, not the whole panel. 
    *   This is necessary for real {@link GralWidgComposite} without an own panel.  
@@ -252,7 +249,7 @@ public class GralPos implements Cloneable, ToStringBuilder
    *
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
-  public static final int version = 20221231;
+  public static final String version = "2023-08-14";
 
 
   /**This mask 0x8... applied at any coordinate parameter of any setPosition- method means, that the value is
@@ -430,11 +427,28 @@ public class GralPos implements Cloneable, ToStringBuilder
     this.parent = parent;
   }
 
-  /**A GralPos should never create as instance from the application. It is created only from the GralMng which accesses package private.
-   * It is copied inside the GralMng for any widget. The position can be changed after them with {@link #setPosition(float, float)} etc.
+  /**Creates a reference position from a given one.
    * @param src the src position to copy all values.
    */
   public GralPos(GralPos src){ set(src); }
+
+  /**Creates a reference position from a given one but modifies the next direction
+   * before applying a position string. 
+   * Note: The next direction in the position string is always related to the next next position.
+   * @param src the src position to copy all values.
+   */
+  public GralPos ( GralPos src, char direction) { 
+    set(src);
+    if("rlRL".indexOf(direction) >=0) {
+      this.x.dirNext = direction; this.y.dirNext = '.';
+    }
+    else if("udUD".indexOf(direction) >=0) {
+      this.y.dirNext = direction; this.x.dirNext = '.';
+    } 
+    else {
+      throw new IllegalArgumentException("direction should be on of rlud or RLUD");
+    }
+  }
 
   public GralPos(GralMng mng, String pos) throws ParseException {
     this(mng);

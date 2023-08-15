@@ -370,6 +370,10 @@ public class InspcGui extends GuiCfg implements CompleteConstructionAndStart
     String sDefaultDirSaveForCurves = "C:/";
 
 
+    CallingArguments (){
+      super("InspcGui made by Hartmut Schorrig, 2010, " + InspcGui.version);
+    }
+    
     @Override protected boolean testArgument(String arg, int nArg)
     {
       boolean bOk = true;  //set to false if the argc is not passed

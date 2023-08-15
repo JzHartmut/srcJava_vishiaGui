@@ -114,9 +114,8 @@ public class Fcmd //extends GuiCfg
     
     
     public CallingArgs() {
-      super();
-      super.aboutInfo = "The.file.Commander made by Hartmut Schorrig, www.vishia.org "
-                      + Fcmd.version;
+      super("The.file.Commander made by Hartmut Schorrig, www.vishia.org "
+                      + Fcmd.version);
       super.helpInfo = "see https://www.vishia.org";
       super.addArg(this.sDirCfg);
     }

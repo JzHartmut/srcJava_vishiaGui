@@ -171,7 +171,6 @@ public class GralCfgBuilder
   public String buildGui ( GralCfgData guiCfgData, GralPanelContent dstPanel ) {
     String sError = null;
     this.gralMng.getReplacerAlias().addDataReplace(this.cfgData.dataReplace);
-    this.currPos = new GralPos(this.gralMng);
     try {
         //
         //======>>>>
@@ -203,6 +202,7 @@ public class GralCfgBuilder
       }
     }
     else {
+      this.currPos = new GralPos(parentPanel);
       for(GralCfgElement cfge: cfgPanel.listElements){
         //=================>>
         String sErrorWidgd;

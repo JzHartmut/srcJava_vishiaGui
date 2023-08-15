@@ -20,6 +20,8 @@ public class GuiCallingArgs extends Arguments
 {
   /**Version, history and licence
    * <ul>
+   * <li>2015-05-16 Hartmut ctor {@link #GuiCallingArgs(String)} now with the sAboutInfo line.
+   *   This is nice & necessary because then this info is always proper.
    * <li>2015-05-16 Hartmut new "-help:" for help base dir in argument check, "-msgcfg:" in argument check. 
    *   It is moved from Fcmd to this base class of Fcmd, available generally.  
    * <li>2013-11-22 Hartmut new {@link #sTitle}
@@ -52,7 +54,7 @@ public class GuiCallingArgs extends Arguments
    * 
    * 
    */
-  public final static int version = 20131122;
+  public final static String version = "2023-08-14";
 
   
   
@@ -71,6 +73,11 @@ public class GuiCallingArgs extends Arguments
    * The file is used to write on menu-save action.
    */
   public File fileGuiCfg;
+  
+  /**The JzTxtCmd script file. It is created while parsing arguments.
+   * The file is opened and closed while the configuration is used to build read a {@link org.vishia.cmd.JZtxtcmdScript}.
+   */
+  public File fileJzTc;
   
   public String sPathZbnf = "GUI";
   
@@ -144,6 +151,9 @@ public class GuiCallingArgs extends Arguments
     { cargs.fileGuiCfg = new File(System.getProperty("user.dir"), value);  //the graphic GUI-appearance
     
     }
+    else if((value = checkArgVal("-jzTc", arg)) !=null) {      
+      cargs.fileJzTc = new File(System.getProperty("user.dir"), value);  //the graphic JzTxtCmd script file
+    }
     else if((value = checkArgVal("-cfg", arg)) !=null)      
     { String sCfg = value;  //the graphic GUI-appearance
       if(cargs.cfgConditions == null){
@@ -213,9 +223,9 @@ public class GuiCallingArgs extends Arguments
 
 
 
-  public GuiCallingArgs() {
+  public GuiCallingArgs(String sAboutInfo) {
     super();
-    super.aboutInfo = "Configurable Gui, made by Hartmut Schorrig, 2010, 2022-09-23";
+    super.aboutInfo = sAboutInfo;
     super.helpInfo = "see https://www.vishia.org/gral/index.html";
     super.addArg(this.sFileLogCfg);
   }

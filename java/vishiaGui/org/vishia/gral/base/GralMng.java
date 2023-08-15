@@ -61,7 +61,6 @@ import org.vishia.util.CheckVs;
 import org.vishia.util.Debugutil;
 import org.vishia.util.ExcUtil;
 import org.vishia.util.FileFunctions;
-import org.vishia.util.FileSystem;
 import org.vishia.util.KeyCode;
 import org.vishia.util.MinMaxTime;
 import org.vishia.util.ReplaceAlias_ifc;
@@ -76,7 +75,24 @@ import org.vishia.util.TimedValues;
  * <li>{@link org.vishia.gral.awt.AwtMng}
  * </ul>
  * <br><br>
- *
+ * The {@link GralPos} instances referred here are not recommended. It's the deprecated concept.
+ * Use own instances for refPos to build the Gral Graphic.
+ * <br><br>
+ * The GralMng instance contains a list of all widgets sorted by name:
+ * <ul>
+ * <li>{@link #getWidget(String)} returns the reference to the named widget.
+ * <li>{@link #getWidgetIter()} returns an iterator over all widgets.
+ * <li>  
+ * </ul>
+ * <br><br>
+ * Important operations, may set breakpoints there:
+ * <ul>
+ * <li>{@link #runGraphicThread()}: This is called firstly on implementing the graphic.
+ * <li>{@link #createImplWidget_Gthread(GralWidget)}: This operation need to be overridden in the implementation graphic,
+ *   see {@link org.vishia.gral.swt.SwtMng#createImplWidget_Gthread(GralWidget)}.
+ *   This operation checks all kinds of widget (should know all) 
+ *   and selects (switch-case) and creates the proper mapping implementation widgets.
+ * </ul>
  * @author Hartmut Schorrig
  *
  */
@@ -309,7 +325,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   /**This instance helps to create the Dialog Widget as part of the whole window. It is used only in the constructor.
    * Therewith it may be defined stack-locally. But it is better to show and explain if it is access-able at class level. */
   //GuiDialogZbnfControlled dialogZbnfConfigurator;
-  GralCfgBuilder cfgBuilder;
+  GralCfgBuilder XXXcfgBuilder;
 
   GralCfgWriter cfgWriter;
 
@@ -1075,6 +1091,7 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
   /**Saves the given configuration.
    * @param dest
    * @return
+   * @deprecated should be a property only of {@link org.vishia.gral.cfg.GuiCfg}
    */
   @Override public String saveCfg(Writer dest)
   { this.cfgWriter = new GralCfgWriter(this.log);
@@ -1377,8 +1394,10 @@ public class GralMng extends EventTimerThread implements GralMngBuild_ifc, GralM
 
 
 
-  /**The run method of the graphic thread. This method is started in the constructor of the derived class
+  /**The run method of the graphic thread. 
+   * The Thread and hence this method is started in the constructor of the derived class
    * of this, which implements the graphic system adapter.
+   * It initializes the graphic appearances and then handles all events.
    * <ul>
    * <li>{@link #initGraphic()} will be called firstly. It is overridden by the graphic system implementing class
    *   and does some things necessary for the graphic system implementing level.

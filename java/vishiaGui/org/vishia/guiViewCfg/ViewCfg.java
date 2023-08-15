@@ -53,7 +53,7 @@ public class ViewCfg //extends GuiCfg
    * <li>2010-06-00 Hartmut created
    * </ul>
    */
-  public static final int versionViewCfg = 0x20220926;
+  public static final String versionViewCfg = "2022-09-26";
   
   private final OamShowValues oamShowValues;
 	  
@@ -120,8 +120,7 @@ public class ViewCfg //extends GuiCfg
     public final Argument targetIpc = new Argument("-targetIpc", ":UDP:192.168.1.77:41234 IP for commands to the target should be given if Ethernet is used.");
     
     public CallingArguments() {
-      super();
-      super.aboutInfo = "Configurable Gui, made by Hartmut Schorrig, 2010, 2022-09-23";
+      super("Configurable Gui, made by Hartmut Schorrig, 2010, " + ViewCfg.versionViewCfg);
       super.helpInfo = "see https://www.vishia.org/gral/index.html";
       super.addArg(this.sFileOamValues);
       //super.addArg(this.sTitle);  // sTitle is in super class. 

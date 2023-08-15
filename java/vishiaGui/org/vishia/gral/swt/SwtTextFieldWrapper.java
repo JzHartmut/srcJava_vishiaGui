@@ -45,6 +45,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
 
   /**Version, history and license.
    * <ul>
+   * <li>2023-08-14 prompt right side should now be work again 
    * <li>2023-01-14 Hartmut fix: after improve of {@link #updateValuesForAction()}: 
    *   a text changed with {@link org.vishia.gral.base.GralTextBox#append(CharSequence)} was not mirrored in {@link GralWidget.DynamicData#displayedText}.
    *   The reason was: It was no more updated, before updated not planned on Focus lost. 
@@ -97,7 +98,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    * 
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2022-01-29";
+  public static final String version = "2023-08-14";
   
   /**It contains the association to the swt widget (Control) and the {@link SwtMng}
    * and implements some methods of {@link GralWidgImplAccess_ifc} which are delegate from this.
@@ -133,7 +134,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
    */
   private SwtTextFieldWrapper(GralTextField widgg, SwtMng swtMng, boolean bbox)
   {
-    widgg.super(widgg, swtMng); //NOTE: superclass is a non static inner class of GralTextField. 
+    widgg.super(widgg, swtMng);                            //NOTE: superclass is a non static inner class of GralTextField. 
     if(widgg.name !=null && widgg.name.startsWith("showSrc"))
       Debugutil.stop();
     this.bbox = bbox;
@@ -387,7 +388,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       this.promptSwt.setBounds(x, y, dx, yPrompt);
       this.textFieldSwt.setBounds(x, y + dy - yPrompt, dx, dy - yPrompt);
     } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
-      this.promptSwt.setBounds(x, y + dy, dx, dy);
+      this.promptSwt.setBounds(x + dx, y, dx, dy);
       this.textFieldSwt.setBounds(x, y, dx, dy);
     }
   }
