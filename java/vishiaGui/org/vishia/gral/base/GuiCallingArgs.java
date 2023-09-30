@@ -1,6 +1,7 @@
 package org.vishia.gral.base;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,8 +140,9 @@ public class GuiCallingArgs extends Arguments
    * @return true is okay,
    *          false if the argument doesn't match. The parseArgument method in MainCmd throws an exception,
    *          the application should be aborted.
+   * @throws FileNotFoundException 
    */
-  @Override protected boolean testArgument(String arg, int nArg) { 
+  @Override protected boolean testArgument(String arg, int nArg) throws FileNotFoundException { 
     boolean bOk = true;  //set to false if the argc is not passed
     GuiCallingArgs cargs = this;
     String value;

@@ -1,5 +1,6 @@
 package org.vishia.guiViewCfg;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -170,7 +171,7 @@ public class OamShowValues
   
   
   
-  public boolean readVariableCfg(ViewCfg.CallingArguments args)
+  public boolean readVariableCfg(ViewCfg.CallingArguments args) throws FileNotFoundException
   { int nrofVariable = this.cfgOamVariable.readVariableCfg(args.sFileOamVariables.val);
     if( nrofVariable>0){
       this.log.sendMsg(0, "success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");

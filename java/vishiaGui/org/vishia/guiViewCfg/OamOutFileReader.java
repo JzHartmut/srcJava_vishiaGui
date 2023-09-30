@@ -71,10 +71,12 @@ public class OamOutFileReader
   
   
   public void readVariableCfg()
-  { int nrofVariable = accessOamVariable.readVariableCfg("GUI/oamVar.cfg");
-    if( nrofVariable>0){
-      log.writeInfoln("success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");
-    }
+  { try {
+      int nrofVariable = accessOamVariable.readVariableCfg("GUI/oamVar.cfg");
+      if( nrofVariable>0){
+        log.writeInfoln("success read " + nrofVariable + " variables from file \"GUI/oamVar.cfg\".");
+      }
+    } catch(java.io.FileNotFoundException exc) { throw new RuntimeException(exc); } 
   }
   
   

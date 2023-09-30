@@ -2,6 +2,7 @@ package org.vishia.commander;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -125,11 +126,10 @@ public class Fcmd //extends GuiCfg
     
     //@Override 
     // not used, old concept with old arguments
-    protected boolean XXXtestArgument(String arg, int nArg)
+    protected boolean XXXtestArgument(String arg, int nArg) throws FileNotFoundException
     {
       boolean bOk = true;
-      if (arg.startsWith("cfg:")) {
-        this.dirCfg = new File(arg.substring(4));
+      this.dirCfg = new File(arg.substring(4));
 //      } else if (arg.startsWith("cmdcfg:")) {
 //        this.fileCfgCmds = new File(arg.substring(7));
 //      } else if (arg.startsWith("cmdext:")) {
@@ -139,8 +139,7 @@ public class Fcmd //extends GuiCfg
 //      } else if (arg.startsWith("sel:")) {
 //        this.fileSelectTabPaths = new File(arg.substring(4));
 //      } else {
-        bOk = super.testArgument(arg, nArg);
-      }
+      bOk = super.testArgument(arg, nArg);
       return bOk;
     }
 

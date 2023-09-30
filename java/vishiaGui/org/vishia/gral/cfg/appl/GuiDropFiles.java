@@ -1,6 +1,7 @@
 package org.vishia.gral.cfg.appl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.LinkedList;
@@ -72,7 +73,7 @@ public class GuiDropFiles {
       super("GuiDropFiles example");
     }
 
-    @Override final protected boolean testArgument(String arg, int nArg) {
+    @Override final protected boolean testArgument(String arg, int nArg) throws FileNotFoundException {
       boolean bOk = true;  //set to false if the argc is not passed
       String value;
       if( (value = checkArgVal("-jzTc", arg)) !=null) {       
