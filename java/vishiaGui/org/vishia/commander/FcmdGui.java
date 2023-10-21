@@ -18,10 +18,10 @@ public class FcmdGui {
    * It can be used especially for new Windows, but also for content in windows.
    * It is changed while using with the sPosName of the created widget.
    */
-  final GralPos refPos = new GralPos(this.gralMng);
+  final GralPos refPos = new GralPos(this.gralMng.screen);
   
   
-  final GralWindow fcmdWindow = this.gralMng.addWindow("@screen,16+80, 20+120=mainWin", "The.file.Commander new"
+  final GralWindow fcmdWindow = new GralWindow(refPos, "@screen,16+80, 20+120=mainWin", "The.file.Commander " + Fcmd.version
       , GralWindow_ifc.windMinimizeOnClose | GralWindow_ifc.windResizeable);
   
   final GralMenu menuBar = this.fcmdWindow.getMenuBar();

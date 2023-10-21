@@ -55,6 +55,10 @@ public class GitGui
 
   /**Version, history and license
    * <ul>
+   * <li>2023-10-21 Hartmut {@link #actionCommit} filelist should have "** /*" as mask instead only "*". 
+   *   It is since srcJava_vishiaBase-2023-01-26.jar and later. 
+   *   All .filelist files are to short, does only contain the working level of files.
+   *   Now fixed.   
    * <li>2023-01-28 Hartmut {@link #actionCommit} Now an existing script "+buildTimestamps.sh" is called instead {@link FileList#list()}
    *   because this script contains options which files should be placed in the list. It is the same script callable by the user.
    *   Hence the problem that the ".filelist" contains unnecessary (stupid) file, is solved.
@@ -130,7 +134,7 @@ public class GitGui
    * 
    * 
    */
-  public final String sVersion = "2023-01-28";  
+  public final String sVersion = "2023-10-21";  
 
 
   static class RevisionEntry
@@ -170,7 +174,7 @@ public class GitGui
 
   GralUserAction actionCleanInfo = new GralUserAction("actionCleanInfo") { 
     @Override public boolean exec(int actionCode, org.vishia.gral.ifc.GralWidget_ifc widgd, Object... params) {
-      GitGui.this.wdgInfo.setText("");  
+      GitGui.this.wdgInfo.setText("GitGui " + sVersion);  
       return true;
   } };
 
@@ -222,7 +226,7 @@ public class GitGui
 
 
 
-  /**Action for do commi. 
+  /**Action for do commit. 
    * 
    */
   GralUserAction actionCommit = new GralUserAction("actionCommit")
@@ -234,7 +238,7 @@ public class GitGui
         String[] argsFileList = prepArgs(sFilelistCmd);  // exec_CommitDone: Writes an error message if sh failes.
         GitGui.this.gitCmd.addCmd(argsFileList, null, GitGui.this.listOut, null, GitGui.this.workingDir, GitGui.this.exec_FileListDone);
       } else {                                           // +buildTimestamps.sh not found, then
-        try{ FileList.list(GitGui.this.sWorkingDir, "*", GitGui.this.sFileList);  //build from all files without mask
+        try{ FileList.list(GitGui.this.sWorkingDir, "**/*", GitGui.this.sFileList);  //build from all files without mask
         } catch(Exception exc){
           GitGui.this.wdgInfo.setText("_filelist.lst problem: " + exc.getMessage());
         }
@@ -694,7 +698,7 @@ public class GitGui
   
   String sTypeOfImplementation = "SWT";  //default
   
-  final GralWindow window = this.gralMng.addWindow("@screen,10+60, 10+90=GitGui", "Git vishia");
+  final GralWindow window = this.gralMng.addWindow("@screen,10+60, 10+90=GitGui", "Git vishia " + sVersion);
 
   final GralTextField wdgCmd = this.gralMng.addTextField("@2-2,0..-7=cmd", GralTextField.Type.editable);
   
