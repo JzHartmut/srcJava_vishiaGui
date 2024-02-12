@@ -1512,11 +1512,31 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
   }
   
   
+  private String setCmpFileResult (int mark) {
+    String sCmp;
+    if(mark != 0){
+      if((mark & FileMark.cmpFileDifferences ) !=0){ sCmp = "#"; }
+      else if((mark & FileMark.cmpMissingFiles ) !=0){ sCmp = "*"; }  //directory contains more files
+      else if((mark & FileMark.cmpAlone ) !=0){ sCmp = "+"; }
+      else if((mark & FileMark.cmpContentEqual ) ==0) {
+        if((mark & FileMark.cmpTimeGreater ) !=0){ sCmp = "^"; }
+        else if((mark & FileMark.cmpTimeLesser ) !=0){ sCmp = "v"; }
+        else if((mark & FileMark.cmpLenTimeEqual ) ==0){ sCmp = "~"; }
+        else { sCmp = " "; }
+
+      } else {
+        sCmp = " ";
+      }
+    }
+    else { sCmp = " ";}
+    return sCmp;
+  }
+  
 
   
   @SuppressWarnings("boxing")
   private void completeLine(GralTableLine_ifc<FileRemote> tline, FileRemote file, long timeNow){
-    final String sDesign, sDir;
+    final String sDir;
     int mark = file.getMark();
     if(file.isSymbolicLink()){ 
       sDir =  file.isDirectory() ? ">" : "s"; 
@@ -1526,22 +1546,8 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     } else {
       sDir = "";
     }
-    if(mark != 0){
-      if((mark & FileMark.cmpFileDifferences ) !=0){ sDesign = "#"; }
-      else if((mark & FileMark.cmpMissingFiles ) !=0){ sDesign = "*"; }  //directory contains more files
-      else if((mark & FileMark.cmpAlone ) !=0){ sDesign = "+"; }
-      else if((mark & FileMark.mCmpFile) !=0){
-        switch(mark & FileMark.mCmpFile){
-          case FileMark.cmpContentEqual: sDesign = " ";break;
-          case FileMark.cmpContentNotEqual: sDesign = "#";break;
-          default: sDesign = " ";
-        }
-      } else {
-        sDesign = " ";
-      }
-    }
-    else { sDesign = " ";}
-    tline.setCellText(sDir + sDesign, Constants.kColDesignation);
+    String sCmp = setCmpFileResult(mark);
+    tline.setCellText(sDir + sCmp, Constants.kColDesignation);
     long fileTime;
     switch(this.idata.showTime){
       case 'm': fileTime = file.lastModified(); break;
@@ -2223,7 +2229,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
         if(progress.done()) {
           finishShowFileTable();
         }
-        progress.clean();
+        //progress.clean();
         return 0;
         
       }

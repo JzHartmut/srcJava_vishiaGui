@@ -30,6 +30,7 @@ import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralLabel;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.util.Debugutil;
+import org.vishia.util.FileCompare;
 import org.vishia.util.FileFunctions;
 import org.vishia.util.KeyCode;
 import org.vishia.util.StringFormatter;
@@ -107,7 +108,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   GralButton widgOverwrFile, widgSkipFile, widgSkipDir, widgBtnPause;
 
 
-  GralButton widgState, widgButtonSetSrc, widgButtonSetDst, widgButtonCheck, widgButtonMove, widgBtnExec;
+  GralButton widgState, widgButtonSetSrc, widgButtonSetDst, widgButtonSetSymbolicLinks, widgButtonSelNewChg, widgButtonSelAll;
+  
+  GralButton widgButtonCheck, widgButtonCmprFast, widgButtonCmprContent, widgButtonMove, widgBtnExec;
 
   GralButton widgButtonClearSel, widgButtonShowSrc, widgButtonShowDst, widgButtonShowResult;
 
@@ -244,9 +247,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   { super(cmdArg);                         // FcmdActionBase
     this.main = main;
     //                       delete            move               copy                  cmp                  search 
-    String[] promptSrcDirSel =  { "delete base dir", "move from base dir", "copy from base dir", "compare base dir1"  , "search base dir" };
+    String[] promptSrcDirSel =  { "delete base dir", "move from base dir", "source base dir", "compare base dir1"  , "search base dir" };
     String[] promptSrcFileSel = { "file mask"   , "file mask"       , "select src files: ?#+ [dirA|dirB]/**/*.ext (F1 for help) ", "file mask"  , "file mask"  };
-    String[] promptDstDirSel =  { null           , "move to dir"     , "copy to dir"      , "compare with dir"  , null  };
+    String[] promptDstDirSel =  { null           , "move to dir"     , "destination base dir"      , "compare with dir"  , null  };
     String[] promptDstFileSel = { null           , "rename to"       , "file modification", null  , null  };
     String name = cmdArg.name;
     GralPos refPos = new GralPos(main.gui.gralMng.screen);
@@ -261,7 +264,12 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.widgButtonSetSrc = new GralButton(refPos, "@+0-2, -8..-1=SetSrc-" + name, "set source", this.actionSetSrc);
     //this.widgButtonShowSrc = new GralButton(refPos, "@5.5-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
 
-    this.widgSrcSelection = new GralTextField(refPos, "@+3.5-3.2, 5..-13++0.3=copyCond-" + name
+    this.widgButtonSelNewChg = new GralButton(refPos, "@+1.5-1.5,-22..-18=SelNewChg" + name, "?+#", this.actionSelNewChg );
+    this.widgButtonSelAll = new GralButton(refPos, "@+0-1.5,-17..-13=SelAll" + name, "*/**", this.actionSelAll );
+    this.widgButtonSetSymbolicLinks = new GralButton(refPos, "@+2-2,1..5=SymLinks" + name, null, null );
+    this.widgButtonSetSymbolicLinks.setSwitchMode(">no", ">ln");
+    this.widgButtonSetSymbolicLinks.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.widgSrcSelection = new GralTextField(refPos, "@+0-3.2, 5..-13++0.3=copyCond-" + name
         , promptSrcFileSel[cmdArg.ix] , "t", GralTextField.Type.editable);
     this.widgSrcSelection.specifyActionChange(null, this.actionSelectMask, null);
     if(cmdArg != Ecmd.search) {
@@ -270,12 +278,16 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //dst path, set dst
     String promptDstDir = promptDstDirSel[cmdArg.ix];
     if(promptDstDir !=null) {
-      this.widgDstDir = new GralTextField(refPos, "@+3.5-3.2,1..-9=DstDir-" + name, promptDstDir, "t");
+      //if(cmdArg == Ecmd.copy) {
+      this.widgButtonCmprFast = new GralButton(refPos, "@+3.2-2,15..24=CmprFast" + name, "cmpr fast", this.actionButtonCmprFast );        
+      this.widgButtonCmprContent = new GralButton(refPos, "@+0-2,25..39=CmprContent" + name, "cmpr content", this.actionButtonCmprContent );        
+      //}
+      this.widgDstDir = new GralTextField(refPos, "@+2.2-3.2,1..-9=DstDir-" + name, promptDstDir, "t");
       this.widgButtonSetDst = new GralButton(refPos, "@+0-2.5,-8..-1=setDst-" + name, "set dst", this.actionSetDst );
       //this.widgButtonShowDst = new GralButton(refPos, "+0-2.5, -4..-1=showDst" + name, "=>", null );
       String promptDstFile = promptDstFileSel[cmdArg.ix];
       if(promptDstFile !=null) {
-        this.widgDstFileModification = new GralTextField(refPos, "@+3.5-3.2,5..-13=DstFileModification-" + name, promptDstFile, "t", GralTextField.Type.editable);
+        this.widgDstFileModification = new GralTextField(refPos, "@+3.5-3.2,5..-16=DstFileModification-" + name, promptDstFile, "t", GralTextField.Type.editable);
         this.widgDstFileModification.specifyActionChange(null, this.actionEnterTextInDst, null);
       }
     }
@@ -635,7 +647,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       FcmdCopyCmprDel.this.progress.clean();
       if(occupyProgress()) {
         if(FcmdCopyCmprDel.this.cmd == Ecmd.compare){
-          execCompare();
+          execCompare(0);
         } else if(FcmdCopyCmprDel.this.cmd == Ecmd.search){ // bFineSelect? todo debug it
           execSearch();
         } else if(FcmdCopyCmprDel.this.cmd == Ecmd.delete){
@@ -652,12 +664,31 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         case copy: execCopy(); break;
         case move: execMove(); break;
         case delete: execDel(); break;
-        case compare: execCompare(); break;
+        case compare: execCompare(0); break;
         case search: execSearch(); break;
         }//switch
       }
     } else if(FcmdCopyCmprDel.this.state == Estate.finit) { //widgg.sCmd.equals("close")){
       closeWindow();
+    } else {
+        //should be state pause
+//          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
+    }
+    
+  }
+  
+  
+  /**Operation associated to the Ok or Exec key: {@link #widgBtnExec} associated to its {@link #actionButtonOk}.
+   * It executes the operation set by construction (via {@link #cmd} and depending from {@link #state}.
+   * It calls {@link #execCheck()} if the state is {@link Estate#start} or {@link Estate#check}.
+   * It closes the window on state {@link Estate#finit}.
+   */
+  protected void execBtnCmpr (int cond) {
+    if(FcmdCopyCmprDel.this.state == Estate.start || FcmdCopyCmprDel.this.state == Estate.check) { //widgg.sCmd.equals("check")){
+      FcmdCopyCmprDel.this.progress.clean();
+      if(occupyProgress()) {
+        execCompare(cond);
+      }
     } else {
         //should be state pause
 //          this.progress.evAnswer.send(FileRemoteProgressEvent.Answer.cont, modeCopy()); //triggerStateMachine(evSrc, FileRemote.Cmd.docontinue);
@@ -682,7 +713,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //regards mark in first level ?
     //int depths = this.srcSomeFiles ? -Integer.MAX_VALUE : Integer.MAX_VALUE;
     //long bMarkSelect = this.srcSomeFiles ? 0x200000000L + FileMark.select : 0;
-    long bMarkSelect = 0;
+    int bMarkSelect = this.widgButtonSetSymbolicLinks.isOn() ? 0 :  FileMark.ignoreSymbolicLinks;
     int ix = 0;
     boolean bCont = sSrcMask.startsWith("?");
     while(bCont && ++ix < sSrcMask.length()) {
@@ -716,7 +747,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       if(selectMask.startsWith("?")) {
         this.widgCopyState.setText("todo deal with marked files to delete");
       } else {
-        this.srcDir.deleteFilesDirTree(false, 999, selectMask, this.progress.evBack);
+        this.srcDir.deleteFilesDirTree(false, 999, selectMask, FileMark.ignoreSymbolicLinks, this.progress.evBack);
       }
     } 
     else if(this.srcFile !=null) {
@@ -851,7 +882,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
   /**Starts the execution of compare in another thread. Note that the compare works with the walk-file algorithm
    * and refreshes the files therewith. See {@link FileRemote#refreshAndCompare(FileRemote, int, String, int, org.vishia.fileRemote.FileRemote.CallbackEvent)}.
    */
-  final protected void execCompare(){
+  final protected void execCompare(int cond){
     //setDirFileDst();
     boolean bOk = true;
     //check whether the event is able to occupy, use it to check.
@@ -867,7 +898,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       //it is a check of sendEvent and it should relinguish the event.
       //====>
       if(this.srcDir !=null) {
-        this.srcDir.cmprDirTreeTo(false, this.dirDst, sSrcMask, this.progress.evBack);
+        int bMaskSel = this.widgButtonSetSymbolicLinks.isOn() ? 0 :  FileMark.ignoreSymbolicLinks;
+        int modeCmpOper = cond | FileCompare.withoutLineend; 
+        this.srcDir.cmprDirTreeTo(false, this.dirDst, sSrcMask, bMaskSel, modeCmpOper, this.progress.evBack);
       }
       //setTexts(Estate.busy);
     } else {
@@ -1115,6 +1148,9 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       } else if(order.answerToCmd == FileRemoteCmdEventData.Cmd.walkRefresh) {
         u.append("checked");
         this.state = Estate.checked;
+      } else if(order.answerToCmd == FileRemoteCmdEventData.Cmd.walkCompare) {
+        u.append("compared ");
+        this.state = Estate.start;
       } else {
         u.append("finish");
         this.state = Estate.finit;
@@ -1165,6 +1201,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         }
       }
     }
+    u.append(Integer.toString(order.nrofFilesMarked)).append(" marked / ");
     u.append("; Files:").append(Integer.toString(this.zFiles)).append(" Bytes: ").append(Long.toString(this.zBytes));
     this.widgCopyState.setText(u.toString());
   }
@@ -1286,6 +1323,44 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
            if(occupyProgress()) {
              execCheck();
            }
+         }
+       }
+       return true;
+     }
+   };
+
+
+
+   GralUserAction actionSelNewChg = new GralUserAction("actionSelNewChg")
+   {
+     /**Openls its fields to ask the user whether confirm.
+      * @param dst The path which is selected as destination. It may be a directory or a file
+      * @param src The path which is selected as source. It may be a directory or a file.
+      */
+     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
+     { //String sSrc, sDstName, sDstDir;
+       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+         if(!FcmdCopyCmprDel.this.widgButtonSelNewChg.isDisabled()){
+           FcmdCopyCmprDel.this.widgSrcSelection.setText("?+#");
+         }
+       }
+       return true;
+     }
+   };
+
+
+
+   GralUserAction actionSelAll = new GralUserAction("actionSelAll")
+   {
+     /**Openls its fields to ask the user whether confirm.
+      * @param dst The path which is selected as destination. It may be a directory or a file
+      * @param src The path which is selected as source. It may be a directory or a file.
+      */
+     @Override public boolean exec(int key, GralWidget_ifc widgi, Object... params)
+     { //String sSrc, sDstName, sDstDir;
+       if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+         if(!FcmdCopyCmprDel.this.widgButtonSelNewChg.isDisabled()){
+           FcmdCopyCmprDel.this.widgSrcSelection.setText("**/*");
          }
        }
        return true;
@@ -1506,6 +1581,26 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     }
   };
 
+
+  protected GralUserAction actionButtonCmprFast = new GralUserAction("actionButtonCmprFast")
+  { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        FcmdCopyCmprDel.this.execBtnCmpr(FileCompare.onlyTimestamp);
+      }
+      return true;
+    }
+  };
+
+
+
+  protected GralUserAction actionButtonCmprContent = new GralUserAction("actionButtonCmprContent")
+  { @Override public boolean exec(int key, GralWidget_ifc widgg, Object... params)
+    { if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
+        FcmdCopyCmprDel.this.execBtnCmpr(0);
+      }
+      return true;
+    }
+  };
 
 
 

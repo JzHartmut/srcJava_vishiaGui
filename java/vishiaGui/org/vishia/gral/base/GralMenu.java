@@ -210,7 +210,7 @@ public class GralMenu //extends GralWidget
    *   For example "&edit/&search/co&ntinue" creates a menu 'edit' or uses the existing one in the top level (menu bar),
    *   then creates the search menu item as pull down in menu bar, and then 'continue' with 'n' as hot key as sub-menu.
    *   It is stored in {@link GralWidget#sDataPath}
-   * @param action called on menu activation.
+   * @param gralAction  called on menu activation.
    */
   public final void addMenuItem(String sMenuPath, GralUserAction gralAction){
     //if(_impl !=null) { _impl.addMenuItemGthread(sMenuPath, gralAction); }
