@@ -21,30 +21,16 @@ import org.vishia.communication.InterProcessCommFactorySocket;
 import org.vishia.fileLocalAccessor.FileAccessorLocalJava7;
 import org.vishia.fileRemote.FileCluster;
 import org.vishia.fileRemote.FileRemote;
-import org.vishia.gral.base.GralArea9Panel;
-//import org.vishia.gral.area9.GralArea9MainCmd;
 import org.vishia.gral.base.GralMenu;
-import org.vishia.gral.base.GralMng;
 import org.vishia.gral.base.GralPanelContent;
-import org.vishia.gral.base.GralWidget;
-import org.vishia.gral.base.GralWindow;
 import org.vishia.gral.base.GuiCallingArgs;
-import org.vishia.gral.ifc.GralMngBuild_ifc;
-import org.vishia.gral.ifc.GralUserAction;
-import org.vishia.gral.ifc.GralWidget_ifc;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileProperties;
 import org.vishia.gral.widget.GralFileSelector;
 import org.vishia.gral.widget.GralViewFileContent;
 import org.vishia.jztxtcmd.JZtxtcmd;
-import org.vishia.mainCmd.MainCmd;
-import org.vishia.mainCmd.MainCmd_ifc;
 import org.vishia.msgDispatch.LogMessage;
-import org.vishia.msgDispatch.LogMessageStream;
-import org.vishia.msgDispatch.MsgRedirectConsole;
-import org.vishia.util.ApplMain;
 import org.vishia.util.DataAccess;
-import org.vishia.util.Debugutil;
 import org.vishia.util.KeyCode;
 
 /**This class is the main class of the-File-commander.
@@ -96,7 +82,7 @@ public class Fcmd //extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2024-02-12";
+  public static final String version = "2024-02-17";
 
   
   static class CallingArgs extends GuiCallingArgs

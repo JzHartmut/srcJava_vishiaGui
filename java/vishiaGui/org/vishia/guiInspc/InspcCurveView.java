@@ -273,9 +273,9 @@ public final class InspcCurveView
     //gralMng.setPosition(4, 0, 4, 0, '.');
     gralMng.setPosition(44, 56, 94, 104, '.');
     //this.widgFileSelector = null;
-    this.listDataFavors.add(new GralFileSelector.FavorPath("tmp", "T:/tmp/curveViewData", FileRemote.clusterOfApplication));
-    this.listDataFavors.add(new GralFileSelector.FavorPath("test", "D:/vishia/emc/Test_emC/src/test/CurveView/curveViewData", FileRemote.clusterOfApplication));
-    this.listDataFavors.add(new GralFileSelector.FavorPath("aux", "D:/vishia/aux", FileRemote.clusterOfApplication));
+    this.listDataFavors.add(new GralFileSelector.FavorPath("cfg", defaultDirCfg));
+    this.listDataFavors.add(new GralFileSelector.FavorPath("data", defaultDirSave));
+    this.listDataFavors.add(new GralFileSelector.FavorPath("aux", "T:/tmp", FileRemote.clusterOfApplication));
     this.widgFileSelector = GralFileSelector.createGralFileSelectorWindow(gralMng, false, "FileSelection", "Read cfg", this.listDataFavors);   //"@screen, 50+40, 50+80"
 //    this.widgFileSelector = new GralFileSelector("-selectFile", 100, new int[]{2,0,-6,-12}, null);
 //    this.widgFileSelector.specifyActionOnFileSelected(this.actionSelectFile);
@@ -1126,7 +1126,7 @@ public final class InspcCurveView
       } else {
         widgTableVariables.setFocus();
         widgFileSelector.closeDialog();
-        actionReadCfg(0, null, params);
+        readCfg((FileRemote)params[0]);
       }
       return true;
   } };
@@ -1248,7 +1248,7 @@ public final class InspcCurveView
           file = dir.child(sFilename);
         }
         if(sWhatTodoWithFile.equals(sBtnReadCfg)) {
-          actionReadCfg(KeyCode.menuEntered, null, file);
+          readCfg(file);
           widgBtnReadCfg.setBackColor(colorBtnFileInactive, 0);
         } 
         else if(sWhatTodoWithFile.equals(sBtnSaveCfg)) {
@@ -1276,26 +1276,23 @@ public final class InspcCurveView
   
   
   
-  boolean actionReadCfg(int actionCode, GralWidget_ifc widgd, Object... params)
-  { //if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-      try{
-        fileCurveCfg = (FileRemote)params[0];
-        System.out.println("InspcCurveView - read curve view from; " + fileCurveCfg.getAbsolutePath());
-        windCurve.setTitle(InspcCurveView.this.sName + ": " + fileCurveCfg.getName());
-        String in = FileSystem.readFile(fileCurveCfg);
-        if(in ==null){
-          System.err.println("InspcCurveView - actionRead, file not found;" + fileCurveCfg.getAbsolutePath());
-        } else {
-          if(widgCurve.applySettings(in)){ //apply the content of the config file to the GralCurveView
-            //and transfer the names into the variable text fields of this widget. 
-            fillTableTracks();
-          }
+  boolean readCfg(FileRemote fileCurveCfg) { 
+    try{
+      System.out.println("InspcCurveView - read curve view from; " + fileCurveCfg.getAbsolutePath());
+      windCurve.setTitle(InspcCurveView.this.sName + ": " + fileCurveCfg.getName());
+      String in = FileSystem.readFile(fileCurveCfg);
+      if(in ==null){
+        System.err.println("InspcCurveView - actionRead, file not found;" + fileCurveCfg.getAbsolutePath());
+      } else {
+        if(widgCurve.applySettings(in)){ //apply the content of the config file to the GralCurveView
+          //and transfer the names into the variable text fields of this widget. 
+          fillTableTracks();
+          this.fileCurveCfg = fileCurveCfg;
         }
-      } catch(Exception exc){
-        widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
       }
-      //windFileCfg.closeWindow();
-    //}
+    } catch(Exception exc){
+      widgBtnScale.setLineColor(GralColor.getColor("lrd"),0);
+    }
     return true;
   }
   

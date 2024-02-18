@@ -406,7 +406,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     
     private float getValueCursor(int cursor){ 
       float value; ///
-      if(cursor >=0 && cursor < ((GraphicImplAccess)outer._wdgImpl).ixDataShown.length){
+      if(cursor >=0 && cursor < ((GraphicImplAccess)outer._wdgImpl).ixDataShownX.length){
         try{
           int ixData = ((GraphicImplAccess)outer._wdgImpl).getIxDataFromPixelRight(cursor);
           value = this.valueTrack.getFloat(ixData); 
@@ -621,7 +621,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     
     public int ixDataStartSave, ixDataEndSave;
     
-    /**The number of array elements which are used in {@link #ixDataShown} for the current view.
+    /**The number of array elements which are used in {@link #ixDataShownX} for the current view.
      * Either the display size is less, then this is less then 2000. It is the usual case.
      * Or the number of available data are less, the it is lesser than the pixel size of the curve. 
      */
@@ -724,7 +724,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * The index refers to the last written value.
    * Initially it is -1, the first write will be increment ?? to prevent any exception while values are not set before.
    */
-  public int ixDataWr;
+  public int ixDataWrX, ixDEnd;
 
 
   /**All tracks to return for filling. It has the same members in the same order like {@link #listTracks}*/
@@ -801,7 +801,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     this.adIxData = 0x40000000 / (maxNrofXValues >>2);  //NOTE: integer division, all >>2
     this.mIxData = ~(this.adIxData -1); //all bits which have to be used, mask out lower bits.
     this.mIxiData = maxNrofXValues -1;  //e.g. from 0x1000 to 0xfff
-    this.ixDataWr = -adIxData; //initial write position, first increment to 0.
+    this.ixDataWrX = -adIxData; //initial write position, first increment to 0.
     this.tracksValue = tracksValues !=null ? tracksValues       // use given track values
                      : new TimedValues(this.maxNrofXValues);    // create here the trackValues.
 
@@ -831,10 +831,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     this.timeorg.absTime.clean();
     if(super._wdgImpl !=null) {
       GraphicImplAccess wdgi = (GraphicImplAccess)super._wdgImpl;
-      wdgi.ixDataDraw = this.ixDataWr =0;
+      wdgi.ixDataDraw = this.ixDataWrX =0;
       wdgi.ixDataCursor1 = wdgi.ixDataCursor2 = 0;
-      wdgi.ixDataShowRight = 0;
-      Arrays.fill(wdgi.ixDataShown, 0);
+      wdgi.ixDataShowRightX = 0; wdgi.ixDShow2 = 0;
+      Arrays.fill(wdgi.ixDataShownX, 0);
     }
   }
   
@@ -851,10 +851,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     this.timeorg.absTime.clean();
     if(super._wdgImpl !=null) {
       GraphicImplAccess wdgi = (GraphicImplAccess)super._wdgImpl;
-      wdgi.ixDataDraw = this.ixDataWr =0;
+      wdgi.ixDataDraw = this.ixDataWrX =0;
       wdgi.ixDataCursor1 = wdgi.ixDataCursor2 = 0;
-      wdgi.ixDataShowRight = 0;
-      Arrays.fill(wdgi.ixDataShown, 0);
+      wdgi.ixDataShowRightX = 0;
+      Arrays.fill(wdgi.ixDataShownX, 0);
     }
   }
   
@@ -1009,7 +1009,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
   public long timeRight(){
-    int ixData = ((GraphicImplAccess)super._wdgImpl).ixDataShown[0];  //right
+    int ixData = ((GraphicImplAccess)super._wdgImpl).ixDataShownX[0];  //right
     int timeShort1 = this.tracksValue.getTimeShort((ixData >> this.shIxiData) & this.mIxiData);
     //synchronized()
     return timeorg.absTime.absTimeshort(timeShort1);
@@ -1032,12 +1032,12 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
       saveOrg.ctValuesAutoSave = saveOrg.nrofValuesAutoSave;  //no more.
     }
-    ixDataWr += adIxData;  ///
-    if(ixDataWr == -adIxData ){  //store to the last position in the data array
+    ixDataWrX += adIxData;  ///
+    if(ixDataWrX == -adIxData ){  //store to the last position in the data array
       dataOrg.bWrappedInBuffer = true;
     }
     if(!common.bFreeze && super._wdgImpl !=null){
-      ((GraphicImplAccess)super._wdgImpl).ixDataShowRight = ixDataWr;
+      ((GraphicImplAccess)super._wdgImpl).ixDataShowRightX = ixDataWrX;
     }
     this.newSamples +=1;  //information for paint event
     this.nrofValuesForGrid +=1;
@@ -1045,7 +1045,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       nrofValuesForGrid -= gridDistanceStrongY;  //prevent large overflow.
     }
     int ixSource = -1;
-    int ixWr = (ixDataWr >> shIxiData) & mIxiData;
+    int ixWr = (ixDataWrX >> shIxiData) & mIxiData;
     //
     //
     //assign the argument values to the track.values
@@ -1219,7 +1219,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   
   
-  /* (non-Javadoc)
+  /**Applies the content of a configuration file or from a configuration string.
+   * Each line contains one track. 
+   * TODO detail syntax. 
+   * see {@link GralCurveView_ifc#applySettings(String)}
    * @see org.vishia.gral.ifc.GralCurveView_ifc#applySettings(java.lang.String)
    */
   @Override public boolean applySettings(String in){
@@ -1273,9 +1276,9 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public CharSequence timeInitSaveViewArea(){
     int ixData;
     if(super._wdgImpl ==null) return "--no graphic--";
-    dataOrg.ixDataStartSave = ((GraphicImplAccess)super._wdgImpl).ixDataShown[dataOrg.zPixelDataShown-1];
+    dataOrg.ixDataStartSave = ((GraphicImplAccess)super._wdgImpl).ixDataShownX[dataOrg.zPixelDataShown-1];
     int timeShort1 = this.tracksValue.getTimeShort((dataOrg.ixDataStartSave >> shIxiData) & mIxiData);
-    dataOrg.ixDataEndSave = ((GraphicImplAccess)super._wdgImpl).ixDataShown[0];
+    dataOrg.ixDataEndSave = ((GraphicImplAccess)super._wdgImpl).ixDataShownX[0];
     if(!common.bFreeze){
       //running curve, autosave starts after it.
       dataOrg.ixDataEndAutoSave = dataOrg.ixDataEndSave;  //atomic access, the actual write pointer.
@@ -1291,7 +1294,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   @Override public CharSequence timeInitAutoSave(){
     dataOrg.ixDataStartAutoSave = dataOrg.ixDataEndAutoSave;  //from last end, now start.
     //threadsafe:
-    dataOrg.ixDataEndAutoSave = ixDataWr;  //atomic access, the actual write pointer.
+    dataOrg.ixDataEndAutoSave = ixDataWrX;  //atomic access, the actual write pointer.
     saveOrg.ctValuesAutoSave = 0;  //maybe non-threadsafe, counts only the time for next save.
     return buildDate(dataOrg.ixDataStartAutoSave, dataOrg.ixDataEndAutoSave);
     //
@@ -1372,7 +1375,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       }
     }
     //listTracks = listTracksNew;
-    this.ixDataWr = -adIxData; //initial write position, first increment to 0.
+    this.ixDataWrX = -adIxData; //initial write position, first increment to 0.
     float[] fvalues = new float[listTracks.size() + 10];
     int timeshort = 0;
     while( (sLine = ifile.readLine())!=null){
@@ -1539,7 +1542,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
 
     /**The number of pixel for the current data point from the current pixel to left.
      * [0] is the number of pixel for the right point.
-     * This array is parallel to {@link #ixDataShown}. 
+     * This array is parallel to {@link #ixDataShownX}. 
      */
     protected final int[] nrofPixel4data = new int[2000];
 
@@ -1550,12 +1553,17 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * {@link #prepareIndicesDataForDrawing(int, int, int)} and used in the drawTrack routine of the implementation level.
      * The field contains old indices if the size of drawing is less then the size of window.
      */
-    protected final int[] ixDataShown = new int[2000];
+    protected final int[] ixDataShownX = new int[2000];
 
     /**The index to show values, it increments with ixWrValues
      * if bFreeze is false
      */
-    protected int ixDataShowRight = 0;
+    protected int ixDataShowRightX = 0;
+    
+    /**The index to current values, it increments with ixWrValues
+     * After this index old data begins, it is the wrapping point. 
+     */
+    protected int ixDShow2 = 0;
 
     //protected int ixLineInit = 0;
     
@@ -1685,12 +1693,12 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
     }
 
     /**Gets the index in data with given pixel position in the graphic.
-     * The wrapping index in the data is contained in {@link #ixDataShown}.
+     * The wrapping index in the data is contained in {@link #ixDataShownX}.
      * @param ixw pixel position countered from right side.
      * @return
      */
     protected int getIxDataFromPixelRight(int ixPixelFromRight){
-      int ixDataWrap = ixDataShown[ixPixelFromRight];
+      int ixDataWrap = ixDataShownX[ixPixelFromRight];
       int ixData = (ixDataWrap >> widgg.shIxiData) & widgg.mIxiData;
       return ixData;
     }
@@ -1805,10 +1813,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * Note that in this case the right index is the actual write index.*/
     protected void zoomToPresent(){
       if(xpCursor1 >=0){
-        ixDataCursor1 = ixDataShown[xpCursor1];
+        ixDataCursor1 = ixDataShownX[xpCursor1];
       }
       if(xpCursor2 >=0){
-        ixDataCursor2 = ixDataShown[xpCursor2];
+        ixDataCursor2 = ixDataShownX[xpCursor2];
       }
       xpCursor1New = xpCursor2New = cmdSetCursor;  
       if(widgg.timeorg.timeSpread > 100) { widgg.timeorg.timeSpread /=2; }
@@ -1824,10 +1832,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       //zoom out
       int maxTimeSpread = widgg.timeorg.lastShortTimeDateInCurve - widgg.timeorg.firstShortTimeDateInCurve;
       if(xpCursor1 >=0){
-        ixDataCursor1 = ixDataShown[xpCursor1];
+        ixDataCursor1 = ixDataShownX[xpCursor1];
       }
       if(xpCursor2 >=0){
-        ixDataCursor2 = ixDataShown[xpCursor2];
+        ixDataCursor2 = ixDataShownX[xpCursor2];
       }
       xpCursor1New = xpCursor2New = cmdSetCursor;  
       if(widgg.timeorg.timeSpread < 0x3fffffff) { widgg.timeorg.timeSpread *=2; }
@@ -1842,11 +1850,11 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * 1/10 and 9/10 of the presentation range.
      */
     protected void zoomBetweenCursors(){
-      ixDataCursor1 = ixDataShown[xpCursor1];
-      ixDataCursor2 = ixDataShown[xpCursor2];
-      ixDataShowRight = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1) / 10) & widgg.mIxData);
-      int ixiData1 = (ixDataShown[xpCursor1] >> widgg.shIxiData) & widgg.mIxiData;
-      int ixiData2 = (ixDataShown[xpCursor2] >> widgg.shIxiData) & widgg.mIxiData;
+      ixDataCursor1 = ixDataShownX[xpCursor1];
+      ixDataCursor2 = ixDataShownX[xpCursor2];
+      ixDataShowRightX = ixDataCursor2 + (((ixDataCursor2 - ixDataCursor1) / 10) & widgg.mIxData);
+      int ixiData1 = (ixDataShownX[xpCursor1] >> widgg.shIxiData) & widgg.mIxiData;
+      int ixiData2 = (ixDataShownX[xpCursor2] >> widgg.shIxiData) & widgg.mIxiData;
       int time1 = widgg.tracksValue.getTimeShort(ixiData1);
       int time2 = widgg.tracksValue.getTimeShort(ixiData2);
       if((time2 - time1)>0){
@@ -1864,22 +1872,22 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * The cursors will be set newly in graphic at the same data indices.
      * The middle value of both cursors will be at the same position.
      * The time spread is multiplied by the value 5.
-     * If the right border of presentation will be in the future, the {@link #ixDataShowRight}
-     * will be greater than {@link #ixDataWr}, then the presentation will be adjusted to the current
-     * right {@link #ixDataWr} and the cursor positions are changed adequate.
+     * If the right border of presentation will be in the future, the {@link #ixDataShowRightX}
+     * will be greater than {@link #ixDataWrX}, then the presentation will be adjusted to the current
+     * right {@link #ixDataWrX} and the cursor positions are changed adequate.
      *
      */
     protected void cursorUnzoom()
     {
       int xpCursorMid = (xpCursor1 + xpCursor2) /2;
-      int ixDataMid = ixDataShown[xpCursorMid];  //from Pixel value of cursor to data index
+      int ixDataMid = ixDataShownX[xpCursorMid];  //from Pixel value of cursor to data index
       //int timeMid = timeValues[(ixDataMid >> shIxiData) & mIxiData];
       //int timeRight = timeValues[(ixDataShowRight >> shIxiData) & mIxiData];
       //int dtime = timeRight - timeMid;
       //Assert.check(dtime > 0);
-      ixDataShowRight = ixDataMid + (ixDataShowRight - ixDataMid) * 5;  //5 times longer
-      if((ixDataShowRight - widgg.ixDataWr) >0){
-        ixDataShowRight = widgg.ixDataWr;    //show full to right
+      ixDataShowRightX = ixDataMid + (ixDataShowRightX - ixDataMid) * 5;  //5 times longer
+      if((ixDataShowRightX - widgg.ixDataWrX) >0){
+        ixDataShowRightX = widgg.ixDataWrX;    //show full to right
       }
       //ixDataCursor1 = ixDataShown[xpCursor1];  //from Pixel value of cursor to data index
       //ixDataCursor2 = ixDataShown[xpCursor2];
@@ -1909,13 +1917,13 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         //int timeRight = timeValues[(ixDataShowRight >> shIxiData) & mIxiData];
         //int timeRightNew = timeRight + timeorg.timeSpread * 7/8;
         
-        int ixdDataSpread = ixDataShowRight - ixDataShown[pixelOrg.xPixelCurve * 5/8];
-        if((ixDataShowRight - widgg.ixDataWr)<0 && (ixDataShowRight - widgg.ixDataWr + ixdDataSpread) >=0){
+        int ixdDataSpread = ixDataShowRightX - ixDataShownX[pixelOrg.xPixelCurve * 5/8];
+        if((ixDataShowRightX - widgg.ixDataWrX)<0 && (ixDataShowRightX - widgg.ixDataWrX + ixdDataSpread) >=0){
           //right end reached.
-          ixDataShowRight = widgg.ixDataWr;
+          ixDataShowRightX = widgg.ixDataWrX;
           widgg.common.bFreeze = false;
         } else {
-          ixDataShowRight += ixdDataSpread;
+          ixDataShowRightX += ixdDataSpread;
         }
         //ixDataShowRight += ixdDataSpread;
         //if((ixDataShowRight - ixDataWr) > 0 && (ixDataShowRight - ixDataWr) < ixdDataSpread * 2) {
@@ -1943,13 +1951,13 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         widgg.common.bFreeze = true;
         //now ixDataShow remain unchanged.
       } else {
-        int ixdDataSpread = ixDataShowRight - ixDataShown[pixelOrg.xPixelCurve * 5/10];
+        int ixdDataSpread = ixDataShowRightX - ixDataShownX[pixelOrg.xPixelCurve * 5/10];
         //int ixDataShowRight1 = ixDataShown[nrofValuesShow * 7/8];
         //int ixdDataSpread = ixDataShowRight - ixDataShowRight1;
-        ixDataShowRight -= ixdDataSpread;
-        if((ixDataShowRight - widgg.ixDataWr) < 0 && (widgg.ixDataWr - ixDataShowRight) < ixdDataSpread) {
+        ixDataShowRightX -= ixdDataSpread;
+        if((ixDataShowRightX - widgg.ixDataWrX) < 0 && (widgg.ixDataWrX - ixDataShowRightX) < ixdDataSpread) {
           //left end reached.
-          ixDataShowRight = widgg.ixDataWr + ixdDataSpread;
+          ixDataShowRightX = widgg.ixDataWrX + ixdDataSpread;
         }
       }
       widgg.redraw(100, 200);
@@ -1963,7 +1971,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
 
     /**prepares indices of data.
      * All data have a timestamp. the xpixel-values are calculated from the timestamp.
-     * The {@link #ixDataShown} array will be filled with the indices to the data for each x pixel from right to left.
+     * The {@link #ixDataShownX} array will be filled with the indices to the data for each x pixel from right to left.
      * If there are more as one data record for one pixel, the step width of ixData is >1,
      * If there are more as one x-pixel for one data record, the same index is written for that pixel
      * <br><br>
@@ -1972,20 +1980,21 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
      * step width of {@link #adIxData}. If the timestamp of any next index is greater than the last one,
      * it is a indication that any newer data are reached after wrapping. Then the preparation stops.
      * <br><br>
-     * It fills {@link #ixDataShown} with indices to data per x pixel point.
-     * If there are the same data for more as one pixel (zoomed near), then {@link #ixDataShown} will contain
+     * It fills {@link #ixDataShownX} with indices to data per x pixel point.
+     * If there are the same data for more as one pixel (zoomed near), then {@link #ixDataShownX} will contain
      * the same index. The presentation can decide whether it should be shown with the same level (stepwise)
      * or with any linear approximation
      * 
-     * @param ixDataRight Index in data array for the right point. 
+     * @param ixDataRightX Index in data array for the right point. 
      *   It is a index which wraps around full integer range, see {@link #adIxData}.
+     * @param ixData2 the index in the data array for the right point on curve.  
      * @param xViewPart width of the spread to prepare in pixel
      * @return nrof pixel to draw. It is xViewPart if enough data are available, elsewhere less. 
      * TODO move to ImplAccess
      */
-    protected int prepareIndicesDataForDrawing(int ixDataRight, int xViewPart, int timePart, boolean bPaintAll){
-      System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, ixDataShown.length - xViewPart);
-      if(bPaintAll){
+    protected int prepareIndicesDataForDrawing(int ixDataRightX, int ixD2, int xViewPart, int timePart, boolean bPaintAll){
+      System.arraycopy(ixDataShownX, 0, ixDataShownX, xViewPart, ixDataShownX.length - xViewPart);  // shift the data to left, 0 = right position, 
+      if(bPaintAll){                                                                             // xViewPart = start of new part from right to end right (=0)
         widgg.dataOrg.zPixelDataShown = 0;
       } else if(widgg.dataOrg.zPixelDataShown + xViewPart >= pixelOrg.xPixelCurve){ 
         widgg.dataOrg.zPixelDataShown = pixelOrg.xPixelCurve;  // the whole curve fills.
@@ -1997,10 +2006,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
       //    ixData, ixData2, ..... ixDataRight   the 32-bit-index to data
       //    ixD                              the really index to data
       //
-      ixDataShown[0] = ixDataRight;
+      ixDataShownX[0] = ixDataRightX;
       //System.out.println("GralCurveView - prepareIndices; timePart=" + timePart + "; timexPart=" + xViewPart * timePerPixel + "; xPart=" + xViewPart);
-      int ixData = ixDataRight;
-      int ixData2 = ixDataRight;
+      int ixData = ixDataRightX;
+      int ixData2 = ixDataRightX;
       int ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData;
       int ixp2 = 0;
       int ixp = 0; //pixel from right to left
@@ -2104,7 +2113,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
         //
         //if(ixp1 > ixp2 && ixp1 <= size_x){ //prevent drawing on false timestamp in data (missing data)
         while(ixp2 < ixp) { 
-          ixDataShown[ixp2] = ixData2;  //same index to more as one point.
+          ixDataShownX[ixp2] = ixData2;  //same index to more as one point.
           this.nrofPixel4data[ixp2] = --nrofPixel4Data;
           ixp2 +=1;
         }
@@ -2234,7 +2243,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   public GralUserAction actionGo = new GralUserAction("actionGo"){
     @Override public boolean exec(int actionCode, GralWidget_ifc widgd, Object... params){
       if(KeyCode.isControlFunctionMouseUpOrMenu(actionCode)){
-        ((GraphicImplAccess)_wdgImpl).ixDataShowRight = ixDataWr;
+        ((GraphicImplAccess)_wdgImpl).ixDataShowRightX = ixDataWrX;
+        ((GraphicImplAccess)_wdgImpl).ixDShow2 = ixDEnd;
         common.bFreeze = false;
       }
       return true;

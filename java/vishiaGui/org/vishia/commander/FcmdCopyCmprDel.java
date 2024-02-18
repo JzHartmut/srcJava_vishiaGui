@@ -69,6 +69,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
 {
   /**Version and History
    * <ul>
+   * <li>2024-02-17 ^ and v as mark bits for copy. 
+   * <li>2024-02-13 enhanced possibility of compare in the copy diaglog and with set ignoring symbolic links.
    * <li>2023-04-06 Hartmut restructured also in widgets as in functionality, in progress, for version 2.0 of The.file.Commander
    * <li>2013-02-03 Hartmut chg: set the destination only if it is not set on button setSrc
    * <li>2013-02-03 Hartmut chg: {@link #execMove()} with files
@@ -264,7 +266,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.widgButtonSetSrc = new GralButton(refPos, "@+0-2, -8..-1=SetSrc-" + name, "set source", this.actionSetSrc);
     //this.widgButtonShowSrc = new GralButton(refPos, "@5.5-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
 
-    this.widgButtonSelNewChg = new GralButton(refPos, "@+1.5-1.5,-22..-18=SelNewChg" + name, "?+#", this.actionSelNewChg );
+    this.widgButtonSelNewChg = new GralButton(refPos, "@+1.5-1.5,-22..-18=SelNewChg" + name, "?+#^", this.actionSelNewChg );
     this.widgButtonSelAll = new GralButton(refPos, "@+0-1.5,-17..-13=SelAll" + name, "*/**", this.actionSelAll );
     this.widgButtonSetSymbolicLinks = new GralButton(refPos, "@+2-2,1..5=SymLinks" + name, null, null );
     this.widgButtonSetSymbolicLinks.setSwitchMode(">no", ">ln");
@@ -720,6 +722,8 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       char cs = sSrcMask.charAt(ix);
       switch(cs) {                       // for file                  for directory
       case '#': bMarkSelect |= FileMark.cmpContentNotEqual | FileMark.cmpFileDifferences; break;
+      case '^': bMarkSelect |= FileMark.cmpTimeGreater     | FileMark.cmpFileDifferences;    break;
+      case 'v': bMarkSelect |= FileMark.cmpTimeLesser      | FileMark.cmpFileDifferences;    break;
       case '+': bMarkSelect |= FileMark.cmpAlone           | FileMark.cmpMissingFiles;    break;
       case '!': bMarkSelect |= FileMark.select             | FileMark.selectSomeInDir;    break;
       default: bCont = false;                  // ix refers the first char which is not ?#+!
@@ -1341,7 +1345,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
      { //String sSrc, sDstName, sDstDir;
        if(KeyCode.isControlFunctionMouseUpOrMenu(key)){
          if(!FcmdCopyCmprDel.this.widgButtonSelNewChg.isDisabled()){
-           FcmdCopyCmprDel.this.widgSrcSelection.setText("?+#");
+           FcmdCopyCmprDel.this.widgSrcSelection.setText("?+#^");
          }
        }
        return true;
