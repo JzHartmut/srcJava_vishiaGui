@@ -1,6 +1,6 @@
-2024-02-18 19:12:18  x     .filelist                                ::           .  0  0000000000 
+2024-02-19 12:25:25  x     .filelist                                ::           .  0  0000000000 
 2024-02-14 18:24:30  x     .git                                     ::           . 71  0018260668 
-2024-02-18 19:12:14  x     .gitCommit                               ::           .106  1922090131 
+2024-02-19 12:25:17  x     .gitCommit                               ::           .148 -0794489325 
 2023-04-16 14:33:35  x     .gitRepository                           ::           . 63  0125671136 
 2023-10-21 22:31:28  x     .gitignore                               ::           . 35 -1444410768 
 2023-01-19 22:33:37  x     README.md                                ::           .194 -1216224005 
@@ -95,7 +95,7 @@
 2023-04-04 22:24:58  x     GralButton.java                          ::         22.438  0957742483 
 2023-04-04 22:25:20  x     GralCanvasStorage.java                   ::         28.889  1960321904 
 2023-04-04 22:25:31  x     GralColorConv.java                       ::         13.997  1466841801 
-2024-02-18 18:59:44  x     GralCurveView.java                       ::         93.219  0602534951 
+2024-02-19 11:39:23  x     GralCurveView.java                       ::         98.627  0945583441 
 2023-07-24 22:37:21  x     GralGraphicOrder.java                    ::          8.682  0857126080 
 2023-04-04 22:25:43  x     GralGridProperties.java                  ::         13.551 -1275273552 
 2023-04-04 22:25:52  x     GralHtmlBox.java                         ::          2.060 -1531889892 
@@ -199,7 +199,7 @@
 2023-01-21 18:32:21  x     SwtButton.java                           ::         12.158 -0729155865 
 2022-12-23 17:15:34  x     SwtCanvasArea.java                       ::          3.406 -1444603454 
 2021-10-04 14:29:58  x     SwtCanvasDrawer.java                     ::          1.154  1236147349 
-2024-02-18 18:59:37  x     SwtCurveView.java                        ::         28.797 -0894883127 
+2024-02-19 11:18:45  x     SwtCurveView.java                        ::         29.547  1489595649 
 2021-10-04 14:29:52  x     SwtDragListener.java                     ::          4.215 -0163176230 
 2021-10-04 14:29:56  x     SwtDropListener.java                     ::          4.387  1572688082 
 2023-02-06 21:56:19  x     SwtFactory.java                          ::          1.167  0345180709 
@@ -254,10 +254,10 @@
 
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2023-08-01 14:32:22  x     ButtonInspcCmd.java                      ::           .522  0712364197 
-2024-02-18 14:37:49  x     InspcCurveView.java                      ::         64.479 -0462738601 
-2024-02-18 14:29:27  x     InspcCurveViewApp.java                   ::          7.443 -1298699114 
+2024-02-18 21:42:39  x     InspcCurveView.java                      ::         64.688  0641051684 
+2024-02-18 21:44:57  x     InspcCurveViewApp.java                   ::          7.497 -1883716412 
 2023-08-03 23:29:10  x     InspcFieldTable.java                     ::         24.911 -1916426610 
-2023-08-15 15:35:53  x     InspcGui.java                            ::         23.540 -1212230615 
+2024-02-18 21:43:33  x     InspcGui.java                            ::         23.561  2129009516 
 2021-10-04 14:29:56  x     InspcGuiFieldsFromFile.java              ::          4.617 -0989852832 
 2023-08-07 09:50:08  x     InspcViewTargetComm.java                 ::         15.161 -1894255373 
 

@@ -211,9 +211,9 @@ public class InspcGui extends GuiCfg implements CompleteConstructionAndStart
       } else {
         defaultDirSave = null;
       }
-      curveA = new InspcCurveView("curve_A", variableMng, null, null, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
-      curveB = new InspcCurveView("curve_B", variableMng, null, null, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
-      curveC = new InspcCurveView("curve_C", variableMng, null, null, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveA = new InspcCurveView("curve_A", variableMng, null, null, 15000, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveB = new InspcCurveView("curve_B", variableMng, null, null, 15000, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
+      curveC = new InspcCurveView("curve_C", variableMng, null, null, 15000, this.gralMng, false, defaultDirCfg, defaultDirSave, null, cargs.curveExporterClasses);
     }
     fieldsA = new InspcFieldTable(this.gralMng, variableMng);
     fieldsB = new InspcFieldTable(this.gralMng, variableMng);

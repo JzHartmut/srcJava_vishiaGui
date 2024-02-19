@@ -293,8 +293,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //fill, clear the area either from 0 to end or from size.x - xView to end,
     g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
     { //draw horizontal grid
-      float yG = dyView / super.gridDistanceX;
-      int yS = super.gridStrongPeriodX;
+      float yG = dyView / super.gridXdistance;
+      int yS = super.gridXstrongPeriod;
       /*TODO
       while(yGridF < dyView){
         int yGrid = (int)yGridF;
@@ -361,7 +361,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       }
       iTrack +=1;
     } //for listlines
-    super.ixDataDraw = ixDataRightX;
+    super.ixDataDrawX = ixDataRightX;
+    super.ixDdraw = ixD2;
     //
     if(widgg.timeorg.pixelWrittenAfterStrongDiv > 30){
       g.drawText(widgg.timeorg.sTimeAbsDiv[0], size.x - 6 - widgg.timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
@@ -420,11 +421,15 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         super.bRedrawAll = false;  //it is done
         super.redrawBecauseNewData = false;  //it is done.
       }
+      int ixd1pix = super.dataIxToShow[super.xpCursor1+1] - super.dataIxToShow[super.xpCursor1+2]; //~ ixData diff 1 pixel
       //
       //detect how many new data are given. Because the data are written in another thread,
       //the number of data, the write index are accessed only one time from this
       //Note that ixDataShowRight is set by ixDataWr if the curve is running.
+      this.widgg.cassert(Math.abs((super.ixDataDrawX >> this.widgg.shIxiData)- super.ixDdraw) <= 5*ixd1pix);
+      this.widgg.cassert((Math.abs((super.ixDataShowRightX >> this.widgg.shIxiData) - super.ixDshowRight)) <= 5*ixd1pix);
       final int ixDataRightX = super.ixDataShowRightX; 
+      final int ixDRight = super.ixDshowRight;             // seems to be ixDshowRight is volatile
       super.pixelOrg.xPixelCurve = size.x;
       super.pixelOrg.yPixelCurve = size.y;
       @SuppressWarnings("hiding")
@@ -442,12 +447,12 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //The curve will be shifted to left.
         //
         bPaintAll = false;
-        if(ixDataRightX != super.ixDataDraw){
+        if(ixDataRightX != super.ixDataDrawX){
           this.widgg.testStopWr = true;
           stop();
         }  
-        int timeLast = this.widgg.tracksValue.getTimeShort((super.ixDataDraw >> this.widgg.shIxiData) & this.widgg.mIxiData);
-        int timeNow = this.widgg.tracksValue.getTimeShort((ixDataRightX >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeLast = this.widgg.tracksValue.getTimeShort(this._wg.bDbgNewX ? super.ixDdraw : (super.ixDataDrawX >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeNow = this.widgg.tracksValue.getTimeShort(this._wg.bDbgNewX ? ixDRight : (ixDataRightX >> this.widgg.shIxiData) & this.widgg.mIxiData);
         timeDiff = timeNow - timeLast + super.timeCaryOverNewValue;  //0 if nothing was written.
         xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
         if(xViewPart > size.x){
@@ -474,7 +479,10 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       if(xViewPart >0) { //only if anything is to draw
         //only if a new point should be drawn.
         try{Thread.sleep(2);} catch(InterruptedException exc){}
-        drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDataRightX, super.ixDShow2, xViewPart, timeDiff, xp0, bPaintAll);
+        if(ixDRight != super.ixDshowRight) {
+          Debugutil.stop();
+        }
+        drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDataRightX, ixDRight, xViewPart, timeDiff, xp0, bPaintAll);
         
       } else { //xViewPart == 0
         //This is is normal case if a new value in data has a too less new timestamp.
@@ -484,8 +492,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //System.out.println("SwtCurveView - xViewPart=0");
       }
       if(widgg.nrofValues >0){  //don't work if no data are stored.
-        int ixDataShow2 = ((widgg.ixDataWrX - super.ixDataDraw)  >> widgg.shIxiData) & widgg.mIxiData;  //index of data which are shown right
-        int ixDataShow1 = ((widgg.ixDataWrX - super.ixDataShownX[size.x])  >> widgg.shIxiData) & widgg.mIxiData; //index of data which are shown left
+        int ixDataShow2 = this._wg.bDbgNewX ? this.widgg.ixDEnd - super.ixDdraw :((widgg.ixDataWrX - super.ixDataDrawX)  >> widgg.shIxiData) & widgg.mIxiData;  //index of data which are shown right
+        int ixDataShow1 = this._wg.bDbgNewX ? this.widgg.ixDEnd - super.dataIxToShow[size.x] : ((widgg.ixDataWrX - super.ixDataShownX[size.x])  >> widgg.shIxiData) & widgg.mIxiData; //index of data which are shown left
         float ixDataRel2 = (float)ixDataShow2 / widgg.maxNrofXValues;  //value 0..1 which range of buffer is shown 
         float ixDataRel1 = (float)ixDataShow1 / widgg.maxNrofXValues;
         int iPixRange2 = size.x - (int)(size.x * ixDataRel2);  //Position shown range right in pixel
@@ -542,8 +550,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
 
     
     public void setGridVertical(int dataPointsBetweenGridLines, int periodStrongLine){
-      SwtCurveView.this.gridDistanceY = dataPointsBetweenGridLines;
-      SwtCurveView.this.gridStrongPeriodY = periodStrongLine;
+      SwtCurveView.this.gridYdstance = dataPointsBetweenGridLines;
+      SwtCurveView.this.gridYstrongPeriod = periodStrongLine;
       widgg.gridDistanceStrongY = dataPointsBetweenGridLines * periodStrongLine;
     }
     
@@ -553,8 +561,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
      * @param periodStrongLine period for strong lines For example 5, any 5. line is stroke.
      */
     public void setGridHorizontal(float percentY, int periodStrongLine){
-      SwtCurveView.this.gridDistanceX = percentY;
-      SwtCurveView.this.gridStrongPeriodX = periodStrongLine;
+      SwtCurveView.this.gridXdistance = percentY;
+      SwtCurveView.this.gridXstrongPeriod = periodStrongLine;
     }
     
     

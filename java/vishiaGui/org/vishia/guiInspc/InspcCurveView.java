@@ -255,7 +255,7 @@ public final class InspcCurveView
    * @param curveExporterClasses Class which is used to export curves.
    */
   public InspcCurveView(String sName, VariableContainer_ifc variables
-      , GralCurveView.CommonCurve common, TimedValues tracksValues
+      , GralCurveView.CommonCurve common, TimedValues tracksValues, int sizeValues
       , GralMng gralMng, boolean visible
       , FileRemote defaultDirCfg, FileRemote defaultDirSave, String sHelpDir
       , Map<String, String> curveExporterClasses){
@@ -282,7 +282,7 @@ public final class InspcCurveView
 //    this.widgFileSelector.setActionOnEnterFile(this.actionEnterFile);
 
     this.widgFilename = new GralTextField(gralMng.refPos(), "-filename", GralTextField.Type.editable);
-    buildGraphic(/*this.windCurve, */colorSelector, common, tracksValues);
+    buildGraphic(sizeValues, colorSelector, common, tracksValues);
     this.curveExporterClasses = curveExporterClasses;
     this.variables = variables;
     this.fileCurveCfg = defaultDirCfg;
@@ -296,7 +296,13 @@ public final class InspcCurveView
    * @param wind The main window where the menu to open will be added
    * @param sName The name, used for menu entry too, sample "curve A"
    */
-  public void buildGraphic(/*GralWindow_ifc wind, */GralColorSelector colorSelector, GralCurveView.CommonCurve common, TimedValues tracksValues)
+  /**
+   * @param sizeBuffer size of all track buffer. The limit in Java is 16'000'000. Here 100'000 may sufficient, 15000 also.
+   * @param colorSelector
+   * @param common
+   * @param tracksValues
+   */
+  public void buildGraphic(int sizeBuffer, GralColorSelector colorSelector, GralCurveView.CommonCurve common, TimedValues tracksValues)
   { gralMng.selectPanel(this.sName);
     //gralMng.setPosition(4, 0, 4, 0, '.');
     gralMng.setPosition(4, 56, 4, 104, '.');
@@ -318,7 +324,7 @@ public final class InspcCurveView
     widgFilename.setVisible(false);
     widgFilename.setText("TEST xyz");
     gralMng.setPosition(0, -2, 0, posright, 'd');
-    widgCurve = gralMng.addCurveViewY(sName, 15000, common, tracksValues);
+    widgCurve = gralMng.addCurveViewY(sName, sizeBuffer, common, tracksValues);
     widgCurve.setActionMoveCursor(actionShowCursorValues);
     widgCurve.setActionTrackSelected(actionTrackSelectedFromGralCurveViewCtrlMousePressed);
     gralMng.setPosition(3, GralPos.size -3, posright, -6, 'r', 0);
