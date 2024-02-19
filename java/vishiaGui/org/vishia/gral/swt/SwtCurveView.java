@@ -147,10 +147,10 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //float pixelFromRight = 0;
     int xp2 = size.x -1;                                   // end x coord of point
     int xp1 = xp2;                                         // start x coord of point
-    int ixData2 = super.ixDataShownX[ixixiData];            // data index,
+    int ixData2 = super.dataIxToShow[ixixiData];           // data index,
     int nrofPixel4Data = super.nrofPixel4data[ixixiData];  // 0 = one point, 1.. more graphic points per one value 
-    int ixData = ixData2;                                  // index of left data value for one point.
-    int ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData; //real index in data
+    int ixData =ixData2;                                   // index of left data value for one point.
+    int ixD = ixData;                                      //real index in data
     //
     float yFactor = size.y / -10.0F / track.scale.yScale;  //y-scaling
     float y0Pix = (1.0F - track.scale.y0Line/100.0F) * size.y; //y0-line
@@ -168,7 +168,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //
     while( ixixiData < ixixDataLast){ //for all gotten ixData
       ixixiData += nrofPixel4Data +1;                      // get next value to left
-      ixData1 = super.ixDataShownX[ixixiData];
+      ixData1 = super.dataIxToShow[ixixiData];
       //ixData1 = ixDataShown[(int)pixelFromRight];
       
       xp1 -= nrofPixel4Data +1;                            // next end point of next value 
@@ -177,20 +177,19 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         int nrofYp = 0;
         yp1 = 0;
         do{                                                // use all values per 1 pixel
-          ixData -= widgg.adIxData;                        // to next point
-          ixD = (ixData >> widgg.shIxiData) & widgg.mIxiData;
+          ixData = --ixData >=0 ? ixData : this._dataOrg1.maxNrofXValues;                        // to next point
           int yp11;
           //if(ixData == ixDataDraw){
           if(ixixiData >= ixixDataLast){
               yp11 = track.ypixLast;
           } else {
-            yF = track.valueTrack.getFloat(ixD);
-            time1 = widgg.tracksValue().getTimeShort(ixD);
+            yF = track.valueTrack.getFloat(ixData);
+            time1 = widgg.tracksValue().getTimeShort(ixData);
             int dTime = time2 - time1;
             //pixelFromRight += dTime * pixel7time;
             yp11 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
           }
-          yp1 += yp11;  //build middle value or init first.
+          yp1 += yp11;                                     // build middle value or init first.
           if(ixData != ixData1){  //more as one value on the same xp
             if(yp1min > yp11){ yp1min = yp11; }
             if(yp1max < yp11){ yp1max = yp11; }
@@ -199,10 +198,10 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         } while(ixData != ixData1); // iData != ixDrawValues); //all values per 1 pixel
         g.setForeground(lineColor);
         g.setLineWidth(track.lineWidth);
-        if(nrofYp > 1){ //more as one value on the same xp
+        if(nrofYp > 1 && yp1min != yp1max){ //more as one value on the same xp
           g.drawLine(xp1, yp1min, xp1, yp1max);  //draw vertical line to show range.
-          yp1 = yp1 / nrofYp;
         }
+        yp1 = yp1 / nrofYp;
         g.drawLine(xp2, yp2, xp1, yp1);
         if(iTrack == 0){
           //System.out.println("SwtCurveView-drawTrack(" + xp2 + "+" + (xp1 - xp2) + ", " + yp2 + "+" + (yp1 - yp2) + ")");
@@ -288,7 +287,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
    * @param bPaintAll
    */
   private void drawRightOrAll(GC g, Point size, int xView, int dxView, int yView, int dyView
-      , int ixDataRightX, int ixD2, int xViewPart, int timeDiff, int xp0, boolean bPaintAll){
+      , int ixD2, int xViewPart, int timeDiff, int xp0, boolean bPaintAll){
     g.setBackground(colorBack);
     //fill, clear the area either from 0 to end or from size.x - xView to end,
     g.fillRectangle(xp0, yView, xViewPart, dyView);  //fill the current background area
@@ -309,7 +308,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     } 
     //  
     //prepare indices of data. Fills {@link #ixDataShown}
-    int ixixDataLast = super.prepareIndicesDataForDrawing(ixDataRightX, ixD2, xViewPart, timeDiff, bPaintAll);
+    int ixixDataLast = super.prepareIndicesDataForDrawing(ixD2, xViewPart, timeDiff, bPaintAll);
     // 
     //write time divisions:
     g.setForeground(gridColor);
@@ -361,7 +360,6 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       }
       iTrack +=1;
     } //for listlines
-    super.ixDataDrawX = ixDataRightX;
     super.ixDdraw = ixD2;
     //
     if(widgg._timeorg.pixelWrittenAfterStrongDiv > 30){
@@ -426,9 +424,6 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       //detect how many new data are given. Because the data are written in another thread,
       //the number of data, the write index are accessed only one time from this
       //Note that ixDataShowRight is set by ixDataWr if the curve is running.
-      this.widgg.cassert(Math.abs((super.ixDataDrawX >> this.widgg.shIxiData)- super.ixDdraw) <= 5*ixd1pix);
-      this.widgg.cassert((Math.abs((super.ixDataShowRightX >> this.widgg.shIxiData) - super.ixDshowRight)) <= 5*ixd1pix);
-      final int ixDataRightX = super.ixDataShowRightX; 
       final int ixDRight = super.ixDshowRight;             // seems to be ixDshowRight is volatile
       super.pixelOrg.xPixelCurve = size.x;
       super.pixelOrg.yPixelCurve = size.y;
@@ -447,12 +442,12 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //The curve will be shifted to left.
         //
         bPaintAll = false;
-        if(ixDataRightX != super.ixDataDrawX){
+        if(ixDRight != super.ixDdraw){
           this.widgg.testStopWr = true;
           stop();
         }  
-        int timeLast = this.widgg.tracksValue().getTimeShort(this._wg.bDbgNewX ? super.ixDdraw : (super.ixDataDrawX >> this.widgg.shIxiData) & this.widgg.mIxiData);
-        int timeNow = this.widgg.tracksValue().getTimeShort(this._wg.bDbgNewX ? ixDRight : (ixDataRightX >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeLast = this.widgg.tracksValue().getTimeShort(super.ixDdraw);
+        int timeNow = this.widgg.tracksValue().getTimeShort(ixDRight);
         timeDiff = timeNow - timeLast + super.timeCaryOverNewValue;  //0 if nothing was written.
         xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
         if(xViewPart > size.x){
@@ -482,7 +477,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         if(ixDRight != super.ixDshowRight) {
           Debugutil.stop();
         }
-        drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDataRightX, ixDRight, xViewPart, timeDiff, xp0, bPaintAll);
+        drawRightOrAll(g, size, xView, dxView, yView, dyView, ixDRight, xViewPart, timeDiff, xp0, bPaintAll);
         
       } else { //xViewPart == 0
         //This is is normal case if a new value in data has a too less new timestamp.
@@ -492,8 +487,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         //System.out.println("SwtCurveView - xViewPart=0");
       }
       if(this._dataOrg1.nrofValues >0){  //don't work if no data are stored.
-        int ixDataShow2 = this._wg.bDbgNewX ? this.widgg.ixDEnd - super.ixDdraw :((widgg.ixDataWrX - super.ixDataDrawX)  >> widgg.shIxiData) & widgg.mIxiData;  //index of data which are shown right
-        int ixDataShow1 = this._wg.bDbgNewX ? this.widgg.ixDEnd - super.dataIxToShow[size.x] : ((widgg.ixDataWrX - super.ixDataShownX[size.x])  >> widgg.shIxiData) & widgg.mIxiData; //index of data which are shown left
+        int ixDataShow2 = this.widgg.ixDEnd - super.ixDdraw;  //index of data which are shown right
+        int ixDataShow1 = this.widgg.ixDEnd - super.dataIxToShow[size.x]; //index of data which are shown left
         float ixDataRel2 = (float)ixDataShow2 / this._dataOrg1.maxNrofXValues;  //value 0..1 which range of buffer is shown 
         float ixDataRel1 = (float)ixDataShow1 / this._dataOrg1.maxNrofXValues;
         int iPixRange2 = size.x - (int)(size.x * ixDataRel2);  //Position shown range right in pixel
