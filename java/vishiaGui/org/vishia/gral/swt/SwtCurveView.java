@@ -97,7 +97,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     GralRectangle bounds = mng.calcWidgetPosAndSize(widgg.pos(), 700, 600);
     //Composite panelSwt = (Composite)widgg.pos().parent.getImpl().getWidgetImplementation();
     Composite panelSwt = (Composite)SwtMng.getSwtImpl(widgg.pos().parent);
-    curveSwt = this.new CurveViewSwtWidget(panelSwt, bounds.dx, bounds.dy, widgg.maxNrofXValues);
+    curveSwt = this.new CurveViewSwtWidget(panelSwt, bounds.dx, bounds.dy, this._dataOrg1.maxNrofXValues);
     curveSwt.setData(this);
     curveSwt.setSize(bounds.dx, bounds.dy);
     curveSwt.setBounds(bounds.x, bounds.y, bounds.dx, bounds.dy);
@@ -155,7 +155,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     float yFactor = size.y / -10.0F / track.scale.yScale;  //y-scaling
     float y0Pix = (1.0F - track.scale.y0Line/100.0F) * size.y; //y0-line
     float yF = track.valueTrack.getFloat(ixD);             // current, here start value
-    int time2 = this.widgg.tracksValue.getTimeShort(ixD);
+    int time2 = this.widgg.tracksValue().getTimeShort(ixD);
     int time1;
     int yp9 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
     int yp2 = yp9;  //right value
@@ -185,7 +185,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
               yp11 = track.ypixLast;
           } else {
             yF = track.valueTrack.getFloat(ixD);
-            time1 = widgg.tracksValue.getTimeShort(ixD);
+            time1 = widgg.tracksValue().getTimeShort(ixD);
             int dTime = time2 - time1;
             //pixelFromRight += dTime * pixel7time;
             yp11 = (int)( (yF - track.scale.yOffset) * yFactor + y0Pix);
@@ -232,7 +232,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     //Shift the graphic if the reason of redraw is only increment samples
     //and the number the values are shifted at least by that number, which is mapped to 1 pixel.
     if(xViewPart >0 && xViewPart < size.x){
-      super.timeCaryOverNewValue = (int)(timeDiff - xViewPart * widgg.timeorg.timePerPixel);
+      super.timeCaryOverNewValue = (int)(timeDiff - xViewPart * widgg._timeorg.timePerPixel);
       super.xViewLastF -= xViewPart;
       if(xView != 0){
         //TODO what is if only a part of control is shown
@@ -251,7 +251,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       }
       g.copyArea(xView + xViewPart, yView, dxView - xViewPart , dyView -5, xView, yView, false);
       //
-      widgg.timeorg.pixelWrittenAfterStrongDiv += xViewPart;
+      widgg._timeorg.pixelWrittenAfterStrongDiv += xViewPart;
       
       //System.out.println("SwtCurveView - draw - shift graphic;" + xViewPart);
       //System.arraycopy(ixDataShown, 0, ixDataShown, xViewPart, size.x - xViewPart);
@@ -317,7 +317,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     g.setLineStyle(SWT.LINE_DOT);
     for(int ii=1; ii <=49; ++ii){  //draw the horizontal grid
       int y = (int)(size.y /50.0f * ii);
-      g.drawLine(size.x - xViewPart, y, size.x, y);
+      g.drawLine(size.x - xViewPart, y, size.x, y);        // draws fine grid x lines
       
     }
     g.setForeground(gridColorStrong);
@@ -325,7 +325,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     g.setLineStyle(SWT.LINE_DOT);
     for(int ii=1; ii <=9; ++ii){  //draw the horizontal grid
       int y = (int)(size.y /10.0f * ii);
-      g.drawLine(size.x - xViewPart, y, size.x, y);
+      g.drawLine(size.x - xViewPart, y, size.x, y);        // draws grid x lines
       
     }
     //
@@ -333,20 +333,20 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     g.setLineWidth(1);
     int ixPixelTimeDiv =-1;
     int xPixelTimeDiv1;                     //draw the vertical fine grid, the time divisions
-    while((xPixelTimeDiv1 = widgg.timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {
+    while((xPixelTimeDiv1 = widgg._timeorg.xPixelTimeDivFine[++ixPixelTimeDiv]) >=0) {
       g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
       //System.out.println("draw " + xPixelTimeDiv);
     }
     g.setForeground(gridColorStrong);
     g.setLineWidth(1);
     ixPixelTimeDiv =-1;                     //draw the vertical grid, strong lines.
-    while((xPixelTimeDiv1 = widgg.timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
+    while((xPixelTimeDiv1 = widgg._timeorg.xPixelTimeDiv[++ixPixelTimeDiv]) >=0) {
       g.drawLine(size.x - xPixelTimeDiv1, 0, size.x - xPixelTimeDiv1, size.y);
       if(xPixelTimeDiv1 > 30){
         g.setForeground((Color)widgg.gralMng()._mngImpl.getColorImpl(GralColor.getColor("bk")));
-        g.drawText(widgg.timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
+        g.drawText(widgg._timeorg.sTimeAbsDiv[ixPixelTimeDiv], size.x - 6 - xPixelTimeDiv1, size.y - 25);
         g.setForeground(gridColorStrong);
-        widgg.timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
+        widgg._timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
       }
       //System.out.println("draw " + xPixelTimeDiv);
     }
@@ -364,9 +364,9 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     super.ixDataDrawX = ixDataRightX;
     super.ixDdraw = ixD2;
     //
-    if(widgg.timeorg.pixelWrittenAfterStrongDiv > 30){
-      g.drawText(widgg.timeorg.sTimeAbsDiv[0], size.x - 6 - widgg.timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
-      widgg.timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
+    if(widgg._timeorg.pixelWrittenAfterStrongDiv > 30){
+      g.drawText(widgg._timeorg.sTimeAbsDiv[0], size.x - 6 - widgg._timeorg.pixelWrittenAfterStrongDiv, size.y - 25);
+      widgg._timeorg.pixelWrittenAfterStrongDiv = Integer.MIN_VALUE;
     }
     //set the cursors
     if(super.xpCursor1New >=0){
@@ -433,7 +433,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
       super.pixelOrg.xPixelCurve = size.x;
       super.pixelOrg.yPixelCurve = size.y;
       @SuppressWarnings("hiding")
-      GralCurveView.TimeOrganisation timeorg = widgg.timeorg;
+      GralCurveView.TimeOrganisation timeorg = widgg._timeorg;
       timeorg.timePerPixel = (float)timeorg.timeSpread / (size.x +1); //nr of time units per pixel. 
       timeorg.pixel7time = (float)(size.x +1) / timeorg.timeSpread; //nr of pixel per time unit.
       int xViewPart = -1;   //nr of new pixel if only a part is drawn
@@ -451,8 +451,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
           this.widgg.testStopWr = true;
           stop();
         }  
-        int timeLast = this.widgg.tracksValue.getTimeShort(this._wg.bDbgNewX ? super.ixDdraw : (super.ixDataDrawX >> this.widgg.shIxiData) & this.widgg.mIxiData);
-        int timeNow = this.widgg.tracksValue.getTimeShort(this._wg.bDbgNewX ? ixDRight : (ixDataRightX >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeLast = this.widgg.tracksValue().getTimeShort(this._wg.bDbgNewX ? super.ixDdraw : (super.ixDataDrawX >> this.widgg.shIxiData) & this.widgg.mIxiData);
+        int timeNow = this.widgg.tracksValue().getTimeShort(this._wg.bDbgNewX ? ixDRight : (ixDataRightX >> this.widgg.shIxiData) & this.widgg.mIxiData);
         timeDiff = timeNow - timeLast + super.timeCaryOverNewValue;  //0 if nothing was written.
         xViewPart = (int)(timeorg.pixel7time * timeDiff + 0.0f);
         if(xViewPart > size.x){
@@ -491,11 +491,11 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         super.nrofValuesLessViewPart +=1;
         //System.out.println("SwtCurveView - xViewPart=0");
       }
-      if(widgg.nrofValues >0){  //don't work if no data are stored.
+      if(this._dataOrg1.nrofValues >0){  //don't work if no data are stored.
         int ixDataShow2 = this._wg.bDbgNewX ? this.widgg.ixDEnd - super.ixDdraw :((widgg.ixDataWrX - super.ixDataDrawX)  >> widgg.shIxiData) & widgg.mIxiData;  //index of data which are shown right
         int ixDataShow1 = this._wg.bDbgNewX ? this.widgg.ixDEnd - super.dataIxToShow[size.x] : ((widgg.ixDataWrX - super.ixDataShownX[size.x])  >> widgg.shIxiData) & widgg.mIxiData; //index of data which are shown left
-        float ixDataRel2 = (float)ixDataShow2 / widgg.maxNrofXValues;  //value 0..1 which range of buffer is shown 
-        float ixDataRel1 = (float)ixDataShow1 / widgg.maxNrofXValues;
+        float ixDataRel2 = (float)ixDataShow2 / this._dataOrg1.maxNrofXValues;  //value 0..1 which range of buffer is shown 
+        float ixDataRel1 = (float)ixDataShow1 / this._dataOrg1.maxNrofXValues;
         int iPixRange2 = size.x - (int)(size.x * ixDataRel2);  //Position shown range right in pixel
         int iPixRange1 = size.x - (int)(size.x * ixDataRel1);  //left
         //int ixDWr = (ixDataWr >> shIxiData) & mIxiData;

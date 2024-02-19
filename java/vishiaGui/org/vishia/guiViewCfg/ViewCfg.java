@@ -280,7 +280,7 @@ public class ViewCfg //extends GuiCfg
       if(gralwidgetCurveView !=null) {
         GralCurveView widgetCurveView = (GralCurveView)gralwidgetCurveView;
         commonCurve = widgetCurveView.common;
-        tracksValues = widgetCurveView.tracksValue;
+        tracksValues = widgetCurveView.tracksValue();
       } else { commonCurve = null; tracksValues = null; }
       
       FileRemote dirCfg = FileRemote.fromFile(new File("T:/"));
