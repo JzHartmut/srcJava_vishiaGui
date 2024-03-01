@@ -1,6 +1,6 @@
-2024-02-19 22:50:00  x     .filelist                                ::           .  0  0000000000 
+2024-03-01 22:06:41  x     .filelist                                ::           .  0  0000000000 
 2024-02-14 18:24:30  x     .git                                     ::           . 71  0018260668 
-2024-02-19 22:49:54  x     .gitCommit                               ::           . 45 -1879586352 
+2024-03-01 22:04:50  x     .gitCommit                               ::           .663 -0897717769 
 2023-04-16 14:33:35  x     .gitRepository                           ::           . 63  0125671136 
 2023-10-21 22:31:28  x     .gitignore                               ::           . 35 -1444410768 
 2023-01-19 22:33:37  x     README.md                                ::           .194 -1216224005 
@@ -19,7 +19,7 @@
 2024-02-17 19:53:16  x     Fcmd.java                                ::         33.277  0024787487 
 2023-02-13 11:48:33  x     FcmdActions.java                         ::         12.122  1323926072 
 2023-01-15 20:39:09  x     FcmdButtons.java                         ::         18.970  1852735082 
-2024-02-18 19:11:09  x     FcmdCopyCmprDel.java                     ::         89.890 -1599815649 
+2024-02-22 23:04:21  x     FcmdCopyCmprDel.java                     ::         89.942  1293993697 
 2023-07-24 21:02:58  x     FcmdDelete.java                          ::          8.481 -1896143198 
 2013-09-08 21:23:40  x     FcmdDocuSearch.java                      ::          1.167 -1869277279 
 2023-01-03 23:42:37  x     FcmdEdit.java                            ::          8.193 -1780324974 
@@ -241,7 +241,7 @@
 2023-01-07 08:13:26  x     GralCommandSelector.java                 ::          8.473  1777158701 
 2023-07-24 21:02:58  x     GralFileProperties.java                  ::         35.131 -1762570772 
 2023-01-22 12:31:29  x     GralFileSelectWindow.java                ::          8.940 -0230463926 
-2024-02-12 23:50:15  x     GralFileSelector.java                    ::        110.447  1231544489 
+2024-02-23 13:34:51  x     GralFileSelector.java                    ::        110.492  0345705962 
 2023-01-20 21:03:12  x     GralHorizontalSelector.java              ::         12.849 -1336694146 
 2021-10-04 14:29:52  x     GralHtmlWindow.java                      ::           .695 -0013155919 
 2023-04-16 23:57:18  x     GralInfoBox.java                         ::         16.024 -1028356567 
@@ -255,7 +255,7 @@
 ============================== java/vishiaGui/org/vishia/guiInspc/ =================================
 2023-08-01 14:32:22  x     ButtonInspcCmd.java                      ::           .522  0712364197 
 2024-02-18 21:42:39  x     InspcCurveView.java                      ::         64.688  0641051684 
-2024-02-18 21:44:57  x     InspcCurveViewApp.java                   ::          7.497 -1883716412 
+2024-03-01 21:53:42  x     InspcCurveViewApp.java                   ::         12.447 -1103835903 
 2023-08-03 23:29:10  x     InspcFieldTable.java                     ::         24.911 -1916426610 
 2024-02-18 21:43:33  x     InspcGui.java                            ::         23.561  2129009516 
 2021-10-04 14:29:56  x     InspcGuiFieldsFromFile.java              ::          4.617 -0989852832 
@@ -264,9 +264,9 @@
 ============================== java/vishiaGui/org/vishia/guiViewCfg/ ===============================
 2022-10-26 00:22:33  x     OamEvalValues_ifc.java                   ::          1.126 -1700044071 
 2023-09-21 13:39:59  x     OamOutFileReader.java                    ::          3.646  0775486077 
-2022-10-20 12:55:59  x     OamRcvValue.java                         ::         10.264  1226517056 
-2023-09-21 13:40:20  x     OamShowValues.java                       ::         29.082  0434985564 
-2024-02-19 13:15:58  x     ViewCfg.java                             ::         19.042 -1840892503 
+2024-03-01 22:00:04  x     OamRcvValue.java                         ::         12.029  1295354517 
+2024-02-27 23:31:18  x     OamShowValues.java                       ::         29.208  0577675552 
+2024-03-01 22:04:28  x     ViewCfg.java                             ::         19.442  0330481935 
 
 ============================== java/vishiaGui/org/vishia/stimuliSelector/ ==========================
 2023-02-21 21:42:39  x     StimuliSelector.java                     ::         39.165 -1902143376 

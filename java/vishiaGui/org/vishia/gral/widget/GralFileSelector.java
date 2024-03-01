@@ -1471,11 +1471,13 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     while(iter.hasNext()){
       Map.Entry<String, GralTableLine_ifc<FileRemote>> entry = iter.next();
       GralTableLine_ifc<FileRemote> tline = entry.getValue();
-      if(tline.getKey().equals("..")){
-        tline.setBackColor(this.idata.colorBack, -1); //set for the whole line.
-      } else if(tline.getBackColor(-1) == this.idata.colorBackPending){
-        this.gui.widgSelectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
-        iter.remove();
+      if(tline !=null) {
+        if(tline.getKey().equals("..")){
+          tline.setBackColor(this.idata.colorBack, -1); //set for the whole line.
+        } else if(tline.getBackColor(-1) == this.idata.colorBackPending){
+          this.gui.widgSelectList.wdgdTable.deleteLine(tline);  //it is a non existing one yet.
+          iter.remove();
+        }
       }
     }
     this.gui.widgSelectList.wdgdTable.setBackColor(this.idata.colorBack, GralTable_ifc.kEmptyArea);

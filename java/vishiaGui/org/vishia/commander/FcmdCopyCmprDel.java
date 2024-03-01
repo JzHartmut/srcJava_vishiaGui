@@ -737,7 +737,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     //====>
     //srcFile.refreshAndMark(bFirstSelect, sSrcMask, bMarkSelect, depths, callbackFromFilesCheck, this.progress);
     this.progress.clean();
-    this.srcDir.refreshAndMark(false, 0, FileMark.select, FileMark.selectSomeInDir, sSrcMask, bMarkSelect
+    this.srcDir.refreshAndMark(false, 0, FileMark.resetNonMarked | FileMark.select, FileMark.resetNonMarked | FileMark.selectSomeInDir, sSrcMask, bMarkSelect
         , this.callbackFromFilesCheck, this.progress.evBack);
     this.widgCopyNameDst.setText(this.srcDir.getStateDevice());
     this.bFirstSelect = false;

@@ -9,14 +9,12 @@ import org.vishia.communication.Address_InterProcessComm;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
 import org.vishia.communication.InterProcessCommFactory;
-import org.vishia.gral.base.GralButton;
-import org.vishia.mainCmd.MainCmdLogging_ifc;
-import org.vishia.mainCmd.Report;
+import org.vishia.msgDispatch.LogMessage;
 
 /**This class organizes the receiving of data from a automation device. An own thread is created.
  * In its run-routine the thread waits for receiving data via socket or another adequate 
  * interprocess-communication.
- * For evaluating the received data the routine {@link OamShowValues#show(byte[], int, int)} is called.
+ * For evaluating the received data the routine {@link Plug#show(byte[], int, int)} is called.
  * <br><br>
  * A datagram may contain more as one data-set. The datagram is defined with the inspector-datagram-
  * definition, see {@link InspcDataExchangeAccess}.
@@ -29,6 +27,10 @@ public class OamRcvValue implements Runnable
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2024-02-28 make it more universal, now also used in {@link org.vishia.guiInspc.InspcCurveViewApp},
+   *   for that the {@link Plug} interface is created here, should be implemented by user.
+   *   The {@link OamShowValues} is no more immediately used by this class, now via the {@link Plug} interface.
+   *   All Gral usages are removed, hence this class can be part of vishiaRun.jar in future.
    * <li>2022-09-22 for experience check of the timestamp is built in to report lost telegrams. 
    * <li>2022-08 
    * <li>2010-06 created.
@@ -58,17 +60,41 @@ public class OamRcvValue implements Runnable
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String version = "2022-09-23";
+  public final static String version = "2024-02-28";
 
   
   
   /**Associated class which shows the values */
-  private final OamShowValues showValues;
+  private final Plug plug;
   
   /**The thread. Composition. */
   private final Thread thread;
   
   boolean bRun;
+  
+  protected final int addr0;
+  
+  /**This specific interface should be implemented by a called plug in which deals with the received data. 
+   */
+  public interface Plug {
+    
+    /**Quest whether it should send any stuff. It is for example implemented as button in a GUI.
+     * @return true then send.
+     */
+    boolean shouldSend();
+    
+    /**This is called if a telegram is received and prepared. The goal is: show this received data in a GUI.
+     * The format of the data depends from the sender and the requests of the implementor, not from this class.
+     * But this class checks the telegram for the head and items.
+     * @param binData The ethernet telegram
+     * @param nrofBytes length
+     * @param from first byte to regard.
+     */
+    void show(byte[] binData, int nrofBytes, int from);
+
+    
+  }
+  
   
   /**This parameter can be changed on debug suspend to influence output for one received telegram.
    * It can be used if receiving is the problem.
@@ -106,11 +132,11 @@ public class OamRcvValue implements Runnable
   
   ByteDataAccessSimple txInfoAccess = new ByteDataAccessSimple(true);
   
-  final MainCmdLogging_ifc log;
+  final LogMessage log;
   
-  private final GralButton wdgButtonOnOff;
-
-
+ 
+  /**The wrapper arroung the socket communication. It can be implemented also via another kind of communication. 
+   */
   private final InterProcessComm ipc;
 
   /**Create firstly an invalid address (port 0), it is filled from sender, if telegrams are received. */
@@ -128,21 +154,31 @@ public class OamRcvValue implements Runnable
   
   byte[] sendData = new byte[1500];
   
-  public OamRcvValue ( OamShowValues showValues, MainCmdLogging_ifc log
-      , ViewCfg.CallingArguments args, GralButton wdgButtonOnOff) {
+  /**
+   * @param plug
+   * @param log
+   * @param sOwnIpcAddr
+   * @param sTargetIpcAddr
+   * @param addr0 it is either 0 or 2. It is 0 if transmit from a higher language (PC), 
+   *   2 if transmitted without socket driver from a embedded platform, because 2 fill-bytes are necessary 
+   *   because elsewhere the payload data starts on an address not divide by 4. (32 bit memory alignment necessary.)
+   */
+  public OamRcvValue ( Plug plug, LogMessage log
+      , String sOwnIpcAddr, String sTargetIpcAddr
+      , int addr0) {
     this.thread = new Thread(this, "oamRcv");
     this.log = log;
-    this.wdgButtonOnOff = wdgButtonOnOff;
-    this.showValues = showValues;
-    senderAddr = InterProcessCommFactory.getInstance().createAddress("UDP:127.0.0.1:0xffff");
-    if(args.targetIpc.val !=null) {
-      this.targetAddr = InterProcessCommFactory.getInstance().createAddress(args.targetIpc.val);
-      bTargetAddrValid = true;                             // should transmit commands to this Ethernet destination
+    this.addr0 = addr0;
+    this.plug = plug;
+    this.senderAddr = InterProcessCommFactory.getInstance().createAddress("UDP:127.0.0.1:0xffff");
+    if(sTargetIpcAddr !=null) {
+      this.targetAddr = InterProcessCommFactory.getInstance().createAddress(sTargetIpcAddr);
+      this.bTargetAddrValid = true;                             // should transmit commands to this Ethernet destination
     } else {
       this.targetAddr = null;                              // targetAddr is only a placeholder
     }
-    if(args.sOwnIpcAddr !=null) {                          // the slot used for transmit and listen 
-      this.ipc = InterProcessCommFactory.getInstance().create(args.sOwnIpcAddr); //It creates and opens the UDP-Port.
+    if(sOwnIpcAddr !=null) {                          // the slot used for transmit and listen 
+      this.ipc = InterProcessCommFactory.getInstance().create(sOwnIpcAddr); //It creates and opens the UDP-Port.
       this.ipc.open(null, true); //InterProcessComm.receiverShouldbeBlocking);
       if(this.ipc != null){
         this.bIpcOpened = true;
@@ -230,7 +266,7 @@ public class OamRcvValue implements Runnable
   
   private void evalTelg(byte[] recvData, int nrofBytes) throws ParseException
   { 
-    this.datagramRcv.assign(recvData, nrofBytes, 2);          // The head of the datagram should be appropriate the head of an inspector datagram.
+    this.datagramRcv.assign(recvData, nrofBytes, this.addr0);          // The head of the datagram should be appropriate the head of an inspector datagram.
     this.datagramRcv.setLittleEndianBig2();
     //this.datagramRcv.setBigEndian(true);                   // it is the general approach.
     int nrofBytesInfoHead = this.infoEntity.getLengthHead(); // the symbolic data starts as one item, from position 0x18
@@ -240,9 +276,8 @@ public class OamRcvValue implements Runnable
       int nrofBytesInfo = this.infoEntity.getLenInfo();
       if(nrofBytesInfo < nrofBytesInfoHead) throw new ParseException("head of info corrupt, nrofBytes", nrofBytesInfo);
       this.infoEntity.setLengthElement(nrofBytesInfo);
-      int posBuffer = this.infoEntity.getPositionInBuffer() + nrofBytesInfoHead;
-      int nrofBytes1 = nrofBytesInfo - nrofBytesInfoHead;
-      this.showValues.show(recvData, nrofBytes1, posBuffer);
+      int posBuffer = this.infoEntity.getPositionInBuffer();
+      this.plug.show(recvData, nrofBytesInfo, posBuffer);  // data fro show are the item inclusively its head.
     }
     //this.showValues.showRedraw();
     if(catastrophicalCount <0) throw new RuntimeException("unterminated while-loop");
@@ -255,7 +290,7 @@ public class OamRcvValue implements Runnable
     catch (InterruptedException e)
     { //dialogZbnfConfigurator.terminate();
     }
-    if(this.bTargetAddrValid && (this.wdgButtonOnOff ==null || this.wdgButtonOnOff.isOn() )) {
+    if(this.bTargetAddrValid && (this.plug.shouldSend() )) {
       long timeAbs = System.currentTimeMillis();
       this.txInfoAccess.setIntVal(2+0, 2, 0x20);   //Position uint16 data[0] for embedded: length item
       this.txInfoAccess.setIntVal(2+2, 2, 0x65);   //Position uint16 data[4] for embedded: cmd
@@ -265,6 +300,15 @@ public class OamRcvValue implements Runnable
   }
   
   
+  
+  /**Sends an answer to the sender address of the incomming telegrams. 
+   * @param txData
+   */
+  public void sendAnswer(byte[] txData, int nrofAnswerBytes) {
+    if(this.bTargetAddrValid) {
+      this.ipc.send(txData, nrofAnswerBytes, this.senderAddr);
+    }
+  }
   
   /**Sheet anchor: close the socket before the object is removed.
    * @see java.lang.Object#finalize()

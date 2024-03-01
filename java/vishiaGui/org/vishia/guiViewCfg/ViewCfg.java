@@ -3,10 +3,7 @@ package org.vishia.guiViewCfg;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.text.ParseException;
 
-import org.vishia.byteData.VariableAccessArray_ifc;
 import org.vishia.byteData.VariableAccess_ifc;
 import org.vishia.communication.InspcDataExchangeAccess;
 import org.vishia.communication.InterProcessComm;
@@ -29,7 +26,7 @@ import org.vishia.mainCmd.MainCmdLoggingStream;
 import org.vishia.mainCmd.MainCmdLogging_ifc;
 import org.vishia.msgDispatch.LogMessage;
 import org.vishia.msgDispatch.LogMessageStream;
-import org.vishia.util.CheckVs;
+import org.vishia.util.ExcUtil;
 import org.vishia.util.FileFunctions;
 import org.vishia.util.TimedValues;
 
@@ -47,6 +44,7 @@ public class ViewCfg //extends GuiCfg
   
   /**Version and history
    * <ul>
+   * <li>2024-02-28 Hartmut adapted using {@link OamRcvValue.Plug} as interface to receive telegram.
    * <li>2022-09-26 Hartmut more refactored. New concepts with docu.
    * <li>2022-08-26 Hartmut little bit refactored because of newly usage, prevent warnings.
    * <li>2012-20-22 Hartmut chg now works yet.
@@ -55,7 +53,7 @@ public class ViewCfg //extends GuiCfg
    */
   public static final String versionViewCfg = "2022-09-26";
   
-  private final OamShowValues oamShowValues;
+  protected final OamShowValues oamShowValues;
 	  
   /**Composition of a class, that reads the oam output values from the target
    * and writes into variables, which are displayed.
@@ -218,6 +216,21 @@ public class ViewCfg //extends GuiCfg
 //
   
   
+  
+  OamRcvValue.Plug plugReceive = new OamRcvValue.Plug() {
+
+    @Override public boolean shouldSend () {
+      return ViewCfg.this.wdgbtnOnOff !=null && ViewCfg.this.wdgbtnOnOff.isOn();
+    }
+
+    @Override public void show ( byte[] binData, int nrofBytes, int from ) {
+      ViewCfg.this.oamShowValues.show(binData, nrofBytes, from);
+      
+    }
+    
+  };
+  
+  
   /**ctor for the main class of the application. 
    * The main class can be created in some other kinds as done in static main too.
    * But it needs the {@link MainCmdWin}.
@@ -309,7 +322,9 @@ public class ViewCfg //extends GuiCfg
     //
     this.logTextbox = new MainCmdLoggingStream("mm-dd-hh:mm:ss", this.outTextbox);
     if(this.callingArguments.sOwnIpcAddr !=null) {
-      this.oamRcvUdpValue = new OamRcvValue(this.oamShowValues, this.logTextbox, this.callingArguments, this.wdgbtnOnOff);
+      this.oamRcvUdpValue = new OamRcvValue(this.plugReceive, this.logTextbox
+          , this.callingArguments.targetIpc.val
+          , this.callingArguments.sOwnIpcAddr, 2);
     } else { 
       this.oamRcvUdpValue = null;
     }
@@ -365,7 +380,7 @@ public class ViewCfg //extends GuiCfg
       }
     } catch(Exception exc){
       //tread-Problem: console.writeError("unexpected Exception", exc);
-      System.out.println(CheckVs.exceptionInfo("ViewCfg - unexpected Exception; ", exc, 0, 7));
+      System.out.println(ExcUtil.exceptionInfo("ViewCfg - unexpected Exception; ", exc, 0, 7));
       exc.printStackTrace();
     }
 

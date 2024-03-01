@@ -149,7 +149,7 @@ public class OamShowValues
     this.dataValid = true;   //it can be set because empty data are present, see above, use to test.
     
     OamEvalValues_ifc evalValues = null;
-    if(argClassEvalRcvValues.val !=null) {
+    if(argClassEvalRcvValues !=null && argClassEvalRcvValues.val !=null) {
       try {
         @SuppressWarnings("unchecked") Class<OamEvalValues_ifc> evalClass = (Class<OamEvalValues_ifc>)Class.forName(argClassEvalRcvValues.val);
         @SuppressWarnings("unchecked") Constructor<OamEvalValues_ifc>[] cactor = (Constructor<OamEvalValues_ifc>[])evalClass.getConstructors();
@@ -282,9 +282,13 @@ public class OamShowValues
     } else {
       //this.timeMilliSecFromBaseyear = System.currentTimeMillis();
     }
-    int yMov = this.accessOamVariable.getVariable("yMov").getInt();
-    if(yMov > 100) {
-      Debugutil.stop();
+    // only test
+    VariableAccess_ifc var_yMov = this.accessOamVariable.getVariable("yMov");
+    if(var_yMov !=null) {
+      int yMov = var_yMov.getInt();
+      if(yMov > 100) {
+        Debugutil.stop();
+      }
     }
     if(this.evalValues !=null) { 
       this.evalValues.calc(); 
@@ -768,13 +772,12 @@ public class OamShowValues
   }
   
 
-  
-  
-  
 
   void stop(){}
 
   void debugStop(){
     stop();
   }
+
+
 }
