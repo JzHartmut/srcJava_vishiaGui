@@ -27,6 +27,8 @@ public class OamRcvValue implements Runnable
   /**Version, history and license. The version number is a date written as yyyymmdd as decimal number.
    * Changes:
    * <ul>
+   * <li>2024-03-02 Answer telegram with the {@link InspcDataExchangeAccess.InspcDatagram} head
+   *   with back seqnr. Now ping-pong (requ/ackn) works with C program (Simulation). 
    * <li>2024-02-28 make it more universal, now also used in {@link org.vishia.guiInspc.InspcCurveViewApp},
    *   for that the {@link Plug} interface is created here, should be implemented by user.
    *   The {@link OamShowValues} is no more immediately used by this class, now via the {@link Plug} interface.
@@ -60,7 +62,7 @@ public class OamRcvValue implements Runnable
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public final static String version = "2024-02-28";
+  public final static String version = "2024-03-02";
 
   
   
@@ -127,6 +129,8 @@ public class OamRcvValue implements Runnable
   private final Map<String, String> indexUnknownVariable = new TreeMap<String, String>();
   
   InspcDataExchangeAccess.InspcDatagram datagramRcv = new InspcDataExchangeAccess.InspcDatagram();
+  
+  InspcDataExchangeAccess.InspcDatagram datagramTx = new InspcDataExchangeAccess.InspcDatagram();
   
   InspcDataExchangeAccess.Inspcitem infoEntity = new InspcDataExchangeAccess.Inspcitem();
   
@@ -200,9 +204,11 @@ public class OamRcvValue implements Runnable
 
   
   /**If the application is stopped, the thread have to be stopped firstly. 
-   * The socket will be closed in the receiver-thread, when it is stopped. */
+   * The socket will be closed here which interrupts receiving.  */
   public void stopThread(){
     this.bRun = false;
+    this.ipc.close();
+    this.bIpcOpened = false;
   }
   
   
@@ -259,8 +265,6 @@ public class OamRcvValue implements Runnable
     while(this.bRun){
       receiveAndExec();
     }
-    this.ipc.close();
-    this.bIpcOpened = false;
   }
   
   
@@ -304,8 +308,12 @@ public class OamRcvValue implements Runnable
   /**Sends an answer to the sender address of the incomming telegrams. 
    * @param txData
    */
-  public void sendAnswer(byte[] txData, int nrofAnswerBytes) {
+  public void sendAnswer(byte[] txData, int nrofAnswerBytes, int seqnr, int cmd) {
     if(this.bTargetAddrValid) {
+      this.datagramTx.assign(txData, nrofAnswerBytes);
+      int entrant = 0;
+      int encryption = 0;
+      this.datagramTx.setHeadAnswer(entrant, seqnr, encryption);
       this.ipc.send(txData, nrofAnswerBytes, this.senderAddr);
     }
   }

@@ -51,6 +51,10 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
   
   /**Version, history and license.
    * <ul>
+   * <li>2024-03-02 Hartmut important bugfix in {@link #setSample(float[], int, int)}: 
+   *   Since a long time the variable testStopWr was active and had prevented write data while refresh graphic runs. 
+   *   This was only a debug helper, but was not obviously in normal operations (usual),
+   *   but with very fast telegrams from a running simulation it was obviously. 
    * <li>2022-09-28 Hartmut deal with timeShort from the measurement resp. value source.
    *   The absolute time is either associated here from the {@link System#currentTimeMillis()} 
    *   or also possible for a given absolute time relation for the values outside of the current values.
@@ -137,7 +141,7 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    * 
    */
-  public final static int version = 20220928;
+  public final static int version = 20240202;
   
   
   
@@ -1001,7 +1005,8 @@ public class GralCurveView extends GralWidget implements GralCurveView_ifc
    * @see org.vishia.gral.ifc.GralCurveView_ifc#setSample(float[], int)
    */
   @Override public void setSample(float[] values, int timeShort, int timeShortAdd) {
-    if(testStopWr) return;  //only for debug test.
+//    if(testStopWr) // this is not proper, disturb the storing of data, maybe only really for debug
+//      return;  //only for debug test.
     //if(++ixDataWr >= this._dataOrg.maxNrofXValues){ ixDataWr = 0; } //wrap arround.
     if( ++saveOrg.ctValuesAutoSave > saveOrg.nrofValuesAutoSave) { 
       saveOrg.ctValuesAutoSave = saveOrg.nrofValuesAutoSave;  //no more.
