@@ -266,54 +266,61 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
     this.widgButtonSetSrc = new GralButton(refPos, "@+0-2, -8..-1=SetSrc-" + name, "set source", this.actionSetSrc);
     //this.widgButtonShowSrc = new GralButton(refPos, "@5.5-2.5, -4..-1=btnShowSrc-" + name, "=>" , null);
 
-    this.widgButtonSelNewChg = new GralButton(refPos, "@+1.5-1.5,-22..-18=SelNewChg" + name, "?+#^", this.actionSelNewChg );
-    this.widgButtonSelAll = new GralButton(refPos, "@+0-1.5,-17..-13=SelAll" + name, "*/**", this.actionSelAll );
-    this.widgButtonSetSymbolicLinks = new GralButton(refPos, "@+2-2,1..5=SymLinks" + name, null, null );
-    this.widgButtonSetSymbolicLinks.setSwitchMode(">no", ">ln");
-    this.widgButtonSetSymbolicLinks.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
-    this.widgSrcSelection = new GralTextField(refPos, "@+0-3.2, 5..-13++0.3=copyCond-" + name
-        , promptSrcFileSel[cmdArg.ix] , "t", GralTextField.Type.editable);
-    this.widgSrcSelection.specifyActionChange(null, this.actionSelectMask, null);
-    if(cmdArg != Ecmd.search) {
-      this.widgButtonCheck = new GralButton(refPos, "@+0-3,-12..-1=check" + name, "check/mark", this.actionCheck );
-    }
     //dst path, set dst
     String promptDstDir = promptDstDirSel[cmdArg.ix];
     if(promptDstDir !=null) {
       //if(cmdArg == Ecmd.copy) {
-      this.widgButtonCmprFast = new GralButton(refPos, "@+3.2-2,15..24=CmprFast" + name, "cmpr fast", this.actionButtonCmprFast );        
-      this.widgButtonCmprContent = new GralButton(refPos, "@+0-2,25..39=CmprContent" + name, "cmpr content", this.actionButtonCmprContent );        
+      //this.widgButtonCmprFast = new GralButton(refPos, "@+3.2-2,15..24=CmprFast" + name, "cmpr fast", this.actionButtonCmprFast );        
+      //this.widgButtonCmprContent = new GralButton(refPos, "@+0-2,25..39=CmprContent" + name, "cmpr content", this.actionButtonCmprContent );        
       //}
-      this.widgDstDir = new GralTextField(refPos, "@+2.2-3.2,1..-9=DstDir-" + name, promptDstDir, "t");
+      this.widgDstDir = new GralTextField(refPos, "@7-3.2,1..-9=DstDir-" + name, promptDstDir, "t");
       this.widgButtonSetDst = new GralButton(refPos, "@+0-2.5,-8..-1=setDst-" + name, "set dst", this.actionSetDst );
       //this.widgButtonShowDst = new GralButton(refPos, "+0-2.5, -4..-1=showDst" + name, "=>", null );
-      String promptDstFile = promptDstFileSel[cmdArg.ix];
-      if(promptDstFile !=null) {
-        this.widgDstFileModification = new GralTextField(refPos, "@+3.5-3.2,5..-16=DstFileModification-" + name, promptDstFile, "t", GralTextField.Type.editable);
-        this.widgDstFileModification.specifyActionChange(null, this.actionEnterTextInDst, null);
-      }
+        //if(cmdArg == Ecmd.copy) {
+      this.widgButtonCmprFast = new GralButton(refPos, "@14-3,-15..-1=CmprFast" + name, "cmpr fast", this.actionButtonCmprFast );        
+      this.widgButtonCmprContent = new GralButton(refPos, "@+3.2-3,-15..-1=CmprContent" + name, "cmpr content", this.actionButtonCmprContent );        
+      //try{ refPos.setPosition("+2.5", refPos);} catch(java.text.ParseException exc) {}
     }
+   
+    this.widgButtonSetSymbolicLinks = new GralButton(refPos, "@10-2.2, 1..15=SymLinks" + name, null, null );
+    this.widgButtonSetSymbolicLinks.setSwitchMode(">sym links no", ">sym links");
+    this.widgButtonSetSymbolicLinks.setSwitchMode(GralColor.getColor("wh"), GralColor.getColor("gn"));
+    this.widgButtonSelAll = new GralButton(refPos, "@+0-2.2, 16..22=SelAll" + name, "*/**", this.actionSelAll );
+    this.widgButtonSelNewChg = new GralButton(refPos, "@+0-2.2, 23..30=SelNewChg" + name, "?+#^", this.actionSelNewChg );
+    if(cmdArg != Ecmd.search) {
+      this.widgButtonCheck = new GralButton(refPos, "@+1-3,-27..-16=check" + name, "check/mark", this.actionCheck );
+    }
+    this.widgSrcSelection = new GralTextField(refPos, "@13.5-3.2, 1..-16++0.3=copyCond-" + name
+        , promptSrcFileSel[cmdArg.ix] , "t", GralTextField.Type.editable);
+    this.widgSrcSelection.specifyActionChange(null, this.actionSelectMask, null);
+
+    String promptDstFile = promptDstFileSel[cmdArg.ix];
+    if(promptDstFile !=null) {
+      this.widgDstFileModification = new GralTextField(refPos, "@+3.5-3.2,1..-16=DstFileModification-" + name, promptDstFile, "t", GralTextField.Type.editable);
+      this.widgDstFileModification.specifyActionChange(null, this.actionEnterTextInDst, null);
+    }
+    
+    
+    
     //String sBtnDstExec = sTextsBtnDstExec[cmdArg.ix]; 
     if(this.cmdWind == Ecmd.delete) {
-      new GralLabel(refPos, "@+4+2, 1..18", "Del read only ?", 0);
+      new GralLabel(refPos, "@19-1.8, 1..18", "Del read only ?", 0);
       this.widgdChoiceOverwrReadOnly = new GralButton(refPos, "@+3-3,1+12++1=overwriter-" + name, "ask ?yes ?no", this.actionOverwrReadonly);
       this.widgdChoiceOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
     } else if(this.cmdWind == Ecmd.compare) {
-      try{ refPos.setPosition("+4", refPos);} catch(java.text.ParseException exc) {}
+      try{ refPos.setPosition("@19", refPos);} catch(java.text.ParseException exc) {}
     } else if(this.cmdWind != Ecmd.compare && this.cmdWind != Ecmd.search) {
-      new GralLabel(refPos, "@+4+2, 1+17++", "Overwr read only ?", 0);
+      new GralLabel(refPos, "@19-1.8, 1+17++", "Overwr read only ?", 0);
       new GralLabel(refPos, null, "Overwr exists ?", 0);
       new GralLabel(refPos, null, "Create ?", 0);
-      this.widgdChoiceOverwrReadOnly = new GralButton(refPos, "@+3-3,1+12++1=overwriter-" + name, "ask ?yes ?no", this.actionOverwrReadonly);
+      this.widgdChoiceOverwrReadOnly = new GralButton(refPos, "@+3-2.8,0+12++1=overwriter-" + name, "ask ?yes ?no", this.actionOverwrReadonly);
       this.widgdChoiceOverwrReadOnly.setBackColor(GralColor.getColor("lam"), 0);
-      this.widgdChoiceOverwrExists = new GralButton(refPos, "@,+13+17=copyOverwriteReadonly", "ask ?newer?older?all ?no", this.actionOverwrDate );
+      this.widgdChoiceOverwrExists = new GralButton(refPos, "@,13+17=copyOverwriteReadonly", "ask ?newer?older?all ?no", this.actionOverwrDate );
       this.widgdChoiceOverwrExists.setBackColor(GralColor.getColor("lam"), 0);
-      this.widgdChoiceCreateNew = new GralButton(refPos, "@,+18+13=copyCreate", "yes ?no ?ask", this.actionCreateCopy );
+      this.widgdChoiceCreateNew = new GralButton(refPos, "@,31+13=copyCreate", "yes ?no ?ask", this.actionCreateCopy );
       this.widgdChoiceCreateNew.setBackColor(GralColor.getColor("lam"), 0);
     }
-    //if(sBtnDstExec !=null) {
-      this.widgBtnExec = new GralButton(refPos, "@+0-3.5, -15..-1=BtnExec-" + name, "exec-?", this.actionButtonOk);
-    //}
+    this.widgBtnExec = new GralButton(refPos, "@+0-3, -15..-1=BtnExec-" + name, "exec-?", this.actionButtonOk);
 
     //field for showing the current action or state, not for input:
     //field for showing the current name, not for input:
@@ -372,6 +379,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
       this.bFirstSelect = true;
       this.filesToCopy.clear();                 // list todo remove.
       this.widgSrcSelection.setText("");
+      this.widgSrcSelection.setText("**/*");
       FileRemote[] srcDirFile = getSrcDstFileDir(false, this.widgSrcDir, this.widgSrcSelection);
       this.srcDir = srcDirFile[0]; 
       this.srcFile = srcDirFile[1];
@@ -905,6 +913,7 @@ public final class FcmdCopyCmprDel extends FcmdFileActionBase
         int bMaskSel = this.widgButtonSetSymbolicLinks.isOn() ? 0 :  FileMark.ignoreSymbolicLinks;
         int modeCmpOper = cond | FileCompare.withoutLineend; 
         this.srcDir.cmprDirTreeTo(false, this.dirDst, sSrcMask, bMaskSel, modeCmpOper, this.progress.evBack);
+        this.widgSrcSelection.setText("?+#^"); // after them select the compare result for copy as default.
       }
       //setTexts(Estate.busy);
     } else {

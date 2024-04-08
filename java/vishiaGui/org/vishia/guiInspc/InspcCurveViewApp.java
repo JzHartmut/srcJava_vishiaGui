@@ -39,7 +39,7 @@ public class InspcCurveViewApp
   /**Version, history and license. 
    * <ul>
    * <li>2024-03-02 Answer telegram if 50 telegrams are received (should be parameterizable? )
-   *   Now ping-pong with C program (Simulation) works. 
+   *   Now ping-pong (requ/ackn) works with C program (Simulation). 
    * <li>2024-03-01 closes {@link FileAccessorLocalJava7} on finish, and also the receive thread.
    *   Elsewhere a process in windows is persistent which blocks the socket. 
    *   It was a serious error because it is hard to detect on run time. 
