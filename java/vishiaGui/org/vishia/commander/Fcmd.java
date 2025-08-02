@@ -11,8 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.script.ScriptException;
+
+import org.vishia.cmd.CmdExecuter;
 import org.vishia.cmd.CmdGetterArguments;
 import org.vishia.cmd.JZtxtcmdScript;
+import org.vishia.cmd.CmdExecuter.CmdQueueEntry;
 import org.vishia.cmd.JZtxtcmdScript.JZcmdClass;
 import org.vishia.cmd.JZtxtcmdScript.Subroutine;
 import org.vishia.commander.target.FcmdtTarget;
@@ -24,6 +28,7 @@ import org.vishia.fileRemote.FileRemote;
 import org.vishia.gral.base.GralMenu;
 import org.vishia.gral.base.GralPanelContent;
 import org.vishia.gral.base.GuiCallingArgs;
+import org.vishia.gral.ifc.GralColor;
 import org.vishia.gral.ifc.GralWindow_ifc;
 import org.vishia.gral.widget.GralFileProperties;
 import org.vishia.gral.widget.GralFileSelector;
@@ -82,7 +87,7 @@ public class Fcmd //extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2024-02-17";
+  public static final String version = "2025-08-02";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -112,7 +117,7 @@ public class Fcmd //extends GuiCfg
     
     //@Override 
     // not used, old concept with old arguments
-    protected boolean XXXtestArgument(String arg, int nArg) throws FileNotFoundException
+    protected boolean XXXtestArgument(String arg, int nArg) throws IOException
     {
       boolean bOk = true;
       this.dirCfg = new File(arg.substring(4));
@@ -503,21 +508,22 @@ public class Fcmd //extends GuiCfg
       this.gui.writeError("Argument sel:SELECTFILE should be given.");
       // mainCmd.e
     } else {
-      String sError = null;
+      String sError = null, sError1;
       File fileCfg = cargs.fileCfgCmds;
-      if (sError == null) {
-        //sError = executer.readCmdFile(fileCfg = cargs.fileCmdsForExt);
-        sError = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
+      sError1 = executer.readCfgExt(new File(cargs.dirCfg, "extjz.cfg"));
+      if (sError1 != null) {
+        this.gui.writeError("Error readCfgExt " + fileCfg.getAbsolutePath() + ": " + sError1);
+        sError = sError1;
       }
-      if (sError == null) {
-        sError = JZtxtcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, this.gui.gralMng.log, executer.cmdExecuter);
+      sError1 = JZtxtcmd.readJZcmdCfg(addButtonCmd, fileCfg = cargs.fileCfgButtonCmds, this.gui.gralMng.log, executer.cmdExecuter);
+      if (sError1 != null) {
+        this.gui.writeError("Error readJZcmdCfg " + fileCfg.getAbsolutePath() + ": " + sError1);
+        sError = sError1;
       }
-      if (sError == null) {
-        sError = this.favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
-      }
-      if (sError != null) {
-        this.gui.writeError("Error reading " + fileCfg.getAbsolutePath() + ": "
-            + sError);
+      sError1 = this.favorPathSelector.readCfg(fileCfg = cargs.fileSelectTabPaths);
+      if (sError1 != null) {
+        this.gui.writeError("Error favorPathSelector " + fileCfg.getAbsolutePath() + ": " + sError1);
+        sError = sError1;
       }
       initGuiAreas();
       sError = this.executer.readCmdCfgSelectList(executer.cmdSelector.addJZsub2SelectTable, fileCfg, this.gui.log());
@@ -558,15 +564,35 @@ public class Fcmd //extends GuiCfg
         return null;
       }
       
-    };
-    
-    //executer.cmdQueue.execCmds(writeStatusCmd);
-    executer.cmdExecuter.executeCmdQueue(false);
+    };  // writeStatus
+    //=========================================== 
+    CmdQueueEntry e = null;
+    while( this.executer.cmdExecuter.cmdQueue !=null && (e = this.executer.cmdExecuter.cmdQueue.poll())!=null) {
+      this.statusLine.widgRunInfo.setBackColor(GralColor.getColor("lrd"), 0);
+      if(e.jzsub !=null) {
+        try{ this.executer.cmdExecuter.jzcmdExecuter.execSub(e.jzsub, e.args, true, e.out1, e.currentDir, this.executer.cmdExecuter);
+        } catch(ScriptException exc){ 
+          String text = "\nexecuteCmdQueue JZsub, scriptexception: " + exc.getMessage();
+          try{ e.out1.append(text); } catch(IOException exc1){}
+        }
+        if(e.executeAfterFinish !=null) {
+          e.executeAfterFinish.exec(0, e.out1, null);
+        }
+      } else {
+        if(e.currentDir !=null) {
+          this.executer.cmdExecuter.setCurrentDir(e.currentDir);
+        }
+        e.errorCmd = this.executer.cmdExecuter.execute(e.cmd, false, e.input, e.out, e.err, e.executeAfterFinish);  //invokes executeAfterFinis if given, after command.
+      }
+    }
+    //replaced: executer.cmdExecuter.executeCmdQueue(false);
+    this.statusLine.widgRunInfo.setBackColor(GralColor.getColor("gn"), 0);
+    //
     long time = System.currentTimeMillis();
     this.favorPathSelector.panelLeft.checkRefresh(time);
     this.favorPathSelector.panelMid.checkRefresh(time);
     this.favorPathSelector.panelRight.checkRefresh(time);
-    try { Thread.sleep(50); } catch (InterruptedException e) { }
+    try { Thread.sleep(50); } catch (InterruptedException exc) { }
     
   }
   

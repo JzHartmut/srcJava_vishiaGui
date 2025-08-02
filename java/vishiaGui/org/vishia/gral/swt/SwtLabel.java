@@ -94,6 +94,8 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
     GralFont gralFont = swtMng.gralMng.gralProps.getTextFont(height);
     Font swtFont = swtMng.propertiesGuiSwt.fontSwt(gralFont);
     this.labelSwt.setFont(swtFont);
+    this.widgg._fontId = swtFont.hashCode();
+
     FontData[] fontData = swtFont.getFontData();
     float fontHeigth = fontData[0].height;
     System.out.println(super.dyda().displayedText + " dy=" + rectangle.dy + " height=" + height + " fontHeight = " + fontHeigth);
@@ -138,6 +140,7 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
           if(dyda.textFont !=null){
             fontSwt = props.fontSwt(dyda.textFont);
             labelSwt.setFont(fontSwt);
+            this.widgg._fontId = fontSwt.hashCode();
           }
           if(dyda.textColor !=null){
             labelSwt.setForeground(props.colorSwt(dyda.textColor));
@@ -147,7 +150,11 @@ public class SwtLabel extends GralLabel.GraphicImplAccess
           }
         }
         if((chg & chgText) !=0 && dyda.displayedText !=null){ 
-          labelSwt.setText(dyda.displayedText);
+          String sText = dyda.displayedText;
+          if(sText.startsWith("<&@&fontId>")) {
+            sText = Integer.toHexString(super.widgg._fontId) + sText.substring(11);
+          }
+          labelSwt.setText(sText);
           //font.getFontData()[0].
           Point textSize = labelSwt.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
           //int width = sText.length();

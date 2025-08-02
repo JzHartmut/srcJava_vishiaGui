@@ -293,7 +293,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
 
   @Override
   public void setBoundsPixel(int x, int y, int dx, int dy) {
-    SwtTable.this.swtWidgHelper.widgetSwt.setBounds(x, y, dx, dy);
+    SwtTable.this.swtWidgHelper.widgetSwt.setBounds(x, y-2, dx, dy+4);
 
   }
 
@@ -480,7 +480,7 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
           int xleft = this.xpixelCell[col] + treeDepth * this.xPixelUnit;
           int xRight = this.xpixelCell[col+1] + (col < (super.nrofColumnTreeShift-1) ?  treeDepth * this.xPixelUnit : 0);
           int yTop = cellData.ixCellLine * this.linePixel;
-          cellSwt.setBounds(xleft, yTop, xRight - xleft, this.linePixel);
+          cellSwt.setBounds(xleft, yTop-2, xRight - xleft, this.linePixel+4);
         }
         //
         if(line.wasCelltextSet(col) || bChangedLinesForCell()) {

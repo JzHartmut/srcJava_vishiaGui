@@ -142,7 +142,7 @@ public class GuiCallingArgs extends Arguments
    *          the application should be aborted.
    * @throws FileNotFoundException 
    */
-  @Override protected boolean testArgument(String arg, int nArg) throws FileNotFoundException { 
+  @Override protected boolean testArgument(String arg, int nArg) throws IOException { 
     boolean bOk = true;  //set to false if the argc is not passed
     GuiCallingArgs cargs = this;
     String value;

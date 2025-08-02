@@ -73,7 +73,7 @@ public class GuiDropFiles {
       super("GuiDropFiles example");
     }
 
-    @Override final protected boolean testArgument(String arg, int nArg) throws FileNotFoundException {
+    @Override final protected boolean testArgument(String arg, int nArg) throws IOException {
       boolean bOk = true;  //set to false if the argc is not passed
       String value;
       if( (value = checkArgVal("-jzTc", arg)) !=null) {       

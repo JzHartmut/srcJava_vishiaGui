@@ -608,6 +608,9 @@ public abstract class GralWidget extends GralWidgetBase implements GralWidget_if
   long lastTimeSetVisible = 0;
 
   protected long dateUser;
+  
+  public int _fontId;
+
 
   /**This inner class holds the dynamic data of a widget.
    * This data are existent for any widget independent of its type.
