@@ -755,7 +755,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
       GralMenu menuFolder = this.widgdPathDir.getContextMenu();
       menuFolder.addMenuItem("x", "refresh [cR]", thisf.action.actionRefreshFileTable);
       menuFolder.addMenuItem("g", "get filename [cN]", thisf.action.actionGetFileName);
-      final int[] columns1 = columns !=null ? columns : new int[]{2,0,-6,-12};
+      final int[] columns1 = columns !=null ? columns : new int[]{4, 0,-6,-12};
       this.widgSelectList = thisf.new FileSelectList(refPos, thisf, posFileTable + thisf.name, rows, columns1);
       if(this.widgFavorTable !=null) {
         this.widgSelectList.setVisible(false);

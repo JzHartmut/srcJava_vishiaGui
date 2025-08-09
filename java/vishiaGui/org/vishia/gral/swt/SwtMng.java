@@ -177,6 +177,8 @@ public class SwtMng extends GralMng.ImplAccess // implements GralMngBuild_ifc, G
   //@SuppressWarnings("hiding")
   public final static String version = "2022-10-27";
   
+  public final String sOS = System.getProperty("OS");
+  public final boolean bLinux = sOS == null || !sOS.contains("indows"); 
   
   /**Gets the SwtMng instance for the given implementation Widget from the {@link GralWidget#gralMng}.
    * Note: It is a quest of effort, simplicity or universality where to use only one instance for the GralMng and SwtMng

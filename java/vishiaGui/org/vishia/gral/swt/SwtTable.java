@@ -632,13 +632,17 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
     int yPix = 0;
     //int xPixelUnit = swtWidgHelper.mng.mng.propertiesGui.xPixelUnit();
     int ixrow = 0;
+    int dy = this.linePixel;
+    if(this.swtWidgHelper.mng.bLinux) {
+      dy +=4;
+    }
     for(Text[] row: this.cellsSwt){
       if(ixrow < zLineVisible) {
         int ixColumn = 0;
         for(Text cell: row){
           ///cell.setVisible(true);
           int xleft = 0;
-          cell.setBounds(xleft + this.xpixelCell[ixColumn], yPix, this.xpixelCell[ixColumn+1] - this.xpixelCell[ixColumn], this.linePixel);
+          cell.setBounds(xleft + this.xpixelCell[ixColumn], yPix, this.xpixelCell[ixColumn+1] - this.xpixelCell[ixColumn], dy);
           ixColumn +=1;
         }
         yPix += this.linePixel;

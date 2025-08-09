@@ -381,10 +381,14 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     }
   }
 
-  @Override public void setBoundsPixel(int x, int y, int dx, int dy) { 
+  @Override public void setBoundsPixel(int x_, int y_, int dx_, int dy_) { 
     //throw new IllegalStateException("should not called because setPosBounds() is overridden.");
+    int x = x_; int y = y_; int dx = dx_; int dy = dy_;
+    if(this.swtWidgHelper.mng.bLinux) {
+      x -=1; dx +=2; y -=2; dy +=4;
+    }
     if(this.posPrompt ==null) {
-      this.textFieldSwt.setBounds(x-1,y-2,dx+2,dy+4);  // without border it's the correct bounds
+      this.textFieldSwt.setBounds(x,y,dx,dy);  // without border it's the correct bounds
     } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
       int yPrompt = (dy+2) / 3 ;     //+4           // should follow the text size, todo...
       int yText = dy - yPrompt;
@@ -392,11 +396,15 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
       this.promptSwt.setBounds(x-1, y-2, dx, yPrompt+1);
       //this.textFieldSwt.setBounds(x, y + dy - yPrompt, dx, dy - yPrompt);
       int dy2 = dy - yPrompt;
-      this.textFieldSwt.setBounds(x, y + yPrompt-2, dx, dy2+4);
+      if(this.swtWidgHelper.mng.bLinux) {
+        this.textFieldSwt.setBounds(x, y + yPrompt-2, dx, dy2+4);
+      } else {
+        this.textFieldSwt.setBounds(x, y + yPrompt, dx, dy2);
+      }
       //this.textFieldSwt.setBounds(x, y + dy - yPrompt-2, dx, dy - yPrompt+5);
     } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
       this.promptSwt.setBounds(x + dx, y, dx, dy);
-      this.textFieldSwt.setBounds(x-1, y-2, dx+2, dy+4);
+      this.textFieldSwt.setBounds(x, y, dx, dy);
     }
   }
   
