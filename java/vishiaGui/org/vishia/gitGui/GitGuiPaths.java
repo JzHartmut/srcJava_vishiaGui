@@ -13,7 +13,7 @@ public class GitGuiPaths {
   public String gitsh_exe = "'C:\\Program Files\\git\\bin\\sh.exe' -x -c";
   
   /**Difftool, should be written with \ because it is used as Windows cmd invocation. */
-  public String diff_exe = "c:\\Programs\\WinMerge-2.12.4-exe\\WinMerge.exe";
+  public String diff_exe = "fdiff.bat"; //"c:\\Programs\\WinMerge-2.12.4-exe\\WinMerge.exe";
   
   File dirTemp1 = new File("t:/git_tmp1");
   File dirTemp2 = new File("t:/git_tmp2");

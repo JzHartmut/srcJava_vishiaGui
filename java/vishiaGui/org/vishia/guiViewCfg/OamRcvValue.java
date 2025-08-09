@@ -242,7 +242,7 @@ public class OamRcvValue implements Runnable
           System.out.append('x');
         }
       }
-    } else {
+    } else if(result[0] < 0){                 // only on receive error
       this.bTargetAddrValid = false;
       System.out.println("error receive");
     }
