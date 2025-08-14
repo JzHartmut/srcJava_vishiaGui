@@ -506,8 +506,7 @@ public abstract class GralWidgetBase implements GralWidgetBase_ifc, ToStringBuil
   public boolean createImplWidget_Gthread() throws IllegalStateException {
     if(this._cdata !=null) {                           // is it a composite widget? a Panel or comprehensive widget?
       for(GralWidgetBase widg: this._cdata.widgetList) {
-        if(widg instanceof org.vishia.gral.widget.GralFileSelector)
-          Debugutil.stop();
+        //if(widg instanceof org.vishia.gral.widget.GralFileSelector) Debugutil.stopp();
         widg.createImplWidget_Gthread();               // recursively call of same for all members.
       }
       return true;

@@ -1353,7 +1353,7 @@ public class GralFileSelector extends GralWidgetBase implements Removeable //ext
     } else {
       this.gralMng.log.sendMsg(GralMng.LogMsg.gralFileSelector_fillin, "fillin sGralFileSelector: " + dir );
     }
-    this.gui.widgdPathDir.setText(this.idata.sCurrentDir);    // set directory string, caret on end
+    this.gui.widgdPathDir.setText(this.idata.sCurrentDir + "/");    // set directory string, caret on end
     if(!bSameDirectory || !this.gui.widgSelectList.wdgdTable.fillinPending()){      //new request anytime if other directory, or if it is not pending.
       this.gui.widgSelectList.wdgdTable.fillinPending(true);
       System.out.println("FcmdFileCard - start fillin; " + this.idata.sCurrentDir + (bSameDirectory ? "; same" : "; new"));

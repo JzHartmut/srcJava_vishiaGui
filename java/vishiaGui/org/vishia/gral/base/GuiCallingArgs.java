@@ -10,6 +10,7 @@ import org.vishia.gral.awt.AwtFactory;
 import org.vishia.gral.ifc.GralFactory;
 import org.vishia.gral.swt.SwtFactory;
 import org.vishia.util.Arguments;
+import org.vishia.util.Debugutil;
 
 /**The standard command-line-arguments for a graphic application are stored in an extra class. 
  * This class should be the base class for users command line argument storage.
@@ -149,9 +150,11 @@ public class GuiCallingArgs extends Arguments
     if( (value = checkArgVal("-title", arg)) !=null) {       
       cargs.sTitle = value;  //the graphic GUI-appearance
     }
-    else if((value = checkArgVal("-gui", arg)) !=null)      
-    { cargs.fileGuiCfg = new File(System.getProperty("user.dir"), value);  //the graphic GUI-appearance
-    
+    else if((value = checkArgVal("-gui", arg)) !=null) { 
+      cargs.fileGuiCfg = new File(System.getProperty("user.dir"), value);  //the graphic GUI-appearance
+      if(!cargs.fileGuiCfg.exists()) {
+        Debugutil.stopp();  
+      }
     }
     else if((value = checkArgVal("-jzTc", arg)) !=null) {      
       cargs.fileJzTc = new File(System.getProperty("user.dir"), value);  //the graphic JzTxtCmd script file

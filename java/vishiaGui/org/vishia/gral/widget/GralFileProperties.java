@@ -223,7 +223,7 @@ public class GralFileProperties extends GralWidgetBase {
     //main.gralMng.addText("directory"); 
     
     //bUnixSystem = true;
-    if(bUnixSystem){
+    if(false && bUnixSystem){
 //      main.gui.gralMng.setPosition(20, GralPos.size -2, 10, 28, 'd');
 //      widGetAllProps = new GralButton("buttonFilePropsGetAll", actionButton, "getAll", null, main.idents.buttonFilePropsGetAll);
 //
@@ -393,7 +393,7 @@ public class GralFileProperties extends GralWidgetBase {
         this.widgRd[0].setState((this.nFlagsOriginal & FileRemote.mCanRead)!=0 ? GralButton.State.On : GralButton.State.Off);
         this.widgEx[0].setState((this.nFlagsOriginal & FileRemote.mExecute)!=0 ? GralButton.State.On : GralButton.State.Off);
         this.widgWr[0].setState((this.nFlagsOriginal & FileRemote.mCanWrite)!=0 ? GralButton.State.On : GralButton.State.Off);
-        if(this.bUnixSystem){
+        if(false && this.bUnixSystem){
           this.widgRd[1].setState(GralButton.State.Disabled);
           this.widgRd[2].setState(GralButton.State.Disabled);
           this.widgWr[1].setState(GralButton.State.Disabled);

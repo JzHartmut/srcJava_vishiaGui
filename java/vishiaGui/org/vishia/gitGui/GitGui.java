@@ -1211,7 +1211,7 @@ public class GitGui
     wdgCmd.setText(sGitCmd);
     String[] args = prepArgs(sGitCmd); //{exepath.gitsh_exe, "-x", "-c", sGitCmd};
     gitCmd.clearCmdQueue();
-    gitCmd.abortCmd();
+    gitCmd.abortCmd(false);
     gitOut.buffer().setLength(0);
     gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     gitCmd.addCmd(args, null, listOut, null, workingDir, exec_fillRevisionTable);
@@ -1332,7 +1332,7 @@ public class GitGui
     //
     //abort the current cmd for diff view (or any other)
     gitCmd.clearCmdQueue();
-    gitCmd.abortCmd();
+    gitCmd.abortCmd(false);
     gitOut.buffer().setLength(0);
     gitOut.assign(gitOut.buffer());   //to reset positions to the changed gitOut.buffer()
     //

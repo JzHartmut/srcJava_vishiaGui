@@ -61,7 +61,7 @@ param::=<?>
 {
 [ [%top<?promptPosition=t>|%t<?promptPosition=t>|%r<?promptPosition=r>] : [<""?prompt> | <*,)?prompt>]
 | cmd =  [<""?cmd>|\[<*\]?cmd>\]] 
-| text = [<""?text>|<$-/?text>] 
+| text = [<""?text>|<$-/?text>]        ## if name is given, the text is used as widget text for example in text field.
 | name = [<""?name>|<$-/?name>] 
 | info = [<""?data>|<$-/?data>] 
 | data = [<""?data>|<*,);\ ?data>] 

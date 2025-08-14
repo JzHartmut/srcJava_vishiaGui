@@ -79,6 +79,10 @@ public class FcmdStatusLine
     this.main.gui.gralMng.setPosition(2, 4, 0, 9.8f, 'r');
     this.widgRunInfo = this.main.gui.gralMng.addTextField(this.main.nameTextFieldRunInfo, false, null, null);
     this.widgRunInfo.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.runInfo.");
+    menuWidg = this.widgRunInfo.getContextMenu();
+    menuWidg.addMenuItem("actionAbortExecProcess", this.main.idents.menuContextAbortExecution, this.main.executer.actionAbortExecProcess);
+    menuWidg.addMenuItem("actionKillExecProcess", this.main.idents.menuContextKillExecution, this.main.executer.actionKillExecProcess);
+    
     this.main.gui.gralMng.setPosition(2, 4, 10, -8, 'r');
     this.widgFileInfo = this.main.gui.gralMng.addTextField(this.main.nameTextFieldInfo, false, null, null);
     this.widgFileInfo.setHtmlHelp(this.main.cargs.dirHtmlHelp + "/Fcmd.html#Topic.FcmdHelp.layout.fileInfo.");
@@ -156,7 +160,6 @@ public class FcmdStatusLine
       return true;
     }    
   };
-
 
 
 }

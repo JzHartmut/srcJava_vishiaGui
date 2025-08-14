@@ -135,8 +135,7 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
   private SwtTextFieldWrapper(GralTextField widgg, SwtMng swtMng, boolean bbox)
   {
     widgg.super(widgg, swtMng);                            //NOTE: superclass is a non static inner class of GralTextField. 
-    if(widgg.name !=null && widgg.name.startsWith("showSrc"))
-      Debugutil.stop();
+    //if(widgg.name !=null && widgg.name.startsWith("infoLine-panelFile")) Debugutil.stopp();
     this.bbox = bbox;
     Composite panelSwt = SwtMng.getWidgetsPanel(widgg);
     //in ctor: setPanelMng(mng);
@@ -385,22 +384,23 @@ public class SwtTextFieldWrapper extends GralTextField.GraphicImplAccess
     //throw new IllegalStateException("should not called because setPosBounds() is overridden.");
     int x = x_; int y = y_; int dx = dx_; int dy = dy_;
     if(this.swtWidgHelper.mng.bLinux) {
-      x -=1; dx +=2; y -=2; dy +=4;
+      x -=1; dx +=2; y -=0; dy +=4;
     }
     if(this.posPrompt ==null) {
       this.textFieldSwt.setBounds(x,y,dx,dy);  // without border it's the correct bounds
     } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("t")){
-      int yPrompt = (dy+2) / 3 ;     //+4           // should follow the text size, todo...
-      int yText = dy - yPrompt;
+      int dyPrompt = (dy+2) / 3 ;     //+4           // should follow the text size, todo...
+      int yText = dy - dyPrompt;
       //if(yPrompt < 7) { yPrompt = 7; }
-      this.promptSwt.setBounds(x-1, y-2, dx, yPrompt+1);
       //this.textFieldSwt.setBounds(x, y + dy - yPrompt, dx, dy - yPrompt);
-      int dy2 = dy - yPrompt;
+      int dy2 = dy - dyPrompt;
       if(this.swtWidgHelper.mng.bLinux) {
-        this.textFieldSwt.setBounds(x, y + yPrompt-2, dx, dy2+4);
+        this.textFieldSwt.setBounds(x, y + dyPrompt-4, dx, dy2+4);
       } else {
-        this.textFieldSwt.setBounds(x, y + yPrompt, dx, dy2);
+        this.textFieldSwt.setBounds(x, y + dyPrompt, dx, dy2);
       }
+      this.promptSwt.setBounds(x-1, y, dx, dyPrompt+1);
+      
       //this.textFieldSwt.setBounds(x, y + dy - yPrompt-2, dx, dy - yPrompt+5);
     } else if(prompt() != null && promptStylePosition() !=null && promptStylePosition().startsWith("r")){
       this.promptSwt.setBounds(x + dx, y, dx, dy);

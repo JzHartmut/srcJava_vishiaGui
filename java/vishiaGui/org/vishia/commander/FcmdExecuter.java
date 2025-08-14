@@ -416,13 +416,29 @@ public class FcmdExecuter
   GralUserAction actionCmdAbort = new GralUserAction("actionCmdAbort")
   { @Override public boolean userActionGui(int key, GralWidget widgd, Object... params)
     { //cmdQueue.abortCmd();
-      cmdExecuter.abortAllCmds();
+      FcmdExecuter.this.cmdExecuter.abortAllCmds();
       return true;
     }
   };
   
 
-  
+  /** actionAbortExecProcess*/
+  GralUserAction actionAbortExecProcess = new GralUserAction("actionAbortExecProcess"){
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
+      FcmdExecuter.this.cmdExecuter.abortCmd(false);
+      return true;
+    }    
+  };
+
+
+  /** actionAbortExecProcess*/
+  GralUserAction actionKillExecProcess = new GralUserAction("actionAbortExecProcess"){
+    @Override public boolean userActionGui(int key, GralWidget infos, Object... params) {
+      FcmdExecuter.this.cmdExecuter.abortCmd(true);  //forcibly
+      return true;
+    }    
+  };
+
 
   
 

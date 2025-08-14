@@ -641,8 +641,11 @@ public class SwtTable  extends GralTable<?>.GraphicImplAccess implements GralWid
         int ixColumn = 0;
         for(Text cell: row){
           ///cell.setVisible(true);
-          int xleft = 0;
-          cell.setBounds(xleft + this.xpixelCell[ixColumn], yPix, this.xpixelCell[ixColumn+1] - this.xpixelCell[ixColumn], dy);
+          int x1Pix = this.xpixelCell[ixColumn];
+          int dxPix = this.xpixelCell[ixColumn+1] - this.xpixelCell[ixColumn];
+          cell.setBounds(x1Pix, yPix, dxPix, dy);
+          //@SuppressWarnings("unused") Rectangle boundsDbg_ = cell.getBounds();
+          //@SuppressWarnings("unused") Rectangle boundsParentDbg_ = cell.getParent().getBounds();
           ixColumn +=1;
         }
         yPix += this.linePixel;

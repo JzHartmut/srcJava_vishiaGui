@@ -56,7 +56,9 @@ public class FcmdIdents extends FcmdIdentsBase
   String menuContextShowBackslash = "backslash\\path (Windows)";
   String menuContextShowSlash = "slash path (compatible)";
   
-  
+  String menuContextAbortExecution = "abort exec-process";
+  String menuContextKillExecution = "kill exec-process";
+   
   String menuBarFolderSyncMidRight = "fol&Der/s&Ync mid - right";
   
 

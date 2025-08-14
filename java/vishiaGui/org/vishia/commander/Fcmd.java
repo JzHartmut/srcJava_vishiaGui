@@ -87,7 +87,7 @@ public class Fcmd //extends GuiCfg
    * @author Hartmut Schorrig = hartmut.schorrig@vishia.de
    */
   //@SuppressWarnings("hiding")
-  public static final String version = "2025-08-09";
+  public static final String version = "2025-08-14";
 
   
   static class CallingArgs extends GuiCallingArgs
@@ -180,7 +180,17 @@ public class Fcmd //extends GuiCfg
   /**This implementation resolves the arguments for invoked commands with the capabilities of the Fcmd.
    * Especially the following argument strings are supported:
    * <ul>
-   * <li>
+   * <li><code>file1</code> <code>file2</code> <code>file3</code>:
+   *   The file {@link FileRemote} instance in the first (current focused), second and third panel. 
+   *   If a directory is selected, this is <code>file1</code> till <code>file3</code>.
+   * <li><code>dir1</code>:
+   *   The directory as {@link FileRemote} instance in the first (current focused) panel as parent of the selected file. 
+   * <li><code>dir2</code> <code>dir3</code>:
+   *   Only if at least two or three File panels were selected, it get from the {@link FcmdLeftMidRightPanel#actFileCard}.
+   *   Only if this is set then from this 'actFileCard' {@link FcmdFileCard#getCurrentDir()} is gotten.
+   *   This is also a{@link FileRemote} instance. 
+   * <li><code>listfiles1</code> <code>listfiles2</code> <code>listfiles3</code>:
+   *   TODO exact description, the list of current files from this panel.
    * </ul>
    * This instance is used only locally (private). It is designated as protected for documentation.
    */

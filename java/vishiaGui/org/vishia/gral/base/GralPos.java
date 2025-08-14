@@ -1211,7 +1211,7 @@ public class GralPos implements Cloneable, ToStringBuilder
 //        : widthParentPixel - (-y2g * xPixelUnit + propertiesGui.xPixelFrac(y2i));
       }
     }
-    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1-1, y2-y1-1);
+    GralRectangle rectangle = new GralRectangle(x1, y1, x2-x1, y2-y1);
     return rectangle;
   }
 

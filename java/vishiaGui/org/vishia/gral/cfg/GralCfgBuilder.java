@@ -206,6 +206,8 @@ public class GralCfgBuilder
       for(GralCfgElement cfge: cfgPanel.listElements){
         //=================>>
         String sErrorWidgd;
+        //if(cfge.widgetType.name.equals("table1")) Debugutil.stopp();
+        //if(cfge.widgetType.whatIs == 'l') Debugutil.stopp();
         try{
           //======>>>>
           sErrorWidgd = buildWidget(cfge, parentPanel); 
@@ -555,6 +557,12 @@ public class GralCfgBuilder
       }
       if(sDataPath !=null) {
         widgd.setDataPath(sDataPath);
+      }
+      if(cfge.widgetType.text !=null) {
+        //if(cfge.widgetType.text.equals("T_qg")) Debugutil.stopp();
+        if(cfge.widgetType.name !=null) {
+          widgd.setText(cfge.widgetType.text);
+        }
       }
       //save the configuration element as association from the widget.
       widgd.setCfgElement(cfge);
