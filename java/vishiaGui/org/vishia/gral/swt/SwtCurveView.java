@@ -128,7 +128,7 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
     }
     dyda().acknChanged(acknChg);
     this.timeRepaintCall = System.currentTimeMillis(); //nanoTime();
-    //System.out.println("repaint req");
+    //System.out.println("redraw req");
     curveSwt.redraw();
   }
 
@@ -421,6 +421,8 @@ public class SwtCurveView extends GralCurveView.GraphicImplAccess
         super.redrawBecauseNewData = false;  //it is done.
       }
       int ixd1pix = super._dataimpl.dataIxToShow[super.xpCursor1+1] - super._dataimpl.dataIxToShow[super.xpCursor1+2]; //~ ixData diff 1 pixel
+      System.out.printf("\ndrawBackGround 123 %b %b", redrawBecauseNewData1, redrawAll);
+      redrawAll = true;
       //
       //detect how many new data are given. Because the data are written in another thread,
       //the number of data, the write index are accessed only one time from this
